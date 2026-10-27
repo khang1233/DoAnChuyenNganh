@@ -1,0 +1,17 @@
+title: Autonomous CTI Detection - Anthropic Expands Claude Access for Vetted Cyber Teams as Glasswing Finds 129,000 Flaws [CVE-2020-29583]
+status: experimental
+description: Auto-generated Sigma rule from Live Threat Feeds
+author: Autonomous CTI AI Agent
+tags:
+  - attack.t1059.001
+  - attack.t1190
+logsource:
+  category: network_connection
+  product: windows
+detection:
+  selection_c2:
+    DestinationIp:
+      - '34.140.212.230'
+      - '0112532.com'
+  condition: selection_c2
+level: critical

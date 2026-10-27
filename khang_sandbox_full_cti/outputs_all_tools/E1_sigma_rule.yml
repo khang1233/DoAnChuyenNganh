@@ -1,0 +1,88 @@
+title: Web Exploit Attempt - [CVE-2026-83548] SonicWall SMA1000 Appliances — SonicWall SMA1000
+id: 9b4a2c10-8e3f-4d2a-b7c1-070045000001
+status: production
+description: >
+  Detects potential exploitation attempts targeting CVE-2026-83548.
+  Monitors web server and reverse proxy logs for unauthorized traversal, exploit parameters, or CVE strings.
+author: Autonomous CTI AI Agent (Phuc Core & Khang Security)
+date: 2026/10/16
+tags:
+  - attack.t1190
+  - attack.initial_access
+  - cve.cve.2026.83548
+logsource:
+  category: webserver
+  product: apache_nginx_iis_webapps
+detection:
+  selection_cve_uri:
+    cs-uri-stem|contains:
+      - 'CVE-2026-83548'
+      - '/api/'
+      - '/rest/'
+      - '/admin/'
+      - '/login'
+  selection_exploit_payloads:
+    cs-uri-query|contains:
+      - '..'
+      - '%2e%2e'
+      - '%252e%252e'
+      - 'WEB-INF'
+      - 'META-INF'
+      - 'cmd='
+      - 'exec='
+      - '${jndi:'
+  selection_status:
+    sc-status:
+      - 200
+      - 302
+      - 500
+  condition: (selection_cve_uri and selection_exploit_payloads) or (selection_cve_uri and selection_status)
+falsepositives:
+  - Legitimate security vulnerability scanning or authorized testing
+level: critical
+---
+title: Post-Exploitation Child Process Creation - [CVE-2026-83548] SonicWall SMA1000 Appliances — SonicWall SM
+id: 9b4a2c10-8e3f-4d2a-b7c1-070045000002
+status: production
+description: >
+  Detects interactive command shells or system enumeration tools spawned by application servers
+  (Java/Tomcat/Atlassian/IIS/Nginx) following successful exploitation of CVE-2026-83548.
+author: Autonomous CTI AI Agent (Phuc Core & Khang Security)
+date: 2026/10/16
+tags:
+  - attack.t1190
+  - attack.t1059.001
+  - attack.t1059.003
+logsource:
+  category: process_creation
+  product: windows_and_linux
+detection:
+  selection_parent:
+    ParentImage|endswith:
+      - '\java.exe'
+      - '\tomcat.exe'
+      - '\tomcat8.exe'
+      - '\tomcat9.exe'
+      - '\w3wp.exe'
+      - '\httpd.exe'
+      - '\nginx.exe'
+      - '/java'
+      - '/httpd'
+      - '/nginx'
+  selection_child:
+    Image|endswith:
+      - '\cmd.exe'
+      - '\powershell.exe'
+      - '\pwsh.exe'
+      - '\whoami.exe'
+      - '\net.exe'
+      - '/bin/sh'
+      - '/bin/bash'
+      - '/usr/bin/id'
+      - '/usr/bin/whoami'
+      - '/usr/bin/curl'
+      - '/usr/bin/wget'
+  condition: selection_parent and selection_child
+falsepositives:
+  - Rare legitimate administrative deployment tasks
+level: critical

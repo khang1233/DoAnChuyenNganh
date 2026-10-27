@@ -1,0 +1,219 @@
+<AppLockerPolicy Version="1">
+  <RuleCollection Type="Exe" EnforcementMode="Enabled">
+    <FileHashRule Id="cti-sha256-1" Name="Block Malware Hash #1" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x4b9fbd0663fbfd6028fc216ed18e0d6ef3ae498a7fdc97083e4b0ce3cec40562" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-2" Name="Block Malware Hash #2" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x255869de85e2a171993fc5eb8a556d873a1b8966e040f6f55926f2fa2d595cc8" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-3" Name="Block Malware Hash #3" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0xde213ebc44c614d0b2324787e267183dbbbbb19e1ad866435a322ee00e24e7b6" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-4" Name="Block Malware Hash #4" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0xc77b3b7a507162bfc03cfeb8ef18d5ee7017e8fcbd6d7e005f986a3c967b8d45" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-5" Name="Block Malware Hash #5" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x4757f3d26bc7110e9c7f4da8050afc2ed661cd92aec9cf7d301d9b9b24e0b668" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-6" Name="Block Malware Hash #6" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0xb90e3aaae14e7787e5ea4a6d4beee672049bd5eb05427f2c80b64f605860d2b8" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-7" Name="Block Malware Hash #7" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x212d21ed1c4b5bd9b9104e04f2876842b99cd17def3591df72781891d584dca0" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-8" Name="Block Malware Hash #8" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x55ee2359b12fbce928532d1d4efcfbbbd63340502d0107466c803d6517b44437" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-9" Name="Block Malware Hash #9" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x0357032e1214ae11d7da8e00f6b89fb7694e240b17d05f2f47feaf43e96aa7d8" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-10" Name="Block Malware Hash #10" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x8886ca2b71501a6729f1ae868bd7d7b9b53c5cb6b5c7d851d041db4d6206945d" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-11" Name="Block Malware Hash #11" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x986d36b1c68c3e800596c4680dd6c67c42118955e08b472f641793c59dcd347b" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-12" Name="Block Malware Hash #12" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x2e1f6d7f24650b0720636efe48f2ccf59704ee6f11ffa52b5a4c4afcc474fe91" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-13" Name="Block Malware Hash #13" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0xe1667fe4e4ea98427960ea2eda7c53af1246ec58ac22282a6877d394a0957065" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-14" Name="Block Malware Hash #14" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0xe1e4fd74f673f1df9c039ae6424b36868a0475a043abea2dedd1f6f12a365ebf" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-15" Name="Block Malware Hash #15" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0xcb09ff86cabde4f8cee2d3cdec370c623bfa6c2b72ae9750fc9a7b299c65d7ca" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-16" Name="Block Malware Hash #16" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x3744f975113dfc552df982dcae699f9154a448e05a743bdfb641a463352bc13a" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-17" Name="Block Malware Hash #17" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0xff664112d3215c5d184689fc836e0dc6c1a47e42c34e70b2c3d356864bc4cb4c" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-18" Name="Block Malware Hash #18" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0xb8b4b88205a8f594b95a841bc37342898f34cad8a5a9e4a22ce69a31a1208650" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-19" Name="Block Malware Hash #19" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0xff3ab9ef841630364818396f62e696b72aed162cf0b895b6643ef25dad79b51d" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-20" Name="Block Malware Hash #20" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x232ef6be134c2b7c14648aa193daf7e23e987477b8a40150dd77883947fdf017" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-21" Name="Block Malware Hash #21" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x088d0742a667f1acfc83edb94671a10b951f6745badec6d5c754ef594dddf815" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-22" Name="Block Malware Hash #22" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x88544d36beb6dc621c9376806836d0ad109ece64b589605d5674e0c86313d1c0" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-23" Name="Block Malware Hash #23" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x9d3085eac9a59a94f0473db5ec0173def8777d2f794da281fb1749389ae33cdb" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-24" Name="Block Malware Hash #24" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x263c14e84398339b25cd3e59da7e108340306fdbb8112bbe7dc0f07a71eb8a31" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-25" Name="Block Malware Hash #25" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x12af9d95c44e20a375148c25f8a2978a62ee95489134654c3537ccfb2d42120d" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-26" Name="Block Malware Hash #26" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0xd9487fdc097f770e5661f9e5dee130068cb179d33716abff1a21c8cb901f25a6" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-27" Name="Block Malware Hash #27" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x8c2665adf8bfab65463f2a9bd1b7bb0231de3f5c1e6a2e51479e44aaac2e7bf0" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-28" Name="Block Malware Hash #28" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x4142d5efd4ea2abab77f2f0a917610e2ff976bf9e19d7ad1e9156eccdc5412db" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-29" Name="Block Malware Hash #29" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x2d4b4bb18b8445e49eeda571982874403befcecf78266e3d405f6529d98bee46" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-30" Name="Block Malware Hash #30" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x19021e53b9929fdf4b7d0e0707434d56bb73c1a9b7403c8837b44d1c417198dc" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-31" Name="Block Malware Hash #31" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x1795eacd2c58894ccdd6be8854fe6456c3b069a3a873432343b57b475b256aee" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-32" Name="Block Malware Hash #32" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x9dab845704d1999ec8ed089594cfd2173a08057f1caf9a2346c22c81039dbb7a" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-33" Name="Block Malware Hash #33" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x4b2d3e8ccce8920a6d01e7d02b84236545a20e5f754b3eec253f8b416b731daa" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-34" Name="Block Malware Hash #34" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x6328567511d88fdc2ae0939c5ef17b7a63d2a833881900de018a4f12f4982525" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-35" Name="Block Malware Hash #35" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x77b4fd46994992f0e57302cfe76ed23c0d90101381d2b89fc2ddf5c4536e77ca" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-36" Name="Block Malware Hash #36" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0xbaabf249c77bc54c54ab0e66e15af798bd28aa5b4683554456a8b73ab8741239" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-37" Name="Block Malware Hash #37" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0xe4503e31d5a297d93ade64f50a5b5fe91e73dad251ac2615b4c975684f68e080" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-38" Name="Block Malware Hash #38" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x7f8e9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-39" Name="Block Malware Hash #39" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-40" Name="Block Malware Hash #40" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x421a4ad2615941b177b6ec4ab5e239c14e62af2ab07c6df1741e2a62223223c4" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-41" Name="Block Malware Hash #41" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0xd8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-42" Name="Block Malware Hash #42" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="cti-sha256-43" Name="Block Malware Hash #43" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition><FileHash Data="0x8f4e2c1b9a7d3e5f6a8b0c2d4e6f8a0b2c4d6e8f0a2b4c6d8e0f2a4b6c8d0e2f" Type="SHA256" Length="0" /></FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+  </RuleCollection>
+</AppLockerPolicy>

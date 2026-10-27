@@ -1,0 +1,44 @@
+[
+  {
+    "Id": "8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a",
+    "Created": "2026-10-23T14:30:00.123456789Z",
+    "Path": "node",
+    "Args": ["server.js"],
+    "State": {
+      "Status": "running",
+      "Running": true,
+      "Pid": 1337
+    },
+    "Image": "sha256:vulnerable_web_app:latest",
+    "Config": {
+      "User": "",
+      "ExposedPorts": {
+        "80/tcp": {},
+        "443/tcp": {},
+        "8080/tcp": {}
+      },
+      "Env": [
+        "NODE_ENV=production",
+        "API_KEY=AKIAIOSFODNN7EX",
+        "DB_PASS=P@ssw0rd123SuperSecret!",
+        "AWS_SECRET=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+      ],
+      "Cmd": ["node", "server.js"],
+      "Healthcheck": null
+    },
+    "HostConfig": {
+      "Privileged": true,
+      "CapAdd": ["ALL", "SYS_ADMIN"],
+      "CapDrop": null,
+      "Binds": [
+        "/var/run/docker.sock:/var/run/docker.sock",
+        "/:/host_root:rw"
+      ],
+      "Memory": 0,
+      "NanoCpus": 0,
+      "CpuQuota": 0,
+      "SecurityOpt": null,
+      "ReadonlyRootfs": false
+    }
+  }
+]

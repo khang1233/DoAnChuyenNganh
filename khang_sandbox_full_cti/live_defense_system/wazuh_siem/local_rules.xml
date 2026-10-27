@@ -1,0 +1,39 @@
+<!-- ========================================================================= -->
+<!-- BẢN BIÊN DỊCH TỰ ĐỘNG SANG WAZUH SIEM LOCAL RULES (/var/ossec/etc/rules/)  -->
+<!-- Tổng hợp giám sát hành vi hậu khai thác (TTPs) từ kho CTI 3 năm (2024-2026) -->
+<!-- ========================================================================= -->
+<group name="local,openclaw_cti_defense,">
+  <!-- Quy tắc 1: Phát hiện máy trạm kết nối trực tiếp tới C2 IP nguy hại -->
+  <rule id="100910" level="14">
+    <if_group>sysmon_event3|firewall|ids</if_group>
+    <match>216.73.160.59|216.73.160.61|216.73.160.210|45.8.19.111|177.75.57.20|84.247.60.125|38.154.185.97|153.75.90.146|46.21.250.135|166.88.95.90|183.154.173.30|182.239.114.223|23.148.212.237|47.102.192.23|156.239.230.120|202.182.109.151|198.13.53.226|80.78.27.252|45.138.12.177|151.243.232.123|3.112.252.14|54.95.112.6|69.10.51.162|172.86.91.7|210.149.87.120|213.163.202.171|221.216.140.49|221.216.140.129|38.244.50.120|37.19.210.12|146.70.117.239|149.102.229.154|104.164.55.46|104.28.162.228|104.28.163.162|64.190.76.14|192.42.116.50|192.42.116.12|192.42.116.56|192.42.116.97|192.42.116.52|193.23.118.155|208.64.33.90|208.94.246.53|5.101.140.80</match>
+    <description>[CTI SIEM] Phát hiện kết nối mạng hai chiều tới máy chủ C2 độc hại</description>
+    <mitre>
+      <id>T1071.001</id>
+      <id>T1190</id>
+    </mitre>
+  </rule>
+
+  <!-- Quy tắc 2: Bắt hành vi Web Shell / RCE: Web server spawn tiến trình cmd / bash -->
+  <rule id="100911" level="15">
+    <if_group>sysmon_event1</if_group>
+    <match>w3wp.exe|httpd.exe|nginx.exe</match>
+    <regex>cmd.exe|powershell.exe|/bin/sh|/bin/bash|whoami|vssadmin</regex>
+    <description>[CTI SIEM] CẢNH BÁO NGUY CẤP: Máy chủ Web sinh tiến trình con bất thường (Web Shell / RCE Execution)</description>
+    <mitre>
+      <id>T1059.001</id>
+      <id>T1505.003</id>
+    </mitre>
+  </rule>
+
+  <!-- Quy tắc 3: Bắt hành vi xóa bản sao lưu chuẩn bị tống tiền Ransomware -->
+  <rule id="100912" level="15">
+    <if_group>sysmon_event1</if_group>
+    <match>vssadmin|wbadmin|bcdedit|cipher.exe</match>
+    <regex>delete\s+shadows|resize\s+shadowstorage|recoveryenabled\s+no</regex>
+    <description>[CTI SIEM] CẢNH BÁO NGUY CẤP: Hành vi phá hủy sao lưu hệ thống (Ransomware Defense Evasion)</description>
+    <mitre>
+      <id>T1490</id>
+    </mitre>
+  </rule>
+</group>

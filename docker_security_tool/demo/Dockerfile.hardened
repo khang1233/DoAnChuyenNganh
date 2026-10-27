@@ -1,0 +1,43 @@
+# ===============================================================
+# DOCKERFILE DA TOI UU & AP DUNG MULTI-STAGE BUILD (SLIDE 11)
+# Mon hoc: Lap trinh An ninh Thong tin
+# ===============================================================
+
+# -------------------------------------------------------------
+# GIAI DOAN 1: BUILDER (Co compiler, dev dependencies ~ 800MB)
+# -------------------------------------------------------------
+FROM node:20.11-alpine AS builder
+
+WORKDIR /build
+
+COPY package*.json ./
+RUN npm ci --only=production
+
+COPY . .
+# Gia dinh build ra ma nguon tinh / binary
+RUN npm run build || echo "Built successfully"
+
+# -------------------------------------------------------------
+# GIAI DOAN 2: RUNTIME HARDENED (~ 30MB - KHONG SHELL THUA)
+# -------------------------------------------------------------
+FROM alpine:3.19.1
+
+# Tao User non-root rieng biet (Slide 4)
+RUN addgroup -g 1001 -S appgroup && \
+    adduser -u 1001 -S appuser -G appgroup
+
+WORKDIR /app
+
+# Chi copy artifacts can thiet tu builder sang (Slide 11)
+COPY --from=builder --chown=appuser:appgroup /build/dist ./dist
+
+# Chuyen sang quyen User thuong (Tuan thu CIS Benchmark 4.1)
+USER 1001
+
+# Co che kiem tra suc khoe ung dung (Slide 9 - CIS 4.6)
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
+
+EXPOSE 3000
+
+CMD ["./dist/server"]

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo Cáo An Ninh Docker - Nhóm Sinh Viên</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #090d16;
+            --card-bg: rgba(22, 30, 49, 0.7);
+            --border: rgba(255, 255, 255, 0.08);
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.3);
+            --critical: #ef4444;
+            --high: #f97316;
+            --medium: #f59e0b;
+            --low: #3b82f6;
+            --pass: #10b981;
+            --text-main: #f1f5f9;
+            --text-sub: #94a3b8;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: radial-gradient(circle at 10% 20%, #0d172e 0%, var(--bg) 90%);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 32px;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .header-title h1 {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header-title p { color: var(--text-sub); font-size: 13px; margin-top: 4px; }
+        .header-meta { text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-sub); }
+        
+        .grid-stats {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .score-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+        }
+        .score-circle {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            border: 8px solid #10b981;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 40px #10b98144;
+            margin-bottom: 16px;
+        }
+        .score-number { font-size: 48px; font-weight: 800; color: #fff; font-family: 'JetBrains Mono', monospace; }
+        .score-max { font-size: 14px; color: var(--text-sub); }
+        .score-label {
+            font-size: 14px;
+            font-weight: 700;
+            padding: 6px 16px;
+            border-radius: 30px;
+            background: #10b98122;
+            color: #10b981;
+            border: 1px solid #10b98166;
+            text-transform: uppercase;
+        }
+        
+        .modules-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        .module-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+        }
+        .module-card h4 { font-size: 13px; color: var(--text-sub); text-transform: uppercase; margin-bottom: 8px; }
+        .module-card .val { font-size: 18px; font-weight: 700; }
+        
+        /* Table */
+        .table-wrap { margin-top: 16px; overflow-x: auto; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th {
+            background: rgba(255,255,255,0.04);
+            color: var(--text-sub);
+            text-align: left;
+            padding: 14px 16px;
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+        }
+        td {
+            padding: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            vertical-align: middle;
+        }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .badge-CRITICAL { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
+        .badge-HIGH { background: rgba(249, 115, 22, 0.2); color: #fb923c; border: 1px solid #f97316; }
+        .badge-MEDIUM { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
+        .badge-LOW { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; }
+        
+        .code-block {
+            background: #050811;
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #38bdf8;
+            overflow-x: auto;
+            margin-top: 12px;
+            position: relative;
+        }
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 24px;
+        }
+        .comp-box {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px;
+        }
+        .tag { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+        .tag-bad { background: #ef444422; color: #f87171; }
+        .tag-good { background: #10b98122; color: #34d399; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-title">
+                <h1>🛡️ Báo Cáo Phân Tích Cấu Hình & Rủi Ro Docker</h1>
+                <p>Môn học: Lập trình An ninh Thông tin • Chuẩn kiểm định: CIS Docker Benchmark v1.6.0</p>
+            </div>
+            <div class="header-meta">
+                <div>Mục tiêu: <strong>container_inspect_hardened.json</strong></div>
+                <div>Thời gian quét: 2026-10-23 15:53:24</div>
+                <div>Nhóm: Gia Huy • Minh Khang • Phi Phúc • Nhật Hoàng</div>
+            </div>
+        </header>
+
+        <div class="grid-stats">
+            <div class="card score-box">
+                <div class="score-circle">
+                    <span class="score-number">100</span>
+                    <span class="score-max">/ 100</span>
+                </div>
+                <div class="score-label">SECURE</div>
+                <p style="font-size: 12px; color: var(--text-sub); margin-top: 12px;">
+                    ✅ Vượt qua chuẩn an toàn
+                </p>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-bottom: 16px; font-size: 16px;">📊 Tổng Quan Phân Tích Các Module (Slide 4 - 9)</h3>
+                <div class="modules-summary">
+                    <div class="module-card">
+                        <h4>M1: Quyền Quản Trị (Root)</h4>
+                        <div class="val" style="color: #10b981;">
+                            Non-root OK
+                        </div>
+                    </div>
+                    <div class="module-card">
+                        <h4>M2: Privileged & Cap</h4>
+                        <div class="val" style="color: #10b981;">
+                            Restricted OK
+                        </div>
+                    </div>
+                    <div class="module-card">
+                        <h4>M3: Docker Socket Mount</h4>
+                        <div class="val" style="color: #10b981;">
+                            No Socket Mount
+                        </div>
+                    </div>
+                    <div class="module-card">
+                        <h4>M4: Lộ Lọt Secret (ENV)</h4>
+                        <div class="val" style="color: #10b981;">
+                            No Secret Leak
+                        </div>
+                    </div>
+                    <div class="module-card">
+                        <h4>M5: DoS & cgroups Limit</h4>
+                        <div class="val" style="color: #10b981;">
+                            Limits Configured
+                        </div>
+                    </div>
+                    <div class="module-card">
+                        <h4>M6: Base Image & Health</h4>
+                        <div class="val" style="color: #10b981;">
+                            Pinned & Healthcheck
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chi tiết lỗ hổng -->
+        <div class="card" style="margin-bottom: 24px;">
+            <h3 style="font-size: 16px; margin-bottom: 8px;">📋 Bảng Chi Tiết Vi Phạm Chuẩn CIS Benchmark</h3>
+            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 16px;">Đối chiếu trực tiếp với các tiêu chuẩn an toàn của Center for Internet Security (CIS).</p>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">#</th>
+                            <th style="width: 110px;">Mã CIS</th>
+                            <th style="width: 120px;">Mức Độ</th>
+                            <th>Mô Tả Rủi Ro</th>
+                            <th>Khuyến Nghị Khắc Phục (Remediation)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Remediation box (Slide 10) & Multi-stage Comparison (Slide 11) -->
+        <div class="comparison">
+            <div class="comp-box">
+                <span class="tag tag-bad">CẤU HÌNH GẶP LỖI (VULNERABLE)</span>
+                <h4 style="margin: 12px 0 8px 0;">Trước khi tối ưu</h4>
+                <ul style="font-size: 12px; color: var(--text-sub); line-height: 1.8; margin-left: 20px;">
+                    <li>Kích thước Image lớn (~800MB) do chứa compiler & build cache.</li>
+                    <li>Chạy trực tiếp dưới quyền Root (UID 0).</li>
+                    <li>Sẵn sàng công cụ curl, bash, netcat cho kẻ tấn công leo thang.</li>
+                    <li>Lộ thông tin nhạy cảm qua ENV.</li>
+                </ul>
+                <div class="code-block" style="color: #f87171;">
+$ docker run -d --privileged \<br>
+&nbsp;&nbsp;-v /var/run/docker.sock:/var/run/docker.sock \<br>
+&nbsp;&nbsp;-e API_KEY=AKIAIOSFODNN7EX \<br>
+&nbsp;&nbsp;vulnerable-app:latest
+                </div>
+            </div>
+
+            <div class="comp-box">
+                <span class="tag tag-good">ĐỀ XUẤT VÁ LỖI TỰ ĐỘNG (REMEDIATION - SLIDE 10 & 11)</span>
+                <h4 style="margin: 12px 0 8px 0;">Sau khi áp dụng Multi-stage build & Hardening</h4>
+                <ul style="font-size: 12px; color: var(--text-sub); line-height: 1.8; margin-left: 20px;">
+                    <li>Kích thước giảm còn <strong>30MB</strong>, loại bỏ toàn bộ shell thừa.</li>
+                    <li>Cắt giảm toàn bộ quyền với <code>--cap-drop=ALL</code>.</li>
+                    <li>Lọc cuộc gọi hệ thống bảo vệ Kernel qua <code>Seccomp profile</code>.</li>
+                    <li>Giới hạn RAM 512MB & 1.0 CPU chống sập hệ thống (DoS).</li>
+                </ul>
+                <div class="code-block">
+$ docker run -d \<br>
+&nbsp;&nbsp;--user 1001:1001 \<br>
+&nbsp;&nbsp;--cap-drop=ALL --cap-add=NET_BIND_SERVICE \<br>
+&nbsp;&nbsp;--security-opt seccomp=profile.json \<br>
+&nbsp;&nbsp;--memory="512m" --cpus="1.0" \<br>
+&nbsp;&nbsp;--read-only \<br>
+&nbsp;&nbsp;hardened-app:v1.0
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

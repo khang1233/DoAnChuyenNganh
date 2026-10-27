@@ -1,0 +1,85 @@
+{
+  "type": "bundle",
+  "id": "bundle--d8915ad5-0198-5723-a343-eafe2f8aa8da",
+  "spec_version": "2.1",
+  "objects": [
+    {
+      "type": "identity",
+      "spec_version": "2.1",
+      "id": "identity--b710dc12-7879-5046-bb5b-e2e390e31ed1",
+      "created": "2026-10-16T07:00:53Z",
+      "modified": "2026-10-16T07:00:53Z",
+      "name": "Autonomous CTI AI Agent System",
+      "identity_class": "system"
+    },
+    {
+      "type": "vulnerability",
+      "spec_version": "2.1",
+      "id": "vulnerability--df10ccda-dfb7-50bd-934a-41b6e5c54671",
+      "created": "2026-10-16T07:00:53Z",
+      "modified": "2026-10-16T07:00:53Z",
+      "name": "CVE-2026-83548",
+      "description": "Extracted CVE vulnerability identifier from security report",
+      "external_references": [
+        {
+          "source_name": "cve",
+          "external_id": "CVE-2026-83548"
+        }
+      ]
+    },
+    {
+      "type": "attack-pattern",
+      "spec_version": "2.1",
+      "id": "attack-pattern--315c1acd-b8f9-5ea9-b00a-8acf086abe16",
+      "created": "2026-10-16T07:00:53Z",
+      "modified": "2026-10-16T07:00:53Z",
+      "name": "T1190 - Exploit Public-Facing Application",
+      "description": "Tactic: Initial Access (TA0001) | Evidence: Khai thác lỗ hổng phần mềm máy chủ công khai (CVE / RCE / API Exploit).",
+      "external_references": [
+        {
+          "source_name": "mitre-attack",
+          "external_id": "T1190",
+          "url": "https://attack.mitre.org/techniques/T1190/"
+        }
+      ]
+    },
+    {
+      "type": "attack-pattern",
+      "spec_version": "2.1",
+      "id": "attack-pattern--5ba2a24c-250a-5554-a45e-ec48bce20700",
+      "created": "2026-10-16T07:00:53Z",
+      "modified": "2026-10-16T07:00:53Z",
+      "name": "T1110 - Brute Force / Credential Stuffing",
+      "description": "Tactic: Credential Access (TA0006) | Evidence: Rà quét cổng quản trị (SSH/RDP/VPN) và dò mật khẩu hoặc đánh cắp phiên xác thực.",
+      "external_references": [
+        {
+          "source_name": "mitre-attack",
+          "external_id": "T1110",
+          "url": "https://attack.mitre.org/techniques/T1110/"
+        }
+      ]
+    },
+    {
+      "type": "report",
+      "spec_version": "2.1",
+      "id": "report--fdc8adcf-677d-57a4-93cd-5999cca534f9",
+      "created": "2026-10-16T07:00:53Z",
+      "modified": "2026-10-16T07:00:53Z",
+      "name": "[CVE-2026-83548] SonicWall SMA1000 Appliances — SonicWall SMA1000 Appliances Server-Side Request Forgery Vulnerability",
+      "description": "1. **Bản chất cuộc tấn công**: Tấn công **Server-Side Request Forgery (SSRF)** qua lỗ hổng **CVE-2026-83548** trên SonicWall SMA1000 Appliances, cho phép kẻ tấn công không xác thực thực hiện các thao tác trái phép từ phía máy chủ.  \n2. **Chặn IP/Domain**: Chặn **IP/Domain liên quan đến SonicWall SMA1000** (nếu có) tại **OpenC2** và **Suricata IPS**, đặc biệt theo dõi các kết nối đến **CVE-2026-83548**.  \n3. **Vá lỗ hổng & quét hành vi**: Vá **CVE-2026-83548** trên **WAF** và quét hành vi **T1190 (Exploit Public-Facing Application)** qua **YARA** và **SIEM** để phát hiện các yêu cầu SSRF bất thường.  \n4. **Khuyến nghị khẩn cấp**: **Ngừng sử dụng SonicWall SMA1000** nếu không thể vá lỗ hổng, tuân thủ **BOD 26-04** của CISA, đánh giá rủi ro và cập nhật phần mềm ngay lập tức.",
+      "published": "2026-10-16T07:00:53Z",
+      "created_by_ref": "identity--b710dc12-7879-5046-bb5b-e2e390e31ed1",
+      "report_types": [
+        "threat-report",
+        "attack-pattern",
+        "indicator"
+      ],
+      "object_refs": [
+        "identity--b710dc12-7879-5046-bb5b-e2e390e31ed1",
+        "vulnerability--df10ccda-dfb7-50bd-934a-41b6e5c54671",
+        "attack-pattern--315c1acd-b8f9-5ea9-b00a-8acf086abe16",
+        "attack-pattern--5ba2a24c-250a-5554-a45e-ec48bce20700"
+      ]
+    }
+  ]
+}

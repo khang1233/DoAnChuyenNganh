@@ -1,0 +1,182 @@
+{
+  "type": "bundle",
+  "id": "bundle--bca7785f-1309-5a1c-a96e-908f1f6d2a32",
+  "spec_version": "2.1",
+  "objects": [
+    {
+      "type": "identity",
+      "spec_version": "2.1",
+      "id": "identity--b710dc12-7879-5046-bb5b-e2e390e31ed1",
+      "created": "2026-10-07T11:43:04Z",
+      "modified": "2026-10-07T11:43:04Z",
+      "name": "Autonomous CTI AI Agent System",
+      "identity_class": "system"
+    },
+    {
+      "type": "threat-actor",
+      "spec_version": "2.1",
+      "id": "threat-actor--ac5829f8-8381-5b74-871b-ceb437a9be7e",
+      "created": "2026-10-07T11:43:04Z",
+      "modified": "2026-10-07T11:43:04Z",
+      "name": "Live Threat Campaign",
+      "threat_actor_types": [
+        "nation-state",
+        "hacker-group"
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--875208c9-56ad-5c9c-acac-cea5cd853ece",
+      "created": "2026-10-07T11:43:04Z",
+      "modified": "2026-10-07T11:43:04Z",
+      "name": "Malicious IP: 34.140.212.230",
+      "description": "Extracted IP from live article | Source: VirusTotal + AbuseIPDB + Shodan (Reputation Score: 100/100)",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[ipv4-addr:value = '34.140.212.230']",
+      "pattern_type": "stix",
+      "valid_from": "2026-10-07T11:43:04Z",
+      "confidence": 100
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--3abcab77-d139-59b8-9c51-8134ad00b0c3",
+      "created": "2026-10-07T11:43:04Z",
+      "modified": "2026-10-07T11:43:04Z",
+      "name": "Malicious SHA256: 00560eaec8e7b1700da1e1747c09cf35222ed881df33864338a3da6efaddeafa",
+      "description": "Extracted SHA256 payload hash | Source: VirusTotal + Abuse.ch MalwareBazaar Live Feed (Reputation Score: 95/100)",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[file:hashes.'SHA-256' = '00560eaec8e7b1700da1e1747c09cf35222ed881df33864338a3da6efaddeafa']",
+      "pattern_type": "stix",
+      "valid_from": "2026-10-07T11:43:04Z",
+      "confidence": 95
+    },
+    {
+      "type": "vulnerability",
+      "spec_version": "2.1",
+      "id": "vulnerability--5e2315d6-9a2d-545f-9638-ff49e33f54e1",
+      "created": "2026-10-07T11:43:04Z",
+      "modified": "2026-10-07T11:43:04Z",
+      "name": "CVE-2020-29583",
+      "description": "Exploited vulnerability CVE",
+      "external_references": [
+        {
+          "source_name": "cve",
+          "external_id": "CVE-2020-29583"
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--521ec0c5-31be-5eeb-a255-47f12d0ea0a0",
+      "created": "2026-10-07T11:43:04Z",
+      "modified": "2026-10-07T11:43:04Z",
+      "name": "Malicious DOMAIN: 0112532.com",
+      "description": "Extracted domain from live article | Source: VirusTotal + OpenPhish Live Feed (Reputation Score: 92/100)",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[domain-name:value = '0112532.com']",
+      "pattern_type": "stix",
+      "valid_from": "2026-10-07T11:43:04Z",
+      "confidence": 92
+    },
+    {
+      "type": "attack-pattern",
+      "spec_version": "2.1",
+      "id": "attack-pattern--bf8af9cc-9355-5112-8e34-0303f3f682eb",
+      "created": "2026-10-07T11:43:04Z",
+      "modified": "2026-10-07T11:43:04Z",
+      "name": "T1059.001 - Command and Scripting Interpreter: PowerShell",
+      "description": "Tactic: Execution | Evidence: Executed obfuscated PowerShell commands (powershell.exe -enc)",
+      "external_references": [
+        {
+          "source_name": "mitre-attack",
+          "external_id": "T1059.001",
+          "url": "https://attack.mitre.org/techniques/T1059/001/"
+        }
+      ]
+    },
+    {
+      "type": "attack-pattern",
+      "spec_version": "2.1",
+      "id": "attack-pattern--315c1acd-b8f9-5ea9-b00a-8acf086abe16",
+      "created": "2026-10-07T11:43:04Z",
+      "modified": "2026-10-07T11:43:04Z",
+      "name": "T1190 - Exploit Public-Facing Application",
+      "description": "Tactic: Initial Access | Evidence: Exploited CISA KEV vulnerability in public-facing system",
+      "external_references": [
+        {
+          "source_name": "mitre-attack",
+          "external_id": "T1190",
+          "url": "https://attack.mitre.org/techniques/T1190/"
+        }
+      ]
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--9f83cbde-f4f7-5f5e-a1c8-0712913c120e",
+      "created": "2026-10-07T11:43:04Z",
+      "modified": "2026-10-07T11:43:04Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--875208c9-56ad-5c9c-acac-cea5cd853ece",
+      "target_ref": "threat-actor--ac5829f8-8381-5b74-871b-ceb437a9be7e"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--3e1cf86e-27de-50e1-ad52-16aaa8fa7212",
+      "created": "2026-10-07T11:43:04Z",
+      "modified": "2026-10-07T11:43:04Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--3abcab77-d139-59b8-9c51-8134ad00b0c3",
+      "target_ref": "threat-actor--ac5829f8-8381-5b74-871b-ceb437a9be7e"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--4f84bd1c-7f5f-5c25-8a98-c202eb65059c",
+      "created": "2026-10-07T11:43:04Z",
+      "modified": "2026-10-07T11:43:04Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--521ec0c5-31be-5eeb-a255-47f12d0ea0a0",
+      "target_ref": "threat-actor--ac5829f8-8381-5b74-871b-ceb437a9be7e"
+    },
+    {
+      "type": "report",
+      "spec_version": "2.1",
+      "id": "report--e24fc383-bb60-5f08-91fc-dbde0580bd98",
+      "created": "2026-10-07T11:43:04Z",
+      "modified": "2026-10-07T11:43:04Z",
+      "name": "Anthropic Expands Claude Access for Vetted Cyber Teams as Glasswing Finds 129,000 Flaws [CVE-2020-29583]",
+      "description": "[THEHACKERNEWS LIVE] Anthropic Expands Claude Access for Vetted Cyber Teams as Glasswing Finds 129,000 Flaws (Wed, 07 Oct 2026 13:37:38 +0530). Anthropic on Tuesday said it's expanding a program that allows vetted cybersecurity professionals to test its advanced artificial intelligence (AI) models w",
+      "published": "2026-10-07T11:43:04Z",
+      "created_by_ref": "identity--b710dc12-7879-5046-bb5b-e2e390e31ed1",
+      "report_types": [
+        "threat-report",
+        "attack-pattern",
+        "indicator"
+      ],
+      "object_refs": [
+        "identity--b710dc12-7879-5046-bb5b-e2e390e31ed1",
+        "threat-actor--ac5829f8-8381-5b74-871b-ceb437a9be7e",
+        "indicator--875208c9-56ad-5c9c-acac-cea5cd853ece",
+        "indicator--3abcab77-d139-59b8-9c51-8134ad00b0c3",
+        "vulnerability--5e2315d6-9a2d-545f-9638-ff49e33f54e1",
+        "indicator--521ec0c5-31be-5eeb-a255-47f12d0ea0a0",
+        "attack-pattern--bf8af9cc-9355-5112-8e34-0303f3f682eb",
+        "attack-pattern--315c1acd-b8f9-5ea9-b00a-8acf086abe16",
+        "relationship--9f83cbde-f4f7-5f5e-a1c8-0712913c120e",
+        "relationship--3e1cf86e-27de-50e1-ad52-16aaa8fa7212",
+        "relationship--4f84bd1c-7f5f-5c25-8a98-c202eb65059c"
+      ]
+    }
+  ]
+}

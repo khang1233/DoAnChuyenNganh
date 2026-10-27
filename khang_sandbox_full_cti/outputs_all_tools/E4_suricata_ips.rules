@@ -1,0 +1,8 @@
+# =============================================================================
+# SURICATA / SNORT IDS/IPS DEEP PACKET INSPECTION (DPI) RULES
+# Chiến dịch: [CVE-2026-83548] SonicWall SMA1000 Appliances — SonicWall SMA1000 Appliance
+# Mục đích: Phát hiện & chặn gói tin khai thác lỗ hổng / C2 ngay cả khi Hacker đổi IP
+# =============================================================================
+
+# [LỚP 1C] Deep Packet Inspection (DPI) bắt gói tin khai thác lỗ hổng CVE & Web Exploit (Không phụ thuộc IP):
+drop http $EXTERNAL_NET any -> $HOME_NET any (msg:"[OPENCLAW-CTI] Virtual IPS Shield for CVE-2026-83548 Remote Exploitation"; flow:established,to_server; http.uri; pcre:"/(\.\.\/|%2e%2e|cmd=|exec=|union\s+select|jndi:)/i"; reference:cve,2026-83548; classtype:attempted-admin; sid:9100001; rev:1;)

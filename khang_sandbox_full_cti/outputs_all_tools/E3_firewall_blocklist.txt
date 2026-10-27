@@ -1,0 +1,2 @@
+# [LỖ HỔNG PHẦN MỀM CVE-2026-83548] Báo cáo cảnh báo lỗ hổng ứng dụng, không có IP C2 máy chủ cố định.
+# Đối sách mạng ưu tiên: Sử dụng ModSecurity WAF & Suricata DPI để chặn HTTP Payload (Xem Tab WAF & Tab Suricata).

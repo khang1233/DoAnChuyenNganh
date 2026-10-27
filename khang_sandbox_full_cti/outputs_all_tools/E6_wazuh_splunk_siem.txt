@@ -1,0 +1,139 @@
+title: Web Exploit Attempt - [CVE-2026-83548] SonicWall SMA1000 Appliances — SonicWall SMA1000
+id: 9b4a2c10-8e3f-4d2a-b7c1-070045000001
+status: production
+description: >
+  Detects potential exploitation attempts targeting CVE-2026-83548.
+  Monitors web server and reverse proxy logs for unauthorized traversal, exploit parameters, or CVE strings.
+author: Autonomous CTI AI Agent (Phuc Core & Khang Security)
+date: 2026/10/16
+tags:
+  - attack.t1190
+  - attack.initial_access
+  - cve.cve.2026.83548
+logsource:
+  category: webserver
+  product: apache_nginx_iis_webapps
+detection:
+  selection_cve_uri:
+    cs-uri-stem|contains:
+      - 'CVE-2026-83548'
+      - '/api/'
+      - '/rest/'
+      - '/admin/'
+      - '/login'
+  selection_exploit_payloads:
+    cs-uri-query|contains:
+      - '..'
+      - '%2e%2e'
+      - '%252e%252e'
+      - 'WEB-INF'
+      - 'META-INF'
+      - 'cmd='
+      - 'exec='
+      - '${jndi:'
+  selection_status:
+    sc-status:
+      - 200
+      - 302
+      - 500
+  condition: (selection_cve_uri and selection_exploit_payloads) or (selection_cve_uri and selection_status)
+falsepositives:
+  - Legitimate security vulnerability scanning or authorized testing
+level: critical
+---
+title: Post-Exploitation Child Process Creation - [CVE-2026-83548] SonicWall SMA1000 Appliances — SonicWall SM
+id: 9b4a2c10-8e3f-4d2a-b7c1-070045000002
+status: production
+description: >
+  Detects interactive command shells or system enumeration tools spawned by application servers
+  (Java/Tomcat/Atlassian/IIS/Nginx) following successful exploitation of CVE-2026-83548.
+author: Autonomous CTI AI Agent (Phuc Core & Khang Security)
+date: 2026/10/16
+tags:
+  - attack.t1190
+  - attack.t1059.001
+  - attack.t1059.003
+logsource:
+  category: process_creation
+  product: windows_and_linux
+detection:
+  selection_parent:
+    ParentImage|endswith:
+      - '\java.exe'
+      - '\tomcat.exe'
+      - '\tomcat8.exe'
+      - '\tomcat9.exe'
+      - '\w3wp.exe'
+      - '\httpd.exe'
+      - '\nginx.exe'
+      - '/java'
+      - '/httpd'
+      - '/nginx'
+  selection_child:
+    Image|endswith:
+      - '\cmd.exe'
+      - '\powershell.exe'
+      - '\pwsh.exe'
+      - '\whoami.exe'
+      - '\net.exe'
+      - '/bin/sh'
+      - '/bin/bash'
+      - '/usr/bin/id'
+      - '/usr/bin/whoami'
+      - '/usr/bin/curl'
+      - '/usr/bin/wget'
+  condition: selection_parent and selection_child
+falsepositives:
+  - Rare legitimate administrative deployment tasks
+level: critical
+
+<!-- ========================================================================= -->
+<!-- BẢN BIÊN DỊCH TỰ ĐỘNG SANG WAZUH SIEM XML RULE (/var/ossec/etc/rules/)    -->
+<!-- ========================================================================= -->
+<group name="local,openclaw_cti_defense,">
+  <!-- [QUY TẮC 1A] Phát hiện hành vi khai thác lỗ hổng Web/API trên máy chủ ứng dụng -->
+  <rule id="100910" level="14">
+    <if_group>web|apache|nginx|iis</if_group>
+    <match>CVE\-2026\-83548|\.\./|\.\.%2e|%2e%2e|/rest/|/xwork/|WEB-INF|META-INF</match>
+    <description>[OPENCLAW CTI] Phát hiện dấu vết khai thác lỗ hổng CVE-2026-83548 trên Web Server</description>
+    <mitre>
+      <id>T1190</id>
+    </mitre>
+  </rule>
+  <!-- [QUY TẮC 1B] Phát hiện máy chủ ứng dụng (Java/Tomcat/Atlassian/IIS) sinh Shell sau RCE -->
+  <rule id="100911" level="15">
+    <if_group>sysmon_event1</if_group>
+    <match>java\.exe.*(cmd|powershell|whoami|net\.exe)|tomcat.*(cmd|sh|bash)|w3wp\.exe.*(cmd|powershell)|nginx.*(bash|sh)</match>
+    <description>[OPENCLAW CTI] Cảnh báo RCE: Máy chủ ứng dụng sinh tiến trình dòng lệnh trái phép sau khai thác CVE-2026-83548</description>
+    <mitre>
+      <id>T1190</id>
+      <id>T1059</id>
+    </mitre>
+  </rule>
+  <!-- [QUY TẮC 1D] Phát hiện hành vi leo thang & hậu khai thác (Post-Exploitation / Ransomware Prep) -->
+  <rule id="100913" level="15">
+    <if_group>sysmon_event1</if_group>
+    <match>wbadmin|portproxy|vssadmin|powershell -enc|-w hidden|certutil -urlcache</match>
+    <description>[OPENCLAW CTI] Phát hiện hành vi hậu khai thác (Post-Exploitation / Ransomware Prep)</description>
+    <mitre>
+      <id>T1059</id>
+    </mitre>
+  </rule>
+</group>
+
+# =============================================================================
+# CÂU TRUY VẤN SPLUNK SPL #1: TRUY TÌM DẤU VẾT KHAI THÁC CVE-2026-83548 TRÊN WEB/API LOG:
+# =============================================================================
+index=web OR index=proxy OR sourcetype="access_combined" OR sourcetype="iis" OR sourcetype="nginx:plus:access"
+(uri_path="*CVE-2026-83548*" OR uri_query="*CVE-2026-83548*" OR uri="*../*" OR uri="*%2e%2e*" OR uri="*/rest/*" OR uri="*/xwork/*") status IN (200, 302, 500)
+| stats count min(_time) as first_attempt max(_time) as last_attempt values(c_ip) as attacker_ips values(uri) as attacked_endpoints by host, status
+| where count >= 1
+
+# =============================================================================
+# CÂU TRUY VẤN SPLUNK SPL #2: PHÁT HIỆN MÁY CHỦ ỨNG DỤNG SINH COMMAND SHELL (RCE / WEB SHELL):
+# =============================================================================
+index=main (sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=1)
+(ParentImage="*\\java.exe" OR ParentImage="*\\tomcat*.exe" OR ParentImage="*\\w3wp.exe" OR ParentImage="*\\httpd.exe" OR ParentImage="*\\nginx.exe" OR ParentImage="*/java" OR ParentImage="*/nginx")
+(Image="*\\cmd.exe" OR Image="*\\powershell.exe" OR Image="*\\whoami.exe" OR Image="*\\net.exe" OR Image="*/bin/sh" OR Image="*/bin/bash" OR Image="*/usr/bin/id")
+| stats count min(_time) as first_seen max(_time) as last_seen values(CommandLine) as spawned_commands by host, ParentImage, Image, User
+| where count >= 1

@@ -1,0 +1,35 @@
+{
+  "protocol": "OASIS OpenC2 v1.0 (Open Command and Control) over OpenClaw Local Bridge",
+  "campaign": "[CVE-2026-83548] SonicWall SMA1000 Appliances — SonicWall SMA1000 Appliances Server-Side Request Forgery Vulnerability",
+  "generated_at_utc": "2026-10-16T07:00:53Z",
+  "total_commands": 1,
+  "openc2_messages": [
+    {
+      "header": {
+        "version": "1.0",
+        "msg_type": "request",
+        "request_id": "openc2-a0d4f187",
+        "created": "2026-10-16T07:00:53Z",
+        "sender": "OpenClaw-Local-CTI-Agent"
+      },
+      "command": {
+        "action": "mitigate",
+        "target": {
+          "vulnerability": "CVE-2026-83548"
+        },
+        "actuator": {
+          "waf_and_suricata_ips": {
+            "virtual_patching": true,
+            "mode": "prevention_block"
+          }
+        },
+        "args": {
+          "mitre_techniques": [
+            "T1190",
+            "T1110"
+          ]
+        }
+      }
+    }
+  ]
+}

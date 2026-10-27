@@ -1,0 +1,26 @@
+<!-- ========================================================================= -->
+<!-- CHÍNH SÁCH CHẶN THỰC THI EDR & WINDOWS APPLOCKER (HASH DENYLIST)          -->
+<!-- Chiến dịch: [CVE-2026-83548] SonicWall SMA1000 Appliances — SonicWall SMA1000 Appl                                           -->
+<!-- Chức năng: Ngăn chặn mã độc khởi chạy ngay từ bước nạp tập tin vào RAM    -->
+<!-- ========================================================================= -->
+
+<AppLockerPolicy Version="1">
+  <RuleCollection Type="Exe" EnforcementMode="Enabled">
+    <FileHashRule Id="9b4a2c10-8e3f-4d2a-b7c1-000000000001" Name="[OPENCLAW-CTI] Block Malicious Payloads" Description="Auto-generated Hash Denylist from CTI Agent" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <!-- Không có mã băm nhị phân trong chiến dịch này -->
+      </Conditions>
+    </FileHashRule>
+  </RuleCollection>
+</AppLockerPolicy>
+
+# =============================================================================
+# CẤU HÌNH WAZUH EDR ACTIVE RESPONSE HASH BLOCKLIST (JSON POLICY):
+# =============================================================================
+{
+  "integration": "wazuh_active_response",
+  "policy_name": "CTI_Malware_Execution_Prevention",
+  "action": "terminate_process_and_quarantine",
+  "blocked_hashes": [],
+  "alert_level": 14
+}

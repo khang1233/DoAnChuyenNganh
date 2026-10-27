@@ -1,0 +1,25 @@
+# ===============================================================
+# DOCKERFILE CHUA CAC LOI CAU HINH PHO BIEN (DE SCAN THU NGHIEM)
+# Mon hoc: Lap trinh An ninh Thong tin
+# ===============================================================
+
+# [Rui ro Slide 9]: Dung the :latest khong xac dinh version
+FROM node:latest
+
+WORKDIR /app
+
+# [Rui ro Slide 7]: Lo lot Secret, Password, API Key truc tiep trong ENV
+ENV API_KEY=AKIAIOSFODNN7EX
+ENV DB_PASS=P@ssw0rd123SuperSecret!
+ENV JWT_SECRET=my_ultra_secure_jwt_token_2026
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+# [Rui ro Slide 9]: Phoi bay port tran lan, khong co Healthcheck
+EXPOSE 80 443 8080 3306
+
+# [Rui ro Slide 4]: Khong he co chi thi USER -> Container se chay mac dinh voi quyen ROOT (UID 0)
+CMD ["node", "server.js"]

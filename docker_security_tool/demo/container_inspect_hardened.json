@@ -1,0 +1,41 @@
+[
+  {
+    "Id": "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b",
+    "Created": "2026-10-23T15:00:00.123456789Z",
+    "Path": "./dist/server",
+    "Args": [],
+    "State": {
+      "Status": "running",
+      "Running": true,
+      "Pid": 5432
+    },
+    "Image": "sha256:hardened_web_app:v1.0.0",
+    "Config": {
+      "User": "1001:1001",
+      "ExposedPorts": {
+        "3000/tcp": {}
+      },
+      "Env": [
+        "NODE_ENV=production",
+        "PORT=3000"
+      ],
+      "Healthcheck": {
+        "Test": ["CMD-SHELL", "wget --spider http://localhost:3000/health || exit 1"],
+        "Interval": 30000000000,
+        "Timeout": 3000000000,
+        "Retries": 3
+      }
+    },
+    "HostConfig": {
+      "Privileged": false,
+      "CapAdd": ["NET_BIND_SERVICE"],
+      "CapDrop": ["ALL"],
+      "Binds": [],
+      "Memory": 536870912,
+      "NanoCpus": 1000000000,
+      "CpuQuota": 100000,
+      "SecurityOpt": ["seccomp=profile.json", "no-new-privileges:true"],
+      "ReadonlyRootfs": true
+    }
+  }
+]

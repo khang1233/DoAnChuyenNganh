@@ -1,0 +1,59 @@
+# ==========================================
+# Git Ignore for DoAnChuyenNganh
+# ==========================================
+
+# 1. Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+ai-devsecops-agent/.venv/
+
+# 2. Python Bytecode & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 3. Model Weights & Massive Datasets
+ollama_models/
+*.gguf
+*.bin
+*.pt
+*.safetensors
+
+# 4. Binaries & Executables (>100MB exceeds GitHub limits)
+*.exe
+*.msi
+*.dll
+*.sys
+khang_sandbox_full_cti/suricata_setup.msi
+khang_sandbox_full_cti/suricata_windivert.msi
+khang_sandbox_full_cti/live_defense_system/suricata_bin/
+khang_sandbox_full_cti/live_defense_system/suricata_windivert_bin/
+
+# 5. OS & IDE Metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo
+.git_submodule_backup/
+**/.git_submodule_backup/
+
+# 6. Temporary scratch & test artifacts
+khang_sandbox_full_cti/scratch/
+*.log
+
+# 7. Exceptions (Keep essential scripts)
+!*.bat
+!*.sh
+!*.md
+!*.json
+!*.sqlite
+!*.html
