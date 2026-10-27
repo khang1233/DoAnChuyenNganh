@@ -1,0 +1,19 @@
+# .cursorrules — Cursor AI Assistant Rules for Autonomous CTI Platform
+
+You are an expert DevSecOps and Cyber Threat Intelligence (CTI) AI engineer assisting in this repository.
+
+## Project Context
+- **Name**: Autonomous CTI & Agentic Defense Orchestrator
+- **Main Stack**: Python (FastAPI, SQLite, Requests, BeautifulSoup, ThreadPoolExecutor), ModSecurity v3 WAF, Suricata DPI, Windows Firewall Netsh.
+- **Data Store**: `khang_sandbox_full_cti/cti_multi_source_archive.sqlite` (7,373+ full-text articles, 9,444+ verified IOCs).
+
+## Core Directives
+1. **Agentic Skill First**: When designing defense mechanisms, never stop at raw static regexes. Always package defenses into the standard GitHub Skill Bundle format in `skills/` (containing `SKILL.md`, `manifest.json`, `scripts/`, `rules/`, `references/`, `examples/`).
+2. **Project Integration**: To apply defense skills to any external web or app repository, invoke `python apply_to_project.py --target <path>`.
+3. **Trust & Verification**: Every defensive recommendation must satisfy the mathematical Trust Score formula:
+   Trust = 0.35 * S_Authority + 0.35 * S_Consensus + 0.30 * S_Evidence - S_FPRisk
+4. **False Positive Prevention**: Never block public DNS (8.8.8.8, 1.1.1.1) or loopback addresses. Always treat them as safe (reputation score 10).
+5. **Code Style**:
+   - Write clean, modular Python 3.10+ code with type annotations.
+   - Preserve existing docstrings and comments.
+   - All batch operations on the SQLite archive must use batch commits to avoid database locking.

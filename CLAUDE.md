@@ -1,0 +1,92 @@
+# CLAUDE.md — Autonomous CTI & Agentic Defense Orchestrator
+
+This document provides system instructions, architectural context, and workflow conventions for **Claude Code** and other AI agents interacting with this repository.
+
+---
+
+## 1. Project Overview
+
+This repository is an **Autonomous Cyber Threat Intelligence (CTI) & Agentic Defense Orchestrator**. It continuously harvests security advisories from 6 global intelligence feeds, extracts and verifies technical indicators (IOCs), calculates mathematical trust scores via an Explainable AI (xAI) engine, and packages defense capabilities into **Agentic Defense Skill Packages (`SKILL.md`)** for direct enforcement on infrastructure or automated code remediation in target repositories.
+
+### Key Metrics
+- **Corpus**: 7,373 full-text verbatim articles (99.0% complete across 2024–2026).
+- **Knowledge Base**: 9,444 verified IOCs (IP, CVE, SHA256, Defanged Domain).
+- **Trust Score**: Verified with dual-loop audit (100% True Positive, 0.0% False Positive).
+- **Active Ports**:
+  - `8765`: FastAPI SOC Live Dashboard & REST APIs.
+  - `8766`: Live WAF Reverse Proxy & Virtual Patching Gateway.
+
+---
+
+## 2. Quick Command Reference
+
+| Action | Command | Purpose |
+| :--- | :--- | :--- |
+| **Start Entire System** | `1_BAT_HE_THONG.bat` | Starts SOC Dashboard (8765) and WAF Gateway (8766). |
+| **Stop Entire System** | `2_TAT_HE_THONG.bat` | Gracefully terminates all background Python servers. |
+| **Protect Any Project** | `python apply_to_project.py --target <path>` | Auto-detects tech stack and installs Agentic Skill into `<path>`. |
+| **Package New Skill** | `python khang_sandbox_full_cti/skill_bundle_packager.py` | Generates a complete GitHub Agent Skill folder bundle. |
+| **Enrich Corpus** | `python khang_sandbox_full_cti/enrich_all_corpus.py 500` | Multi-threaded full-text crawl and IOC learning pipeline. |
+| **Test WAF Gateway** | `curl -i -X POST http://localhost:8766/api/login -d "cmd=id"` | Verifies 403 Forbidden virtual patch blocking. |
+
+---
+
+## 3. Architecture & Repository Structure
+
+```
+DoAnChuyenNganh/
+├── apply_to_project.py               # Universal 1-step connector for external projects
+├── 1_BAT_HE_THONG.bat                # 1-Click launcher
+├── 2_TAT_HE_THONG.bat                # 1-Click shutdown
+├── CLAUDE.md                         # Anthropic Claude system instructions (this file)
+├── AGENTS.md                         # Universal Multi-Agent repository guidelines
+├── .cursorrules                      # Cursor AI development rules
+├── README.md                         # Main user documentation
+│
+├── skills/                           # Standard GitHub Agent Skill Packages
+│   └── agentic-defense-cve-2026-*/   # Complete skill folder (manifest, scripts, rules, refs, examples)
+│       ├── manifest.json             # Agent marketplace metadata & schema
+│       ├── SKILL.md                  # Core instruction prompt & action workflow
+│       ├── scripts/                  # Executable tools for agents (verify_exploit.py, apply_patch.py)
+│       ├── rules/                    # Firewall, WAF, Suricata, Wazuh rules
+│       ├── references/               # Ground truth CTI reports, STIX 2.1, xAI audit trail
+│       └── examples/                 # Vulnerable vs. hardened code fixtures
+│
+├── khang_sandbox_full_cti/           # Core Backend Engine
+│   ├── live_dashboard_app.py         # FastAPI SOC Dashboard Server (Port 8765)
+│   ├── live_defense_orchestrator.py  # Defense engine orchestrator & WAF Proxy (Port 8766)
+│   ├── agentic_defense_skill_engine.py # Trust Score calculation & xAI attribution engine
+│   ├── skill_bundle_packager.py      # GitHub-style skill bundle packager
+│   ├── lam_automation_crawler.py     # Multi-source 100% full-text verbatim crawler
+│   ├── phuc_core_ai_agent.py         # Hybrid IOC extraction & NER engine
+│   ├── openclaw_firewall_bridge.py   # Windows Defender Firewall (netsh) controller
+│   └── cti_multi_source_archive.sqlite # SQLite database (7,450 articles, 9,444 IOCs)
+│
+├── ai-devsecops-agent/               # Deep DevSecOps Agent module
+└── docker_security_tool/             # Docker container vulnerability scanner
+```
+
+---
+
+## 4. Target Scopes (Input Scoping Specification)
+
+| Scope ID | Target Persona | Focus Area | Scan Cadence | Feeds |
+| :--- | :--- | :--- | :--- | :--- |
+| `SCOPE_WEB` | Web / API DevSecOps | OWASP Top 10, SQLi, RCE, Path Traversal | 15 minutes | TheHackerNews, CISA KEV |
+| `SCOPE_NETWORK` | Network / Perimeter SOC | C2 IPs, Botnet Trackers, DNS Sinkhole, VPN | 1 hour | TheHackerNews, Check Point, DFIR |
+| `SCOPE_ENDPOINT` | SysAdmin / Endpoint SOC | Post-exploitation, Webshell spawn, Ransomware | 4 hours | Kaspersky, SentinelOne, DFIR |
+| `SCOPE_HARDWARE` | Infrastructure Architect | Firmware, BIOS/UEFI, Microcode, BMC, ICS | 24 hours | CISA ICS-CERT, Hardware Vendors |
+
+---
+
+## 5. Mathematical Trust Framework & xAI Standards
+
+Every defense output generated by this system must strictly satisfy the **Explainable AI (xAI)** verification standards:
+
+### Formula
+$$\text{Trust} = 0.35 \times S_{\text{Authority}} + 0.35 \times S_{\text{Consensus}} + 0.30 \times S_{\text{Evidence}} - S_{\text{FPRisk}}$$
+
+### Agent Execution Rules
+1. **Zero-Hallucination Mandate**: Never fabricate or synthesize IOCs. Every IP, CVE, or Hash must originate directly from `cti_multi_source_archive.sqlite` and include verifiable verbatim quotations in `references/`.
+2. **False Positive Guardrail**: Public DNS (`8.8.8.8`, `1.1.1.1`), loopback (`127.0.0.1`), and RFC 1918 private IP ranges (`10.0.0.0/8`, `192.168.0.0/16`) must NEVER be flagged as malicious or blocked by firewall rules. They must always carry a reputation score of 10 and display green in the UI.
+3. **Fail-Closed Dual-Loop Audit**: If Trust Score < 70, the system must downgrade active virtual patching to passive logging. Only scores > 90 are verified for automated production enforcement.
