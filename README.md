@@ -1,78 +1,86 @@
-# HỆ THỐNG CTI ĐA NGUỒN TỰ ĐỘNG HÓA & ĐÓNG GÓI KỸ NĂNG PHÒNG THỦ TÁC TỬ (AGENTIC DEFENSE SKILL)
+# HỆ THỐNG TỰ ĐỘNG HÓA TÌNH BÁO AN NINH MẠNG (CTI) & ĐÓNG GÓI KỸ NĂNG TÁC TỬ (AGENTIC DEFENSE SKILLS)
 
-Hệ thống tự động cào 7,450+ bài báo tình báo an ninh mạng (CTI), trích xuất 9,440+ chỉ số kỹ thuật (IOCs), tính toán độ tin cậy toán học **Trust Score** (>90đ, 0% False Positive) và đóng gói thành các **Bộ Kỹ Năng Tác Tử (Agentic Skill Package)** để AI Agent tự động vá mã nguồn hoặc nạp trực tiếp vào Tường lửa/WAF.
+Hệ thống tự động phân tích mã nguồn dự án mục tiêu, đối soát với kho tri thức tình báo an ninh mạng (CTI), thẩm định độ tin cậy toán học **Trust Score** (>90đ, 0% False Positive) và đóng gói thành các **Bộ Kỹ Năng Tác Tử (Agentic Skill Package)** hỗ trợ chuẩn bản địa cho **15 nền tảng AI Coding Agent lớn nhất thế giới** (Claude Code, Cursor, Codex, Antigravity, Aider, Devin, Windsurf, Copilot...).
 
 ---
 
-## 🚀 CÁCH ÁP DỤNG VÀO DỰ ÁN BẤT KỲ (CHỈ CẦN 1 BƯỚC)
+## 🚀 HƯỚNG DẪN CHẠY THỬ NHANH TRÊN MÁY BẤT KỲ (CHO NGƯỜI MỚI)
 
-Nếu bạn (hoặc bạn của bạn) có một dự án Web/App và muốn trợ lý AI (Cursor, Antigravity, Claude Code, Copilot) tự động bảo vệ hệ thống:
-
-### Bước 1: Ném link GitHub này cho AI Agent hoặc Clone về máy
+### Bước 1: Clone Repository Về Máy
+Mở Terminal / PowerShell / Command Prompt và chạy:
 ```bash
 git clone https://github.com/khang1233/DoAnChuyenNganh.git
+cd DoAnChuyenNganh
 ```
 
-### Bước 2: Chạy lệnh kết nối tự động tới thư mục dự án của bạn
+---
+
+### Bước 2: Chọn Cách Khởi Chạy
+
+#### CÁCH 1: KHỞI CHẠY GIAO DIỆN WEB DASHBOARD (KHUYÊN DÙNG — 1-CLICK)
+1. **Cài đặt thư viện (chỉ cần làm 1 lần đầu)**:
+   - Nhấp đúp vào file: `0_CAI_DAT_MOI_TRUONG.bat` (hoặc gõ `pip install -r requirements.txt`).
+2. **Bật toàn bộ hệ thống**:
+   - Nhấp đúp vào file: `1_BAT_HE_THONG.bat`.
+   - Hệ thống sẽ tự động bật Live Server, WAF Proxy cổng 8766 và **tự động mở trình duyệt** tại:
+     👉 **`http://127.0.0.1:8765`**
+3. **Quét dự án và sinh Kỹ năng tự động**:
+   - Tại mục **"🚀 5 Bước Tự Hành (Wizard)"**:
+     - Nhập đường dẫn thư mục dự án bạn muốn bảo vệ (Ví dụ: `D:/my-web-app` hoặc link GitHub repo).
+     - Nhấn nút **`[ 🚀 BẮT ĐẦU QUÉT DỰ ÁN ]`**.
+   - Hệ thống tự động:
+     - Nhận diện Tech Stack (Node.js, Express, PHP, Python, Docker...).
+     - Lọc bỏ 100% CTI không liên quan, chỉ cào các bài báo và lỗ hổng đe dọa đúng công nghệ của bạn.
+     - Sinh trọn bộ Kỹ Năng Tác Tử và tự động cài đặt thẳng vào dự án đích.
+4. **Tắt hệ thống**:
+   - Nhấp đúp vào file: `2_TAT_HE_THONG.bat` để giải phóng sạch toàn bộ cổng mạng và RAM/GPU.
+
+---
+
+#### CÁCH 2: KẾT NỐI QUA DÒNG LỆNH CLI (CHO LẬP TRÌNH VIÊN)
+Nếu không muốn mở Web Dashboard, bạn có thể chạy thẳng script Python:
 ```bash
-python DoAnChuyenNganh/apply_to_project.py --target /duong/dan/toi/du-an-cua-ban
+pip install -r requirements.txt
+python apply_to_project.py --target /duong/dan/toi/du-an-cua-ban
 ```
-
-### Kết quả tự động diễn ra:
-1. **Tự động nhận diện công nghệ**: Tự phát hiện dự án của bạn dùng PHP, Node.js, Python hay Docker.
-2. **Tự động nạp Skill**: Copy trọn bộ gói kỹ năng tác tử vào đúng thư mục AI của bạn:
-   - `.gemini/skills/` (cho Google Antigravity)
-   - `.cursor/rules/` (cho Cursor)
-   - `defense_skills/` (cho Claude Code / Copilot / Developer)
-3. **Tự động sinh hướng dẫn vá lỗi**: Tạo file `AGENT_REMEDIATION_GUIDE.md` trong dự án.
-4. **AI Agent tự sửa mã nguồn**: Khi bạn mở Cursor/Antigravity trong dự án của mình, AI Agent sẽ tự động đọc `SKILL.md`, đối chiếu mã nguồn của bạn với mẫu `examples/vulnerable_sample.php` và tự động refactor code sang chuẩn an toàn `examples/patched_secure_sample.php`.
+*(Nếu muốn clone trực tiếp từ GitHub repo, dùng thêm cờ `--clone <url-github>`)*.
 
 ---
 
-## 🛡️ CẤU TRÚC BỘ KỸ NĂNG PHÒNG THỦ TRÊN GITHUB (`skills/`)
+## 🤖 MỞ DỰ ÁN BẰNG BẤT KỲ CÔNG CỤ AI NÀO
 
-Mỗi kỹ năng được đóng gói theo chuẩn thư mục tác tử quốc tế:
-```
-skills/agentic-defense-cve-2026-109618-php2shell/
-├── manifest.json              # Metadata định danh, phiên bản, quyền thực thi
-├── SKILL.md                   # BỘ NÃO: Prompt chỉ dẫn, YAML metadata, quy trình SOP
-├── scripts/                   # TAY CHÂN: Công cụ Python Agent tự gọi bằng tool-call
-│   ├── verify_exploit.py      # Tool kiểm thử xem máy chủ có bị dính lỗ hổng không
-│   └── apply_virtual_patch.py # Tool nạp quy tắc WAF & Tường lửa tự động
-├── rules/                     # CHỮ KÝ PHÒNG VỆ: Cấu hình nạp trực tiếp vào Engine
-│   ├── waf_modsecurity.conf   # Quy tắc WAF ModSecurity v3 (chặn HTTP RCE)
-│   ├── suricata_dpi.rules     # Quy tắc Suricata L4-L7 Deep Packet Inspection
-│   ├── wazuh_siem.xml         # Quy tắc Wazuh SIEM giám sát Endpoint
-│   └── firewall_c2_blocklist.txt # Danh sách IP C2 chặn trên OS
-├── references/                # CƠ SỞ CHỨNG CỨ: Tri thức đối soát triệt tiêu ảo giác
-│   ├── cti_verbatim_report.txt# Toàn văn bài báo gốc (Ctrl+F khớp 100%)
-│   ├── stix21_bundle.json     # Dữ liệu chuẩn quốc tế OASIS STIX 2.1
-│   ├── xai_audit_trail.json   # Vết giải trình xAI (Feature Attribution, Grounding)
-│   └── trust_score_breakdown.json # Phân rã công thức toán học Trust Score
-└── examples/                  # MẪU ĐỐI CHỨNG: Dành cho Developer & AI Agent
-    ├── vulnerable_sample.php  # Mẫu code dính lỗi trước khi vá
-    └── patched_secure_sample.php # Mẫu code đã được chuẩn hóa an toàn
-```
+Sau khi quét xong, mở thư mục dự án đích bằng bất kỳ công cụ nào, AI Agent sẽ tự động nạp Kỹ năng phòng thủ:
+
+| Công cụ AI Agent | File hệ thống tự động sinh và nạp | Hành vi tự động của Agent |
+| :--- | :--- | :--- |
+| **Claude Code** | `CLAUDE.md`, `.claude/skills/` | Tự động đọc chỉ thị an ninh và chạy probe kiểm thử |
+| **Cursor** | `.cursor/rules/*.mdc`, `.cursorrules` | Tự động áp dụng rule trên mọi tệp mã nguồn mở trong editor |
+| **OpenAI Codex & ChatGPT** | `CODEX.md`, `OPENAI.md`, `.codex/` | Nạp prompt an ninh và danh sách các điểm nóng nhạy cảm |
+| **Google Antigravity & Gemini** | `.gemini/skills/`, `.gemini/rules/` | Tự động kích hoạt skill package chuẩn |
+| **Aider AI** | `.aider.conf.yml`, `CONVENTIONS.md` | Tự động áp dụng quy ước an toàn trước mỗi commit |
+| **Cline & Roo Code** | `.clinerules`, `.roomodes` | Kích hoạt chế độ `CTI Security Refactor` |
+| **Continue.dev** | `.continue/config.json`, `prompts/` | Cung cấp lệnh `/cti-defense` để audit file trực tiếp |
+| **Devin AI** | `DEVIN.md`, `.devin/instructions.md` | Tác tử Devin tự động refactor theo SOP |
+| **Windsurf (Cascade)** | `.windsurfrules` | Cascade tự động đối chiếu mẫu code trước khi vá |
+| **GitHub Copilot** | `.github/copilot-instructions.md` | Copilot Workspace tự áp dụng parameter binding |
 
 ---
 
-## ⚙️ KHỞI CHẠY HỆ THỐNG TRỰC TIẾP (SOC DASHBOARD & TƯỜNG LỬA)
+## 📦 CẤU TRÚC GÓI KỸ NĂNG TÁC TỬ (AGENTIC SKILL STANDARD)
 
-Nếu muốn bật bảng điều khiển trung tâm và kích hoạt Tường lửa / WAF trực tiếp:
-
-1. **Khởi động 1-Click**:
-   Chạy file `1_BAT_HE_THONG.bat` ở thư mục gốc:
-   - **SOC Live Dashboard**: Mở trình duyệt truy cập `http://localhost:8765`
-   - **WAF Reverse Proxy**: Lắng nghe tại `http://localhost:8766`
-2. **Áp dụng Tường lửa OS**:
-   - Trên Dashboard, tab **Tường lửa & WAF** -> Bấm **"Kích hoạt Tường lửa Windows"** để chặn ngay 9,440+ IP C2 ở tầng Kernel.
-   - Bấm **"Khôi phục (Rollback)"** bất cứ khi nào muốn gỡ bỏ sạch sẽ.
-3. **Tắt an toàn 1-Click**:
-   Chạy file `2_TAT_HE_THONG.bat`.
-
----
-
-## 📊 SỐ LIỆU ĐÃ KIỂM CHỨNG TRONG CƠ SỞ DỮ LIỆU
-- **Tổng số bài báo toàn văn**: 7,373 / 7,450 bài (99.0% toàn văn nguyên bản).
-- **Tổng số chỉ số kỹ thuật IOC**: 9,444 chỉ số (IP C2, DNS an toàn, CVE, SHA256).
-- **Điểm toán học Trust Score**: Đạt trên 93.6 / 100 điểm, vượt qua bài kiểm toán vòng lặp kép (True Positive 100%, False Positive 0.0%).
+Mỗi kỹ năng trong `defense_skills/` hoặc `skills/` được đóng gói hoàn chỉnh gồm 5 thành phần:
+```
+defense_skills/<skill-name>/
+├── manifest.json              # Schema định danh công cụ & quyền thực thi
+├── SKILL.md                   # Hướng dẫn tư duy, prompt, SOP chuẩn hóa cho AI
+├── scripts/                   # Công cụ thực thi của Agent
+│   ├── verify_exploit.py      # Tác tử tự chạy để kiểm chứng lỗ hổng (True Positive)
+│   └── apply_virtual_patch.py # Tác tử tự kích hoạt lá chắn bảo vệ WAF L7
+├── examples/                  # 12 cặp test fixture đa ngôn ngữ (Python, JS, Java, PHP, Go, C#)
+│   ├── vulnerable_sample.*    # Mẫu code dính lỗi
+│   └── patched_secure_sample.*# Mẫu code chuẩn an toàn
+└── references/                # Căn cứ kiểm toán Trust Score và xAI
+    ├── project_context_blueprint.json # Điểm nóng mã nguồn thực tế của dự án
+    ├── xai_audit_trail.json   # Vết giải trình toán học
+    └── cti_verbatim_report.txt# Toàn văn báo cáo tình báo an ninh mạng
+```
