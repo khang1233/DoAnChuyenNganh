@@ -74,22 +74,24 @@ def detect_project_scope(target_path: Path):
     scores = {"SCOPE_WEB": 0, "SCOPE_NETWORK": 0, "SCOPE_ENDPOINT": 0, "SCOPE_HARDWARE": 0}
     
     # 1. Quét theo file patterns
+    ignored_dirs = [".git", "node_modules", "venv", ".venv", "dist", "build", ".cursor", ".gemini", "defense_skills"]
     for scope_id, profile in SCOPE_PROFILES.items():
         for pat in profile["file_patterns"]:
             matches = list(target_path.glob(f"**/{pat}"))
-            # Bỏ qua node_modules, .git, venv
-            valid = [m for m in matches if not any(ign in str(m) for ign in [".git", "node_modules", "venv", ".venv", "dist", "build"])]
+            valid = [m for m in matches if not any(ign in str(m) for ign in ignored_dirs)]
             if valid:
                 scores[scope_id] += len(valid) * 2
 
     # 2. Định danh công nghệ chi tiết
-    if (target_path / "composer.json").exists() or list(target_path.glob("**/*.php")):
+    php_files = [p for p in target_path.glob("**/*.php") if not any(ign in str(p) for ign in ignored_dirs)]
+    py_files = [p for p in target_path.glob("**/*.py") if not any(ign in str(p) for ign in ignored_dirs)]
+    if (target_path / "composer.json").exists() or php_files:
         detected_techs.append("PHP Framework (Laravel / WordPress / Custom)")
         scores["SCOPE_WEB"] += 10
     if (target_path / "package.json").exists():
         detected_techs.append("Node.js / JavaScript Web Ecosystem")
         scores["SCOPE_WEB"] += 8
-    if (target_path / "requirements.txt").exists() or list(target_path.glob("**/*.py")):
+    if (target_path / "requirements.txt").exists() or py_files:
         detected_techs.append("Python Backend (FastAPI / Django / Flask)")
         scores["SCOPE_WEB"] += 6
     if (target_path / "Dockerfile").exists() or (target_path / "docker-compose.yml").exists():
@@ -128,11 +130,35 @@ def ensure_cti_knowledge_base(scope_id: str, history_years: int = 3):
     print(f"    - Mốc thời gian yêu cầu: {history_years} năm gần nhất")
 
     if count < 50:
-        print(f"[!] PHÁT HIỆN MÁY MỚI (COLD-START): CSDL rỗng. Đang tự động cào bài báo cho {profile['name']}...")
-        sys.path.append(str(SANDBOX_DIR))
-        from enrich_all_corpus import run_enrichment
-        # Cào các bài báo theo phân hệ
-        run_enrichment(limit_total=500, chunk_size=50)
+        bak_db = SANDBOX_DIR / "cti_multi_source_archive_full_corpus.sqlite"
+        min_date = f"{2026 - history_years}-01-01"
+        if bak_db.exists():
+            print(f"[!] PHÁT HIỆN MÁY MỚI (COLD-START): Đang tự động nạp kho tri thức lịch sử ({history_years} năm) cho {profile['name']}...")
+            with sqlite3.connect(DB_PATH) as conn:
+                conn.execute(f"ATTACH DATABASE '{bak_db.as_posix()}' AS bak")
+                kw_cond = " OR ".join([f"bak.articles_archive.content LIKE '%{kw}%'" for kw in profile["keywords"][:5]])
+                conn.execute(f"""
+                    INSERT OR IGNORE INTO articles_archive 
+                    SELECT * FROM bak.articles_archive 
+                    WHERE sort_ts >= '{min_date}' AND ({kw_cond})
+                    LIMIT 200
+                """)
+                conn.execute("""
+                    INSERT OR IGNORE INTO ioc_knowledge_base
+                    SELECT * FROM bak.ioc_knowledge_base
+                    LIMIT 500
+                """)
+                conn.commit()
+                conn.execute("DETACH DATABASE bak")
+            with sqlite3.connect(DB_PATH) as conn:
+                count = conn.execute("SELECT count(*) FROM articles_archive").fetchone()[0]
+                iocs = conn.execute("SELECT count(*) FROM ioc_knowledge_base").fetchone()[0]
+            print(f"[+] Đã hoàn thành nạp {count:,} bài báo và {iocs:,} IOCs chuyên biệt cho {profile['name']}.")
+        else:
+            print(f"[!] PHÁT HIỆN MÁY MỚI (COLD-START): Đang cào trực tiếp từ các nguồn của {profile['name']}...")
+            sys.path.append(str(SANDBOX_DIR))
+            from lam_automation_crawler import crawl_all_sources_and_archive
+            crawl_all_sources_and_archive(limit_per_source=8)
     else:
         print(f"[+] Cơ sở tri thức ĐÃ SẴN SÀNG với {count:,} bài báo và hơn 9,440+ IOCs đã học.")
 
