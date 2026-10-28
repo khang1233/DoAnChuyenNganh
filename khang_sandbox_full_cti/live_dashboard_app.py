@@ -926,7 +926,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
       <button class="NavLink" onclick="switchView('sec-feed', this)">1. Nguồn Báo</button>
       <button class="NavLink" onclick="switchView('sec-history', this)">Lịch Sử Đã Học (<span id="navHistoryCount">0</span>)</button>
       <button class="NavLink" onclick="switchView('sec-score', this)">2. Bảng Điểm IOC</button>
-      <button class="NavLink" onclick="switchView('sec-defense', this)">3. Phòng Thủ 5 Lớp</button>
+      <button class="NavLink" onclick="switchView('sec-defense', this)">3. Kho Kỹ Năng Tác Tử (Agentic Skills)</button>
       <button class="NavLink" onclick="switchView('sec-defense-connect', this)">4. Kết Nối Công Cụ Live</button>
       <button class="NavLink" onclick="switchView('sec-chat', this)">Chat AI Agent</button>
       <button class="NavLink" onclick="switchView('sec-add', this)">+ Thêm Báo Mới</button>
@@ -1506,7 +1506,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
 
     <!-- MỤC 3: PHÒNG THỦ ĐA TẦNG & GIAO TIẾP FIREWALL -->
     <section class="CyberBox" id="sec-defense">
-      <div class="BoxLegend" style="margin-bottom:12px;">3. PHƯƠNG PHÁP PHÒNG THỦ ĐA TẦNG VÀ FIREWALL</div>
+      <div class="BoxLegend" style="margin-bottom:12px;">3. KHO GÓI KỸ NĂNG TÁC TỬ PHÒNG THỦ TỰ HÀNH (AGENTIC DEFENSE SKILLS HUB)</div>
 
       <!-- THANH ĐIỀU KHIỂN TRUNG TÂM: SCOPE & NGUỒN CTI HỢP NHẤT -->
       <div style="background:var(--bg-subtle); border:1px solid var(--border-main); border-radius:8px; padding:12px 14px; margin-bottom:12px;">
@@ -1701,7 +1701,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
                 MÁY CHỦ WAF REVERSE PROXY: CỔNG 8766 (RUNNING LIVE)
               </span>
               <span style="font-size:11.5px; font-weight:700; padding:3px 8px; background:var(--primary-subtle); color:var(--primary); border:1px solid #bfdbfe; border-radius:4px;">
-                KHO TRI THỨC 3 NĂM: 1,695 BÀI BÁO &amp; CVE (2024 - 2026)
+                <span id="lblCorpusStats1">KHO TRI THỨC PHÂN HỆ: 221 BÀI BÁO &amp; 1,828 IOCs (2024 - 2026)</span>
               </span>
             </div>
             <div>
@@ -1816,7 +1816,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
               5/5 CÔNG CỤ ĐÃ SẴN SÀNG KẾT NỐI &amp; NẠP RULE TRỰC TIẾP
             </span>
             <span style="font-size:12px; font-weight:700; padding:4px 10px; background:var(--primary-subtle); color:var(--primary); border:1px solid #bfdbfe; border-radius:4px;">
-              KHO TRI THỨC 3 NĂM: 7,258 BÀI BÁO &amp; 969 CVEs
+              <span id="lblCorpusStats2">KHO TRI THỨC PHÂN HỆ: 221 BÀI BÁO &amp; 1,828 IOCs</span>
             </span>
           </div>
           <div style="font-size:12.5px; color:var(--text-muted); margin-top:6px;">
@@ -3586,10 +3586,15 @@ Nhấn bất kỳ nút chức năng nào phía trên để thực thi lệnh tr�
         masterDefenseCache = d;
 
         // Cập nhật số liệu bài báo và IOC mới nhất lên nút và giao diện
-        const elArt = document.getElementById('lblMasterArticlesCount');
+const elArt = document.getElementById('lblMasterArticlesCount');
         if (elArt) elArt.textContent = d.total_articles.toLocaleString();
         const elIoc = document.getElementById('lblMasterIocsCount');
         if (elIoc) elIoc.textContent = d.total_iocs.toLocaleString();
+        
+        const s1 = document.getElementById('lblCorpusStats1');
+        if (s1) s1.innerHTML = `KHO TRI THỨC PHÂN HỆ: ${d.total_articles.toLocaleString()} BÀI BÁO &amp; ${d.total_iocs.toLocaleString()} IOCs (2024 - 2026)`;
+        const s2 = document.getElementById('lblCorpusStats2');
+        if (s2) s2.innerHTML = `KHO TRI THỨC PHÂN HỆ: ${d.total_articles.toLocaleString()} BÀI BÁO &amp; ${d.total_iocs.toLocaleString()} IOCs`;
 
         // 1. Cập nhật Banner Ngữ Cảnh
         const banner = document.getElementById('unifiedScopeBanner');
@@ -4235,7 +4240,7 @@ Nhấn bất kỳ nút chức năng nào phía trên để thực thi lệnh tr�
       // Đặt thông báo tải rõ ràng trong các ô quy tắc phòng thủ thay vì để sót văn bản cũ gây hiểu lầm
       const loadingNotice = `[AI AGENT ĐANG PHÂN TÍCH VÀ BIÊN SOẠN QUY TẮC PHÒNG THỦ CHO BÀI BÁO #${idx + 1}]\n` +
         `• Bài báo: "${(art.title || '').slice(0, 75)}..."\n` +
-        `• Tiến trình: Đang đọc nội dung, tra cứu 5 nguồn OSINT và biên dịch mã phòng thủ 5 lớp...\n` +
+        `• Tiến trình: Đang đọc nội dung, tra cứu 5 nguồn OSINT và tổng hợp Gói Kỹ Năng Tác Tử Phòng Thủ (Agentic Defense Skills)...\n` +
         `• Quy tắc đầy đủ (OpenC2, Suricata, ModSecurity, Sigma, YARA) sẽ tự động hiển thị ngay khi hoàn tất (~20s)...`;
       ['outHistory', 'outFirewall', 'outSuricata', 'outWaf', 'outSigma', 'outYara'].forEach(id => {
         const el = document.getElementById(id);
@@ -6256,7 +6261,7 @@ class ServerAutonomousDaemon:
                                     save_enriched_iocs_to_db(enriched, source_title=art_title)
 
                                     self.active_stage_idx = 4
-                                    self.active_stage_name = "Sinh quy tắc phòng thủ 5 lớp (OpenC2, Suricata, WAF, Wazuh, YARA)"
+                                    self.active_stage_name = "Tổng hợp Gói Kỹ Năng Tác Tử Đa Lớp (SKILL.md, Tools, Rules, Examples)"
                                     mitre = tool7_map_mitre_attack(art_content, malicious)
                                     base_rules = tool8_generate_defensive_rules(art_title, malicious, mitre, raw_text=art_content)
                                     save_ai_analysis_run_to_db(
@@ -6265,7 +6270,7 @@ class ServerAutonomousDaemon:
                                         model_used="LOCAL OLLAMA (khang-qwen3 • 100% GPU RX 6600)",
                                         total_iocs=len(enriched),
                                         malicious_iocs=len(malicious),
-                                        defense_summary=f"Server tự động phân tích và sinh phòng thủ 5 lớp cho {len(malicious)} IOC nguy hại.",
+                                        defense_summary=f"Server tự động phân tích và tổng hợp Kỹ Năng Tác Tử cho {len(malicious)} IOC nguy hại.",
                                     )
 
                                 duration = round(time.time() - t_start, 2)

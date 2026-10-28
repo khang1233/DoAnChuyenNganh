@@ -146,8 +146,10 @@ def ensure_cti_knowledge_base(scope_id: str, history_years: int = 3):
                 conn.execute("""
                     INSERT OR IGNORE INTO ioc_knowledge_base
                     SELECT * FROM bak.ioc_knowledge_base
-                    LIMIT 500
+                    ORDER BY reputation_score DESC
+                    LIMIT 1500
                 """)
+                conn.execute("UPDATE articles_archive SET fetched_at_utc = datetime('now'), last_analyzed_at = datetime('now', 'localtime')")
                 conn.commit()
                 conn.execute("DETACH DATABASE bak")
             with sqlite3.connect(DB_PATH) as conn:
