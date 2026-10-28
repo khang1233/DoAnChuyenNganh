@@ -1,50 +1,49 @@
 @echo off
 chcp 65001 >nul
-title [CTI SYSTEM] DANG KHOI DONG TOAN BO HE THONG...
+title [CTI DEFENSE SYSTEM] KHOI DONG THANH CONG
 color 0A
 
 set "BASE_DIR=%~dp0"
 set "OLLAMA_MODELS=%BASE_DIR%ollama_models"
 set "OLLAMA_KEEP_ALIVE=24h"
 
-echo ==============================================================================
-echo   KHOI DONG HE THONG PHONG THU CTI VA AGENTIC SKILLS (5-STAGE WIZARD)
-echo   - Web Dashboard : http://127.0.0.1:8765
-echo   - WAF Proxy L7  : http://127.0.0.1:8766
-echo   - Thu muc goc   : %BASE_DIR%
-echo ==============================================================================
-echo.
-
-:: 1. Kiem tra Ollama neu may co san
+:: 1. Kiem tra Ollama neu may co san thi chay ngam
 where ollama >nul 2>nul
 if %errorlevel% equ 0 (
-    echo [1/3] Phat hien Ollama trong he thong, dang bat Ollama Server...
-    start ">>> [1] OLLAMA GPU SERVER <<<" ollama serve
+    start /B "" ollama serve >nul 2>&1
 ) else if exist "%LOCALAPPDATA%\Programs\Ollama\ollama.exe" (
-    echo [1/3] Dang mo Ollama GPU Server tai LocalAppData...
-    start ">>> [1] OLLAMA GPU SERVER <<<" "%LOCALAPPDATA%\Programs\Ollama\ollama.exe" serve
-) else (
-    echo [1/3] [THONG TIN] Khong phat hien Ollama (He thong chay che do CTI Rule va Agentic Skill tieu chuan).
+    start /B "" "%LOCALAPPDATA%\Programs\Ollama\ollama.exe" serve >nul 2>&1
 )
 
 :: 2. Khoi dong CTI Web Server va WAF Proxy
-echo [2/3] Dang khoi dong CTI Defense Live Server va WAF Proxy (Cong 8765 / 8766)...
 cd /d "%BASE_DIR%khang_sandbox_full_cti"
-start ">>> [2] CTI DEFENSE SERVER <<<" python live_dashboard_app.py
+start /B "" python live_dashboard_app.py >nul 2>&1
 
-:: 3. Cho server khoi dong va tu dong bat trinh duyet
-echo [3/3] Dang cho he thong san sang...
-ping 127.0.0.1 -n 4 >nul
+:: 3. Cho server san sang
+ping 127.0.0.1 -n 3 >nul
 
-echo.
-echo Dang mo trinh duyet Web Dashboard tai: http://127.0.0.1:8765 ...
+:: 4. Tu dong mo trinh duyet vao ngay Buoc 1 (Scan)
 start "" "http://127.0.0.1:8765"
 
-echo.
+cls
 echo ==============================================================================
-echo   [OK] HE THONG DA KHOI DONG THANH CONG!
-echo   - Giao dien: http://127.0.0.1:8765
-echo   - De TAT TOAN BO: Hay chay file 2_TAT_HE_THONG.bat
+echo   🚀 HE THONG AN NINH MANG TU HANH CTI AGENTIC DEFENSE (KHOI DONG THANH CONG)
+echo ==============================================================================
+echo.
+echo   [OK] CTI Defense Engine & WAF Reverse Proxy dang hoat dong tai cong 8766.
+echo   [OK] Da tu dong mo trinh duyet Web Dashboard.
+echo.
+echo   ==========================================================================
+echo   👉 DUONG LINK TRUY CAP TRUC TIEP:
+echo.
+echo        http://127.0.0.1:8765
+echo.
+echo   ==========================================================================
+echo.
+echo   * BUOC 1 TREN WEB LA: [ QUET DU AN (SCAN CODEBASE) ]
+echo     Chi can nhap duong dan thu muc hoac link Git, he thong se tu dong lam het.
+echo.
+echo   * DE TAT HE THONG: Nhap dup vao file "2_TAT_HE_THONG.bat"
 echo ==============================================================================
 echo.
 pause

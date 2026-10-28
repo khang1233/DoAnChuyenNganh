@@ -921,8 +921,8 @@ HTML_PAGE = r"""<!DOCTYPE html>
     </div>
 
     <div class="NavLinks">
-      <button class="NavLink" style="background:#eff6ff; color:#2563eb; font-weight:700; border:1px solid #bfdbfe;" onclick="switchView('sec-wizard', this)">🚀 5 Bước Tự Hành (Wizard)</button>
-      <button class="NavLink active" onclick="switchView('all', this)">Tất Cả</button>
+      <button class="NavLink active" style="background:#2563eb; color:#ffffff; font-weight:700; border:1px solid #1d4ed8;" onclick="switchView('sec-wizard', this)">🚀 5 Bước Tự Hành (Wizard)</button>
+      <button class="NavLink" onclick="switchView('all', this)">Tất Cả</button>
       <button class="NavLink" onclick="switchView('sec-feed', this)">1. Nguồn Báo</button>
       <button class="NavLink" onclick="switchView('sec-history', this)">Lịch Sử Đã Học (<span id="navHistoryCount">0</span>)</button>
       <button class="NavLink" onclick="switchView('sec-score', this)">2. Bảng Điểm IOC</button>
@@ -1103,7 +1103,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
         <div style="display:grid; grid-template-columns:1fr; gap:12px; margin-bottom:16px;">
           <div>
             <label class="FieldLabel" style="font-size:12px; font-weight:600; color:#334155; margin-bottom:4px; display:block;">ĐƯỜNG DẪN THƯ MỤC DỰ ÁN MỤC TIÊU</label>
-            <input type="text" id="wizardInputTarget" class="CleanInput" style="width:100%; font-family:monospace; padding:9px 12px;" value="./target_projects/demo_vulnerable_php_app" placeholder="Ví dụ: D:/my-web-app hoặc ./target_projects/sample_web" />
+            <input type="text" id="wizardInputTarget" class="CleanInput" style="width:100%; font-family:monospace; padding:9px 12px;" value="./target_projects/My_Website" placeholder="Ví dụ: D:/my-web-app hoặc ./target_projects/sample_web" />
           </div>
           <div>
             <label class="FieldLabel" style="font-size:12px; font-weight:600; color:#334155; margin-bottom:4px; display:block;">HOẶC NHẬP LINK GITHUB (TỰ ĐỘNG CLONE VỀ TARGET_PROJECTS/)</label>
@@ -2027,11 +2027,13 @@ HTML_PAGE = r"""<!DOCTYPE html>
     function renderSourceWebsites() {
       const baseSites = [
         { host: "thehackernews.com", url: "https://thehackernews.com" },
-        { host: "securelist.com", url: "https://securelist.com" },
-        { host: "checkpoint.com", url: "https://research.checkpoint.com" },
-        { host: "sentinelone.com", url: "https://www.sentinelone.com/labs/" },
-        { host: "thedfirreport.com", url: "https://thedfirreport.com" },
+        { host: "bleepingcomputer.com", url: "https://www.bleepingcomputer.com" },
         { host: "cisa.gov", url: "https://www.cisa.gov/known-exploited-vulnerabilities-catalog" },
+        { host: "threatfox.abuse.ch", url: "https://threatfox.abuse.ch" },
+        { host: "securityweek.com", url: "https://www.securityweek.com" },
+        { host: "research.checkpoint.com", url: "https://research.checkpoint.com" },
+        { host: "securelist.com", url: "https://securelist.com" },
+        { host: "thedfirreport.com", url: "https://thedfirreport.com" }
       ];
       const box = document.getElementById('sourceWebsitesList');
       if (box) {
@@ -4569,13 +4571,14 @@ const elArt = document.getElementById('lblMasterArticlesCount');
       switchDefenseScope('MASTER');
       fetchLiveDefenseStatus();
       setInterval(fetchLiveDefenseStatus, 3500);
+      switchView('sec-wizard', document.querySelector('.NavLinks .NavLink'));
     });
   
     // =========================================================================
     // WIZARD INTERACTIVE CONTROLLER JAVASCRIPT
     // =========================================================================
     let wzCurrentStep = 1;
-    let wzTarget = "./target_projects/demo_vulnerable_php_app";
+    let wzTarget = "./target_projects/My_Website";
     let wzScopeId = "SCOPE_WEB";
     let wzBestArticleId = "thn-79d0e8ee";
     let wzSkillName = "agentic-defense-cve-2026-php2shell";

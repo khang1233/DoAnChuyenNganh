@@ -850,15 +850,15 @@ def get_archived_articles(source_filter: str = "ALL", keyword: str = "") -> List
 
     # Sắp xếp ưu tiên:
     # 1. Bài do người dùng tự thêm (Web: ...) lên đầu tiên
-    # 2. Bài có chứa IP thật (ioc_counts['ips'] > 0) và bài mới nhất hôm nay của TheHackerNews, Check Point, Securelist, SentinelOne, DFIR Report
+    # 2. Bài có chứa IP/Domain/CVE thật và bài mới nhất đa nguồn (BleepingComputer, CISA, Abuse.ch, SecurityWeek, TheHackerNews, Check Point, Securelist)
     def _rank_key(it: Dict[str, Any]):
         is_custom = 1 if it["source"].startswith("Web:") else 0
         has_ips = 1 if it["ioc_counts"]["ips"] >= 2 else (1 if it["ioc_counts"]["ips"] >= 1 else 0)
         has_any_ioc = 1 if it["ioc_counts"]["total"] >= 2 else 0
-        is_thn_fresh = 1 if (it["source"] == "TheHackerNews" and it["sort_ts"] >= "2026-10-08" and it["ioc_counts"]["total"] > 0) else 0
+        is_fresh = 1 if (it["sort_ts"] >= "2026-10-08" and it["ioc_counts"]["total"] > 0) else 0
         return (
             is_custom,
-            is_thn_fresh,
+            is_fresh,
             has_ips,
             has_any_ioc,
             it["sort_ts"],
