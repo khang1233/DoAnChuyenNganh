@@ -1,33 +1,31 @@
-// HARDENED & SECURE SAMPLE (Node.js / Express — Sau khi AI Agent sửa)
+// [HARDENED] Node.js Express — Whitelist Regex, execFile không dùng shell, Parameterized Query
 const express = require('express');
 const { execFile } = require('child_process');
 const helmet = require('helmet');
 const app = express();
 
-app.use(helmet()); // Bổ sung các Security Headers chuẩn OWASP
+app.use(helmet()); // Bổ sung Security Headers chuẩn OWASP
 
-// Khắc phục 1: Dùng execFile với mảng tham số cố định và Whitelist regex
+// Khắc phục RCE: Whitelist kiểm tra định dạng IP/Domain + execFile mảng cố định
+const IP_REGEX = /^([0-9]{1,3}\.){3}[0-9]{1,3}$/;
 app.get('/api/ping', (req, res) => {
     const host = req.query.host;
-    const IP_REGEX = /^([0-9]{1,3}\.){3}[0-9]{1,3}$/;
-    
     if (!host || !IP_REGEX.test(host)) {
         return res.status(400).json({ error: "Tham số IP không hợp lệ theo Whitelist." });
     }
-    // Thực thi an toàn tuyệt đối, không kích hoạt shell trung gian
-    execFile('ping', ['-c', '1', host], (err, stdout) => {
-        if (err) return res.status(500).json({ error: "Lỗi thực thi lệnh" });
+    // Thực thi trực tiếp binary không qua shell trung gian (/bin/sh)
+    execFile('ping', ['-c', '1', host], { timeout: 3000 }, (err, stdout) => {
+        if (err) return res.status(500).json({ error: "Lỗi thực thi kiểm tra mạng" });
         res.type('text/plain').send(stdout);
     });
 });
 
-// Khắc phục 2: Sử dụng Parameterized Query (Prepared Statement)
+// Khắc phục SQLi: Prepared Statement với tham số hóa (?)
 app.get('/api/user', async (req, res) => {
-    const userId = parseInt(req.query.id, 10);
-    if (isNaN(userId)) {
-        return res.status(400).json({ error: "ID người dùng bắt buộc là số nguyên." });
+    const id = parseInt(req.query.id, 10);
+    if (isNaN(id) || id <= 0) {
+        return res.status(400).json({ error: "ID người dùng không hợp lệ." });
     }
-    // An toàn tuyệt đối trước mọi kỹ thuật SQL Injection
-    const result = await db.query('SELECT id, username, email FROM users WHERE id = ?', [userId]);
-    res.json(result);
+    const [rows] = await db.execute('SELECT id, username, email FROM users WHERE id = ?', [id]);
+    res.json(rows);
 });

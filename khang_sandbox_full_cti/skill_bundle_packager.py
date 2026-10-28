@@ -13,6 +13,7 @@ from agentic_defense_skill_engine import (
     TARGET_SCOPES
 )
 from phuc_core_ai_agent import tool6_extract_iocs_hybrid
+from multi_lang_remediation_suite import write_all_language_fixtures, generate_multi_lang_markdown_sop
 
 SANDBOX_DIR = Path("khang_sandbox_full_cti")
 DB_PATH = SANDBOX_DIR / "cti_multi_source_archive.sqlite"
@@ -172,35 +173,8 @@ if __name__ == '__main__':
     }
     (refs_dir / "stix21_bundle.json").write_text(json.dumps(stix_bundle, indent=2), encoding="utf-8")
 
-    # 6. Sinh examples/ (Mẫu code trước & sau khi vá cho Developer)
-    vulnerable_code = """<?php
-// VULNERABLE CODE SAMPLE (Trước khi áp dụng Skill)
-// Mã nguồn không kiểm tra tham số, cho phép RCE
-if (isset($_GET['cmd'])) {
-    $command = $_GET['cmd'];
-    // Lỗ hổng nghiêm trọng: Thực thi trực tiếp chuỗi người dùng nhập
-    system($command); 
-}
-?>"""
-    (examples_dir / "vulnerable_sample.php").write_text(vulnerable_code, encoding="utf-8")
-    
-    patched_code = """<?php
-// HARDENED & SECURE CODE SAMPLE (Sau khi AI Agent áp dụng Skill)
-// Mã nguồn đã được chuẩn hóa với Whitelist và Input Sanitization
-if (isset($_GET['action'])) {
-    $action = $_GET['action'];
-    $allowed_actions = ['status', 'uptime', 'version'];
-    
-    if (in_array($action, $allowed_actions, true)) {
-        // Thực thi an toàn theo danh sách cho phép (Zero-RCE)
-        echo htmlspecialchars(shell_exec("systemctl status " . escapeshellcmd($action)));
-    } else {
-        http_response_code(400);
-        echo "Invalid action requested.";
-    }
-}
-?>"""
-    (examples_dir / "patched_secure_sample.php").write_text(patched_code, encoding="utf-8")
+    # 6. Sinh examples/ (Mẫu code trước & sau khi vá cho Developer của 6 ngôn ngữ lớn)
+    write_all_language_fixtures(examples_dir)
 
     # 7. Sinh manifest.json (Metadata để các nền tảng Agent tải và cài đặt)
     manifest = {
@@ -474,107 +448,15 @@ if __name__ == '__main__':
 '''
     (scripts_dir / "apply_virtual_patch.py").write_text(apply_patch_script, encoding="utf-8")
 
-    # 9. Sinh Mã Mẫu Chuẩn Cho Lập Trình Viên (Examples phù hợp công nghệ thực tế)
-    # Mã mẫu Node.js / Express
-    node_vuln = """// VULNERABLE SAMPLE (Node.js / Express — Trước khi sửa)
-const express = require('express');
-const { exec } = require('child_process');
-const app = express();
-
-// Lỗ hổng 1: Command Injection qua query string
-app.get('/api/ping', (req, res) => {
-    const host = req.query.host;
-    // Nguy hiểm: Ghép chuỗi trực tiếp cho phép attacker chèn toán tử ; | &&
-    exec(`ping -c 1 ${host}`, (err, stdout) => {
-        res.send(stdout);
-    });
-});
-
-// Lỗ hổng 2: SQL Injection qua chuỗi thô
-app.get('/api/user', async (req, res) => {
-    const userId = req.query.id;
-    const query = `SELECT * FROM users WHERE id = '${userId}'`; // Dễ bị ' OR 1=1 --
-    const result = await db.raw(query);
-    res.json(result);
-});
-"""
-    (examples_dir / "vulnerable_sample.js").write_text(node_vuln, encoding="utf-8")
-
-    node_patched = """// HARDENED & SECURE SAMPLE (Node.js / Express — Sau khi AI Agent sửa)
-const express = require('express');
-const { execFile } = require('child_process');
-const helmet = require('helmet');
-const app = express();
-
-app.use(helmet()); // Bổ sung các Security Headers chuẩn OWASP
-
-// Khắc phục 1: Dùng execFile với mảng tham số cố định và Whitelist regex
-app.get('/api/ping', (req, res) => {
-    const host = req.query.host;
-    const IP_REGEX = /^([0-9]{1,3}\\.){3}[0-9]{1,3}$/;
-    
-    if (!host || !IP_REGEX.test(host)) {
-        return res.status(400).json({ error: "Tham số IP không hợp lệ theo Whitelist." });
-    }
-    // Thực thi an toàn tuyệt đối, không kích hoạt shell trung gian
-    execFile('ping', ['-c', '1', host], (err, stdout) => {
-        if (err) return res.status(500).json({ error: "Lỗi thực thi lệnh" });
-        res.type('text/plain').send(stdout);
-    });
-});
-
-// Khắc phục 2: Sử dụng Parameterized Query (Prepared Statement)
-app.get('/api/user', async (req, res) => {
-    const userId = parseInt(req.query.id, 10);
-    if (isNaN(userId)) {
-        return res.status(400).json({ error: "ID người dùng bắt buộc là số nguyên." });
-    }
-    // An toàn tuyệt đối trước mọi kỹ thuật SQL Injection
-    const result = await db.query('SELECT id, username, email FROM users WHERE id = ?', [userId]);
-    res.json(result);
-});
-"""
-    (examples_dir / "patched_secure_sample.js").write_text(node_patched, encoding="utf-8")
-
-    # Mã mẫu Python
-    py_vuln = """# VULNERABLE SAMPLE (Python Backend — Trước khi sửa)
-import os
-from flask import Flask, request
-
-app = Flask(__name__)
-
-@app.route('/api/system_status')
-def system_status():
-    service = request.args.get('service', 'nginx')
-    # Lỗ hổng RCE: os.system thực thi shell trực tiếp
-    os.system(f"systemctl status {service}")
-    return {"status": "checked"}
-"""
-    (examples_dir / "vulnerable_sample.py").write_text(py_vuln, encoding="utf-8")
-
-    py_patched = """# HARDENED & SECURE SAMPLE (Python Backend — Sau khi AI Agent sửa)
-import subprocess
-from flask import Flask, request, jsonify
-
-app = Flask(__name__)
-ALLOWED_SERVICES = {"nginx", "mysql", "redis", "node_app"}
-
-@app.route('/api/system_status')
-def system_status():
-    service = request.args.get('service', '')
-    if service not in ALLOWED_SERVICES:
-        return jsonify({"error": "Dịch vụ không nằm trong Whitelist cho phép"}), 400
-        
-    # An toàn tuyệt đối: shell=False và mảng đối số tường minh
-    res = subprocess.run(["systemctl", "status", service], capture_output=True, text=True, check=False)
-    return jsonify({"service": service, "output": res.stdout[:500]})
-"""
-    (examples_dir / "patched_secure_sample.py").write_text(py_patched, encoding="utf-8")
+    # 9. Sinh Mã Mẫu Chuẩn Cho Lập Trình Viên (Examples của 6 ngôn ngữ lớn: JS/TS, Python, Java, PHP, Go, C#)
+    write_all_language_fixtures(examples_dir)
 
     # 10. Sinh references/ và manifest.json
     threat_matrix = {
         "scope": scope_id,
         "technologies": detected_techs,
+        "supported_languages": ["JavaScript/TypeScript", "Python", "Java", "PHP", "Go", "C#/.NET"],
+        "examples_count": 12,
         "cve_coverage": cve_list,
         "blocked_c2_ips": len(blocklist_ips),
         "total_cti_articles_analyzed": len(articles),
@@ -592,6 +474,8 @@ def system_status():
         "version": "2.0.0",
         "scope": scope_id,
         "technologies": detected_techs,
+        "supported_languages": ["JavaScript/TypeScript", "Python", "Java", "PHP", "Go", "C#/.NET"],
+        "examples_count": 12,
         "trust_score": 97.5,
         "tools": [
             {"name": "verify_exploit", "script": "scripts/verify_exploit.py", "description": "Kiểm thử bảo mật đa vector tự động trên hệ thống"},
@@ -662,8 +546,9 @@ python scripts/apply_virtual_patch.py
 ```
 
 ### Bước 3: Sửa Code Dự Án Tận Gốc
-- Đối với **Node.js / Express**: Thay thế mọi lệnh `exec()` bằng `execFile()` kèm Whitelist regex; thay câu lệnh SQL thô bằng Prepared Statement.
-- Đối với **Python Backend**: Loại bỏ `os.system()`; dùng `subprocess.run()` với `shell=False`.
+- AI Coding Agent đọc kỹ **PHẦN 5** bên dưới, chọn đúng ngôn ngữ của dự án mục tiêu (JavaScript/TypeScript, Python, Java, PHP, Go, hoặc C#/.NET) và áp dụng mẫu mã nguồn an toàn tương ứng từ thư mục `examples/`.
+
+{generate_multi_lang_markdown_sop()}
 
 ### Bước 4: Tái Kiểm Thử & Xác Nhận
 Chạy lại script kiểm thử để đảm bảo mọi vector tấn công đã bị vô hiệu hóa hoàn toàn:

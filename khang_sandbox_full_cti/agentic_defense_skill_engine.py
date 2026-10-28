@@ -13,6 +13,7 @@ import json
 from pathlib import Path
 import re
 from typing import Any, Dict, List, Optional
+from multi_lang_remediation_suite import generate_multi_lang_markdown_sop
 
 # ==============================================================================
 # 1. ĐỊNH NGHĨA 4 HỒ SƠ PHẠM VI MỤC TIÊU (TARGET SCOPE PROFILES)
@@ -547,14 +548,7 @@ def build_agentic_defense_skill_package(
         "    run_dual_loop_audit()",
         "```",
         "",
-        "## PHẦN 5: HƯỚNG DẪN KHẮC PHỤC TẬN GỐC CHO LẬP TRÌNH VIÊN (DEVELOPER REMEDIATION SOP)",
-        "",
-        "1. **Bản chất điểm yếu:** Kẻ tấn công lợi dụng việc nối chuỗi trực tiếp dữ liệu người dùng vào câu lệnh truy vấn mà không qua cơ chế tham số hóa.",
-        "2. **Hành động bắt buộc ở tầng mã nguồn:**",
-        "   - **Đối với SQL Injection:** Tuyệt đối không sử dụng `SELECT * FROM table WHERE id = ' + userId`. Bắt buộc chuyển sang dùng **Prepared Statements / Parameterized Queries** (PDO trong PHP, PreparedStatement trong Java, hoặc ORM Prisma/TypeORM/Hibernate).",
-        "   - **Đối với RCE / Command Injection:** Cấm gọi trực tiếp `exec()`, `system()`, `Runtime.getRuntime().exec()`, hoặc `eval()`. Dùng whitelist tham số nghiêm ngặt.",
-        "   - **Đối với Path Traversal:** Chuẩn hóa đường dẫn bằng `Path.normalize()` hoặc `realpath()`, từ chối mọi chuỗi chứa `../` hoặc `%2e%2e`.",
-        f"3. **Bản vá chính hãng (Vendor Patching):** Tham chiếu ngay khuyến cáo của CISA và nhà phát triển ứng dụng liên quan tới danh mục: `{cve_str}`.",
+        generate_multi_lang_markdown_sop(),
         "",
         "## PHẦN 6: GIẢI TRÌNH MINH BẠCH xAI (EXPLAINABLE AI & ATTRIBUTION AUDIT)",
         "",

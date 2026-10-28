@@ -10,6 +10,15 @@
     "Node.js / JavaScript Web Ecosystem",
     "Python Backend (FastAPI / Django / Flask)"
   ],
+  "supported_languages": [
+    "JavaScript/TypeScript",
+    "Python",
+    "Java",
+    "PHP",
+    "Go",
+    "C#/.NET"
+  ],
+  "examples_count": 12,
   "trust_score": 97.5,
   "tools": [
     {
