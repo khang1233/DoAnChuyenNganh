@@ -128,7 +128,9 @@ class MultiProviderLLMBrain:
 
     @classmethod
     def _ensure_and_detect_local_ollama_model(cls, preferred: Optional[str] = None) -> str:
-        os.environ["OLLAMA_MODELS"] = r"D:\mkhang\DoAnChuyenNganh\ollama_models"
+        custom_models_dir = Path(__file__).resolve().parents[1] / "ollama_models"
+        if custom_models_dir.exists():
+            os.environ["OLLAMA_MODELS"] = str(custom_models_dir)
         for attempt in range(2):
             try:
                 r = requests.get("http://127.0.0.1:11434/api/tags", timeout=2)
@@ -138,8 +140,8 @@ class MultiProviderLLMBrain:
                         for m in models:
                             if m.startswith(preferred):
                                 return m
-                    # Ưu tiên số 1: khang-qwen3 (Qwen 3 - 8B mới nhất) & khang-ai (Google DeepMind Gemma 3)
-                    for candidate in ("khang-qwen3", "qwen3:8b", "khang-ai", "gemma3:4b", "qwen2.5:7b", "deepseek-r1:7b", "qwen2.5:1.5b", "llama3.2"):
+                    # Ưu tiên các model phổ biến nhất
+                    for candidate in ("qwen3:8b", "khang-qwen3", "qwen2.5:7b", "gemma3:4b", "khang-ai", "deepseek-r1:7b", "qwen2.5:1.5b", "llama3.2", "llama3", "mistral"):
                         for m in models:
                             if m.startswith(candidate):
                                 cls._cached_ollama_model = m
@@ -155,7 +157,8 @@ class MultiProviderLLMBrain:
                         ollama_exe = Path(os.environ.get("LOCALAPPDATA", "")) / "Programs" / "Ollama" / "ollama.exe"
                         if ollama_exe.exists():
                             env_copy = os.environ.copy()
-                            env_copy["OLLAMA_MODELS"] = r"D:\mkhang\DoAnChuyenNganh\ollama_models"
+                            if custom_models_dir.exists():
+                                env_copy["OLLAMA_MODELS"] = str(custom_models_dir)
                             flags = getattr(subprocess, "DETACHED_PROCESS", 0) | getattr(subprocess, "CREATE_NO_WINDOW", 0)
                             subprocess.Popen(
                                 [str(ollama_exe), "serve"],

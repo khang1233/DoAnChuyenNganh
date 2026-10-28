@@ -73,6 +73,9 @@ from phuc_core_ai_agent import (
     tool8_generate_defensive_rules,
 )
 from live_defense_orchestrator import live_orchestrator
+from system_hardware_detector import detect_hardware_profile, get_adaptive_system_profile
+
+CURRENT_HARDWARE = detect_hardware_profile()
 
 app = FastAPI(title="Tự động hóa quy trình CTI và Sinh quy tắc phòng thủ ứng dụng AI agent")
 
@@ -931,10 +934,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
 
     <div class="NavRight">
       <select id="aiModelSelect" class="CleanSelect" onchange="onAiModelChange()">
-        <option value="khang-qwen3" selected>Model: Qwen 3 - 8B (Suy luận chuyên sâu • GPU RX 6600)</option>
-        <option value="qwen2.5:7b">Model: Qwen 2.5 (7B • Alibaba)</option>
-        <option value="khang-ai">Model: Google Gemma 3 (4B)</option>
-        <option value="qwen2.5:1.5b">Model: Qwen 2.5 (1.5B Siêu tốc)</option>
+        <option value="auto" selected>Đang dò tìm Model &amp; GPU cục bộ...</option>
       </select>
       <button class="CleanBtn btn-primary" id="btnRunAll" onclick="runPipeline()">
         Chạy Phân Tích
@@ -950,7 +950,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
     <!-- THANH TRẠNG THÁI -->
     <div class="StatusStrip">
       <div>
-        <b style="color:var(--primary);" id="localModelBadge">QWEN 3 - 8B (DEEP REASONING • GPU AMD RX 6600 8GB)</b>
+        <b style="color:var(--primary);" id="localModelBadge">TỰ ĐỘNG NHẬN DIỆN PHẦN CỨNG...</b>
         <span style="margin:0 8px;">&bull;</span>
         <span id="statusText">Sẵn sàng phân tích.</span>
         <span id="liveTelemetryLine" style="display:none;"></span>
@@ -985,7 +985,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
 
     <!-- KHUNG CHAT TRỰC TIẾP VỚI LOCAL AI AGENT -->
     <section class="CyberBox" id="sec-chat" style="display:none; max-width:820px; margin:0 auto 26px;">
-      <div class="BoxLegend">TRỢ LÝ AI AGENT (LOCAL GPU RX 6600)</div>
+      <div class="BoxLegend" id="chatBoxLegend">TRỢ LÝ AI AGENT (ĐANG TẢI PHẦN CỨNG)</div>
 
       <div id="chatLogBox" style="background:var(--bg-subtle); border:1px solid var(--border-main); border-radius:6px; height:320px; overflow-y:auto; padding:14px 16px; margin-bottom:14px; display:flex; flex-direction:column; gap:12px; font-size:13.5px;">
         <div style="padding:10px 14px; border-left:3px solid var(--primary); background:#ffffff; border-radius:0 6px 6px 0; border:1px solid var(--border-main); border-left:3px solid var(--primary);">
@@ -2016,16 +2016,58 @@ Nhấn bất kỳ nút chức năng nào phía trên để thực thi lệnh tr�
       }
     }
 
+    let detectedSystemHardware = null;
+
+    async function loadHardwareAndModels() {
+      try {
+        const res = await fetch('/api/system/hardware-info');
+        if (res.ok) {
+          const data = await res.json();
+          detectedSystemHardware = data.hardware;
+          const sel = document.getElementById('aiModelSelect');
+          const badge = document.getElementById('localModelBadge');
+          const chatLegend = document.getElementById('chatBoxLegend');
+          
+          if (chatLegend && data.hardware) {
+            chatLegend.textContent = `TRỢ LÝ AI AGENT (${data.hardware.gpu_name.toUpperCase()})`;
+          }
+
+          if (sel && data.options && data.options.length > 0) {
+            sel.innerHTML = '';
+            data.options.forEach(opt => {
+              const optEl = document.createElement('option');
+              optEl.value = opt.value;
+              optEl.textContent = opt.label;
+              if (opt.is_active) optEl.selected = true;
+              sel.appendChild(optEl);
+            });
+          }
+          
+          if (badge && data.hardware) {
+            const activeVal = sel ? sel.value : data.active_model;
+            updateModelBadgeText(activeVal);
+          }
+        }
+      } catch (e) {
+        console.error("Không thể lấy thông tin phần cứng:", e);
+      }
+    }
+
+    function updateModelBadgeText(modelVal) {
+      const badge = document.getElementById('localModelBadge');
+      if (!badge) return;
+      const hw = detectedSystemHardware || { gpu_name: "Tự Động", vram_gb: 8.0, is_gpu_available: true };
+      if (!modelVal || modelVal === 'cti-heuristic-engine') {
+        badge.textContent = `CTI HEURISTIC CORE (OFFLINE • ${hw.gpu_name.toUpperCase()})`;
+      } else {
+        badge.textContent = `${modelVal.toUpperCase()} (${hw.gpu_name.toUpperCase()} • ${hw.vram_gb}GB VRAM)`;
+      }
+    }
+
     function onAiModelChange() {
       const sel = document.getElementById('aiModelSelect');
-      const val = sel ? sel.value : 'khang-qwen3';
-      const badge = document.getElementById('localModelBadge');
-      if (badge) {
-        if (val === 'khang-qwen3') badge.textContent = 'QWEN 3 - 8B (DEEP REASONING • GPU AMD RX 6600 8GB)';
-        else if (val === 'khang-ai') badge.textContent = 'GEMMA 3 - 4B (GOOGLE DEEPMIND • GPU AMD RX 6600)';
-        else if (val === 'qwen2.5:7b') badge.textContent = 'QWEN 2.5 - 7B (ALIBABA CLOUD • GPU AMD RX 6600)';
-        else badge.textContent = 'QWEN 2.5 - 1.5B TURBO (SIÊU TỐC 1-2S • GPU AMD RX 6600)';
-      }
+      const val = sel ? sel.value : 'cti-heuristic-engine';
+      updateModelBadgeText(val);
     }
 
     function quickFillChat(text) {
@@ -2057,7 +2099,7 @@ Nhấn bất kỳ nút chức năng nào phía trên để thực thi lệnh tr�
         </div>
         <div id="${pendingId}" style="padding:10px 14px; border-left:3px solid var(--primary); background:var(--bg-subtle); border-radius:0 6px 6px 0; border:1px solid var(--border-main); color:var(--text-muted); font-size:12.5px;">
           <b style="color:var(--primary);">OpenClaw AI Agent (${selectedModel}):</b><br/>
-          Đang kích hoạt Tool-calling và suy luận trên GPU AMD Radeon RX 6600...
+          Đang kích hoạt Tool-calling và suy luận trên ${detectedSystemHardware ? detectedSystemHardware.gpu_name : 'phần cứng cục bộ'}...
         </div>
       `;
       logBox.scrollTop = logBox.scrollHeight;
@@ -4686,6 +4728,7 @@ Nhấn bất kỳ nút chức năng nào phía trên để thực thi lệnh tr�
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
+      await loadHardwareAndModels();
       startBackgroundCountdown();
       await loadArticles('ALL', false);
       await loadMasterDefenseMatrix();
@@ -5016,7 +5059,7 @@ def api_step2_extract_and_plan(req: Step2Request):
         "Trích xuất IOC",
         f"Văn bản: {guard['sanitized_text'][:1800]}\nDanh sách IOC ({len(iocs)} chỉ số): {ioc_str}",
     )
-    provider_label = f"LOCAL OLLAMA ({req.model_name} • GPU RX 6600 8GB)"
+    provider_label = f"LOCAL OLLAMA ({req.model_name} • {CURRENT_HARDWARE['gpu_name']})"
 
     return {
         "guard": guard,
@@ -5056,7 +5099,7 @@ def api_step3_khang_enrich_and_reason(req: Step3Request):
         "Điểm rủi ro IOC",
         "Số liệu Hợp nhất 5 Nguồn (OTX + Abuse.ch/VT + AbuseIPDB + GreyNoise + Shodan) của Khang:\n" + "\n".join(telemetry_lines),
     )
-    provider_label = f"LOCAL OLLAMA ({req.model_name} • GPU RX 6600 8GB)"
+    provider_label = f"LOCAL OLLAMA ({req.model_name} • {CURRENT_HARDWARE['gpu_name']})"
 
     return {
         "all_enriched": [e.model_dump() for e in enriched],
@@ -5666,7 +5709,7 @@ def api_get_article_details(article_id: str):
     )
 
     reason_text = (
-        f"[KẾT LUẬN ĐỒNG THUẬN TÌNH BÁO (LOCAL GPU RX 6600)]\n"
+        f"[KẾT LUẬN ĐỒNG THUẬN TÌNH BÁO (LOCAL {CURRENT_HARDWARE['gpu_name'].upper()})]\n"
         f"Đã thẩm định {len(enriched_list)} chỉ số IOC đối chiếu qua CSDL tình báo SQLite.\n"
         f"Phán quyết: {len(malicious_only)} chỉ số có điểm nguy hại > 80 (CHẶN & BẢO VỆ), "
         f"{len(enriched_list) - len(malicious_only)} chỉ số an toàn / tham chiếu."
@@ -5928,7 +5971,7 @@ def api_chat_with_agent(req: ChatAgentRequest):
         history.append({"role": "user", "content": raw_msg})
         history.append({"role": "assistant", "content": reply})
         return {
-            "model_used": "CTI AGENT INTELLIGENCE CORE (Phản hồi tức thì • GPU RX 6600)",
+            "model_used": f"CTI AGENT INTELLIGENCE CORE (Phản hồi tức thì • {CURRENT_HARDWARE['gpu_name']})",
             "reply": reply,
             "tool_summary": "[Tool-Calling Engine] Sẵn sàng kích hoạt tự động khi phát hiện IP, Domain, Hash hoặc CVE.",
             "history": history,
@@ -6020,7 +6063,7 @@ def api_chat_with_agent(req: ChatAgentRequest):
 
     model = MultiProviderLLMBrain._ensure_and_detect_local_ollama_model(req.model_name)
     reply = ""
-    model_used_label = f"LOCAL OLLAMA ({model} • 100% GPU RX 6600)"
+    model_used_label = f"LOCAL OLLAMA ({model} • 100% {CURRENT_HARDWARE['gpu_name']})"
 
     payload: Dict[str, Any] = {
         "model": model,
@@ -6048,7 +6091,7 @@ def api_chat_with_agent(req: ChatAgentRequest):
             if r_fb.status_code == 200:
                 raw_reply = r_fb.json().get("message", {}).get("content", "")
                 reply = re.sub(r"<think>.*?</think>\s*", "", raw_reply, flags=re.DOTALL).strip()
-                model_used_label = "LOCAL OLLAMA (qwen2.5:1.5b Turbo Fallback • GPU RX 6600)"
+                model_used_label = f"LOCAL OLLAMA (qwen2.5:1.5b Turbo Fallback • {CURRENT_HARDWARE['gpu_name']})"
         except Exception:
             pass
 
@@ -6247,6 +6290,12 @@ class ServerAutonomousDaemon:
 
 server_daemon = ServerAutonomousDaemon()
 
+
+
+@app.get("/api/system/hardware-info")
+def api_get_hardware_info():
+    """Tự động nhận diện GPU/CPU và các Model Ollama thực tế có trên máy người dùng."""
+    return get_adaptive_system_profile()
 
 @app.get("/api/system/daemon-status")
 def api_get_daemon_status():
