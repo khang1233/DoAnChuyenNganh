@@ -491,7 +491,7 @@ Duy trì chu kỳ quét 15 phút / lần để tự động nạp các mã CVE m
 ## 🧭 BẢN ĐỒ NGỮ CẢNH DỰ ÁN MỤC TIÊU (TARGET PROJECT ARCHITECTURAL CONTEXT)
 
 > [!IMPORTANT]
-> **Tác tử AI (Claude, Cursor, Antigravity, Devin)**: Dự án `My_Website` đã được hệ thống CTI thẩm định ngữ cảnh.
+> **Tác tử AI (Claude, Cursor, Codex, Antigravity, Devin, Aider, Continue)**: Dự án `My_Website` đã được hệ thống CTI thẩm định ngữ cảnh.
 > Tuyệt đối không suy luận chung chung! Bạn phải đọc ngữ cảnh thực tế của dự án dưới đây để thực hiện refactor:
 
 - **Tên dự án:** `My_Website`

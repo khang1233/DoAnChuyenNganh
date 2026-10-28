@@ -1216,12 +1216,23 @@ HTML_PAGE = r"""<!DOCTYPE html>
               </ul>
             </div>
             <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:4px; padding:10px; font-size:12px;">
-              <b style="color:#334155;">ĐÃ TỰ ĐỘNG CÀI ĐẶT VÀO DỰ ÁN:</b>
-              <ul style="margin-left:18px; margin-top:6px; line-height:1.6; color:#15803d; font-family:monospace;">
-                <li>✓ .cursor/rules/<span class="wzShortSkill">skill</span>/</li>
-                <li>✓ .gemini/skills/<span class="wzShortSkill">skill</span>/</li>
-                <li>✓ defense_skills/<span class="wzShortSkill">skill</span>/</li>
-                <li>✓ AGENT_REMEDIATION_GUIDE.md</li>
+              <b style="color:#334155;">ĐÃ TỰ ĐỘNG CÀI ĐẶT 15 NỀN TẢNG AGENT LỚN:</b>
+              <ul style="margin-left:18px; margin-top:6px; line-height:1.6; color:#15803d; font-family:monospace; max-height:120px; overflow-y:auto;">
+                <li>✓ Claude Code: CLAUDE.md &amp; .claude/skills/</li>
+                <li>✓ Cursor: .cursor/rules/*.mdc &amp; .cursorrules</li>
+                <li>✓ OpenAI Codex &amp; ChatGPT: CODEX.md &amp; OPENAI.md</li>
+                <li>✓ Antigravity &amp; Gemini: .gemini/skills/ &amp; rules/</li>
+                <li>✓ Aider AI: .aider.conf.yml &amp; CONVENTIONS.md</li>
+                <li>✓ Cline &amp; Roo Code: .clinerules &amp; .roomodes</li>
+                <li>✓ Continue.dev: .continue/config.json &amp; prompts/</li>
+                <li>✓ Devin AI: DEVIN.md &amp; .devin/instructions.md</li>
+                <li>✓ Windsurf Cascade: .windsurfrules</li>
+                <li>✓ GitHub Copilot: .github/copilot-instructions.md</li>
+                <li>✓ JetBrains AI / Junie: .jetbrains/ai-instructions.md</li>
+                <li>✓ Zed Editor: .zed/settings.json</li>
+                <li>✓ Amazon Q &amp; Sourcegraph Cody</li>
+                <li>✓ defense_skills/<span class="wzShortSkill">skill</span>/ (Universal RFC)</li>
+                <li>✓ AGENT_REMEDIATION_GUIDE.md (Master SOP)</li>
               </ul>
             </div>
           </div>
