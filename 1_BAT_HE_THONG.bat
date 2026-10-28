@@ -27,14 +27,14 @@ start "" "http://127.0.0.1:8765"
 
 cls
 echo ==============================================================================
-echo   🚀 HE THONG AN NINH MANG TU HANH CTI AGENTIC DEFENSE (KHOI DONG THANH CONG)
+echo   HE THONG AN NINH MANG TU HANH CTI AGENTIC DEFENSE (KHOI DONG THANH CONG)
 echo ==============================================================================
 echo.
 echo   [OK] CTI Defense Engine & WAF Reverse Proxy dang hoat dong tai cong 8766.
 echo   [OK] Da tu dong mo trinh duyet Web Dashboard.
 echo.
 echo   ==========================================================================
-echo   👉 DUONG LINK TRUY CAP TRUC TIEP:
+echo   DUONG LINK TRUY CAP TRUC TIEP:
 echo.
 echo        http://127.0.0.1:8765
 echo.

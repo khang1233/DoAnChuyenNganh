@@ -135,7 +135,7 @@ function startSystem() {
     }
 
     console.log('==============================================================================');
-    console.log('  🚀 DANG KHOI DONG HE THONG CTI AGENTIC DEFENSE...');
+    console.log('  DANG KHOI DONG HE THONG CTI AGENTIC DEFENSE...');
     console.log('==============================================================================');
     console.log(`[*] Su dung trinh thong dich Python: ${pyCmd}`);
     console.log(`[*] Thu muc goc: ${ROOT_DIR}`);
@@ -180,14 +180,14 @@ function startSystem() {
       if (isReady) {
         console.clear ? console.clear() : console.log('\n'.repeat(10));
         console.log('==============================================================================');
-        console.log('  🚀 HE THONG AN NINH MANG TU HANH CTI AGENTIC DEFENSE (KHOI DONG THANH CONG)');
+        console.log('  HE THONG AN NINH MANG TU HANH CTI AGENTIC DEFENSE (KHOI DONG THANH CONG)');
         console.log('==============================================================================');
         console.log('');
         console.log('  [OK] CTI Defense Engine & WAF Reverse Proxy dang hoat dong tai cong 8766.');
         console.log('  [OK] Da tu dong mo trinh duyet Web Dashboard.');
         console.log('');
         console.log('  ==========================================================================');
-        console.log('  👉 DUONG LINK TRUY CAP TRUC TIEP:');
+        console.log('  DUONG LINK TRUY CAP TRUC TIEP:');
         console.log('');
         console.log('       http://127.0.0.1:8765');
         console.log('');

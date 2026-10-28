@@ -4,7 +4,7 @@ Hệ thống tự động phân tích mã nguồn dự án mục tiêu, đối s
 
 ---
 
-## 🚀 HƯỚNG DẪN CHẠY THỬ NHANH TRÊN MÁY BẤT KỲ (CHO NGƯỜI MỚI)
+## HƯỚNG DẪN CHẠY THỬ NHANH TRÊN MÁY BẤT KỲ (CHO NGƯỜI MỚI)
 
 ### Bước 1: Clone Repository Về Máy
 Mở Terminal / PowerShell / Command Prompt và chạy:
@@ -31,7 +31,7 @@ cti-defense
 *(Hoặc viết tắt: `cti`)*
 
 - Hệ thống sẽ **tự động khởi chạy** máy chủ CTI, WAF Proxy và **tự động mở trình duyệt** tại:
-  👉 **`http://127.0.0.1:8765`** (vào ngay **Bước 1: Quét Dự Án**).
+  **`http://127.0.0.1:8765`** (vào ngay **Bước 1: Quét Dự Án**).
 - Các lệnh điều khiển nhanh:
   - `cti-defense` hoặc `cti` : Khởi động hệ thống và mở Dashboard.
   - `cti stop` : Tắt toàn bộ hệ thống và giải phóng cổng mạng.
@@ -45,11 +45,11 @@ cti-defense
 2. **Bật toàn bộ hệ thống**:
    - Nhấp đúp vào file: `1_BAT_HE_THONG.bat`.
    - Hệ thống sẽ tự động bật Live Server, WAF Proxy cổng 8766 và **tự động mở trình duyệt** tại:
-     👉 **`http://127.0.0.1:8765`**
+     **`http://127.0.0.1:8765`**
 3. **Quét dự án và sinh Kỹ năng tự động**:
-   - Tại mục **"🚀 5 Bước Tự Hành (Wizard)"**:
+   - Tại mục **"5 Bước Tự Hành (Wizard)"**:
      - Nhập đường dẫn thư mục dự án bạn muốn bảo vệ (Ví dụ: `D:/my-web-app` hoặc link GitHub repo).
-     - Nhấn nút **`[ 🚀 BẮT ĐẦU QUÉT DỰ ÁN ]`**.
+     - Nhấn nút **`[ BẮT ĐẦU QUÉT DỰ ÁN ]`**.
    - Hệ thống tự động:
      - Nhận diện Tech Stack (Node.js, Express, PHP, Python, Docker...).
      - Lọc bỏ 100% CTI không liên quan, chỉ cào các bài báo và lỗ hổng đe dọa đúng công nghệ của bạn.
@@ -69,7 +69,7 @@ python apply_to_project.py --target /duong/dan/toi/du-an-cua-ban
 
 ---
 
-## 🤖 MỞ DỰ ÁN BẰNG BẤT KỲ CÔNG CỤ AI NÀO
+## MỞ DỰ ÁN BẰNG BẤT KỲ CÔNG CỤ AI NÀO
 
 Sau khi quét xong, mở thư mục dự án đích bằng bất kỳ công cụ nào, AI Agent sẽ tự động nạp Kỹ năng phòng thủ:
 
@@ -88,7 +88,7 @@ Sau khi quét xong, mở thư mục dự án đích bằng bất kỳ công cụ
 
 ---
 
-## 📦 CẤU TRÚC GÓI KỸ NĂNG TÁC TỬ (AGENTIC SKILL STANDARD)
+## CẤU TRÚC GÓI KỸ NĂNG TÁC TỬ (AGENTIC SKILL STANDARD)
 
 Mỗi kỹ năng trong `defense_skills/` hoặc `skills/` được đóng gói hoàn chỉnh gồm 5 thành phần:
 ```

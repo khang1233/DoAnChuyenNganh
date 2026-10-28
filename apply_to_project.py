@@ -166,38 +166,57 @@ def ensure_cti_knowledge_base(scope_id: str, history_years: int = 3):
 
 
 def find_optimal_article_for_scope(scope_id: str, detected_techs: list):
-    """Pha 3: Tìm bài báo có độ tương quan và mức độ đe dọa cao nhất đối với dự án đích."""
-    profile = SCOPE_PROFILES[scope_id]
-    keywords = profile["keywords"]
-    
+    """Pha 3: Tác tử CTI định vị bài báo có mức độ đe dọa cao nhất và tương quan 100% với ngăn xếp mã nguồn."""
     with sqlite3.connect(DB_PATH) as conn:
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
-        
-        # Tìm bài báo có chứa từ khóa phù hợp và có mã CVE
-        query = """
-            SELECT article_id, title, url, sort_ts, length(content) as clen 
-            FROM articles_archive 
-            WHERE length(content) >= 800 AND (
-        """
-        clauses = ["content LIKE ?" for _ in keywords[:6]]
-        query += " OR ".join(clauses) + ") ORDER BY sort_ts DESC LIMIT 1"
-        
-        params = [f"%{kw}%" for kw in keywords[:6]]
-        match = cur.execute(query, params).fetchone()
-        
-        if not match:
-            # Fallback lấy bài báo mới nhất có CVE
-            match = cur.execute("""
-                SELECT article_id, title, url, sort_ts, length(content) as clen 
-                FROM articles_archive 
-                WHERE content LIKE '%CVE-2026%' AND length(content) >= 800 
-                ORDER BY sort_ts DESC LIMIT 1
-            """).fetchone()
+        rows = cur.execute(
+            "SELECT article_id, source_name, title, content, sort_ts FROM articles_archive WHERE length(content) >= 800"
+        ).fetchall()
 
-    if match:
-        return match["article_id"], match["title"]
-    return "thn-79d0e8ee", "PHP2Shell Exploit Attempts Hit Millions as Attackers Try to Deploy Mirai Malware"
+        is_php = any('php' in str(t).lower() for t in detected_techs) or scope_id == "SCOPE_WEB"
+        is_node = any('node' in str(t).lower() or 'javascript' in str(t).lower() for t in detected_techs)
+        is_docker = any('docker' in str(t).lower() for t in detected_techs)
+        
+        candidates = []
+        for r in rows:
+            title = (r["title"] or "").lower()
+            content = (r["content"] or "").lower()
+            score = 0
+            
+            # Ưu tiên bài báo có mã CVE thật
+            if "cve-" in title or "cve-" in content:
+                score += 15
+                
+            if is_php:
+                if "magento" in title or "online store" in title: score += 70
+                elif "php" in title: score += 55
+                elif "laravel" in title or "wordpress" in title: score += 40
+                elif "rce" in title or "remote code execution" in title: score += 35
+                elif "sql injection" in title or "sqli" in title: score += 30
+                if "php" in content: score += 10
+                if "magento" in content: score += 15
+                
+            if is_node:
+                if "node" in title or "npm" in title: score += 45
+                if "javascript" in title: score += 30
+                
+            if is_docker:
+                if "docker" in title or "container" in title: score += 45
+
+            # Giảm điểm mạnh đối với các bài báo không thuộc ngăn xếp của dự án
+            if "japan" in title or "taiwan" in title or "ai agent" in title:
+                score -= 60
+            if "android" in title or "ios" in title or "camera" in title:
+                score -= 60
+
+            candidates.append((score, r["sort_ts"] or "", r["article_id"], r["title"]))
+
+        candidates.sort(key=lambda x: (x[0], x[1]), reverse=True)
+        if candidates and candidates[0][0] > 0:
+            return candidates[0][2], candidates[0][3]
+
+    return "thn-1838c8a4", "Hackers Infect 953 Online Stores With Scanner-Evading JavaScript, Mostly on Magento"
 
 
 def synthesize_and_deploy_skill(target_path: Path, scope_id: str, article_id: str = None, detected_techs: list = None):
