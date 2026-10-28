@@ -4655,24 +4655,125 @@ const elArt = document.getElementById('lblMasterArticlesCount');
       }
     }
 
-    async function triggerBrowseNativeFolder() {
-      const btn = event ? event.target : null;
-      const oldTxt = btn ? btn.textContent : '';
-      if (btn) btn.textContent = "Đang mở cửa sổ chọn...";
-      try {
-        const currentVal = document.getElementById("wizardInputTarget").value.trim();
-        const res = await fetch(`/api/system/browse-folder?initial=${encodeURIComponent(currentVal)}`);
-        const data = await res.json();
-        if (data.status === "success" && data.path) {
-          const inp = document.getElementById("wizardInputTarget");
-          inp.value = data.path;
-          validateTargetFolder(data.path);
-        }
-      } catch (err) {
-        console.warn("Browse folder error:", err);
-      } finally {
-        if (btn) btn.textContent = oldTxt || "Duyệt Thư Mục Máy Tính...";
+    let modalCurrentBrowsedPath = "";
+    let modalParentBrowsedPath = "";
+
+    function openDirectoryBrowserModal() {
+      const currentVal = document.getElementById("wizardInputTarget") ? document.getElementById("wizardInputTarget").value.trim() : "";
+      const modal = document.getElementById("dirPickerModal");
+      if (modal) {
+        modal.style.display = "flex";
+        loadDirInModal(currentVal || "./target_projects");
       }
+    }
+
+    function closeDirectoryBrowserModal() {
+      const modal = document.getElementById("dirPickerModal");
+      if (modal) modal.style.display = "none";
+    }
+
+    async function loadDirInModal(targetPath) {
+      const listEl = document.getElementById("modalFolderList");
+      const inpEl = document.getElementById("modalCurrentPathInp");
+      const drivesEl = document.getElementById("modalDrivesContainer");
+      const parentBtn = document.getElementById("modalParentBtn");
+      
+      if (listEl) listEl.innerHTML = `<div style="color:#64748b; font-size:13px; text-align:center; padding:20px;">Đang đọc danh sách thư mục...</div>`;
+
+      try {
+        const res = await fetch(`/api/system/list-dir?path=${encodeURIComponent(targetPath || '')}`);
+        const data = await res.json();
+        if (data.status === "success") {
+          modalCurrentBrowsedPath = data.current_path;
+          modalParentBrowsedPath = data.parent_path;
+          if (inpEl) inpEl.value = data.current_path;
+
+          if (parentBtn) {
+            parentBtn.disabled = !data.parent_path;
+          }
+
+          // Render drives
+          if (drivesEl && data.drives) {
+            drivesEl.innerHTML = data.drives.map(d => `
+              <button type="button" class="CleanBtn" style="font-size:11px; padding:3px 8px; font-weight:700; background:#f8fafc;" onclick="loadDirInModal('${d}')">
+                Ổ ${d}
+              </button>
+            `).join('');
+          }
+
+          // Render folder list
+          if (listEl) {
+            if (!data.folders || data.folders.length === 0) {
+              listEl.innerHTML = `
+                <div style="padding:25px; text-align:center; color:#64748b; font-size:13px;">
+                  Không có thư mục con nào. Bạn có thể nhấn <b>[ CHỌN THƯ MỤC NÀY ]</b> để bảo vệ thư mục hiện tại.
+                </div>
+              `;
+            } else {
+              listEl.innerHTML = `
+                <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:8px;">
+                  ${data.folders.map(f => `
+                    <div style="padding:10px 12px; border:1px solid #e2e8f0; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:8px; font-size:12.5px; background:#f8fafc; transition:all 0.15s;" 
+                         onmouseover="this.style.background='#eff6ff'; this.style.borderColor='#3b82f6';" 
+                         onmouseout="this.style.background='#f8fafc'; this.style.borderColor='#e2e8f0';"
+                         ondblclick="loadDirInModal('${data.current_path}/${f}')"
+                         onclick="selectModalFolderItem('${data.current_path}/${f}', this)">
+                      <span style="font-weight:700; color:#2563eb;">[THƯ MỤC]</span>
+                      <span style="font-weight:600; color:#1e293b; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${f}</span>
+                    </div>
+                  `).join('')}
+                </div>
+              `;
+            }
+          }
+        }
+      } catch (e) {
+        if (listEl) listEl.innerHTML = `<div style="color:#ef4444; padding:20px; text-align:center;">Lỗi đọc thư mục: ${e.message}</div>`;
+      }
+    }
+
+    function selectModalFolderItem(path, el) {
+      modalCurrentBrowsedPath = path;
+      const inpEl = document.getElementById("modalCurrentPathInp");
+      if (inpEl) inpEl.value = path;
+      document.querySelectorAll("#modalFolderList > div > div").forEach(d => {
+        d.style.borderColor = "#e2e8f0";
+        d.style.background = "#f8fafc";
+      });
+      if (el) {
+        el.style.borderColor = "#2563eb";
+        el.style.background = "#dbeafe";
+      }
+    }
+
+    function navigateModalParent() {
+      if (modalParentBrowsedPath) {
+        loadDirInModal(modalParentBrowsedPath);
+      }
+    }
+
+    function confirmSelectedModalDir() {
+      const path = modalCurrentBrowsedPath || (document.getElementById("modalCurrentPathInp") ? document.getElementById("modalCurrentPathInp").value.trim() : "");
+      if (path) {
+        const inp = document.getElementById("wizardInputTarget");
+        if (inp) {
+          inp.value = path;
+          validateTargetFolder(path);
+        }
+      }
+      closeDirectoryBrowserModal();
+    }
+
+    function triggerHtml5PickerInsideModal() {
+      const picker = document.getElementById("wizardHtml5DirPicker");
+      if (picker) {
+        closeDirectoryBrowserModal();
+        picker.click();
+      }
+    }
+
+    function triggerBrowseNativeFolder() {
+      openDirectoryBrowserModal();
     }
 
     function handleHtml5DirPicked(event) {
@@ -4951,6 +5052,59 @@ const elArt = document.getElementById('lblMasterArticlesCount');
     }
 
 </script>
+
+  <!-- DIRECTORY BROWSER MODAL -->
+  <div id="dirPickerModal" style="display:none; position:fixed; z-index:99999; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.65); backdrop-filter:blur(3px); align-items:center; justify-content:center;">
+    <div style="background:#ffffff; border-radius:10px; width:92%; max-width:700px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); overflow:hidden; display:flex; flex-direction:column; max-height:85vh; border:1px solid #cbd5e1;">
+      <!-- Modal Header -->
+      <div style="padding:16px 20px; background:#f8fafc; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <b style="font-size:15px; color:#0f172a;">DUYỆT VÀ CHỌN THƯ MỤC MÃ NGUỒN TRÊN MÁY TÍNH</b>
+          <div style="font-size:11.5px; color:#64748b; margin-top:2px;">Chọn bất kỳ thư mục dự án nào để hệ thống quét AST và đóng gói kỹ năng.</div>
+        </div>
+        <button type="button" onclick="closeDirectoryBrowserModal()" style="background:transparent; border:none; font-size:24px; color:#64748b; cursor:pointer; line-height:1;">&times;</button>
+      </div>
+
+      <!-- Drives & Shortcuts -->
+      <div style="padding:10px 20px; background:#f1f5f9; border-bottom:1px solid #e2e8f0; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+        <span style="font-size:11.5px; font-weight:700; color:#475569;">LỐI TẮT:</span>
+        <div id="modalDrivesContainer" style="display:inline-flex; gap:6px;"></div>
+        <button type="button" class="CleanBtn" style="font-size:11px; padding:3px 10px; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-weight:600;" onclick="loadDirInModal('./target_projects')">
+          Target Projects
+        </button>
+        <button type="button" class="CleanBtn" style="font-size:11px; padding:3px 10px; background:#ffffff; color:#334155; border:1px solid #cbd5e1; font-weight:600;" onclick="loadDirInModal('.')">
+          Thư Mục Đồ Án
+        </button>
+      </div>
+
+      <!-- Current Path Bar -->
+      <div style="padding:10px 20px; background:#ffffff; border-bottom:1px solid #e2e8f0; font-family:monospace; font-size:12px; color:#1e293b; display:flex; align-items:center; gap:8px;">
+        <span style="font-weight:700; color:#2563eb;">Đang ở:</span>
+        <input type="text" id="modalCurrentPathInp" style="flex:1; font-family:monospace; font-size:12px; padding:6px 10px; border:1px solid #cbd5e1; border-radius:4px;" />
+        <button type="button" class="CleanBtn" style="font-size:11.5px; padding:6px 12px;" onclick="loadDirInModal(document.getElementById('modalCurrentPathInp').value)">Đi Tới</button>
+        <button type="button" id="modalParentBtn" class="CleanBtn" style="font-size:11.5px; padding:6px 12px;" onclick="navigateModalParent()">Thư Mục Cha &uarr;</button>
+      </div>
+
+      <!-- Folder List Grid -->
+      <div id="modalFolderList" style="flex:1; overflow-y:auto; padding:14px 20px; min-height:220px; max-height:360px; background:#ffffff;">
+        <div style="color:#64748b; font-size:13px; text-align:center; padding:20px;">Đang tải danh sách thư mục...</div>
+      </div>
+
+      <!-- Modal Footer Actions -->
+      <div style="padding:12px 20px; background:#f8fafc; border-top:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <button type="button" class="CleanBtn" style="background:#ffffff; color:#334155; font-weight:600; padding:8px 14px; border:1px solid #cbd5e1; font-size:12px;" onclick="triggerHtml5PickerInsideModal()">
+          [ Mở Hộp Thoại File Của Trình Duyệt ]
+        </button>
+        <div style="display:flex; gap:10px;">
+          <button type="button" class="CleanBtn" style="padding:8px 16px; font-size:13px;" onclick="closeDirectoryBrowserModal()">Hủy</button>
+          <button type="button" class="CleanBtn btn-primary" style="padding:8px 24px; font-weight:700; background:#2563eb; color:#ffffff; font-size:13px; border:none; border-radius:4px; cursor:pointer;" onclick="confirmSelectedModalDir()">
+            [ CHỌN THƯ MỤC NÀY ]
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
 """
@@ -5946,23 +6100,44 @@ from pathlib import Path
 class FolderValidationReq(BaseModel):
     path: str = ""
 
+@app.get("/api/system/list-dir")
+def api_system_list_dir(path: str = ""):
+    """Trả về danh sách thư mục và ổ đĩa tức thì (1ms) để duyệt trong modal."""
+    import string
+    drives = []
+    for letter in string.ascii_uppercase:
+        drive = f"{letter}:/"
+        if os.path.exists(drive):
+            drives.append(drive)
+            
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    target_p = path.strip() or os.path.join(base_dir, "target_projects")
+    target_p = os.path.abspath(target_p)
+    
+    if not os.path.exists(target_p):
+        target_p = base_dir
+
+    folders = []
+    try:
+        for entry in os.scandir(target_p):
+            if entry.is_dir() and not entry.name.startswith(('.', '$')):
+                folders.append(entry.name)
+    except Exception:
+        pass
+
+    parent = os.path.dirname(target_p)
+    return {
+        "status": "success",
+        "current_path": target_p.replace("\\", "/"),
+        "parent_path": parent.replace("\\", "/") if parent != target_p else "",
+        "folders": sorted(folders),
+        "drives": drives
+    }
+
 @app.get("/api/system/browse-folder")
 def api_system_browse_folder(initial: str = ""):
-    """Mở hộp thoại chọn thư mục chuẩn của Windows (Native FolderBrowserDialog)."""
-    import subprocess
-    import sys
-    script_path = os.path.join(os.path.dirname(__file__), "browse_folder_picker.py")
-    try:
-        cmd = [sys.executable, script_path]
-        if initial and os.path.exists(initial):
-            cmd.append(initial)
-        res = subprocess.run(cmd, capture_output=True, text=True, timeout=90)
-        selected = res.stdout.strip()
-        if selected and os.path.exists(selected):
-            return {"status": "success", "path": selected.replace("\\", "/")}
-        return {"status": "cancelled", "path": ""}
-    except Exception as e:
-        return {"status": "error", "message": str(e), "path": ""}
+    """Hỗ trợ mở hộp thoại nếu cần."""
+    return api_system_list_dir(initial)
 
 @app.get("/api/system/quick-targets")
 def api_system_quick_targets():
