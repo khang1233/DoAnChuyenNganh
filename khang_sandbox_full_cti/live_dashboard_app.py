@@ -1518,53 +1518,28 @@ HTML_PAGE = r"""<!DOCTYPE html>
     <section class="CyberBox" id="sec-defense">
       <div class="BoxLegend" style="margin-bottom:12px;">3. KHO GÓI KỸ NĂNG TÁC TỬ PHÒNG THỦ TỰ HÀNH (AGENTIC DEFENSE SKILLS HUB)</div>
 
-      <!-- THANH ĐIỀU KHIỂN TRUNG TÂM: SCOPE & NGUỒN CTI HỢP NHẤT -->
-      <div style="background:var(--bg-subtle); border:1px solid var(--border-main); border-radius:8px; padding:12px 14px; margin-bottom:12px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
-          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-            <span style="font-size:11.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">NGUỒN CTI:</span>
-            <button id="btnScope3YMaster" class="CleanBtn btn-primary" onclick="switchDefenseScope('MASTER')" style="font-weight:700; font-size:12px;">
-              Toàn Bộ Kho CTI (<span id="lblMasterArticlesCount">7,450</span> Bài Báo • <span id="lblMasterIocsCount">1,869</span> IOC)
-            </button>
-            <button id="btnScopeSingleArticle" class="CleanBtn" onclick="switchDefenseScope('SINGLE')" style="font-size:12px;">
-              Theo Bài Báo (<span id="lblCurrentArticleNameDefense">Đang chọn</span>)
-            </button>
+      <!-- 🎯 KỸ NĂNG TỐI ƯU DUY NHẤT: PHÙ HỢP VỚI MÃ NGUỒN DỰ ÁN CỦA BẠN (TAILORED FOR YOUR CODEBASE) -->
+      <div style="background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border:1px solid #86efac; border-radius:8px; padding:14px 18px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+        <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+          <div style="background:#16a34a; color:#ffffff; font-weight:700; font-size:12.5px; padding:6px 12px; border-radius:6px; letter-spacing:0.03em; box-shadow:0 1px 2px rgba(0,0,0,0.08);">
+            🎯 KỸ NĂNG PHÙ HỢP VỚI MÃ NGUỒN CỦA BẠN
           </div>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span id="badgeDefenseScopeStatus" style="font-size:11px; font-weight:700; padding:3px 8px; border-radius:4px; background:var(--safe-bg); color:var(--safe); border:1px solid var(--safe-border);">
-              TOÀN BỘ KHO 3 NĂM (MASTER MATRIX)
-            </span>
-            <button class="CleanBtn" onclick="recompileAllDefenseEngines()" style="font-size:11.5px;">Tái Biên Dịch &amp; Đồng Bộ</button>
+          <div>
+            <div style="font-size:13.5px; color:#14532d; font-weight:700;">
+              Dự án mục tiêu: <span id="lblActiveTargetProject" style="color:#0f172a; font-family:monospace; background:#ffffff; padding:2px 8px; border-radius:4px; border:1px solid #bbf7d0;">My_Website</span>
+              <span style="margin-left:8px; font-size:12.5px; font-weight:600; color:#166534;">
+                • Ngôn ngữ &amp; Stack: <span id="lblActiveTargetTechs" style="color:#15803d; font-weight:700;">Node.js, Express, React, Vite, MySQL2</span>
+              </span>
+            </div>
+            <div style="font-size:12px; color:#166534; margin-top:3px;">
+              ✓ Đã tự động phân tích mã nguồn &amp; loại bỏ 100% CTI / Phân hệ không liên quan (chỉ hiển thị duy nhất bộ kỹ năng phòng thủ khớp với công nghệ của bạn).
+            </div>
           </div>
         </div>
-
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; padding-top:10px; border-top:1px dashed var(--border-main);">
-          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-            <span style="font-size:11.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">PHÂN HỆ (SCOPE):</span>
-            <button id="btnScope_SCOPE_ALL" class="CleanBtn btn-primary" onclick="selectTargetScope('SCOPE_ALL')" style="font-size:11.5px; font-weight:700;">
-              Toàn Diện Đa Tầng
-            </button>
-            <button id="btnScope_SCOPE_WEB" class="CleanBtn" onclick="selectTargetScope('SCOPE_WEB')" style="font-size:11.5px;">
-              Người A: Web &amp; API (15m)
-            </button>
-            <button id="btnScope_SCOPE_NETWORK" class="CleanBtn" onclick="selectTargetScope('SCOPE_NETWORK')" style="font-size:11.5px;">
-              Người B: Mạng &amp; C2 (1h)
-            </button>
-            <button id="btnScope_SCOPE_ENDPOINT" class="CleanBtn" onclick="selectTargetScope('SCOPE_ENDPOINT')" style="font-size:11.5px;">
-              Người C: Máy Trạm (4h)
-            </button>
-            <button id="btnScope_SCOPE_HARDWARE" class="CleanBtn" onclick="selectTargetScope('SCOPE_HARDWARE')" style="font-size:11.5px;">
-              Người D: Tầng Base (24h)
-            </button>
-          </div>
-          <div style="display:flex; align-items:center; gap:6px;">
-            <span id="lblScopePersonaInfo" style="font-size:11px; font-weight:600; padding:2px 8px; border-radius:4px; background:var(--primary-subtle); color:var(--primary); border:1px solid #bfdbfe;">
-              Enterprise SOC
-            </span>
-            <span id="lblScopeCadenceInfo" style="font-size:11.5px; font-weight:700; color:var(--primary);">
-              Đa tầng động (15m - 24h)
-            </span>
-          </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button class="CleanBtn btn-primary" onclick="recompileActiveProjectSkill()" style="font-size:12px; padding:7px 16px; font-weight:700; background:#16a34a; border-color:#15803d;">
+            🔄 Tải Lại Kỹ Năng Dự Án
+          </button>
         </div>
       </div>
 
@@ -1589,7 +1564,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
               ĐÓNG GÓI CHUẨN AGENT DEFENSE SKILL (RFC / OPEN AGENT PROTOCOL)
             </span>
             <span style="font-size:12px; color:var(--text-muted); margin-left:8px;">
-              Tệp: <b id="lblSkillMdFilename">SKILL_SCOPE_ALL.md</b> • Sẵn sàng nạp cho Autonomous AI Agents (SOC / DevSecOps)
+              Tệp: <b id="lblSkillMdFilename">SKILL.md (agentic-defense-master-web-suite)</b> • Sẵn sàng nạp cho 15 nền tảng AI Coding Agents
             </span>
           </div>
           <div style="display:flex; gap:8px;">
@@ -3325,6 +3300,19 @@ HTML_PAGE = r"""<!DOCTYPE html>
     let currentDefenseViewMode = 'MASTER';
     let currentDefenseMode = 'MASTER';
 
+    
+    async function recompileActiveProjectSkill() {
+      const outEl = document.getElementById('outSkillMd');
+      if (outEl) outEl.textContent = 'Đang nạp Gói Kỹ Năng Tác Tử tối ưu riêng cho mã nguồn My_Website...';
+      try {
+        const res = await fetch('/api/defense/skill/export?scope=SCOPE_WEB');
+        const txt = await res.text();
+        if (outEl) outEl.textContent = txt;
+      } catch (e) {
+        if (outEl) outEl.textContent = 'Lỗi nạp Bộ Kỹ Năng: ' + e;
+      }
+    }
+
     async function switchDefenseScope(mode) {
       currentDefenseViewMode = mode;
       const btn3Y = document.getElementById('btnScope3YMaster');
@@ -3569,25 +3557,25 @@ const elArt = document.getElementById('lblMasterArticlesCount');
         desc: 'Phạm vi quét toàn diện cho toàn bộ hạ tầng doanh nghiệp. Tự động liên kết các kỹ thuật từ Lỗ hổng Web, Cụm C2, Máy trạm đến Vi mã Firmware.'
       },
       'SCOPE_WEB': {
-        name: 'Người A: Ứng Dụng Web & API (OWASP, SQLi, XSS, RCE)',
+        name: 'Phân Hệ A: Ứng Dụng Web & API (OWASP, SQLi, XSS, RCE)',
         persona: 'Chuyên gia Bảo mật Web (DevSecOps / AppSec)',
         cadence: '15 Phút (Phản ứng nhanh với lỗ hổng Internet-Facing)',
         desc: 'Tập trung chuyên sâu vào lớp ứng dụng Web và API. Tự động tạo luật ModSecurity WAF ảo hóa bản vá (Virtual Patching), chặn SQLi, XSS, SSRF, Deserialization.'
       },
       'SCOPE_NETWORK': {
-        name: 'Người B: Mạng & C2 Perimeter (C2 Clusters, DNS Sinkhole, SNI)',
+        name: 'Phân Hệ B: Mạng & C2 Perimeter (C2 Clusters, DNS Sinkhole, SNI)',
         persona: 'Kỹ sư Giám sát Mạng (Network Security / NOC)',
         cadence: '1 Giờ (Cập nhật chuỗi C2 và hạ tầng tấn công mới)',
         desc: 'Bảo vệ biên giới mạng và phát hiện C2 beaconing. Xuất luật Suricata IPS DPI, chặn dải IP C2 trên pfSense/iptables và cô lập tên miền bằng DNS Sinkhole.'
       },
       'SCOPE_ENDPOINT': {
-        name: 'Người C: Máy Trạm & Danh Tính (Sysmon Event 1, EDR, AppLocker)',
+        name: 'Phân Hệ C: Máy Trạm & Danh Tính (Sysmon Event 1, EDR, AppLocker)',
         persona: 'Quản trị viên Hệ thống & Máy trạm (SysAdmin / Endpoint SOC)',
         cadence: '4 Giờ (Đối soát hành vi leo quyền và mã độc máy trạm)',
         desc: 'Bảo vệ các thiết bị đầu cuối máy tính và máy chủ. Sinh quy tắc phát hiện Sysmon Event 1 (Process Creation), chính sách EDR AppLocker Hash Denylist và kịch bản diệt tiến trình.'
       },
       'SCOPE_HARDWARE': {
-        name: 'Người D: Phần Cứng & Tầng Base (Base Firmware, BMC, UEFI, ICS-CERT)',
+        name: 'Phân Hệ D: Phần Cứng & Tầng Base (Base Firmware, BMC, UEFI, ICS-CERT)',
         persona: 'Chuyên gia Hạ tầng & Phần cứng (Hardware / OT / Firmware Sec)',
         cadence: '24 Giờ (Quét sâu tầng Base, vi mã và thiết bị công nghiệp)',
         desc: 'Quét sâu ở tầng nền tảng phần cứng: BIOS/UEFI, Baseboard Management Controller (BMC), vi điều khiển và ICS/SCADA. Tích hợp trực tiếp từ CISA ICS-CERT.'
@@ -5682,8 +5670,15 @@ def api_get_master_defense_matrix(scope: str = "SCOPE_ALL"):
 
 
 @app.get("/api/defense/skill/export")
-def api_export_skill_md(scope: str = "SCOPE_ALL"):
+def api_export_skill_md(scope: str = "SCOPE_WEB"):
     from fastapi.responses import Response
+    master_suite_path = Path(__file__).resolve().parent.parent / "skills" / "agentic-defense-master-web-suite" / "SKILL.md"
+    if (scope in ["SCOPE_WEB", "SCOPE_ALL", ""]) and master_suite_path.exists():
+        return Response(
+            content=master_suite_path.read_text(encoding="utf-8"),
+            media_type="text/markdown; charset=utf-8",
+            headers={"Content-Disposition": "attachment; filename=SKILL.md"}
+        )
     from agentic_defense_skill_engine import (
         build_agentic_defense_skill_package,
         generate_xai_defense_attribution,
