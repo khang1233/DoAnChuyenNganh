@@ -1106,12 +1106,11 @@ HTML_PAGE = r"""<!DOCTYPE html>
           </label>
           <div style="display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
             <input type="text" id="wizardInputTarget" class="CleanInput" style="flex:1; min-width:280px; font-family:monospace; padding:10px 14px; font-size:13px; border:1px solid #cbd5e1; border-radius:6px;" value="./target_projects/My_Website" placeholder="Ví dụ: D:/my-web-app hoặc C:/xampp/htdocs/my-shop" oninput="debounceValidateFolder()" />
-            <button type="button" class="CleanBtn" style="background:#2563eb; color:#ffffff; font-weight:700; padding:10px 18px; border-radius:6px; border:none; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="triggerBrowseNativeFolder()">
-              Duyệt Thư Mục Máy Tính...
+            <button type="button" id="btnBrowseNativeFolder" class="CleanBtn" style="background:#2563eb; color:#ffffff; font-weight:700; padding:10px 18px; border-radius:6px; border:none; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="triggerBrowseNativeFolder()">
+              Duyệt File Explorer Máy Tính...
             </button>
-            <input type="file" id="wizardHtml5DirPicker" webkitdirectory directory style="display:none;" onchange="handleHtml5DirPicked(event)" />
-            <button type="button" class="CleanBtn" style="background:#f1f5f9; color:#475569; font-weight:600; padding:10px 14px; border-radius:6px; border:1px solid #cbd5e1; cursor:pointer;" onclick="document.getElementById('wizardHtml5DirPicker').click()" title="Chọn qua cửa sổ chọn thư mục của trình duyệt">
-              Duyệt Browser
+            <button type="button" class="CleanBtn" style="background:#f1f5f9; color:#475569; font-weight:600; padding:10px 14px; border-radius:6px; border:1px solid #cbd5e1; cursor:pointer;" onclick="openDirectoryBrowserModal()" title="Duyệt nhanh danh sách thư mục">
+              Duyệt Cây Thư Mục
             </button>
           </div>
 
@@ -4824,8 +4823,32 @@ const elArt = document.getElementById('lblMasterArticlesCount');
       }
     }
 
-    function triggerBrowseNativeFolder() {
-      openDirectoryBrowserModal();
+    async function triggerBrowseNativeFolder() {
+      const btn = document.getElementById("btnBrowseNativeFolder");
+      const oldTxt = btn ? btn.textContent : '';
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = "Đang mở File Explorer...";
+      }
+      try {
+        const currentVal = document.getElementById("wizardInputTarget") ? document.getElementById("wizardInputTarget").value.trim() : "";
+        const res = await fetch(`/api/system/browse-folder?initial=${encodeURIComponent(currentVal)}`);
+        const data = await res.json();
+        if (data.status === "success" && data.path) {
+          const inp = document.getElementById("wizardInputTarget");
+          if (inp) {
+            inp.value = data.path;
+            validateTargetFolder(data.path);
+          }
+        }
+      } catch (e) {
+        console.error("Lỗi duyệt File Explorer:", e);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = oldTxt || "Duyệt File Explorer Máy Tính...";
+        }
+      }
     }
 
     function handleHtml5DirPicked(event) {
@@ -6268,8 +6291,21 @@ def api_system_list_dir(path: str = ""):
 
 @app.get("/api/system/browse-folder")
 def api_system_browse_folder(initial: str = ""):
-    """Hỗ trợ mở hộp thoại nếu cần."""
-    return api_system_list_dir(initial)
+    """Mở hộp thoại File Explorer chọn thư mục chuẩn của Windows."""
+    import subprocess
+    import sys
+    script_path = os.path.join(os.path.dirname(__file__), "native_folder_picker.py")
+    try:
+        cmd = [sys.executable, script_path]
+        if initial and os.path.exists(initial):
+            cmd.append(initial)
+        res = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+        selected = res.stdout.strip()
+        if selected and os.path.exists(selected):
+            return {"status": "success", "path": selected.replace("\\", "/")}
+        return {"status": "cancelled", "path": ""}
+    except Exception as e:
+        return {"status": "error", "message": str(e), "path": ""}
 
 @app.get("/api/system/quick-targets")
 def api_system_quick_targets():
