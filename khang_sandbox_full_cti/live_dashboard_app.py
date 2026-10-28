@@ -1095,31 +1095,59 @@ HTML_PAGE = r"""<!DOCTYPE html>
 
       <!-- STEP 1 CONTAINER -->
       <div id="wizardCard1" class="WizardCard" style="display:block;">
-        <h3 style="font-size:16px; margin-bottom:8px; color:#0f172a;">Bước 1: Nhập Dự Án Mục Tiêu Cần Bảo Vệ</h3>
+        <h3 style="font-size:16px; margin-bottom:8px; color:#0f172a;">Bước 1: Chọn Mã Nguồn &amp; Thư Mục Hệ Thống Cần Bảo Vệ</h3>
         <p style="color:#64748b; font-size:13px; margin-bottom:16px;">
-          Hệ thống sẽ quét mã nguồn của dự án đích để nhận diện công nghệ (PHP, Node, Python, Docker...) và tự động định danh Phân hệ bảo vệ tương ứng.
+          Bạn có thể nhấn nút Duyệt thư mục để chọn trực tiếp bất kỳ thư mục mã nguồn/hệ thống nào trên máy tính, hoặc dán link Git. Hệ thống sẽ tự động quét cây AST để nhận diện ngăn xếp công nghệ và bóc tách các điểm nhạy cảm.
         </p>
 
-        <div style="display:grid; grid-template-columns:1fr; gap:12px; margin-bottom:16px;">
-          <div>
-            <label class="FieldLabel" style="font-size:12px; font-weight:600; color:#334155; margin-bottom:4px; display:block;">ĐƯỜNG DẪN THƯ MỤC DỰ ÁN MỤC TIÊU</label>
-            <input type="text" id="wizardInputTarget" class="CleanInput" style="width:100%; font-family:monospace; padding:9px 12px;" value="./target_projects/My_Website" placeholder="Ví dụ: D:/my-web-app hoặc ./target_projects/sample_web" />
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:16px; margin-bottom:18px;">
+          <label class="FieldLabel" style="font-size:12px; font-weight:700; color:#1e293b; margin-bottom:6px; display:block;">
+            ĐƯỜNG DẪN THƯ MỤC MÃ NGUỒN TRÊN MÁY TÍNH:
+          </label>
+          <div style="display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
+            <input type="text" id="wizardInputTarget" class="CleanInput" style="flex:1; min-width:280px; font-family:monospace; padding:10px 14px; font-size:13px; border:1px solid #cbd5e1; border-radius:6px;" value="./target_projects/My_Website" placeholder="Ví dụ: D:/my-web-app hoặc C:/xampp/htdocs/my-shop" oninput="debounceValidateFolder()" />
+            <button type="button" class="CleanBtn" style="background:#2563eb; color:#ffffff; font-weight:700; padding:10px 18px; border-radius:6px; border:none; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="triggerBrowseNativeFolder()">
+              📂 Duyệt Thư Mục Máy Tính...
+            </button>
+            <input type="file" id="wizardHtml5DirPicker" webkitdirectory directory style="display:none;" onchange="handleHtml5DirPicked(event)" />
+            <button type="button" class="CleanBtn" style="background:#f1f5f9; color:#475569; font-weight:600; padding:10px 14px; border-radius:6px; border:1px solid #cbd5e1; cursor:pointer;" onclick="document.getElementById('wizardHtml5DirPicker').click()" title="Chọn qua cửa sổ chọn thư mục của trình duyệt">
+              📁 Duyệt Browser
+            </button>
           </div>
-          <div>
-            <label class="FieldLabel" style="font-size:12px; font-weight:600; color:#334155; margin-bottom:4px; display:block;">HOẶC NHẬP LINK GITHUB (TỰ ĐỘNG CLONE VỀ TARGET_PROJECTS/)</label>
-            <input type="text" id="wizardInputClone" class="CleanInput" style="width:100%; font-family:monospace; padding:9px 12px;" placeholder="https://github.com/username/vulnerable-web-app.git" />
+
+          <!-- Realtime folder validation card -->
+          <div id="folderValidationBox" style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; padding:10px 14px; font-size:12.5px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <div id="folderValText" style="color:#334155;">
+              <span style="font-weight:600; color:#2563eb;">📍 Đang trỏ tới:</span> <span class="mono" id="folderValPath">./target_projects/My_Website</span>
+            </div>
+            <div id="folderValBadge" style="display:inline-flex; gap:6px; align-items:center;">
+              <span style="background:#dcfce7; color:#15803d; font-weight:700; padding:3px 10px; border-radius:12px; font-size:11px;">✅ ĐÃ XÁC THỰC</span>
+            </div>
           </div>
         </div>
 
-        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:18px;">
-          <span style="font-size:12px; color:#64748b; font-weight:600;">DÙNG THỬ NHANH:</span>
-          <button type="button" class="CleanBtn" style="font-size:12px; padding:4px 10px; background:#f1f5f9;" onclick="setWizardDemo('php')">Demo Web PHP Lỗi (RCE)</button>
-          <button type="button" class="CleanBtn" style="font-size:12px; padding:4px 10px; background:#f1f5f9;" onclick="setWizardDemo('docker')">Demo Docker Security</button>
+        <!-- Git Clone Alternate -->
+        <div style="margin-bottom:18px;">
+          <label class="FieldLabel" style="font-size:12px; font-weight:600; color:#475569; margin-bottom:4px; display:block;">HOẶC NHẬP LINK GITHUB (TỰ ĐỘNG CLONE VỀ TARGET_PROJECTS/)</label>
+          <input type="text" id="wizardInputClone" class="CleanInput" style="width:100%; font-family:monospace; padding:9px 12px; border:1px solid #cbd5e1; border-radius:6px;" placeholder="https://github.com/username/vulnerable-web-app.git" />
         </div>
 
-        <button type="button" class="CleanBtn btn-primary" style="padding:10px 22px; font-size:14px; font-weight:700;" onclick="wizardExecuteStep1()">
-          [ 🚀 BẮT ĐẦU QUÉT DỰ ÁN ]
-        </button>
+        <!-- Quick Select Buttons -->
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:20px;">
+          <span style="font-size:12px; color:#64748b; font-weight:700;">CHỌN NHANH DỰ ÁN MẪU:</span>
+          <button type="button" class="CleanBtn" style="font-size:12px; padding:5px 12px; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-weight:600; border-radius:4px; cursor:pointer;" onclick="setWizardTarget('./target_projects/My_Website')">🌐 My_Website (PHP + Docker)</button>
+          <button type="button" class="CleanBtn" style="font-size:12px; padding:5px 12px; background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; font-weight:600; border-radius:4px; cursor:pointer;" onclick="setWizardTarget('./target_projects/demo_vulnerable_php_app')">⚠️ Demo Web PHP Lỗi (RCE)</button>
+          <button type="button" class="CleanBtn" style="font-size:12px; padding:5px 12px; background:#f8fafc; color:#334155; border:1px solid #cbd5e1; font-weight:600; border-radius:4px; cursor:pointer;" onclick="setWizardTarget('.')">💻 Đồ Án Hiện Tại (DoAnChuyenNganh)</button>
+        </div>
+
+        <div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap;">
+          <button type="button" class="CleanBtn btn-primary" style="padding:12px 28px; font-size:15px; font-weight:700; background:#2563eb; color:#ffffff; border:none; border-radius:6px; cursor:pointer;" onclick="wizardExecuteStep1()">
+            [ 🚀 BẮT ĐẦU QUÉT DỰ ÁN ]
+          </button>
+          <a href="/static/so_do_luong_do_an_chuan.html" target="_blank" style="font-size:13px; color:#2563eb; font-weight:600; text-decoration:none;">
+            📊 Xem Sơ Đồ Kiến Trúc &amp; Luồng Đồ Án (Dark Theme) &nearr;
+          </a>
+        </div>
       </div>
 
       <!-- STEP 2 CONTAINER -->
@@ -4607,6 +4635,87 @@ const elArt = document.getElementById('lblMasterArticlesCount');
       }
     }
 
+    function setWizardTarget(path) {
+      const inp = document.getElementById("wizardInputTarget");
+      if (inp) {
+        inp.value = path;
+        validateTargetFolder(path);
+      }
+    }
+
+    async function triggerBrowseNativeFolder() {
+      const btn = event ? event.target : null;
+      const oldTxt = btn ? btn.textContent : '';
+      if (btn) btn.textContent = "⏳ Đang mở cửa sổ chọn...";
+      try {
+        const currentVal = document.getElementById("wizardInputTarget").value.trim();
+        const res = await fetch(`/api/system/browse-folder?initial=${encodeURIComponent(currentVal)}`);
+        const data = await res.json();
+        if (data.status === "success" && data.path) {
+          const inp = document.getElementById("wizardInputTarget");
+          inp.value = data.path;
+          validateTargetFolder(data.path);
+        }
+      } catch (err) {
+        console.warn("Browse folder error:", err);
+      } finally {
+        if (btn) btn.textContent = oldTxt || "📂 Duyệt Thư Mục Máy Tính...";
+      }
+    }
+
+    function handleHtml5DirPicked(event) {
+      const files = event.target.files;
+      if (files && files.length > 0) {
+        const firstRel = files[0].webkitRelativePath;
+        const rootFolder = firstRel.split('/')[0];
+        const valText = document.getElementById("folderValText");
+        const valBadge = document.getElementById("folderValBadge");
+        if (valText) {
+          valText.innerHTML = `<span style="font-weight:600; color:#2563eb;">📍 Đã chọn qua trình duyệt:</span> <b>${rootFolder}</b> (${files.length} tệp tin)`;
+        }
+        if (valBadge) {
+          valBadge.innerHTML = `<span style="background:#dcfce7; color:#15803d; font-weight:700; padding:3px 10px; border-radius:12px; font-size:11px;">✅ ĐÃ NẠP ${files.length} TỆP</span>`;
+        }
+        const inp = document.getElementById("wizardInputTarget");
+        if (inp && (inp.value === "./target_projects/My_Website" || !inp.value)) {
+          inp.value = `./target_projects/${rootFolder}`;
+        }
+      }
+    }
+
+    let validateDebounceTimer = null;
+    function debounceValidateFolder() {
+      clearTimeout(validateDebounceTimer);
+      validateDebounceTimer = setTimeout(() => {
+        const path = document.getElementById("wizardInputTarget").value.trim();
+        validateTargetFolder(path);
+      }, 350);
+    }
+
+    async function validateTargetFolder(path) {
+      if (!path) return;
+      try {
+        const res = await fetch('/api/system/validate-folder', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({path: path})
+        });
+        const d = await res.json();
+        const valText = document.getElementById("folderValText");
+        const valBadge = document.getElementById("folderValBadge");
+        if (d.exists) {
+          const techsStr = (d.detected_techs && d.detected_techs.length > 0) ? ` &bull; Ngăn xếp: <b style="color:#0284c7;">${d.detected_techs.join(', ')}</b>` : '';
+          if (valText) valText.innerHTML = `<span style="font-weight:600; color:#15803d;">📍 Đã xác thực:</span> <span class="mono">${d.path}</span> (${d.file_count} tệp tin${techsStr})`;
+          if (valBadge) valBadge.innerHTML = `<span style="background:#dcfce7; color:#15803d; font-weight:700; padding:3px 10px; border-radius:12px; font-size:11px;">✅ HỢP LỆ (${d.file_count} TỆP)</span>`;
+        } else {
+          if (valText) valText.innerHTML = `<span style="font-weight:600; color:#dc2626;">⚠️ Chưa tìm thấy:</span> <span class="mono">${path}</span>`;
+          if (valBadge) valBadge.innerHTML = `<span style="background:#fee2e2; color:#b91c1c; font-weight:700; padding:3px 10px; border-radius:12px; font-size:11px;">❌ CHƯA TỒN TẠI</span>`;
+        }
+      } catch (e) {
+        console.warn("Folder validation error:", e);
+      }
+    }
+
     function setWizardDemo(type) {
       const inpTarget = document.getElementById("wizardInputTarget");
       const inpClone = document.getElementById("wizardInputClone");
@@ -5749,6 +5858,99 @@ from wizard_api_service import (
     wizard_remediate_code,
 )
 
+import os
+from pathlib import Path
+
+class FolderValidationReq(BaseModel):
+    path: str = ""
+
+@app.get("/api/system/browse-folder")
+def api_system_browse_folder(initial: str = ""):
+    """Mở hộp thoại chọn thư mục chuẩn của Windows (Native FolderBrowserDialog)."""
+    import subprocess
+    import sys
+    script_path = os.path.join(os.path.dirname(__file__), "browse_folder_picker.py")
+    try:
+        cmd = [sys.executable, script_path]
+        if initial and os.path.exists(initial):
+            cmd.append(initial)
+        res = subprocess.run(cmd, capture_output=True, text=True, timeout=90)
+        selected = res.stdout.strip()
+        if selected and os.path.exists(selected):
+            return {"status": "success", "path": selected.replace("\\", "/")}
+        return {"status": "cancelled", "path": ""}
+    except Exception as e:
+        return {"status": "error", "message": str(e), "path": ""}
+
+@app.get("/api/system/quick-targets")
+def api_system_quick_targets():
+    """Liệt kê các thư mục dự án đích có sẵn."""
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    target_dir = os.path.join(base_dir, "target_projects")
+    results = []
+    if os.path.exists(target_dir):
+        for name in os.listdir(target_dir):
+            full_p = os.path.join(target_dir, name)
+            if os.path.isdir(full_p):
+                results.append({
+                    "name": name,
+                    "path": full_p.replace("\\", "/"),
+                    "type": "target_project"
+                })
+    return {"status": "success", "projects": results, "workspace_root": base_dir.replace("\\", "/")}
+
+@app.post("/api/system/validate-folder")
+def api_system_validate_folder(req: FolderValidationReq):
+    """Kiểm tra tức thì thư mục mã nguồn mà người dùng nhập."""
+    p_str = req.path.strip()
+    if not p_str:
+        return {"exists": False, "message": "Chưa nhập đường dẫn"}
+    
+    p = Path(p_str)
+    if not p.is_absolute():
+        p = (Path(__file__).resolve().parents[1] / p_str).resolve()
+        
+    if not p.exists() or not p.is_dir():
+        return {
+            "exists": False,
+            "path": str(p).replace("\\", "/"),
+            "message": "Không tìm thấy thư mục trên máy tính"
+        }
+    
+    file_count = 0
+    sample_files = []
+    detected_techs = []
+    for root, dirs, files in os.walk(p):
+        if ".git" in root or "node_modules" in root or "vendor" in root or "__pycache__" in root:
+            continue
+        for f in files:
+            file_count += 1
+            if len(sample_files) < 6:
+                sample_files.append(f)
+            fl = f.lower()
+            if fl.endswith(".php") and "PHP" not in detected_techs:
+                detected_techs.append("PHP")
+            elif fl in ("package.json",) or (fl.endswith(".js") and "JavaScript/Node.js" not in detected_techs):
+                detected_techs.append("JavaScript/Node.js")
+            elif fl.endswith(".py") and "Python" not in detected_techs:
+                detected_techs.append("Python")
+            elif fl.endswith(".go") and "Go" not in detected_techs:
+                detected_techs.append("Go")
+            elif fl in ("dockerfile", "docker-compose.yml") and "Docker" not in detected_techs:
+                detected_techs.append("Docker")
+            elif fl == "composer.json" and "Composer" not in detected_techs:
+                detected_techs.append("Composer")
+
+    return {
+        "exists": True,
+        "path": str(p).replace("\\", "/"),
+        "name": p.name,
+        "file_count": file_count,
+        "detected_techs": detected_techs,
+        "sample_files": sample_files,
+        "message": f"Hợp lệ: Tìm thấy {file_count} tệp tin mã nguồn"
+    }
+
 class WizardScanReq(BaseModel):
     target: str = ""
     clone_url: str = ""
@@ -6140,6 +6342,24 @@ server_daemon = ServerAutonomousDaemon()
 def api_get_hardware_info():
     """Tự động nhận diện GPU/CPU và các Model Ollama thực tế có trên máy người dùng."""
     return get_adaptive_system_profile()
+
+@app.get("/static/so_do_luong_do_an_chuan.html")
+def view_so_do_html():
+    from fastapi.responses import HTMLResponse
+    p = os.path.join(os.path.dirname(__file__), "so_do_luong_do_an_chuan.html")
+    if os.path.exists(p):
+        with open(p, "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    return HTMLResponse("<h1>Không tìm thấy tệp sơ đồ</h1>", status_code=404)
+
+@app.get("/static/so_do_luong_do_an_chuan.svg")
+def view_so_do_svg():
+    from fastapi.responses import Response
+    p = os.path.join(os.path.dirname(__file__), "so_do_luong_do_an_chuan.svg")
+    if os.path.exists(p):
+        with open(p, "r", encoding="utf-8") as f:
+            return Response(content=f.read(), media_type="image/svg+xml")
+    return Response("Not found", status_code=404)
 
 @app.get("/api/system/daemon-status")
 def api_get_daemon_status():
