@@ -1,0 +1,74 @@
+{
+  "project_name": "My_Website",
+  "target_path": "D:\\mkhang\\DoAnChuyenNganh\\target_projects\\My_Website",
+  "frameworks": [
+    "express",
+    "react",
+    "vite",
+    "discord.py",
+    "requests"
+  ],
+  "entrypoints": [
+    "botdiscord/app.py",
+    "frontend/src/App.jsx",
+    "frontend/src/main.jsx",
+    "frontend/src/components/AppHeader.jsx",
+    "frontend/src/components/AppSidebar.jsx",
+    "frontend/src/components/MinecraftBotViews.jsx",
+    "botdiscord/ptkngu/bot.py",
+    "botdiscord/token_manager_tool/modules/server_checker.py",
+    "botdiscord/ptkngu/token_manager_tool/modules/server_checker.py",
+    "backend/src/server.js",
+    "backend/src/bot/botManager.js",
+    "backend/src/discord/app.py",
+    "backend/src/tempmail/customSmtpServer.js"
+  ],
+  "sensitive_sinks": [
+    {
+      "file": "backend/src/admin/vpsMonitor.js",
+      "findings": [
+        {
+          "line": 3,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "import { exec, execSync } from 'child_process';"
+        },
+        {
+          "line": 6,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "const execAsync = util.promisify(exec);"
+        },
+        {
+          "line": 229,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec('pm2 jlist', { encoding: 'utf-8', timeout: 4000, stdio: ['pipe', 'pipe', 'ignore'] }, (err, std"
+        },
+        {
+          "line": 276,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "const { stdout, stderr } = await execAsync(cmd, { timeout: 10000 });"
+        }
+      ]
+    },
+    {
+      "file": "backend/src/discord/discordManager.js",
+      "findings": [
+        {
+          "line": 2,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "import { spawn } from 'child_process';"
+        },
+        {
+          "line": 455,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "const scoutProc = spawn(pyCmd, [PROXY_SCOUT_SCRIPT, PROXY_POOL_FILE], {"
+        },
+        {
+          "line": 682,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "const pyProcess = spawn(pyCmd, pyArgs, { shell: false });"
+        }
+      ]
+    }
+  ],
+  "total_source_files": 72
+}

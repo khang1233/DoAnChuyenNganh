@@ -1,6 +1,7 @@
 {
   "scope": "SCOPE_WEB",
   "technologies": [
+    "PHP Framework (Laravel / WordPress / Custom)",
     "Node.js / JavaScript Web Ecosystem",
     "Python Backend (FastAPI / Django / Flask)"
   ],

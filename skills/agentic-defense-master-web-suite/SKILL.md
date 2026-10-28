@@ -1,6 +1,6 @@
 ---
 name: agentic-defense-master-web-suite
-description: Gói kỹ năng phòng thủ tác tử toàn diện (Master Defense Suite) cho phân hệ SCOPE_WEB (Node.js / JavaScript Web Ecosystem, Python Backend (FastAPI / Django / Flask)). Tích hợp đa lớp WAF, Tường lửa C2, Kiểm thử đa vector và Quy chuẩn sửa code an toàn cho Node.js, Express, Python.
+description: Gói kỹ năng phòng thủ tác tử toàn diện (Master Defense Suite) cho phân hệ SCOPE_WEB (PHP Framework (Laravel / WordPress / Custom), Node.js / JavaScript Web Ecosystem, Python Backend (FastAPI / Django / Flask)). Tích hợp đa lớp WAF, Tường lửa C2, Kiểm thử đa vector và Quy chuẩn sửa code an toàn cho Node.js, Express, Python.
 author: OpenClaw CTI Defense Orchestrator
 version: 2.0.0
 scope: SCOPE_WEB
@@ -11,7 +11,7 @@ trust_score: 97.5
 
 ## 📌 THÔNG TIN ĐỊNH DANH PHÂN HỆ
 - **Mã phân hệ bảo vệ:** `SCOPE_WEB`
-- **Công nghệ đích:** `Node.js / JavaScript Web Ecosystem, Python Backend (FastAPI / Django / Flask)`
+- **Công nghệ đích:** `PHP Framework (Laravel / WordPress / Custom), Node.js / JavaScript Web Ecosystem, Python Backend (FastAPI / Django / Flask)`
 - **Mã CVE bao phủ:** `CVE-2016-15042, CVE-2017-7921, CVE-2019-11510, CVE-2019-9879, CVE-2020-1938, CVE-2020-25078, CVE-2020-25169, CVE-2021-22205`
 - **Mức độ tin cậy CTI:** `97.5 / 100 (Evidence-Driven)`
 
@@ -486,3 +486,41 @@ python scripts/verify_exploit.py http://localhost:8766
 
 ### Bước 5: Giám Sát Liên Tục
 Duy trì chu kỳ quét 15 phút / lần để tự động nạp các mã CVE mới nhất từ CTI feeds.
+
+
+## 🧭 BẢN ĐỒ NGỮ CẢNH DỰ ÁN MỤC TIÊU (TARGET PROJECT ARCHITECTURAL CONTEXT)
+
+> [!IMPORTANT]
+> **Tác tử AI (Claude, Cursor, Antigravity, Devin)**: Dự án `My_Website` đã được hệ thống CTI thẩm định ngữ cảnh.
+> Tuyệt đối không suy luận chung chung! Bạn phải đọc ngữ cảnh thực tế của dự án dưới đây để thực hiện refactor:
+
+- **Tên dự án:** `My_Website`
+- **Frameworks nhận diện:** `express, react, vite, discord.py, requests`
+- **Tổng số tệp mã nguồn:** `72 files`
+
+### 1. Các File Khởi Chạy Trọng Tâm (Key Entrypoints):
+- `botdiscord/app.py`
+- `frontend/src/App.jsx`
+- `frontend/src/main.jsx`
+- `frontend/src/components/AppHeader.jsx`
+- `frontend/src/components/AppSidebar.jsx`
+- `frontend/src/components/MinecraftBotViews.jsx`
+- `botdiscord/ptkngu/bot.py`
+- `botdiscord/token_manager_tool/modules/server_checker.py`
+
+### 2. Các Điểm Nóng Bảo Mật Thực Tế Cần Rà Soát (Detected Sensitive Sinks):
+Hệ thống phát hiện các hàm thực thi hệ thống hoặc truy vấn cần được bảo vệ theo chuẩn CTI:
+- **Tệp:** `backend/src/admin/vpsMonitor.js`
+  - Dòng 3 [Command Execution / RCE Risk]: `import { exec, execSync } from 'child_process';`
+  - Dòng 6 [Command Execution / RCE Risk]: `const execAsync = util.promisify(exec);`
+  - Dòng 229 [Command Execution / RCE Risk]: `exec('pm2 jlist', { encoding: 'utf-8', timeout: 4000, stdio: ['pipe', 'pipe', 'ignore'] }, (err, std`
+  - Dòng 276 [Command Execution / RCE Risk]: `const { stdout, stderr } = await execAsync(cmd, { timeout: 10000 });`
+- **Tệp:** `backend/src/discord/discordManager.js`
+  - Dòng 2 [Command Execution / RCE Risk]: `import { spawn } from 'child_process';`
+  - Dòng 455 [Command Execution / RCE Risk]: `const scoutProc = spawn(pyCmd, [PROXY_SCOUT_SCRIPT, PROXY_POOL_FILE], {`
+  - Dòng 682 [Command Execution / RCE Risk]: `const pyProcess = spawn(pyCmd, pyArgs, { shell: false });`
+
+### 3. Chỉ Dẫn Hành Động Cụ Thể Cho AI Coding Agent:
+1. Mở trực tiếp các tệp tin trong danh sách Điểm Nóng phía trên.
+2. Thay thế việc ghép chuỗi câu lệnh trong các hàm `execAsync` / `exec` bằng mảng tham số cố định `execFile` hoặc Whitelist.
+3. Đảm bảo toàn bộ câu lệnh truy vấn dữ liệu được chuẩn hóa bằng Prepared Statements.

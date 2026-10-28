@@ -213,21 +213,10 @@ def synthesize_and_deploy_skill(target_path: Path, scope_id: str, article_id: st
     bundle_path = package_master_scope_skill(scope_id=scope_id, detected_techs=detected_techs, output_root=SKILLS_DIR)
     print(f"[+] Đã đóng gói thành công Master Skill Bundle: {bundle_path.name}")
 
-    # Đưa vào các thư mục Agent chuẩn
-    dest_dirs = [
-        target_path / ".gemini" / "skills" / bundle_path.name,
-        target_path / ".cursor" / "rules" / bundle_path.name,
-        target_path / "defense_skills" / bundle_path.name
-    ]
-    for dest in dest_dirs:
-        try:
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            if dest.exists():
-                shutil.rmtree(dest)
-            shutil.copytree(bundle_path, dest)
-            print(f"    -> Đã cài đặt vào: {dest.relative_to(target_path) if dest.is_relative_to(target_path) else dest}")
-        except Exception as e:
-            print(f"    [!] Không thể copy vào {dest}: {e}")
+    # 2. Đóng gói và phân phối tới TOÀN BỘ CÁC NỀN TẢNG AGENT LỚN (Claude, Cursor, Gemini, Windsurf, Copilot)
+    from agent_context_orchestrator import extract_project_context, deploy_to_all_major_agent_platforms
+    context = extract_project_context(target_path)
+    deploy_to_all_major_agent_platforms(target_path, bundle_path, context)
 
     # Nếu có bài báo đe dọa cao nhất, sinh thêm Micro-Skill chuyên sâu nếu cần
     if article_id:
