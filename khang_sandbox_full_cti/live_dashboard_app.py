@@ -1232,7 +1232,20 @@ HTML_PAGE = r"""<!DOCTYPE html>
           <div style="padding:12px; background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; margin-bottom:8px;">
             <b id="wzBestTitle" style="color:#b91c1c; font-size:13.5px; display:block; margin-bottom:4px;">-</b>
             <div id="wzBestCves" style="font-family:monospace; color:#2563eb; font-size:12px; margin-bottom:6px;">-</div>
-            <p id="wzExcerpt" style="font-size:12px; color:#64748b; line-height:1.5; font-style:italic;">-</p>
+            <p id="wzExcerpt" style="font-size:12px; color:#64748b; line-height:1.5; font-style:italic; margin-bottom:10px;">-</p>
+            
+            <!-- Quick View Buttons for Scoped Articles and OSINT Score Table -->
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; border-top:1px dashed #e2e8f0; padding-top:8px;">
+              <button type="button" class="CleanBtn" style="font-size:12px; font-weight:600; padding:6px 12px; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; border-radius:4px; cursor:pointer;" onclick="viewArticleById(wzBestArticleId, false)">
+                [ Xem Bài Báo &amp; Highlight Văn Bản Gốc ]
+              </button>
+              <button type="button" class="CleanBtn" style="font-size:12px; font-weight:600; padding:6px 12px; background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; border-radius:4px; cursor:pointer;" onclick="switchView('sec-score', document.querySelectorAll('.NavLink')[4])">
+                [ Xem Bảng Điểm IOC 5 Nguồn OSINT Của Scope ]
+              </button>
+              <button type="button" class="CleanBtn" style="font-size:12px; font-weight:600; padding:6px 12px; background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; border-radius:4px; cursor:pointer;" onclick="switchView('sec-history', document.querySelectorAll('.NavLink')[3])">
+                [ Xem Danh Sách Bài Báo Đã Học (${wzScopeId}) ]
+              </button>
+            </div>
           </div>
         </div>
 
@@ -1340,7 +1353,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
     </section>
 
     <!-- MỤC 1: BÀI BÁO & HIGHLIGHT IOC -->
-
+    <section class="CyberBox" id="sec-feed">
       <div class="BoxLegend">1. NGUỒN BÁO VÀ VĂN BẢN GỐC HIGHLIGHT</div>
 
       <!-- LIVE AI AGENT ACTIVITY TICKER -->
@@ -1452,6 +1465,14 @@ HTML_PAGE = r"""<!DOCTYPE html>
             <option value="ALL">Trạng thái: Tất cả bài báo</option>
             <option value="PENDING">Chỉ bài Chờ xử lý</option>
             <option value="HAS_IOC">Chỉ bài có bất kỳ IOC nào</option>
+          </select>
+
+          <select class="CleanSelect" id="historyScopeFilter" onchange="renderHistoryManager()">
+            <option value="ALL">Phân hệ: Tất cả bài báo</option>
+            <option value="SCOPE_WEB">Phân hệ Web &amp; API (SCOPE_WEB)</option>
+            <option value="SCOPE_NETWORK">Phân hệ Mạng &amp; C2 (SCOPE_NETWORK)</option>
+            <option value="SCOPE_ENDPOINT">Phân hệ Máy Trạm &amp; EDR (SCOPE_ENDPOINT)</option>
+            <option value="SCOPE_HARDWARE">Phân hệ Phần Cứng &amp; IoT (SCOPE_HARDWARE)</option>
           </select>
 
           <select class="CleanSelect" id="historySourceFilter" onchange="renderHistoryManager()">
@@ -2531,10 +2552,18 @@ HTML_PAGE = r"""<!DOCTYPE html>
       if (elIocs) elIocs.textContent = `${compTotalIocs} chỉ số đã học`;
       if (elIocSub) elIocSub.textContent = `${compIps} IP • ${compDoms} Domain • ${compCves} CVE • ${compShas} Hash (từ ${completedCount}/${list.length} bài)`;
 
-      // 2. Lọc theo Trạng thái, Nguồn, Từ khóa
+      // 2. Lọc theo Trạng thái, Nguồn, Phân hệ Scope, Từ khóa
       const statusFilter = (document.getElementById('historyStatusFilter')?.value) || 'COMPLETED';
       const srcFilter = (document.getElementById('historySourceFilter')?.value) || 'ALL';
+      const scopeFilter = (document.getElementById('historyScopeFilter')?.value) || 'ALL';
       const kw = ((document.getElementById('historySearchInput')?.value) || '').trim().toLowerCase();
+
+      const scopeKeywordsMap = {
+        'SCOPE_WEB': ['web', 'php', 'node', 'javascript', 'sql', 'rce', 'api', 'xss', 'magento', 'wordpress', 'express', 'laravel'],
+        'SCOPE_NETWORK': ['network', 'c2', 'botnet', 'mirai', 'dns', 'router', 'traffic', 'ddos', 'firewall', 'packet'],
+        'SCOPE_ENDPOINT': ['endpoint', 'windows', 'sysmon', 'edr', 'applocker', 'ransomware', 'mimikatz', 'trojan', 'malware'],
+        'SCOPE_HARDWARE': ['firmware', 'uefi', 'bios', 'iot', 'hardware', 'scada', 'ics', 'ot']
+      };
 
       // Đánh số thứ tự gốc từ Cũ Nhất (#01) -> Mới Nhất (#N) để hiển thị rõ tiến trình học
       const chronologicalOrderMap = {};
@@ -2551,6 +2580,11 @@ HTML_PAGE = r"""<!DOCTYPE html>
         if (statusFilter === 'HAS_IP' && ((a.ioc_counts?.ips || 0) === 0)) return false;
         if (statusFilter === 'HAS_CVE' && ((a.ioc_counts?.cves || 0) === 0)) return false;
         if (srcFilter !== 'ALL' && !a.source.toLowerCase().includes(srcFilter.toLowerCase())) return false;
+        if (scopeFilter !== 'ALL' && scopeKeywordsMap[scopeFilter]) {
+          const contentHay = `${a.title} ${a.content || ''}`.toLowerCase();
+          const matchesScope = scopeKeywordsMap[scopeFilter].some(sk => contentHay.includes(sk));
+          if (!matchesScope) return false;
+        }
         if (kw) {
           const hay = `${a.title} ${a.source} ${a.published_at} ${a.content}`.toLowerCase();
           if (!hay.includes(kw)) return false;
@@ -5115,6 +5149,15 @@ const elArt = document.getElementById('lblMasterArticlesCount');
                 nextBtn.disabled = false;
                 nextBtn.style.background = "#2563eb";
                 nextBtn.scrollIntoView({ behavior: "smooth", block: "nearest" });
+              }
+              // Tự động đồng bộ Scope vào toàn bộ Kho Tri Thức, Bảng Điểm IOC và Lịch Sử Bài Báo
+              if (typeof selectTargetScope === 'function') {
+                selectTargetScope(wzScopeId);
+              }
+              const scopeSel = document.getElementById('historyScopeFilter');
+              if (scopeSel) {
+                scopeSel.value = wzScopeId;
+                renderHistoryManager();
               }
             }
           }
