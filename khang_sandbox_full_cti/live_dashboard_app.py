@@ -1141,40 +1141,59 @@ HTML_PAGE = r"""<!DOCTYPE html>
         </div>
 
         <div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap;">
-          <button type="button" class="CleanBtn btn-primary" style="padding:12px 28px; font-size:15px; font-weight:700; background:#2563eb; color:#ffffff; border:none; border-radius:6px; cursor:pointer;" onclick="wizardExecuteStep1()">
+          <button type="button" id="btnRunStep1" class="CleanBtn btn-primary" style="padding:12px 28px; font-size:15px; font-weight:700; background:#2563eb; color:#ffffff; border:none; border-radius:6px; cursor:pointer;" onclick="wizardExecuteStep1()">
             [ BẮT ĐẦU QUÉT DỰ ÁN ]
           </button>
           <a href="/static/so_do_luong_do_an_chuan.html" target="_blank" style="font-size:13px; color:#2563eb; font-weight:600; text-decoration:none;">
             Xem Sơ Đồ Kiến Trúc &amp; Luồng Đồ Án (Dark Theme) &nearr;
           </a>
         </div>
+
+        <!-- LIVE STREAMING AGENT SCAN CONSOLE -->
+        <div id="wzScanAgentTerminal" style="display:none; background:#0f172a; color:#38bdf8; font-family:monospace; font-size:12px; padding:14px; border-radius:6px; max-height:180px; overflow-y:auto; margin-top:14px; border:1px solid #1e293b; line-height:1.6;">
+        </div>
       </div>
 
       <!-- STEP 2 CONTAINER -->
       <div id="wizardCard2" class="WizardCard" style="display:none;">
-        <h3 style="font-size:16px; margin-bottom:8px; color:#0f172a;">Bước 2: Kết Quả Nhận Diện & Phân Loại Scope</h3>
-        <p style="color:#64748b; font-size:13px; margin-bottom:14px;">Quá trình quét tĩnh hoàn tất 100%. Dưới đây là hồ sơ công nghệ và phân hệ được gán tự động:</p>
+        <h3 style="font-size:16px; margin-bottom:8px; color:#0f172a;">Bước 2: Kết Quả Phân Tích Mã Nguồn Của Tác Tử AI (Codebase Inspector Agent)</h3>
+        <p style="color:#64748b; font-size:13px; margin-bottom:14px;">Tác tử AI đã hoàn thành việc rà soát cấu trúc mã nguồn, cây AST và các điểm nhạy cảm. Dưới đây là hồ sơ kiến trúc chi tiết:</p>
 
-        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:14px; margin-bottom:16px;">
-          <div style="margin-bottom:8px;">
-            <b style="color:#334155;">Thư mục dự án:</b> <span id="wzTargetName" style="font-family:monospace; color:#2563eb;">-</span>
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:16px; margin-bottom:16px;">
+          <div style="margin-bottom:10px;">
+            <b style="color:#334155;">Thư mục dự án:</b> <span id="wzTargetName" style="font-family:monospace; color:#2563eb; font-weight:600;">-</span>
           </div>
-          <div style="margin-bottom:8px;">
-            <b style="color:#334155;">Công nghệ nhận diện:</b> <span id="wzTechsBadge" style="display:inline-flex; gap:6px; flex-wrap:wrap;">-</span>
+
+          <div style="margin-bottom:10px;">
+            <b style="color:#334155;">Ngôn ngữ lập trình chính:</b>
+            <div id="wzLanguagesBadge" style="display:inline-flex; gap:6px; flex-wrap:wrap; margin-left:8px;">-</div>
           </div>
-          <div style="margin-bottom:8px;">
-            <b style="color:#334155;">Phân hệ bảo vệ gán tự động:</b> <span id="wzScopeBadge" style="font-weight:700; color:#15803d; background:#dcfce7; padding:2px 8px; border-radius:4px;">-</span>
+
+          <div style="margin-bottom:10px;">
+            <b style="color:#334155;">Frameworks &amp; Công nghệ nhận diện:</b>
+            <div id="wzTechsBadge" style="display:inline-flex; gap:6px; flex-wrap:wrap; margin-left:8px;">-</div>
           </div>
-          <div>
-            <b style="color:#334155;">Chu kỳ quét khuyến nghị:</b> <span id="wzCadenceLabel" style="color:#b45309; font-weight:600;">-</span>
+
+          <div style="margin-bottom:10px;">
+            <b style="color:#334155;">Phân hệ bảo vệ gán tự động:</b> 
+            <span id="wzScopeBadge" style="font-weight:700; color:#15803d; background:#dcfce7; padding:2px 8px; border-radius:4px; margin-left:8px;">-</span>
+            <span style="font-size:12px; color:#64748b; margin-left:8px;">(Chu kỳ khuyến nghị: <span id="wzCadenceLabel" style="color:#b45309; font-weight:600;">-</span>)</span>
+          </div>
+
+          <!-- SENSITIVE SINKS BOX -->
+          <div style="margin-top:12px; border-top:1px dashed #cbd5e1; padding-top:10px;">
+            <b style="color:#b91c1c; font-size:12.5px;">Các điểm nhạy cảm do Tác tử AI định vị trong mã nguồn (AST Sensitive Sinks):</b>
+            <div id="wzSinksBox" style="font-family:monospace; font-size:11.5px; color:#334155; background:#ffffff; padding:10px; border:1px solid #e2e8f0; border-radius:4px; max-height:130px; overflow-y:auto; margin-top:6px;">
+              Đang phân tích...
+            </div>
           </div>
         </div>
 
         <div style="display:flex; gap:12px;">
-          <button type="button" class="CleanBtn btn-primary" style="padding:10px 22px; font-weight:700;" onclick="wizardGotoStep(3)">
+          <button type="button" class="CleanBtn btn-primary" style="padding:10px 22px; font-weight:700; background:#2563eb; color:#ffffff; border:none; border-radius:6px; cursor:pointer;" onclick="wizardGotoStep(3)">
             TỚI BƯỚC TIẾP THEO: CÀO BÁO CTI THEO PHÂN HỆ ->
           </button>
-          <button type="button" class="CleanBtn" onclick="wizardGotoStep(1)">Quay Lại Bước 1</button>
+          <button type="button" class="CleanBtn" style="padding:10px 18px; border:1px solid #cbd5e1; background:#ffffff; color:#334155; border-radius:6px; cursor:pointer;" onclick="wizardGotoStep(1)">Quay Lại Bước 1</button>
         </div>
       </div>
 
@@ -4844,7 +4863,18 @@ const elArt = document.getElementById('lblMasterArticlesCount');
     async function wizardExecuteStep1() {
       const targetVal = document.getElementById("wizardInputTarget").value.trim();
       const cloneVal = document.getElementById("wizardInputClone").value.trim();
+      const btn = document.getElementById("btnRunStep1");
+      const term = document.getElementById("wzScanAgentTerminal");
       
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = "[ AGENT ĐANG PHÂN TÍCH MÃ NGUỒN... ]";
+      }
+      if (term) {
+        term.style.display = "block";
+        term.innerHTML = `<div style="color:#94a3b8;">[KHỞI TẠO] Tác tử AI Codebase Inspector đang đọc cây AST và các tệp cấu hình...</div>`;
+      }
+
       try {
         const res = await fetch("/api/wizard/scan", {
           method: "POST",
@@ -4859,21 +4889,90 @@ const elArt = document.getElementById('lblMasterArticlesCount');
           document.getElementById("wzScopeBadge").textContent = d.scope_name;
           document.getElementById("wzCadenceLabel").textContent = d.cadence_label;
           
+          // Render languages chips
+          const langBox = document.getElementById("wzLanguagesBadge");
+          if (langBox) {
+            langBox.innerHTML = "";
+            (d.languages || []).forEach(l => {
+              const sp = document.createElement("span");
+              sp.style.cssText = "background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; padding:2px 8px; border-radius:4px; font-size:12px; font-weight:600;";
+              sp.textContent = l;
+              langBox.appendChild(sp);
+            });
+          }
+
+          // Render frameworks & techs
           const techsBox = document.getElementById("wzTechsBadge");
-          techsBox.innerHTML = "";
-          d.detected_techs.forEach(t => {
-            const sp = document.createElement("span");
-            sp.style.cssText = "background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:4px; font-size:12px; font-weight:600;";
-            sp.textContent = t;
-            techsBox.appendChild(sp);
-          });
-          
-          wizardGotoStep(2);
+          if (techsBox) {
+            techsBox.innerHTML = "";
+            (d.detected_techs || []).forEach(t => {
+              const sp = document.createElement("span");
+              sp.style.cssText = "background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:4px; font-size:12px; font-weight:600;";
+              sp.textContent = t;
+              techsBox.appendChild(sp);
+            });
+          }
+
+          // Render sensitive sinks
+          const sinksBox = document.getElementById("wzSinksBox");
+          if (sinksBox) {
+            if (d.sensitive_sinks && d.sensitive_sinks.length > 0) {
+              sinksBox.innerHTML = d.sensitive_sinks.map(s => `
+                <div style="margin-bottom:3px; padding:3px 6px; background:#fff1f2; border-radius:3px; border-left:3px solid #e11d48;">
+                  ${s}
+                </div>
+              `).join('');
+            } else {
+              sinksBox.innerHTML = `<span style="color:#15803d; font-weight:600;">[OK] Không phát hiện hàm nhạy cảm nguy hiểm nào.</span>`;
+            }
+          }
+
+          // Stream logs in terminal
+          const logs = d.agent_logs || [
+            "[AGENT 1: CODEBASE INSPECTOR] Đã đọc xong cấu trúc mã nguồn.",
+            "[AST SCANNER] Nhận diện ngăn xếp và các tệp cấu hình hoàn tất.",
+            "[LUẬN ĐIỂM TÁC TỬ] Đã gán phân hệ bảo vệ phù hợp nhất."
+          ];
+
+          let i = 0;
+          function printScanLog() {
+            if (i < logs.length) {
+              const el = document.createElement("div");
+              el.style.marginBottom = "3px";
+              if (logs[i].includes("SENSITIVE")) el.style.color = "#f87171";
+              else if (logs[i].includes("LUẬN ĐIỂM") || logs[i].includes("HOÀN TẤT")) el.style.color = "#4ade80";
+              else el.style.color = "#38bdf8";
+              el.textContent = logs[i];
+              if (term) {
+                term.appendChild(el);
+                term.scrollTop = term.scrollHeight;
+              }
+              i++;
+              setTimeout(printScanLog, 140);
+            } else {
+              if (btn) {
+                btn.disabled = false;
+                btn.textContent = "[ BẮT ĐẦU QUÉT DỰ ÁN ]";
+              }
+              setTimeout(() => {
+                wizardGotoStep(2);
+              }, 400);
+            }
+          }
+          printScanLog();
         } else {
           alert("Lỗi khi quét: " + (d.message || "Không xác định"));
+          if (btn) {
+            btn.disabled = false;
+            btn.textContent = "[ BẮT ĐẦU QUÉT DỰ ÁN ]";
+          }
         }
       } catch (e) {
         alert("Lỗi kết nối API /api/wizard/scan: " + e);
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = "[ BẮT ĐẦU QUÉT DỰ ÁN ]";
+        }
       }
     }
 
@@ -6187,16 +6286,18 @@ def api_system_validate_folder(req: FolderValidationReq):
             fl = f.lower()
             if fl.endswith(".php") and "PHP" not in detected_techs:
                 detected_techs.append("PHP")
-            elif fl in ("package.json",) or (fl.endswith(".js") and "JavaScript/Node.js" not in detected_techs):
+            elif (fl == "package.json" or fl.endswith(".js")) and "JavaScript/Node.js" not in detected_techs:
                 detected_techs.append("JavaScript/Node.js")
             elif fl.endswith(".py") and "Python" not in detected_techs:
                 detected_techs.append("Python")
             elif fl.endswith(".go") and "Go" not in detected_techs:
                 detected_techs.append("Go")
-            elif fl in ("dockerfile", "docker-compose.yml") and "Docker" not in detected_techs:
+            elif (fl in ("dockerfile", "docker-compose.yml", "docker-compose.yaml")) and "Docker" not in detected_techs:
                 detected_techs.append("Docker")
             elif fl == "composer.json" and "Composer" not in detected_techs:
                 detected_techs.append("Composer")
+
+        detected_techs = list(dict.fromkeys(detected_techs))
 
     return {
         "exists": True,

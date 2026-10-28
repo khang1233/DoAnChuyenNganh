@@ -1,7 +1,7 @@
 @echo off
 :: SCRIPT DONG BO TUONG LUA WINDOWS DEFENDER CHUAN SOC ENTERPRISE
-:: Tong hop 175 IP C2 nguy hai tu he thong CTI Autonomous Agent
-:: Thoi gian bien dich: 2026-10-28 14:13:16
+:: Tong hop 176 IP C2 nguy hai tu he thong CTI Autonomous Agent
+:: Thoi gian bien dich: 2026-10-28 14:19:26
 
 echo [CTI AGENT] Dang ap dung quy tac chan ket noi outbound/inbound toi C2 Servers...
 netsh advfirewall firewall add rule name="CTI_BLOCK_216_73_160_59" dir=out action=block remoteip=216.73.160.59 >nul
@@ -354,4 +354,6 @@ netsh advfirewall firewall add rule name="CTI_BLOCK_142_93_149_77" dir=out actio
 netsh advfirewall firewall add rule name="CTI_BLOCK_142_93_149_77" dir=in action=block remoteip=142.93.149.77 >nul
 netsh advfirewall firewall add rule name="CTI_BLOCK_104_248_126_159" dir=out action=block remoteip=104.248.126.159 >nul
 netsh advfirewall firewall add rule name="CTI_BLOCK_104_248_126_159" dir=in action=block remoteip=104.248.126.159 >nul
+netsh advfirewall firewall add rule name="CTI_BLOCK_94_154_43_7" dir=out action=block remoteip=94.154.43.7 >nul
+netsh advfirewall firewall add rule name="CTI_BLOCK_94_154_43_7" dir=in action=block remoteip=94.154.43.7 >nul
 echo [CTI AGENT] Hoan tat ap dung rule Windows Defender Firewall!

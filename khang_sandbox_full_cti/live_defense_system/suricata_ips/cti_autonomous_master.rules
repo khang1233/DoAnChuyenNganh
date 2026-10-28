@@ -1,9 +1,9 @@
 # =============================================================================
 # SURICATA IDS/IPS MASTER DEEP PACKET INSPECTION (DPI) RULES
-# Tong hop: 175 C2 IPs, 169 C2 Domains, 1330 CVEs
+# Tong hop: 176 C2 IPs, 169 C2 Domains, 1330 CVEs
 # =============================================================================
 
-# [1] CHAN LUU LUONG HAI CHIEU TOI 175 IP C2:
+# [1] CHAN LUU LUONG HAI CHIEU TOI 176 IP C2:
 drop ip any any -> [216.73.160.59,216.73.160.61,216.73.160.210,45.8.19.111,177.75.57.20,84.247.60.125,38.154.185.97,153.75.90.146,46.21.250.135,166.88.95.90,183.154.173.30,182.239.114.223,23.148.212.237,47.102.192.23,156.239.230.120] any (msg:"[CTI-IPS] Outbound C2 Traffic to Cluster #1"; classtype:trojan-activity; sid:9200100; rev:1;)
 drop ip [216.73.160.59,216.73.160.61,216.73.160.210,45.8.19.111,177.75.57.20,84.247.60.125,38.154.185.97,153.75.90.146,46.21.250.135,166.88.95.90,183.154.173.30,182.239.114.223,23.148.212.237,47.102.192.23,156.239.230.120] any -> $HOME_NET any (msg:"[CTI-IPS] Inbound Intrusion from C2 Cluster #1"; classtype:attempted-recon; sid:9200101; rev:1;)
 drop ip any any -> [202.182.109.151,198.13.53.226,80.78.27.252,45.138.12.177,151.243.232.123,3.112.252.14,54.95.112.6,69.10.51.162,172.86.91.7,210.149.87.120,213.163.202.171,221.216.140.49,221.216.140.129,38.244.50.120,37.19.210.12] any (msg:"[CTI-IPS] Outbound C2 Traffic to Cluster #2"; classtype:trojan-activity; sid:9200102; rev:1;)
@@ -26,8 +26,8 @@ drop ip any any -> [208.64.33.90,208.94.246.53,43.134.165.205,91.92.40.202,176.6
 drop ip [208.64.33.90,208.94.246.53,43.134.165.205,91.92.40.202,176.65.139.228,45.194.92.222,193.32.204.199,43.250.53.42,85.11.167.243,45.198.224.169,109.71.252.97,204.76.203.7,96.62.224.81,23.94.145.224,2.27.248.127] any -> $HOME_NET any (msg:"[CTI-IPS] Inbound Intrusion from C2 Cluster #10"; classtype:attempted-recon; sid:9200119; rev:1;)
 drop ip any any -> [168.100.8.57,193.26.115.221,149.104.78.141,103.160.59.97,162.219.30.165,8.231.120.246,193.178.159.128,107.175.82.242,104.194.9.227,180.251.159.243,195.178.110.247,107.189.14.87,45.61.184.170,92.246.130.76,69.55.61.82] any (msg:"[CTI-IPS] Outbound C2 Traffic to Cluster #11"; classtype:trojan-activity; sid:9200120; rev:1;)
 drop ip [168.100.8.57,193.26.115.221,149.104.78.141,103.160.59.97,162.219.30.165,8.231.120.246,193.178.159.128,107.175.82.242,104.194.9.227,180.251.159.243,195.178.110.247,107.189.14.87,45.61.184.170,92.246.130.76,69.55.61.82] any -> $HOME_NET any (msg:"[CTI-IPS] Inbound Intrusion from C2 Cluster #11"; classtype:attempted-recon; sid:9200121; rev:1;)
-drop ip any any -> [193.247.144.38,82.192.72.4,103.102.31.18,11.134.0.57,11.136.0.41,11.138.0.8,11.138.1.11,45.61.157.22,142.93.149.77,104.248.126.159] any (msg:"[CTI-IPS] Outbound C2 Traffic to Cluster #12"; classtype:trojan-activity; sid:9200122; rev:1;)
-drop ip [193.247.144.38,82.192.72.4,103.102.31.18,11.134.0.57,11.136.0.41,11.138.0.8,11.138.1.11,45.61.157.22,142.93.149.77,104.248.126.159] any -> $HOME_NET any (msg:"[CTI-IPS] Inbound Intrusion from C2 Cluster #12"; classtype:attempted-recon; sid:9200123; rev:1;)
+drop ip any any -> [193.247.144.38,82.192.72.4,103.102.31.18,11.134.0.57,11.136.0.41,11.138.0.8,11.138.1.11,45.61.157.22,142.93.149.77,104.248.126.159,94.154.43.7] any (msg:"[CTI-IPS] Outbound C2 Traffic to Cluster #12"; classtype:trojan-activity; sid:9200122; rev:1;)
+drop ip [193.247.144.38,82.192.72.4,103.102.31.18,11.134.0.57,11.136.0.41,11.138.0.8,11.138.1.11,45.61.157.22,142.93.149.77,104.248.126.159,94.154.43.7] any -> $HOME_NET any (msg:"[CTI-IPS] Inbound Intrusion from C2 Cluster #12"; classtype:attempted-recon; sid:9200123; rev:1;)
 
 # [2] CHAN DNS SINKHOLE & TLS SNI CHO 169 TEN MIEN DOC:
 drop dns $HOME_NET any -> any 53 (msg:"[CTI-IPS] DNS Query for Malicious Domain ecomtrack.io"; dns.query; content:"ecomtrack.io"; nocase; classtype:trojan-activity; sid:9200124; rev:1;)
