@@ -48,6 +48,7 @@ desktop.ini
 
 # 6. Temporary scratch & test artifacts
 khang_sandbox_full_cti/scratch/
+target_projects/
 *.log
 
 # 7. Exceptions (Keep essential scripts)

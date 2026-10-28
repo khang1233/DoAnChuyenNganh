@@ -258,13 +258,31 @@ def synthesize_and_deploy_skill(target_path: Path, scope_id: str, article_id: st
 
 def main():
     parser = argparse.ArgumentParser(description="Autonomous CTI Defense Lifecycle Controller.")
+    parser.add_argument("--clone", "-c", type=str, default="", help="URL Git của dự án web đích để tự động clone về target_projects/ và bảo vệ")
     parser.add_argument("--target", "-t", type=str, default=".", help="Đường dẫn thư mục dự án cần bảo vệ")
     parser.add_argument("--scope", "-s", type=str, default="auto", help="Phân hệ (auto, SCOPE_WEB, SCOPE_NETWORK, SCOPE_ENDPOINT, SCOPE_HARDWARE)")
     parser.add_argument("--history-years", "-y", type=int, default=3, choices=[1, 3, 5], help="Mốc thời gian cào dữ liệu lịch sử cho máy mới (1, 3, hoặc 5 năm)")
     parser.add_argument("--daemon", "-d", action="store_true", help="Chạy chế độ giám sát tự động định kỳ theo chu kỳ của Scope")
     args = parser.parse_args()
 
-    target_path = Path(args.target).resolve()
+    import subprocess
+    if args.clone:
+        repo_url = args.clone.strip()
+        repo_name = repo_url.rstrip("/").split("/")[-1].replace(".git", "")
+        dest_dir = ROOT_DIR / "target_projects" / repo_name
+        dest_dir.parent.mkdir(parents=True, exist_ok=True)
+        if not dest_dir.exists():
+            print(f"[*] Đang tự động clone dự án web từ: {repo_url} vào {dest_dir}...")
+            res = subprocess.run(["git", "clone", repo_url, str(dest_dir)])
+            if res.returncode != 0:
+                print(f"[-] Không thể clone kho lưu trữ {repo_url}.")
+                return
+        else:
+            print(f"[*] Dự án đã tồn tại tại: {dest_dir}. Tiến hành kiểm tra và bảo vệ...")
+        target_path = dest_dir
+    else:
+        target_path = Path(args.target).resolve()
+
     print("=" * 75)
     print("🚀 AUTONOMOUS CTI & AGENTIC DEFENSE LIFECYCLE (5-STAGE PROTOCOL)")
     print("=" * 75)
