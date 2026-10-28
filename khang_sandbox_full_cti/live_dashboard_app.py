@@ -927,7 +927,6 @@ HTML_PAGE = r"""<!DOCTYPE html>
       <button class="NavLink" onclick="switchView('sec-history', this)">Lịch Sử Đã Học (<span id="navHistoryCount">0</span>)</button>
       <button class="NavLink" onclick="switchView('sec-score', this)">2. Bảng Điểm IOC</button>
       <button class="NavLink" onclick="switchView('sec-defense', this)">3. Kho Kỹ Năng Tác Tử (Agentic Skills)</button>
-      <button class="NavLink" onclick="switchView('sec-defense-connect', this)">4. Kết Nối Công Cụ Live</button>
       <button class="NavLink" onclick="switchView('sec-chat', this)">Chat AI Agent</button>
       <button class="NavLink" onclick="switchView('sec-add', this)">+ Thêm Báo Mới</button>
     </div>
@@ -1567,7 +1566,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
           ✓ THẨM ĐỊNH TIN CẬY &amp; xAI (TRUST AUDIT)
         </button>
         <button id="mainTabBtn_engines" class="CleanBtn MasterTabBtn" onclick="switchMasterTab('tabEnginesMaster', this)" style="padding:10px 14px; font-size:12.5px; font-weight:700; color:var(--text-main); border-color:var(--border-main); background:#ffffff; text-align:center;">
-          🛡️ 5 LỚP PHÒNG THỦ KỸ THUẬT &amp; LIVE TEST
+          ⚡ CÔNG CỤ THỰC THI &amp; KIỂM CHỨNG TÁC TỬ (AGENT PLAYBOOK &amp; PROBES)
         </button>
       </div>
 
@@ -1616,25 +1615,25 @@ HTML_PAGE = r"""<!DOCTYPE html>
         <!-- THANH CHUYỂN SUB-TAB PHÒNG THỦ 1 DÒNG DUY NHẤT -->
         <div style="display:flex; flex-wrap:wrap; gap:6px; padding:8px 10px; margin-bottom:12px; background:var(--bg-subtle); border:1px solid var(--border-main); border-radius:6px;">
           <button id="subBtn_subTabWaf" class="CleanBtn EngineSubBtn active btn-primary" onclick="switchEngineSubTab('subTabWaf', this)" style="font-size:12px;">
-            1. WAF ModSecurity (CVE)
+            1. Vá Ảo Hóa L7 (Virtual Patching)
           </button>
           <button id="subBtn_subTabSuricata" class="CleanBtn EngineSubBtn" onclick="switchEngineSubTab('subTabSuricata', this)" style="font-size:12px;">
-            2. Suricata IPS (.rules)
+            2. Chữ Ký Kiểm Định Tầng Mạng (DPI Probe)
           </button>
           <button id="subBtn_subTabFirewall" class="CleanBtn EngineSubBtn" onclick="switchEngineSubTab('subTabFirewall', this)" style="font-size:12px;">
-            3. Giao Tiếp Firewall (OpenC2)
+            3. Lệnh Tác Tử Chặn C2 (OpenC2 Action)
           </button>
           <button id="subBtn_subTabSigma" class="CleanBtn EngineSubBtn" onclick="switchEngineSubTab('subTabSigma', this)" style="font-size:12px;">
-            4. Sigma &amp; Wazuh SIEM
+            4. Tương Quan Hành Vi TTPs (Sysmon & SIEM)
           </button>
           <button id="subBtn_subTabYara" class="CleanBtn EngineSubBtn" onclick="switchEngineSubTab('subTabYara', this)" style="font-size:12px;">
-            5. Phòng Thủ Mã Độc &amp; YARA
+            5. Nhận Diện Mã Độc (YARA & EDR)
           </button>
           <button id="subBtn_subTabHistory" class="CleanBtn EngineSubBtn" onclick="switchEngineSubTab('subTabHistory', this)" style="font-size:12px;">
-            6. Chiến Lược D3FEND
+            6. Ma Trận Phòng Thủ MITRE D3FEND
           </button>
           <button id="subBtn_subTabLiveServer" class="CleanBtn EngineSubBtn" onclick="switchEngineSubTab('subTabLiveServer', this)" style="font-size:12px;">
-            7. Máy Chủ Live (Port 8766)
+            7. Môi Trường Thực Nghiệm (Port 8766)
           </button>
         </div>
 
@@ -1719,7 +1718,6 @@ HTML_PAGE = r"""<!DOCTYPE html>
             </div>
           </div>
         </div>
-      </div>
 
         <!-- BẢNG THỬ NGHIỆM TẤN CÔNG THỰC TẾ LÊN WAF PROXY CỔNG 8766 -->
         <div style="border:1px solid var(--border-main); border-radius:6px; padding:14px; margin-bottom:14px; background:var(--bg-card);">
@@ -1795,185 +1793,19 @@ HTML_PAGE = r"""<!DOCTYPE html>
           </div>
 
           <div style="background:#ffffff; border:1px solid var(--border-main); border-radius:6px; padding:12px; font-size:12.5px; line-height:1.6;">
-            <b style="color:var(--text-main);">LUẬN ĐIỂM BẢO VỆ ĐỒ ÁN VỀ TÍNH THỰC CHIẾN CỦA QUY TẮC PHÒNG THỦ:</b><br/>
-            1. <b>Vượt qua hạn chế của việc chỉ chặn IP:</b> Kẻ tấn công đổi địa chỉ IP trong 1 giây qua Botnet/VPN/Proxy. Nếu chỉ dựa vào IP thì phòng thủ vô dụng. Dự án áp dụng mô hình <i>Pyramid of Pain (David Bianco)</i>: IP chỉ là lớp đáy bổ trợ.<br/>
-            2. <b>Vá ảo WAF ModSecurity v3 (Tầng L7):</b> Tự động sinh luật vá ảo cho 526 lỗ hổng CVE (SQLi, RCE, Path Traversal, JNDI). Cho dù kẻ tấn công đổi hàng triệu địa chỉ IP khác nhau, gói tin chứa payload khai thác vẫn bị chặn đứng 403 Forbidden tại WAF Proxy trước khi chạm vào backend.<br/>
-            3. <b>Phát hiện bất thường chuỗi tiến trình (Wazuh SIEM &amp; Sysmon Event 1):</b> Bắt trọn kỹ thuật TTPs và WebShell khi tiến trình web server (w3wp.exe, nginx, httpd) spawn ra cmd.exe hoặc powershell.exe để leo thang đặc quyền.
+            <b style="color:var(--text-main);">LUẬN ĐIỂM BẢO VỆ ĐỒ ÁN VỀ BỘ KỸ NĂNG TÁC TỬ (AGENTIC SKILLS OVER STATIC RULES):</b><br/>
+            1. <b>Chuyển dịch từ sinh luật tĩnh (Rules) sang Kỹ năng Tác tử tự hành (Agentic Skills):</b> Thay vì sinh ra các dòng rule tĩnh rời rạc khó đồng bộ và dễ xung đột, hệ thống đóng gói tri thức CTI thành các gói Kỹ Năng Tác Tử hoàn chỉnh (bao gồm quy trình SOP, kịch bản probe kiểm chứng, và các cặp mã refactor đa ngôn ngữ).<br/>
+            2. <b>Tác tử tự động kiểm chứng True Positive &amp; Zero False Positive:</b> Tác tử sử dụng kịch bản kiểm thử (<code>scripts/verify_exploit.py</code>) để tự động bắn gói tin mô phỏng và thẩm định tính khả thi trên hệ thống thực tế trước khi đề xuất vá mã nguồn.<br/>
+            3. <b>Phối hợp vá ảo và sửa mã nguồn tận gốc:</b> Trong lúc AI Agent hoặc lập trình viên tiến hành refactor mã nguồn theo SOP an toàn, công cụ vá ảo hóa (<code>scripts/apply_virtual_patch.py</code>) lập tức kích hoạt để bảo vệ ứng dụng ở tầng L7 mà không gây gián đoạn dịch vụ.
           </div>
         </div>
       </div>
-    </section>
-
-    <!-- MỤC 4: TRUNG TÂM KẾT NỐI VÀ ĐIỀU PHỐI CÔNG CỤ AN NINH THỰC TẾ -->
-    <section class="CyberBox" id="sec-defense-connect">
-      <div class="BoxLegend" style="margin-bottom:12px;">4. TRUNG TÂM KẾT NỐI VÀ ĐIỀU PHỐI CÔNG CỤ AN NINH THỰC TẾ (LIVE SECURITY ENGINES CONNECTOR)</div>
-
-      <!-- HEADER TỔNG QUAN KẾT NỐI -->
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; padding:14px 16px; margin-bottom:14px; background:var(--bg-subtle); border:1px solid var(--border-main); border-radius:6px;">
-        <div>
-          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-            <span style="font-size:12px; font-weight:700; padding:4px 10px; background:var(--safe-bg); color:var(--safe); border:1px solid var(--safe-border); border-radius:4px;">
-              5/5 CÔNG CỤ ĐÃ SẴN SÀNG KẾT NỐI &amp; NẠP RULE TRỰC TIẾP
-            </span>
-            <span style="font-size:12px; font-weight:700; padding:4px 10px; background:var(--primary-subtle); color:var(--primary); border:1px solid #bfdbfe; border-radius:4px;">
-              <span id="lblCorpusStats2">KHO TRI THỨC PHÂN HỆ: 221 BÀI BÁO &amp; 1,828 IOCs</span>
-            </span>
-          </div>
-          <div style="font-size:12.5px; color:var(--text-muted); margin-top:6px;">
-            Hệ thống tự động liên kết và phân phối bộ luật phòng thủ xuống các công cụ bảo mật thực tế: Windows Defender Firewall qua netsh kernel, Máy chủ WAF ModSecurity Proxy qua cổng 8766, Suricata IPS DPI, Wazuh SIEM Sysmon, và YARA / Windows AppLocker EDR.
-          </div>
-        </div>
-        <div style="display:flex; gap:8px;">
-          <button class="CleanBtn btn-primary" onclick="recompileAllDefenseEngines()" style="font-weight:600;">Đồng Bộ Toàn Bộ 5 Tool</button>
-          <button class="CleanBtn" onclick="clearLiveToolTerminal()">Xóa Log Terminal</button>
-        </div>
       </div>
 
-      <!-- THANH TRẠNG THÁI KẾT NỐI TỰ ĐỘNG THỜI GIAN THỰC (REAL-TIME AUTO-SYNC BUS) -->
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; padding:12px 16px; margin-bottom:14px; background:#0f172a; border:1px solid #1e293b; border-left:4px solid #22c55e; border-radius:6px; color:#f8fafc;">
-        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="display:inline-block; width:10px; height:10px; background:#22c55e; border-radius:50%; box-shadow:0 0 8px #22c55e; animation:pulseAnim 1.8s infinite;"></span>
-            <span style="font-size:12.5px; font-weight:700; color:#22c55e; letter-spacing:0.04em;">REAL-TIME AUTO-SYNC BUS: ĐANG KẾT NỐI VÀ LẮNG NGHE</span>
-          </div>
-          <span id="badgeSyncCounter" style="font-size:11px; font-family:var(--font-mono); background:#1e293b; color:#93c5fd; padding:3px 8px; border-radius:4px; border:1px solid #334155;">Đồng bộ: #1</span>
-          <span id="badgeLastSyncTime" style="font-size:11px; font-family:var(--font-mono); background:#1e293b; color:#a7f3d0; padding:3px 8px; border-radius:4px; border:1px solid #334155;">Vừa nạp: Đang tải...</span>
-        </div>
-        <div style="display:flex; align-items:center; gap:10px;">
-          <span id="autoSyncTrigger" style="font-size:11px; color:#94a3b8; font-family:var(--font-mono); max-width:320px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Nguồn: Khởi động hệ thống</span>
-          <button class="CleanBtn" style="font-size:11.5px; background:#1e293b; color:#f8fafc; border:1px solid #475569;" onclick="recompileAllDefenseEngines()">Tái Nạp Ngay (Hot-Reload)</button>
-        </div>
-      </div>
+        
+</section>
 
-      <!-- 5 THẺ ĐIỀU KHIỂN & KẾT NỐI 5 CÔNG CỤ -->
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:12px; margin-bottom:14px;">
-
-        <!-- TOOL 1: WINDOWS DEFENDER FIREWALL -->
-        <div style="background:var(--bg-card); border:1px solid var(--border-main); border-radius:6px; padding:14px; display:flex; flex-direction:column; justify-content:space-between;">
-          <div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-              <b style="font-size:13.5px; color:var(--text-main);">1. WINDOWS DEFENDER FIREWALL</b>
-              <span id="badgeFwToolStatus" style="font-size:11px; font-weight:700; padding:2px 6px; border-radius:3px; background:var(--safe-bg); color:var(--safe); border:1px solid var(--safe-border);">KẾT NỐI: KERNEL NETSH</span>
-            </div>
-            <div style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">
-              Giao tiếp trực tiếp với tường lửa Windows Host thông qua <b>netsh advfirewall</b> kernel. Tự động thêm/xóa rule chặn 2 chiều khi AI phát hiện C2 IP mới.
-            </div>
-            <div style="font-size:11.5px; font-family:var(--font-mono); color:var(--text-muted); background:var(--bg-subtle); padding:6px 8px; border-radius:4px; margin-bottom:10px; word-break:break-all;">
-              Tệp: live_defense_system/windows_firewall/apply_firewall.bat
-            </div>
-          </div>
-          <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <button class="CleanBtn btn-primary" style="font-size:11.5px; flex:1;" onclick="applyWindowsFirewallTool()">Nạp Rule Vào Firewall</button>
-            <button class="CleanBtn" style="font-size:11.5px;" onclick="checkWindowsFirewallStatusTool()">Kiểm Tra Kernel</button>
-            <button class="CleanBtn" style="font-size:11.5px; color:var(--danger); border-color:var(--danger-border);" onclick="rollbackWindowsFirewallTool()">Gỡ Bỏ Rule</button>
-          </div>
-        </div>
-
-        <!-- TOOL 2: WAF MODSECURITY V3 PROXY -->
-        <div style="background:var(--bg-card); border:1px solid var(--border-main); border-radius:6px; padding:14px; display:flex; flex-direction:column; justify-content:space-between;">
-          <div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-              <b style="font-size:13.5px; color:var(--text-main);">2. WAF MODSECURITY v3 PROXY</b>
-              <span style="font-size:11px; font-weight:700; padding:2px 6px; border-radius:3px; background:var(--safe-bg); color:var(--safe); border:1px solid var(--safe-border);">KẾT NỐI: CỔNG 8766 LIVE</span>
-            </div>
-            <div style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">
-              Máy chủ WAF Reverse Proxy thực tế đang lắng nghe tại <b>http://127.0.0.1:8766</b>. Tự động hot-reload 969 bản vá ảo CVE vào RAM để chặn RCE, SQLi, LFI, JNDI.
-            </div>
-            <div style="font-size:11.5px; font-family:var(--font-mono); color:var(--text-muted); background:var(--bg-subtle); padding:6px 8px; border-radius:4px; margin-bottom:10px; word-break:break-all;">
-              Tệp: live_defense_system/waf_modsecurity/cti_virtual_patching.conf
-            </div>
-          </div>
-          <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <button class="CleanBtn" style="font-size:11.5px; color:var(--danger); border-color:var(--danger-border);" onclick="testWafAttack('sqli')">Test SQLi</button>
-            <button class="CleanBtn" style="font-size:11.5px; color:var(--danger); border-color:var(--danger-border);" onclick="testWafAttack('rce')">Test RCE</button>
-            <button class="CleanBtn" style="font-size:11.5px; color:var(--danger); border-color:var(--danger-border);" onclick="testWafAttack('traversal')">Test Traversal</button>
-            <button class="CleanBtn" style="font-size:11.5px; color:var(--danger); border-color:var(--danger-border);" onclick="testWafAttack('jndi')">Test Log4Shell</button>
-            <button class="CleanBtn" style="font-size:11.5px; color:var(--safe); border-color:var(--safe-border);" onclick="testWafAttack('clean')">Clean Traffic (200)</button>
-          </div>
-        </div>
-
-        <!-- TOOL 3: SURICATA IPS DPI ENGINE -->
-        <div style="background:var(--bg-card); border:1px solid var(--border-main); border-radius:6px; padding:14px; display:flex; flex-direction:column; justify-content:space-between;">
-          <div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-              <b style="font-size:13.5px; color:var(--text-main);">3. SURICATA IPS / SNORT DPI</b>
-              <span id="badgeSuriToolStatus" style="font-size:11px; font-weight:700; padding:2px 6px; border-radius:3px; background:var(--safe-bg); color:var(--safe); border:1px solid var(--safe-border);">KẾT NỐI: VIRTUAL DPI &amp; FAST.LOG</span>
-            </div>
-            <div style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">
-              Hệ thống phòng chống xâm nhập tầng mạng (IDS/IPS), kiểm tra sâu gói tin (DPI), bắt kết nối C2 IP, DNS Sinkhole và chặn cổng RAT. Tự động ghi alert vào fast.log và eve.json trên đĩa.
-            </div>
-            <div style="font-size:11.5px; font-family:var(--font-mono); color:var(--text-muted); background:var(--bg-subtle); padding:6px 8px; border-radius:4px; margin-bottom:10px; word-break:break-all;">
-              Tệp: live_defense_system/suricata_ips/cti_autonomous_master.rules
-            </div>
-          </div>
-          <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <button class="CleanBtn btn-primary" style="font-size:11.5px; flex:1;" onclick="validateSuricataRules()">Nạp &amp; Soát 422 Rules</button>
-            <button class="CleanBtn" style="font-size:11.5px;" onclick="testSuricataDpi('c2_flow')">Test DPI C2</button>
-            <button class="CleanBtn" style="font-size:11.5px;" onclick="testSuricataDpi('dns_sinkhole')">Test DNS Sinkhole</button>
-            <button class="CleanBtn" style="font-size:11.5px;" onclick="testSuricataDpi('cve_dpi')">Test CVE DPI</button>
-          </div>
-        </div>
-
-        <!-- TOOL 4: WAZUH SIEM & SYSMON -->
-        <div style="background:var(--bg-card); border:1px solid var(--border-main); border-radius:6px; padding:14px; display:flex; flex-direction:column; justify-content:space-between;">
-          <div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-              <b style="font-size:13.5px; color:var(--text-main);">4. WAZUH SIEM &amp; SYSMON CORRELATION</b>
-              <span style="font-size:11px; font-weight:700; padding:2px 6px; border-radius:3px; background:var(--safe-bg); color:var(--safe); border:1px solid var(--safe-border);">KẾT NỐI: WAZUH LOCAL RULES</span>
-            </div>
-            <div style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">
-              Bộ luật tương quan phát hiện Web Shell sinh cmd.exe, kết nối socket C2 nguy hại, và hành vi xóa sao lưu volume shadow của Ransomware. Tự động nạp vào local_rules.xml của Wazuh.
-            </div>
-            <div style="font-size:11.5px; font-family:var(--font-mono); color:var(--text-muted); background:var(--bg-subtle); padding:6px 8px; border-radius:4px; margin-bottom:10px; word-break:break-all;">
-              Tệp: live_defense_system/wazuh_siem/local_rules.xml
-            </div>
-          </div>
-          <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <button class="CleanBtn btn-primary" style="font-size:11.5px; flex:1;" onclick="syncWazuhSiemTool()">Đồng Bộ local_rules.xml</button>
-            <button class="CleanBtn" style="font-size:11.5px;" onclick="simulateSysmonEventTool('web_shell_spawn')">Mô Phỏng Web Shell Spawn</button>
-            <button class="CleanBtn" style="font-size:11.5px;" onclick="simulateSysmonEventTool('c2_socket')">Mô Phỏng C2 Socket</button>
-          </div>
-        </div>
-
-        <!-- TOOL 5: YARA & APPLOCKER EDR -->
-        <div style="background:var(--bg-card); border:1px solid var(--border-main); border-radius:6px; padding:14px; display:flex; flex-direction:column; justify-content:space-between;">
-          <div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-              <b style="font-size:13.5px; color:var(--text-main);">5. YARA SCANNER &amp; APPLOCKER EDR</b>
-              <span style="font-size:11px; font-weight:700; padding:2px 6px; border-radius:3px; background:var(--safe-bg); color:var(--safe); border:1px solid var(--safe-border);">KẾT NỐI: APPLOCKER &amp; YARA</span>
-            </div>
-            <div style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">
-              Cấm thực thi tệp tin mã độc qua Windows AppLocker XML Policy và quét nhận diện mã độc chạy ngầm trong bộ nhớ RAM qua chữ ký YARA. Tự động bổ sung mã băm mới phát hiện.
-            </div>
-            <div style="font-size:11.5px; font-family:var(--font-mono); color:var(--text-muted); background:var(--bg-subtle); padding:6px 8px; border-radius:4px; margin-bottom:10px; word-break:break-all;">
-              Tệp: live_defense_system/applocker/AppLocker_Policy.xml
-            </div>
-          </div>
-          <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <button class="CleanBtn btn-primary" style="font-size:11.5px; flex:1;" onclick="testYaraApplockerTool('')">Kiểm Tra AppLocker Policy</button>
-            <button class="CleanBtn" style="font-size:11.5px;" onclick="testYaraApplockerTool('0188049ec724db2f8c5b3d687ea0bcf3b9c9c8ef78ee50e3bb45f9fbefaa9745')">Quét Mã Băm Malware</button>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- INTERACTIVE LIVE TOOL EXECUTION TERMINAL -->
-      <div style="border:1px solid var(--border-main); border-radius:6px; padding:14px; background:var(--bg-card);">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
-          <div>
-            <b style="font-size:13.5px; color:var(--text-main);">MÀN HÌNH ĐIỀU PHỐI VÀ NHẬT KÝ THỰC THI THỜI GIAN THỰC (LIVE ORCHESTRATION TERMINAL)</b>
-            <div style="font-size:12px; color:var(--text-muted);">
-              Phản hồi thực thi trực tiếp từ các lệnh netsh, Suricata DPI engine, WAF ModSecurity proxy và Wazuh SIEM kernel.
-            </div>
-          </div>
-          <div style="display:flex; gap:6px;">
-            <button class="CleanBtn" onclick="clearLiveToolTerminal()" style="font-size:12px;">Xóa Màn Hình</button>
-          </div>
-        </div>
-        <pre id="liveToolTerminal" style="background:#0a0a0a; color:#33ff00; padding:14px; border-radius:4px; font-family:'JetBrains Mono',monospace; font-size:12px; min-height:220px; max-height:360px; overflow-y:auto; white-space:pre-wrap; border:1px solid #1f521f;">[LIVE ORCHESTRATOR CONNECTED] Trung tâm điều phối an ninh đã sẵn sàng.
-Nhấn bất kỳ nút chức năng nào phía trên để thực thi lệnh trực tiếp lên các công cụ an ninh của hệ thống.</pre>
-      </div>
-    </section>
+    
 
   </div>
 
@@ -1995,7 +1827,7 @@ Nhấn bất kỳ nút chức năng nào phía trên để thực thi lệnh tr�
     function switchView(sectionId, btnEl) {
       document.querySelectorAll('.NavLinks .NavLink').forEach(b => b.classList.remove('active'));
       if (btnEl) btnEl.classList.add('active');
-      const ids = ['sec-wizard', 'sec-chat', 'sec-add', 'sec-feed', 'sec-history', 'sec-score', 'sec-defense', 'sec-defense-connect'];
+      const ids = ['sec-wizard', 'sec-chat', 'sec-add', 'sec-feed', 'sec-history', 'sec-score', 'sec-defense'];
       if (sectionId === 'all') {
         const wiz = document.getElementById('sec-wizard'); if (wiz) wiz.style.display = 'block';
         document.getElementById('sec-chat').style.display = 'none';
@@ -2004,8 +1836,6 @@ Nhấn bất kỳ nút chức năng nào phía trên để thực thi lệnh tr�
         document.getElementById('sec-history').style.display = 'block';
         document.getElementById('sec-score').style.display = 'block';
         document.getElementById('sec-defense').style.display = 'block';
-        const connEl = document.getElementById('sec-defense-connect');
-        if (connEl) connEl.style.display = 'block';
       } else {
         ids.forEach(id => {
           const el = document.getElementById(id);
