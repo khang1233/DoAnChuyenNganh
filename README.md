@@ -17,7 +17,29 @@ cd DoAnChuyenNganh
 
 ### Bước 2: Chọn Cách Khởi Chạy
 
-#### CÁCH 1: KHỞI CHẠY GIAO DIỆN WEB DASHBOARD (KHUYÊN DÙNG — 1-CLICK)
+#### CÁCH 1: KHỞI CHẠY BẰNG LỆNH GLOBAL QUA NPM (TIỆN LỢI NHẤT — GÕ TÊN TỪ BẤT KỲ ĐÂU)
+Chỉ cần chạy lệnh liên kết 1 lần duy nhất:
+```bash
+npm link
+```
+*(Hoặc cài đặt toàn cục: `npm install -g .`)*
+
+Từ lần sau trở đi, tại bất kỳ thư mục nào trên máy tính (Terminal, PowerShell, CMD), bạn chỉ cần gõ tên:
+```bash
+cti-defense
+```
+*(Hoặc viết tắt: `cti`)*
+
+- Hệ thống sẽ **tự động khởi chạy** máy chủ CTI, WAF Proxy và **tự động mở trình duyệt** tại:
+  👉 **`http://127.0.0.1:8765`** (vào ngay **Bước 1: Quét Dự Án**).
+- Các lệnh điều khiển nhanh:
+  - `cti-defense` hoặc `cti` : Khởi động hệ thống và mở Dashboard.
+  - `cti stop` : Tắt toàn bộ hệ thống và giải phóng cổng mạng.
+  - `cti status` : Kiểm tra trạng thái hệ thống (Online / Offline).
+
+---
+
+#### CÁCH 2: KHỞI CHẠY BẰNG FILE BATCH 1-CLICK (KHÔNG CẦN CÀI NPM)
 1. **Cài đặt thư viện (chỉ cần làm 1 lần đầu)**:
    - Nhấp đúp vào file: `0_CAI_DAT_MOI_TRUONG.bat` (hoặc gõ `pip install -r requirements.txt`).
 2. **Bật toàn bộ hệ thống**:

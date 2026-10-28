@@ -1,0 +1,33 @@
+{
+  "name": "cti-defense",
+  "version": "1.0.0",
+  "description": "He thong phong thu an ninh mang tu hanh tu tinh bao CTI va dong goi ky nang tac tu (Autonomous CTI Agentic Defense)",
+  "main": "bin/cli.js",
+  "bin": {
+    "cti-defense": "./bin/cli.js",
+    "cti": "./bin/cli.js"
+  },
+  "scripts": {
+    "start": "node ./bin/cli.js",
+    "stop": "node ./bin/cli.js stop",
+    "status": "node ./bin/cli.js status"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/khang1233/DoAnChuyenNganh.git"
+  },
+  "keywords": [
+    "cti",
+    "cyber-threat-intelligence",
+    "agentic-defense",
+    "ai-security",
+    "waf",
+    "autonomous-agent",
+    "mitre-attack"
+  ],
+  "author": "Khang",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
