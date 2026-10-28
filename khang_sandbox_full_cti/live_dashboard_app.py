@@ -1909,13 +1909,29 @@ HTML_PAGE = r"""<!DOCTYPE html>
 
           if (sel && data.options && data.options.length > 0) {
             sel.innerHTML = '';
+            let savedModel = null;
+            try {
+              savedModel = localStorage.getItem('selectedAiModel');
+            } catch (e) {}
+
+            let matched = false;
             data.options.forEach(opt => {
               const optEl = document.createElement('option');
               optEl.value = opt.value;
               optEl.textContent = opt.label;
-              if (opt.is_active) optEl.selected = true;
+              if (savedModel && opt.value === savedModel) {
+                optEl.selected = true;
+                matched = true;
+              } else if (!savedModel && opt.is_active) {
+                optEl.selected = true;
+                matched = true;
+              }
               sel.appendChild(optEl);
             });
+
+            if (!matched && sel.options.length > 0) {
+              sel.selectedIndex = 0;
+            }
           }
           
           if (badge && data.hardware) {
@@ -1931,18 +1947,22 @@ HTML_PAGE = r"""<!DOCTYPE html>
     function updateModelBadgeText(modelVal) {
       const badge = document.getElementById('localModelBadge');
       if (!badge) return;
-      const hw = detectedSystemHardware || { gpu_name: "Tự Động", vram_gb: 8.0, is_gpu_available: true };
+      const hw = detectedSystemHardware || { gpu_name: "AMD Radeon RX 6600", vram_gb: 8.0, is_gpu_available: true };
       if (!modelVal || modelVal === 'cti-heuristic-engine') {
-        badge.textContent = `CTI HEURISTIC CORE (OFFLINE • ${hw.gpu_name.toUpperCase()})`;
+        badge.textContent = `CTI HEURISTIC CORE (${hw.gpu_name.toUpperCase()} • NHẸ)`;
       } else {
-        badge.textContent = `${modelVal.toUpperCase()} (${hw.gpu_name.toUpperCase()} • ${hw.vram_gb}GB VRAM)`;
+        badge.textContent = `TÁC TỬ: ${modelVal.toUpperCase()} (${hw.gpu_name.toUpperCase()} • ${hw.vram_gb}GB VRAM • SẴN SÀNG)`;
       }
     }
 
     function onAiModelChange() {
       const sel = document.getElementById('aiModelSelect');
-      const val = sel ? sel.value : 'cti-heuristic-engine';
+      const val = sel ? sel.value : 'qwen2.5:7b';
+      try {
+        localStorage.setItem('selectedAiModel', val);
+      } catch (e) {}
       updateModelBadgeText(val);
+      updateLiveTicker(`Đã chuyển sang mô hình: ${val} (${detectedSystemHardware ? detectedSystemHardware.gpu_name : 'GPU Cục Bộ'})`);
     }
 
     function quickFillChat(text) {
@@ -3523,9 +3543,9 @@ const elArt = document.getElementById('lblMasterArticlesCount');
 
         const statusEl = document.getElementById('statusText');
         if (statusEl) {
-          statusEl.textContent = `Đang hiển thị: Ma Trận Toàn Bộ Kho (${d.total_articles} bài • ${d.total_iocs} IOCs).`;
+          statusEl.textContent = `Quy trình phòng thủ 5 bước chuẩn hóa • Sẵn sàng quét mã nguồn.`;
         }
-        updateLiveTicker(`Đã hiển thị Ma Trận Tổng Hợp: ${d.total_iocs} IOCs (${d.malware_hashes} Hash, ${d.malicious_ips} IP C2, ${d.cves_count} CVE).`);
+        updateLiveTicker(`Tác tử CTI sẵn sàng • Hệ thống phòng thủ tự hành dựa trên tri thức CTI đa nguồn.`);
       } catch (e) {
         console.error('Lỗi tải Ma Trận Tổng Hợp:', e);
       } finally {
@@ -4631,6 +4651,7 @@ const elArt = document.getElementById('lblMasterArticlesCount');
       fetchLiveDefenseStatus();
       setInterval(fetchLiveDefenseStatus, 3500);
       switchView('sec-wizard', document.querySelector('.NavLinks .NavLink'));
+      wizardGotoStep(1);
     });
   
     // =========================================================================
@@ -4663,6 +4684,18 @@ const elArt = document.getElementById('lblMasterArticlesCount');
             badge.style.fontWeight = "600";
           }
         }
+      }
+      const stepDescriptions = [
+        "",
+        "Bước 1: Chọn mã nguồn & Quét cây cú pháp AST.",
+        "Bước 2: Kết quả quét phân hệ & Nhận diện điểm nhạy cảm.",
+        "Bước 3: Lọc tình báo an ninh mạng mục tiêu cho phân hệ.",
+        "Bước 4: Sinh Gói Kỹ Năng Tác Tử Phòng Thủ (SKILL.md).",
+        "Bước 5: Kiểm thử khai thác & Vá mã nguồn tự hành."
+      ];
+      const st = document.getElementById("statusText");
+      if (st && stepDescriptions[stepNum]) {
+        st.textContent = stepDescriptions[stepNum];
       }
     }
 

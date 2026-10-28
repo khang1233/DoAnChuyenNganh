@@ -117,28 +117,136 @@ def detect_hardware_profile() -> Dict[str, Any]:
     }
 
 
-def query_ollama_runtime() -> Dict[str, Any]:
+import shutil
+import time
+
+def get_disk_installed_models() -> List[str]:
     """
-    Truy vấn API Ollama cục bộ (`http://127.0.0.1:11434/api/tags`) để lấy
-    danh sách chính xác các mô hình đang thực sự có mặt trên máy của người dùng.
+    Tự động quét các tệp manifest của Ollama trên ổ cứng để lập tức nhận diện
+    tất cả các mô hình AI đã tải về máy, ngay cả khi dịch vụ Ollama vừa khởi động.
     """
+    models = []
+    models_dir = ROOT_DIR / "ollama_models"
+    manifest_roots = [
+        models_dir / "manifests-v2" / "ollama.com" / "library",
+        models_dir / "manifests" / "registry.ollama.ai" / "library",
+        Path.home() / ".ollama" / "models" / "manifests" / "registry.ollama.ai" / "library"
+    ]
+    for mroot in manifest_roots:
+        if mroot.exists():
+            for model_dir in mroot.iterdir():
+                if model_dir.is_dir():
+                    for tag_file in model_dir.iterdir():
+                        if tag_file.is_file():
+                            models.append(f"{model_dir.name}:{tag_file.name}")
+
+    priority_order = ["qwen2.5:7b", "khang-qwen3:latest", "qwen3:8b", "khang-ai:latest", "gemma3:4b", "qwen2.5:1.5b"]
+    seen = set()
+    deduped = []
+    for p in priority_order:
+        if p in models and p not in seen:
+            deduped.append(p)
+            seen.add(p)
+    for m in models:
+        if m not in seen:
+            deduped.append(m)
+            seen.add(m)
+    return deduped
+
+
+def ensure_ollama_daemon() -> bool:
+    """
+    Tự động khởi động tiến trình Ollama nền nếu dịch vụ chưa chạy.
+    """
+    # 1. Kiểm tra nhanh port 11434
     try:
         req = urllib.request.Request("http://127.0.0.1:11434/api/tags")
-        with urllib.request.urlopen(req, timeout=1.8) as r:
+        with urllib.request.urlopen(req, timeout=0.8) as r:
             if r.status == 200:
-                data = json.loads(r.read().decode("utf-8"))
-                models = [m.get("name") for m in data.get("models", []) if m.get("name")]
-                return {
-                    "is_running": True,
-                    "models": models,
-                    "port": 11434
-                }
+                return True
     except Exception:
         pass
 
+    # 2. Tìm binary Ollama
+    ollama_bin = shutil.which("ollama")
+    if not ollama_bin:
+        default_path = Path(os.environ.get("LOCALAPPDATA", "")) / "Programs" / "Ollama" / "ollama.exe"
+        if default_path.exists():
+            ollama_bin = str(default_path)
+
+    if not ollama_bin:
+        return False
+
+    env = os.environ.copy()
+    models_dir = ROOT_DIR / "ollama_models"
+    if models_dir.exists():
+        env["OLLAMA_MODELS"] = str(models_dir)
+    env["OLLAMA_KEEP_ALIVE"] = "24h"
+
+    try:
+        creationflags = 0x08000000 if sys.platform == "win32" else 0  # CREATE_NO_WINDOW
+        subprocess.Popen(
+            [ollama_bin, "serve"],
+            env=env,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            creationflags=creationflags
+        )
+        for _ in range(10):
+            time.sleep(0.2)
+            try:
+                req = urllib.request.Request("http://127.0.0.1:11434/api/tags")
+                with urllib.request.urlopen(req, timeout=0.5) as r:
+                    if r.status == 200:
+                        return True
+            except Exception:
+                pass
+    except Exception:
+        pass
+
+    return False
+
+
+def query_ollama_runtime() -> Dict[str, Any]:
+    """
+    Truy vấn API Ollama cục bộ (`http://127.0.0.1:11434/api/tags`) kết hợp
+    quét manifest trên đĩa để luôn có danh sách mô hình đầy đủ nhất.
+    """
+    disk_models = get_disk_installed_models()
+    is_alive = False
+    runtime_models = []
+
+    try:
+        req = urllib.request.Request("http://127.0.0.1:11434/api/tags")
+        with urllib.request.urlopen(req, timeout=1.5) as r:
+            if r.status == 200:
+                is_alive = True
+                data = json.loads(r.read().decode("utf-8"))
+                runtime_models = [m.get("name") for m in data.get("models", []) if m.get("name")]
+    except Exception:
+        # Nếu chưa sống, thử kích hoạt nền
+        is_alive = ensure_ollama_daemon()
+        if is_alive:
+            try:
+                req = urllib.request.Request("http://127.0.0.1:11434/api/tags")
+                with urllib.request.urlopen(req, timeout=1.5) as r:
+                    if r.status == 200:
+                        data = json.loads(r.read().decode("utf-8"))
+                        runtime_models = [m.get("name") for m in data.get("models", []) if m.get("name")]
+            except Exception:
+                pass
+
+    # Hợp nhất danh sách từ runtime và đĩa cứng
+    all_models = []
+    seen = set()
+    for m in (runtime_models + disk_models):
+        if m and m not in seen:
+            all_models.append(m)
+            seen.add(m)
+
     return {
-        "is_running": False,
-        "models": [],
+        "is_running": is_alive or (len(all_models) > 0),
+        "models": all_models,
         "port": 11434
     }
 
@@ -157,15 +265,15 @@ def get_adaptive_system_profile() -> Dict[str, Any]:
     # Xác định kích thước mô hình khuyến nghị dựa trên cấu hình phần cứng
     if is_gpu and vram >= 12.0:
         recommended_tier = "7B - 14B (Suy Luận Đỉnh Cao)"
-        suggested_names = ["qwen2.5:7b", "llama3.1:8b", "deepseek-r1:8b", "qwen3:8b", "khang-qwen3"]
+        suggested_names = ["qwen2.5:7b", "qwen3:8b", "khang-qwen3", "llama3.1:8b", "deepseek-r1:8b"]
     elif is_gpu and vram >= 7.5:
         recommended_tier = "7B - 8B (Cân Bằng Tốc Độ & Độ Sâu)"
-        suggested_names = ["qwen2.5:7b", "qwen3:8b", "khang-qwen3", "gemma3:4b", "deepseek-r1:7b"]
+        suggested_names = ["qwen2.5:7b", "khang-qwen3", "qwen3:8b", "gemma3:4b", "deepseek-r1:7b"]
     elif is_gpu and vram >= 3.5:
         recommended_tier = "3B - 4B (Tối Ưu Hóa VRAM)"
         suggested_names = ["gemma3:4b", "khang-ai", "qwen2.5:3b", "phi3:mini", "qwen2.5:1.5b"]
     else:
-        recommended_tier = "1.5B Turbo / CTI Matrix Core (CPU Friendly)"
+        recommended_tier = "1.5B Turbo / CTI Heuristic Core (CPU Friendly)"
         suggested_names = ["qwen2.5:1.5b", "llama3.2:1b"]
 
     # Tìm xem trong số model người dùng đã cài, model nào phù hợp nhất
@@ -181,7 +289,6 @@ def get_adaptive_system_profile() -> Dict[str, Any]:
         if not active_model:
             active_model = installed_models[0]
     else:
-        # Nếu chưa bật Ollama, dùng CTI Matrix Heuristic Core không cần GPU
         active_model = "cti-heuristic-engine"
 
     # Xây dựng danh sách lựa chọn Dropdown trực quan
@@ -189,18 +296,25 @@ def get_adaptive_system_profile() -> Dict[str, Any]:
     if installed_models:
         for m in installed_models:
             is_active = (m == active_model)
-            clean_name = m.split(":")[0].upper()
+            extra_tag = ""
+            if "7b" in m.lower():
+                extra_tag = " • Khuyên Dùng"
+            elif "qwen3" in m.lower():
+                extra_tag = " • Tối Ưu An Ninh"
+            elif "ai" in m.lower() or "gemma" in m.lower():
+                extra_tag = " • Tốc Độ Cao"
+            
             options.append({
                 "value": m,
-                "label": f"Model: {m} (Khả dụng trên {hw['gpu_name']})",
+                "label": f"Model: {m} ({hw['gpu_name']}{extra_tag})",
                 "is_active": is_active,
                 "is_installed": True
             })
     
-    # Luôn có tùy chọn CTI Heuristic Core (an toàn 100%, chạy tức thì trên mọi máy)
+    # Luôn có tùy chọn CTI Heuristic Core phòng hờ
     options.append({
         "value": "cti-heuristic-engine",
-        "label": f"Chế độ CTI Heuristic Core (Offline • Phân tích 5 nguồn • Siêu nhẹ)",
+        "label": f"Chế độ CTI Heuristic Core (Phân tích tĩnh dự phòng • Không tải GPU)",
         "is_active": (active_model == "cti-heuristic-engine"),
         "is_installed": True
     })
