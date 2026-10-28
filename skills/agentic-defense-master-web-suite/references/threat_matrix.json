@@ -1,0 +1,25 @@
+{
+  "scope": "SCOPE_WEB",
+  "technologies": [
+    "Node.js / JavaScript Web Ecosystem",
+    "Python Backend (FastAPI / Django / Flask)"
+  ],
+  "cve_coverage": [
+    "CVE-2016-15042",
+    "CVE-2017-7921",
+    "CVE-2019-11510",
+    "CVE-2019-9879",
+    "CVE-2020-1938",
+    "CVE-2020-25078",
+    "CVE-2020-25169",
+    "CVE-2021-22205"
+  ],
+  "blocked_c2_ips": 85,
+  "total_cti_articles_analyzed": 20,
+  "defense_layers": [
+    "Perimeter Firewall (C2 Drop)",
+    "ModSecurity WAF v3 (Zero-Day Virtual Patching)",
+    "Suricata L7 DPI",
+    "Agentic Code Remediation (Whitelist & Parameterization)"
+  ]
+}

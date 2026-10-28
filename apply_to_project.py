@@ -198,14 +198,18 @@ def find_optimal_article_for_scope(scope_id: str, detected_techs: list):
     return "thn-79d0e8ee", "PHP2Shell Exploit Attempts Hit Millions as Attackers Try to Deploy Mirai Malware"
 
 
-def synthesize_and_deploy_skill(target_path: Path, scope_id: str, article_id: str):
-    """Pha 4: Sinh gói kỹ năng động chuẩn GitHub (SKILL.md, Scripts, Rules, Examples) và cài đặt."""
+def synthesize_and_deploy_skill(target_path: Path, scope_id: str, article_id: str = None, detected_techs: list = None):
+    """Pha 4: Sinh Gói Kỹ Năng Phòng Thủ Tác Tử Tổng Thể (Master Scope Skill) chuẩn GitHub và cài đặt."""
     sys.path.append(str(SANDBOX_DIR))
-    from skill_bundle_packager import package_github_skill_bundle
+    from skill_bundle_packager import package_master_scope_skill, package_github_skill_bundle
     
-    print(f"\n[*] Đang tổng hợp và đóng gói Kỹ Năng Tác Tử Động từ bài báo: [{article_id}]...")
-    bundle_path = package_github_skill_bundle(article_id=article_id, output_root=SKILLS_DIR)
-    print(f"[+] Đã đóng gói thành công gói kỹ năng: {bundle_path.name}")
+    if not detected_techs:
+        _, detected_techs = detect_project_scope(target_path)
+
+    # 1. Luôn sinh Gói Kỹ Năng Tổng Thể cho Phân hệ (Master Defense Skill)
+    print(f"\n[*] Đang tổng hợp GÓI KỸ NĂNG PHÒNG THỦ TÁC TỬ TỔNG THỂ cho {scope_id} ({', '.join(detected_techs)})...")
+    bundle_path = package_master_scope_skill(scope_id=scope_id, detected_techs=detected_techs, output_root=SKILLS_DIR)
+    print(f"[+] Đã đóng gói thành công Master Skill Bundle: {bundle_path.name}")
 
     # Đưa vào các thư mục Agent chuẩn
     dest_dirs = [
@@ -223,6 +227,18 @@ def synthesize_and_deploy_skill(target_path: Path, scope_id: str, article_id: st
         except Exception as e:
             print(f"    [!] Không thể copy vào {dest}: {e}")
 
+    # Nếu có bài báo đe dọa cao nhất, sinh thêm Micro-Skill chuyên sâu nếu cần
+    if article_id:
+        try:
+            cve_bundle = package_github_skill_bundle(article_id=article_id, output_root=SKILLS_DIR)
+            cve_dest = target_path / "defense_skills" / cve_bundle.name
+            if cve_dest.exists():
+                shutil.rmtree(cve_dest)
+            shutil.copytree(cve_bundle, cve_dest)
+            print(f"    -> Đã nạp bổ trợ Micro-Skill chuyên sâu: defense_skills/{cve_bundle.name}")
+        except Exception as e:
+            pass
+
     # Pha 5: Tạo kịch bản hành động hậu kỹ năng (Post-Skill Action SOP)
     guide_file = target_path / "AGENT_REMEDIATION_GUIDE.md"
     profile = SCOPE_PROFILES[scope_id]
@@ -238,11 +254,11 @@ def synthesize_and_deploy_skill(target_path: Path, scope_id: str, article_id: st
 ## 🎯 NHIỆM VỤ DÀNH CHO AI AGENT (5 BƯỚC HÀNH ĐỘNG KHÉP KÍN):
 
 ### BƯỚC 1: KIỂM THỬ ĐIỂM YẾU BAN ĐẦU (ACTIVE PROBE AUDIT)
-- Chạy script kiểm thử có sẵn để kiểm tra xem server/ứng dụng có bị dính lỗ hổng không:
+- Chạy script kiểm thử đa vector tự động để phát hiện lỗ hổng:
   ```bash
-  python ./defense_skills/{bundle_path.name}/scripts/verify_exploit.py
+  python ./defense_skills/{bundle_path.name}/scripts/verify_exploit.py http://localhost:8766
   ```
-- Ghi nhận trạng thái: Đánh dấu là **TRUE POSITIVE (Cần khắc phục ngay)** nếu endpoint có phản hồi lỗi.
+- Ghi nhận trạng thái: Nếu có vector thất bại, đánh dấu **TRUE POSITIVE (Cần khắc phục ngay)**.
 
 ### BƯỚC 2: KÍCH HOẠT LÁ CHẮN TỨC THỜI (VIRTUAL PATCHING & WAF SHIELD)
 - Trong thời gian lập trình viên sửa mã nguồn, kích hoạt ngay lá chắn phòng vệ mạng để chặn đứng tấn công từ bên ngoài:
@@ -254,18 +270,18 @@ def synthesize_and_deploy_skill(target_path: Path, scope_id: str, article_id: st
 
 ### BƯỚC 3: TỰ ĐỘNG SỬA TẬN GỐC MÃ NGUỒN (CODE REFACTORING)
 - Đọc file chỉ dẫn tư duy: `./defense_skills/{bundle_path.name}/SKILL.md`.
-- Đối chiếu mã nguồn của dự án với 2 file mẫu chuẩn:
-  - File mẫu dính lỗi: `./defense_skills/{bundle_path.name}/examples/vulnerable_sample.php`
-  - File mẫu chuẩn an toàn: `./defense_skills/{bundle_path.name}/examples/patched_secure_sample.php`
+- Đối chiếu mã nguồn của dự án với các file mẫu chuẩn trong `./defense_skills/{bundle_path.name}/examples/`:
+  - Đối với Node.js / Express: xem `vulnerable_sample.js` vs `patched_secure_sample.js`
+  - Đối với Python Backend: xem `vulnerable_sample.py` vs `patched_secure_sample.py`
 - Thực hiện sửa code trực tiếp:
   1. Thêm Whitelist kiểm tra giá trị tham số hợp lệ.
   2. Bổ sung Parameterized Queries và Input Sanitization.
-  3. Loại bỏ mọi hàm gọi thực thi hệ điều hành tùy tiện (RCE mitigation).
+  3. Loại bỏ mọi hàm gọi thực thi hệ điều hành tùy tiện (`exec()`, `os.system()`).
 
 ### BƯỚC 4: TÁI KIỂM THỬ XÁC MINH KHÔNG BÁO NHẦM (POST-FIX VERIFICATION)
-- Chạy lại script kiểm thử:
+- Chạy lại script kiểm thử đa vector:
   ```bash
-  python ./defense_skills/{bundle_path.name}/scripts/verify_exploit.py
+  python ./defense_skills/{bundle_path.name}/scripts/verify_exploit.py http://localhost:8766
   ```
 - Kết quả bắt buộc:
   - Tấn công bị vô hiệu hóa hoàn toàn (True Positive = 0).
@@ -335,7 +351,7 @@ def main():
     best_art_id, best_art_title = find_optimal_article_for_scope(scope_id, techs)
     print(f"[+] Bài báo đe dọa cao nhất đối với dự án: [{best_art_id}] - {best_art_title}")
     
-    skill_name = synthesize_and_deploy_skill(target_path, scope_id, best_art_id)
+    skill_name = synthesize_and_deploy_skill(target_path, scope_id, best_art_id, detected_techs=techs)
 
     # Pha 5: Kịch bản hậu kỹ năng
     print("\n" + "=" * 75)
