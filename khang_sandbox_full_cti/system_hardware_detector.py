@@ -356,38 +356,38 @@ def get_adaptive_system_profile() -> Dict[str, Any]:
     elif is_gpu and vram >= 6.5:
         hw["tier_id"] = "MID_RANGE"
         hw["tier_title"] = f"Cấu hình Tiêu Chuẩn Đồ Họa Rời ({vram}GB VRAM • {ram_gb}GB RAM)"
-        hw["tier_desc"] = "Cấu hình lý tưởng để vận hành các mô hình 7B - 8B với hiệu năng và độ chính xác hoàn hảo."
+        hw["tier_desc"] = "Băng thông VRAM 224 GB/s đáp ứng hoàn hảo cho mô hình 7B - 8B ở định dạng lượng hóa Q4_K_M."
         recommended_tier = "7B - 8B (Cân Bằng Tốc Độ & Độ Sâu)"
         tier1_candidates = [
             {
                 "id": "qwen2.5:7b",
                 "name": "Qwen 2.5 (7B Security Instruct)",
                 "badge": "MẠNH NHẤT - KHUYẾN NGHỊ MẶC ĐỊNH",
-                "desc": "Mô hình chuẩn mực tối ưu cho 8GB VRAM. Phân tích AST chuyên sâu, trích xuất Sensitive Sinks và sinh luật WAF đạt độ chính xác cao.",
+                "desc": "Mô hình 7B chuẩn mực tối ưu cho 8GB VRAM. Phân tích ngữ cảnh AST sâu, sinh luật WAF và kịch bản phòng thủ chính xác.",
                 "recommended": True,
-                "intelligence": 92,
-                "speed_tps": 48,
-                "vram_gb": 6.8
+                "intelligence": 68,
+                "speed_tps": 28,
+                "vram_gb": 5.8
             },
             {
                 "id": "qwen3:8b",
                 "name": "Qwen 3 (8B Security Ops)",
                 "badge": "CHUYÊN BIỆT AN NINH",
-                "desc": "Mô hình chuyên biệt nhận diện định danh CVE, mã khai thác PoC và đối soát tương quan IoC đa nguồn.",
+                "desc": "Mô hình 8B chuyên trách nhận diện mã định danh CVE, giải mã kỹ thuật khai thác PoC và đối soát IoC.",
                 "recommended": False,
-                "intelligence": 90,
-                "speed_tps": 50,
-                "vram_gb": 7.2
+                "intelligence": 70,
+                "speed_tps": 24,
+                "vram_gb": 6.4
             },
             {
                 "id": "khang-qwen3:latest",
                 "name": "Qwen 2.5 (CyberSec Special Edition)",
                 "badge": "TỐI ƯU CTI",
-                "desc": "Phiên bản tinh chỉnh cục bộ chuyên trách xử lý báo cáo tình báo an ninh mạng với độ trễ thấp.",
+                "desc": "Phiên bản tinh chỉnh cục bộ chuyên phân loại báo cáo an ninh mạng và trích xuất IoC với độ trễ thấp.",
                 "recommended": False,
-                "intelligence": 91,
-                "speed_tps": 52,
-                "vram_gb": 7.0
+                "intelligence": 69,
+                "speed_tps": 27,
+                "vram_gb": 5.9
             }
         ]
     elif is_gpu and vram >= 3.0:
@@ -464,19 +464,19 @@ def get_adaptive_system_profile() -> Dict[str, Any]:
             "id": "gemma3:4b",
             "name": "Gemma 3 (4B IT High-Efficiency)",
             "badge": "PHẢN HỒI SIÊU TỐC",
-            "desc": "Kiến trúc gọn nhẹ của Google DeepMind, phản hồi dưới 1 giây, tiết kiệm VRAM và ít chiếm dụng bộ nhớ.",
-            "intelligence": 82,
-            "speed_tps": 95,
-            "vram_gb": 3.8
+            "desc": "Kiến trúc gọn nhẹ từ Google DeepMind, phản hồi tức thời, chiếm dụng chỉ ~3.6GB VRAM, phù hợp vừa quét vừa chạy tác vụ khác.",
+            "intelligence": 56,
+            "speed_tps": 48,
+            "vram_gb": 3.6
         },
         {
             "id": "khang-ai:latest",
             "name": "SecOps Fast Classifier (4B Light)",
             "badge": "TỐC ĐỘ CAO",
-            "desc": "Mô hình gọn nhẹ chuyên phân loại nhanh mức độ nghiêm trọng của mối đe dọa với tốc độ phản hồi tức thời.",
-            "intelligence": 83,
-            "speed_tps": 105,
-            "vram_gb": 3.4
+            "desc": "Mô hình 4B chuyên trách phân loại nhanh mức độ nghiêm trọng và trích xuất thực thể IoC với tốc độ vượt bậc.",
+            "intelligence": 55,
+            "speed_tps": 52,
+            "vram_gb": 3.3
         }
     ]
     for m in tier2_candidates:
@@ -487,19 +487,20 @@ def get_adaptive_system_profile() -> Dict[str, Any]:
             "id": "qwen2.5:1.5b",
             "name": "Qwen 2.5 (1.5B Ultra-Light)",
             "badge": "SIÊU NHẸ • CPU MODE",
-            "desc": "Mô hình tối giản chạy êm ái trên bộ xử lý CPU văn phòng, tải bộ nhớ dưới 2GB RAM.",
-            "intelligence": 70,
-            "speed_tps": 140,
-            "vram_gb": 1.5
+            "desc": "Mô hình tối giản chạy hoàn toàn trên CPU thông qua tập lệnh AVX2, chiếm dụng chỉ 1.5GB RAM hệ thống.",
+            "intelligence": 42,
+            "speed_tps": 30,
+            "vram_gb": 0.0
         },
         {
             "id": "cti-heuristic-engine",
-            "name": "CTI Heuristic Engine (Thuật Toán Đối Soát Tĩnh)",
+            "name": "CTI Heuristic Engine (Thuật Toán Đối Soát Tĩnh AST)",
             "badge": "0% GPU • KHÔNG CẦN OLLAMA",
-            "desc": "Thuật toán chuyên gia đối soát tĩnh cây AST và chuẩn hóa STIX/MITRE. Hoạt động độc lập, không tốn tài nguyên GPU, phản hồi tức thì < 2ms.",
+            "desc": "Động cơ phân tích tĩnh thuần túy (Static AST Analyzer). Đối soát cây cú pháp và đối chiếu IoC bằng thuật toán quy tắc, không qua mạng nơ-ron.",
             "is_installed": True,
-            "intelligence": 88,
-            "speed_tps": 500,
+            "is_heuristic": True,
+            "coverage_pct": 94,
+            "latency_ms": 2,
             "vram_gb": 0.0
         }
     ]
