@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * CTI Agentic Defense System - Global CLI Launcher
+ * CTI Agentic Defense System - Global CLI Launcher & Interactive Controller
  * Ho tro khoi chay qua npm: cti-defense hoac cti
+ * Chuan Interactive Controller giu terminal chay lien tuc (tuong tu 9router)
  */
 
 const { spawn, execSync } = require('child_process');
@@ -13,6 +14,7 @@ const fs = require('fs');
 const ROOT_DIR = path.resolve(__dirname, '..');
 const SANDBOX_DIR = path.join(ROOT_DIR, 'khang_sandbox_full_cti');
 const APP_FILE = path.join(SANDBOX_DIR, 'live_dashboard_app.py');
+const SYSTEM_CTL_FILE = path.join(SANDBOX_DIR, 'system_ctl.py');
 const PORT = 8765;
 const WAF_PORT = 8766;
 
@@ -87,17 +89,29 @@ function findPythonCommand() {
 }
 
 function stopSystem() {
-  console.log('[*] Dang tat he thong CTI Defense (Cong 8765 & 8766)...');
+  console.log('[*] Dang tat he thong CTI Defense (Cong 8765, 8766, 11434)...');
+  const pyCmd = findPythonCommand();
+  
+  if (fs.existsSync(SYSTEM_CTL_FILE)) {
+    try {
+      execSync(`"${pyCmd}" "${SYSTEM_CTL_FILE}" stop`, { stdio: 'inherit' });
+      return;
+    } catch (e) {}
+  }
+
+  // Fallback dung bang powershell / shell
   if (process.platform === 'win32') {
     try {
       execSync(
-        `powershell -NoProfile -Command "Get-NetTCPConnection -LocalPort 8765,8766 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }"`,
+        `powershell -NoProfile -Command "Get-NetTCPConnection -LocalPort 8765,8766,11434 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }"`,
         { stdio: 'ignore' }
       );
+      execSync(`taskkill /F /IM ollama.exe /T 2>nul`, { stdio: 'ignore' });
+      execSync(`taskkill /F /IM ollama_llama_server.exe /T 2>nul`, { stdio: 'ignore' });
     } catch (e) {}
   } else {
     try {
-      execSync(`lsof -ti:8765,8766 | xargs kill -9`, { stdio: 'ignore' });
+      execSync(`lsof -ti:8765,8766,11434 | xargs kill -9`, { stdio: 'ignore' });
     } catch (e) {}
   }
   console.log('[OK] Da tat toan bo tien trinh he thong CTI Defense.');
@@ -137,9 +151,104 @@ function ensureDependencies(pyCmd) {
   }
 }
 
+/**
+ * Giu terminal lien tuc o trang thai interactive (tuong tu 9router)
+ * Lang nghe Ctrl+C hoac 'q' de tat sach he thong va giai phong RAM/GPU
+ */
+function attachInteractiveConsole(targetDir, webUrl, childProcess = null) {
+  let isShuttingDown = false;
+
+  const performCleanExit = () => {
+    if (isShuttingDown) return;
+    isShuttingDown = true;
+    console.log('\n==============================================================================');
+    console.log('  DANG TAT TOAN BO HE THONG CTI DEFENSE VA GIAI PHONG RAM / GPU...');
+    console.log('==============================================================================');
+
+    if (childProcess) {
+      try {
+        childProcess.kill('SIGINT');
+      } catch (e) {}
+    }
+
+    stopSystem();
+    console.log('[HOAN TAT] He thong da tat sach se. Hen gap lai!');
+    process.exit(0);
+  };
+
+  // Lang nghe cac su kien ngat de tat sach se
+  process.on('SIGINT', performCleanExit);
+  process.on('SIGTERM', performCleanExit);
+  process.on('SIGHUP', performCleanExit);
+  process.on('exit', () => {
+    if (!isShuttingDown) {
+      isShuttingDown = true;
+      stopSystem();
+    }
+  });
+
+  // Hien thi giao dien dieu khien Interactive
+  console.clear ? console.clear() : console.log('\n'.repeat(5));
+  console.log('==============================================================================');
+  console.log('  HE THONG AN NINH MANG TU HANH CTI AGENTIC DEFENSE (v1.0.0)');
+  console.log('==============================================================================');
+  console.log('');
+  console.log(`  [*] Thu muc du an muc tieu : ${targetDir}`);
+  console.log(`  [*] Web Dashboard quan ly  : ${webUrl}`);
+  console.log(`  [*] Trang thai tien trinh  : ONLINE (Dang giam sat thoi gian thuc)`);
+  console.log('');
+  console.log('  ==========================================================================');
+  console.log('  TRUNG TAM DIEU KHIEN DONG LENH (INTERACTIVE CLI CONTROLLER):');
+  console.log('');
+  console.log('    - Nhan [o] hoac [Enter]  : Mo lai giao dien Web tren trinh duyet');
+  console.log('    - Nhan [s]               : Kiem tra trang thai ket noi');
+  console.log('    - Nhan [q] hoac [Ctrl+C] : Tat he thong, giai phong RAM/GPU va thoat');
+  console.log('');
+  console.log('  * HUONG DAN DUNG HE THONG:');
+  console.log('    - Nhap to hop phim Ctrl+C tren ban phim; HOAC');
+  console.log('    - Dong truc tiep cua so CMD nay de tu dong giai phong toan bo he thong!');
+  console.log('  ==========================================================================');
+  console.log('');
+  console.log('[DANG CHAY] Server dang hoat dong ngam. Terminal dang giu tien trinh...');
+
+  // Bat che do raw mode tren stdin neu la TTY
+  if (process.stdin.isTTY) {
+    try {
+      process.stdin.setRawMode(true);
+      process.stdin.resume();
+      process.stdin.setEncoding('utf8');
+
+      process.stdin.on('data', (key) => {
+        // Ctrl+C hoac 'q'
+        if (key === '\u0003' || key.toLowerCase() === 'q') {
+          performCleanExit();
+        } else if (key === '\r' || key === '\n' || key.toLowerCase() === 'o') {
+          console.log('[*] Dang mo lai Web Dashboard tren trinh duyet...');
+          openBrowser(webUrl);
+        } else if (key.toLowerCase() === 's') {
+          checkServerReady(PORT, (ok) => {
+            console.log(`[*] Trang thai: ${ok ? 'ONLINE (Ket noi on dinh)' : 'OFFLINE'}`);
+          });
+        }
+      });
+    } catch (e) {}
+  }
+
+  // Giu event loop Node luon hoat dong (khong bao gio tu dong thoat ra CMD prompt)
+  setInterval(() => {
+    checkServerReady(PORT, (isAlive) => {
+      if (!isAlive && !isShuttingDown) {
+        console.log('\n[THONG BAO] May chu backend da dung.');
+        performCleanExit();
+      }
+    });
+  }, 4000);
+}
+
 function startSystem() {
   const pyCmd = findPythonCommand();
   const targetDir = path.resolve(process.cwd());
+  const webUrl = `http://127.0.0.1:8765/?target=${encodeURIComponent(targetDir)}`;
 
   ensureDependencies(pyCmd);
 
@@ -148,9 +257,8 @@ function startSystem() {
     if (alreadyRunning) {
       console.log('==============================================================================');
       console.log('  HE THONG CTI DEFENSE DANG HOAT DONG SAN TAI: http://127.0.0.1:8765');
-      console.log(`  Thu muc du an : ${targetDir}`);
+      console.log(`  Cap nhat thu muc du an : ${targetDir}`);
       console.log('==============================================================================');
-      console.log('[*] Dang cap nhat thu muc du an toi may chu...');
 
       const postData = JSON.stringify({ target_path: targetDir });
       const req = http.request({
@@ -163,17 +271,22 @@ function startSystem() {
           'Content-Length': Buffer.byteLength(postData)
         }
       }, () => {
-        console.log('[*] Dang mo trinh duyet...');
-        openBrowser(`http://127.0.0.1:8765/?target=${encodeURIComponent(targetDir)}`);
+        openBrowser(webUrl);
+        // GIU TERMINAL CHAY LIEN TUC, KHONG THOAT RA PROMPT CMD
+        attachInteractiveConsole(targetDir, webUrl, null);
       });
+
       req.on('error', () => {
-        openBrowser(`http://127.0.0.1:8765/?target=${encodeURIComponent(targetDir)}`);
+        openBrowser(webUrl);
+        attachInteractiveConsole(targetDir, webUrl, null);
       });
+
       req.write(postData);
       req.end();
       return;
     }
 
+    // Neu chua chay -> Khoi dong moi
     console.log('==============================================================================');
     console.log('  DANG KHOI DONG HE THONG CTI AGENTIC DEFENSE...');
     console.log('==============================================================================');
@@ -181,7 +294,6 @@ function startSystem() {
     console.log(`[*] Thu muc goc he thong: ${ROOT_DIR}`);
     console.log(`[*] Thu muc du an muc tieu: ${targetDir}`);
 
-    // Kiem tra thu muc Sandbox
     if (!fs.existsSync(APP_FILE)) {
       console.error(`[LOI] Khong tim thay tep khoi dong tai: ${APP_FILE}`);
       process.exit(1);
@@ -199,7 +311,7 @@ function startSystem() {
     console.log('[*] Dang khoi chay Live Dashboard & WAF Proxy (Cong 8765 & 8766)...');
     const child = spawn(pyCmd, [APP_FILE, '--target', targetDir], {
       cwd: SANDBOX_DIR,
-      env: { ...process.env, CTI_TARGET_PROJECT: targetDir },
+      env: { ...process.env, CTI_TARGET_PROJECT: targetDir, PYTHONIOENCODING: 'utf-8' },
       stdio: ['ignore', 'pipe', 'pipe'],
       detached: false
     });
@@ -220,56 +332,15 @@ function startSystem() {
     // Cho den khi server san sang
     pollServerReady(PORT, 30, 600, (isReady) => {
       if (isReady) {
-        console.clear ? console.clear() : console.log('\n'.repeat(10));
-        console.log('==============================================================================');
-        console.log('  HE THONG AN NINH MANG TU HANH CTI AGENTIC DEFENSE (KHOI DONG THANH CONG)');
-        console.log('==============================================================================');
-        console.log('');
-        console.log(`  [OK] Thu muc du an       : ${targetDir}`);
-        console.log('  [OK] Da tu dong mo trinh duyet Web Dashboard quan ly trung tam.');
-        console.log('');
-        console.log('  ==========================================================================');
-        console.log('  DIA CHI TRUY CAP DUY NHAT (ALL-IN-ONE):');
-        console.log('');
-        console.log(`       http://127.0.0.1:8765/?target=${encodeURIComponent(targetDir)}`);
-        console.log('');
-        console.log('  (Toan bo viec quet ma nguon, xem tin CTI, sinh ky nang, chat voi AI');
-        console.log('   va kiem thu la chan WAF deu duoc don 100% vao DUY NHAT 1 WEB o tren)');
-        console.log('  ==========================================================================');
-        console.log('');
-        console.log('  * CO CHE HOAT DONG:');
-        console.log('    - Lan dau tien: Giao dien khoa vao thu muc tren, nhan [ BAT DAU QUET DU AN ]');
-        console.log('      de AI Agent phan tich AST, chon moc thoi gian, cào tinh bao va dong goi.');
-        console.log('    - Cac lan tiep theo: He thong nhan dien da co cau hinh va mo ngay Bang Phong Thu.');
-        console.log('');
-        console.log('  * CAC LENH HO TRO:');
-        console.log('    - cti             : Khoi dong & mo Dashboard cho thu muc hien tai');
-        console.log('    - cti stop        : Tat he thong');
-        console.log('    - cti status      : Kiem tra trang thai');
-        console.log('==============================================================================');
-        console.log('');
-        console.log('Nhan Ctrl+C hoac dong cua so nay de tat he thong.');
-
-        openBrowser(`http://127.0.0.1:8765/?target=${encodeURIComponent(targetDir)}`);
+        openBrowser(webUrl);
+        // GIU TERMINAL CHAY LIEN TUC, KHONG THOAT RA PROMPT CMD
+        attachInteractiveConsole(targetDir, webUrl, child);
       } else {
         console.error('[LOI] Qua thoi gian cho may chu khoi dong. Chi tiet log:');
         console.error(stdoutData.slice(-500));
+        stopSystem();
+        process.exit(1);
       }
-    });
-
-    const cleanShutdown = () => {
-      console.log('\n[*] Dang dung he thong...');
-      try {
-        child.kill();
-      } catch (e) {}
-      stopSystem();
-      process.exit(0);
-    };
-
-    process.on('SIGINT', cleanShutdown);
-    process.on('SIGTERM', cleanShutdown);
-    process.on('exit', () => {
-      stopSystem();
     });
   });
 }
@@ -286,8 +357,8 @@ if (arg === 'stop' || arg === 'down' || arg === 'tat') {
 Su dung: cti-defense [command] (hoac cti [command])
 
 Lenh:
-  cti-defense            Khoi dong toan bo he thong va tu dong mo trinh duyet
-  cti-defense stop       Tat toan bo tien trinh dang chay (cong 8765 & 8766)
+  cti-defense            Khoi dong toan bo he thong, giu terminal va tu dong mo trinh duyet
+  cti-defense stop       Tat toan bo tien trinh dang chay (cong 8765, 8766, 11434)
   cti-defense status     Kiem tra he thong dang Online hay Offline
   cti-defense --help     Hien thi huong dan su dung
 `);
