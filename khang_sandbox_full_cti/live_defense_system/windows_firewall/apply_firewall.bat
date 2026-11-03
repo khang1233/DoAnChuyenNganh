@@ -1,7 +1,7 @@
 @echo off
 :: SCRIPT DONG BO TUONG LUA WINDOWS DEFENDER CHUAN SOC ENTERPRISE
 :: Tong hop 181 IP C2 nguy hai tu he thong CTI Autonomous Agent
-:: Thoi gian bien dich: 2026-11-03 16:39:33
+:: Thoi gian bien dich: 2026-11-03 17:10:08
 
 echo [CTI AGENT] Dang ap dung quy tac chan ket noi outbound/inbound toi C2 Servers...
 netsh advfirewall firewall add rule name="CTI_BLOCK_216_73_160_59" dir=out action=block remoteip=216.73.160.59 >nul
