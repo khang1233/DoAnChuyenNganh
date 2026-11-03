@@ -41,7 +41,7 @@ cti-defense
 
 #### CÁCH 2: KHỞI CHẠY BẰNG FILE BATCH 1-CLICK (KHÔNG CẦN CÀI NPM)
 1. **Cài đặt thư viện (chỉ cần làm 1 lần đầu)**:
-   - Nhấp đúp vào file: `0_CAI_DAT_MOI_TRUONG.bat` (hoặc gõ `pip install -r requirements.txt`).
+   - Nhấp đúp vào file: `1_BAT_HE_THONG.bat (he thong tu dong kiem tra va cai dat neu thieu)` (hoặc gõ `pip install -r requirements.txt`).
 2. **Bật toàn bộ hệ thống**:
    - Nhấp đúp vào file: `1_BAT_HE_THONG.bat`.
    - Hệ thống sẽ tự động bật Live Server, WAF Proxy cổng 8766 và **tự động mở trình duyệt** tại:

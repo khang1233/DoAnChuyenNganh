@@ -4668,7 +4668,7 @@ const elArt = document.getElementById('lblMasterArticlesCount');
             <h2 style="color:#0f172a; margin-bottom:12px; font-weight:700;">HỆ THỐNG ĐÃ TẮT</h2>
             <p style="color:#475569; line-height:1.6; font-size:14px;">
               Server Web (cổng 8765) và Ollama GPU Server (cổng 11434) đã được tắt hoàn toàn.<br/>
-              Khi cần mở lại, vui lòng chạy file <b>1_BAT_HE_THONG_CTI.bat</b> trong thư mục dự án.
+              Khi cần mở lại, vui lòng chạy file <b>1_BAT_HE_THONG.bat</b> trong thư mục dự án.
             </p>
           </div>
         </div>

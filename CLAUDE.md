@@ -23,7 +23,7 @@ This repository is an **Autonomous Cyber Threat Intelligence (CTI) & Agentic Def
 | Action | Command | Purpose |
 | :--- | :--- | :--- |
 | **Start Entire System** | `1_BAT_HE_THONG.bat` | Starts SOC Dashboard (8765) and WAF Gateway (8766). |
-| **Stop Entire System** | `2_TAT_HE_THONG.bat` | Gracefully terminates all background Python servers. |
+| **Stop Entire System** | Press `[T]` in `1_BAT_HE_THONG.bat` or click `[Tat He Thong]` in UI | Gracefully terminates all background Python servers. |
 | **Protect Any Project** | `python apply_to_project.py --target <path>` | Auto-detects tech stack and installs Agentic Skill into `<path>`. |
 | **Package New Skill** | `python khang_sandbox_full_cti/skill_bundle_packager.py` | Generates a complete GitHub Agent Skill folder bundle. |
 | **Enrich Corpus** | `python khang_sandbox_full_cti/enrich_all_corpus.py 500` | Multi-threaded full-text crawl and IOC learning pipeline. |
@@ -37,7 +37,6 @@ This repository is an **Autonomous Cyber Threat Intelligence (CTI) & Agentic Def
 DoAnChuyenNganh/
 ├── apply_to_project.py               # Universal 1-step connector for external projects
 ├── 1_BAT_HE_THONG.bat                # 1-Click launcher
-├── 2_TAT_HE_THONG.bat                # 1-Click shutdown
 ├── CLAUDE.md                         # Anthropic Claude system instructions (this file)
 ├── AGENTS.md                         # Universal Multi-Agent repository guidelines
 ├── .cursorrules                      # Cursor AI development rules
