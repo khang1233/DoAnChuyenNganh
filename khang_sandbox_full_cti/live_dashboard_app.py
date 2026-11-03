@@ -2168,14 +2168,18 @@ HTML_PAGE = r"""<!DOCTYPE html>
         const add = document.getElementById('sec-add');
         if (add) add.style.display = 'none';
 
+        // Giao dien Live Server (feed, history, score, defense) chi hien o Buoc 5 tro di hoac khi du an da cau hinh xong hoac nguoi dung chu dong click tab xem
+        const shouldShowLive = (sectionId !== 'sec-wizard') || (wzCurrentStep >= 5 || wzIsProjectConfigured);
+        const liveDisp = shouldShowLive ? 'block' : 'none';
+
         const feed = document.getElementById('sec-feed');
-        if (feed) feed.style.display = 'block';
+        if (feed) feed.style.display = liveDisp;
         const hist = document.getElementById('sec-history');
-        if (hist) hist.style.display = 'block';
+        if (hist) hist.style.display = liveDisp;
         const score = document.getElementById('sec-score');
-        if (score) score.style.display = 'block';
+        if (score) score.style.display = liveDisp;
         const defense = document.getElementById('sec-defense');
-        if (defense) defense.style.display = 'block';
+        if (defense) defense.style.display = liveDisp;
 
         if (sectionId !== 'all') {
           const targetEl = document.getElementById(sectionId);
@@ -5193,12 +5197,23 @@ let wzIsProjectConfigured = false;
     function wizardGotoStep(stepNum) {
       wzCurrentStep = stepNum;
       
-      // Chi hien cac tab dieu huong tren cung khi vao Buoc 5 (Cao bao) tro di hoac du an da hoan tat bao ve
-      if (stepNum >= 5 || wzIsProjectConfigured) {
+      // Chi hien cac tab dieu huong va khong gian Live Server khi vao Buoc 5 tro di hoac du an da bao ve
+      const isLiveStage = (stepNum >= 5 || wzIsProjectConfigured);
+      if (isLiveStage) {
         document.body.classList.remove("wizard-setup-mode");
       } else {
         document.body.classList.add("wizard-setup-mode");
       }
+
+      // An toan bo khong gian Live Server o cac buoc khoi tao (Buoc 0 den 4), chi hien thi khi toi Buoc 5
+      const feedSec = document.getElementById('sec-feed');
+      if (feedSec) feedSec.style.display = isLiveStage ? 'block' : 'none';
+      const histSec = document.getElementById('sec-history');
+      if (histSec) histSec.style.display = isLiveStage ? 'block' : 'none';
+      const scoreSec = document.getElementById('sec-score');
+      if (scoreSec) scoreSec.style.display = isLiveStage ? 'block' : 'none';
+      const defSec = document.getElementById('sec-defense');
+      if (defSec) defSec.style.display = isLiveStage ? 'block' : 'none';
 
       const stepperNav = document.getElementById("wizardStepperNav");
       if (stepperNav) {
@@ -6666,7 +6681,7 @@ def api_find_article_by_ioc(ioc: str = Query("")):
                 "content": row["content"],
                 "sort_ts": row["sort_ts"],
                 "status": row["status"] or "completed",
-                "processing_time_sec": row["processing_time_sec"] or 1.2,
+                "processing_time_sec": row["processing_time_sec"] or 18.5,
                 "ioc_counts": ioc_stats,
                 "fetched_at": fetched_at,
             }

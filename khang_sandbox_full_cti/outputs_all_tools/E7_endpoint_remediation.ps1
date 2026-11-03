@@ -1,15 +1,15 @@
 # =============================================================================
 # KỊCH BẢN KHẮC PHỤC SỰ CỐ, DIỆT MÃ ĐỘC & HARDENING HỆ THỐNG TỰ ĐỘNG
-# Chiến dịch: Tricks from the Past deployed via signed ChatGPT and Claude binaries
-# Lỗ hổng liên quan: Active CTI Campaign
+# Chiến dịch: Hackers Infect 953 Online Stores With Scanner-Evading JavaScript, Most
+# Lỗ hổng liên quan: CVE-2026-48356, CVE-2025-54236, CVE-2026-109618, CVE-2026-109619
 # Chức năng: Quét mã băm diệt tiến trình mã độc, cô lập file vào vùng cách ly,
 # ngắt kết nối socket tới C2, khóa DNS Sinkhole và rà soát bản vá hệ thống.
 # =============================================================================
 
 # --- [1] WINDOWS POWERSHELL ACTIVE REMEDIATION & MALWARE CLEANUP (.ps1) ---
-$MaliciousIPs = @("51.89.231.85", "51.89.228.250")
-$MaliciousDomains = @("GitHub.io", "outlook.com", "digit.dedyn.io", "dedyn.io", "gpt-5-6.github.io", "opus-5-0.github.io", "calm-piano-floats-313.dedyn.io")
-$MaliciousHashes = @("b5c2d20623d4e6647d06a42864edd8629f82c5c384b243fdaeeeca24b3873d64", "1d0d1368b4d53f3a6322cf40e84e63db", "dcde1f56048fa18657dc4820397592f7")
+$MaliciousIPs = @("162.35.99.94")
+$MaliciousDomains = @("lanhd6549tdhse.top", "additionalver.com", "deepveindrilling.com")
+$MaliciousHashes = @()
 
 # Bước 0: Rà quét tiến trình bộ nhớ, tính hash SHA256 và tiêu diệt ngay tiến trình mã độc:
 Write-Host '[*] Đang rà soát tiến trình hệ thống theo bảng mã băm CTI độc hại...' -ForegroundColor Cyan
@@ -67,10 +67,10 @@ Clear-DnsClientCache
 Get-HotFix | Sort-Object InstalledOn -Descending | Select-Object -First 5
 
 # --- [2] LINUX BASH REMEDIATION & MALWARE CLEANUP SCRIPT (.sh) ---
-# for h in b5c2d20623d4e6647d06a42864edd8629f82c5c384b243fdaeeeca24b3873d64 1d0d1368b4d53f3a6322cf40e84e63db dcde1f56048fa18657dc4820397592f7; do
+# for h in none; do
 #     find /tmp /var/tmp /dev/shm -type f -exec sha256sum {} + 2>/dev/null | grep "$h" | awk '{print $2}' | xargs -r rm -f
 # done
-# for ip in 51.89.231.85 51.89.228.250; do
+# for ip in 162.35.99.94; do
 #     ss -tupn | grep "$ip" && echo "[ALERT] Active C2 socket to $ip"
 #     iptables -I OUTPUT -d "$ip" -j DROP
 #     iptables -I INPUT -s "$ip" -j DROP

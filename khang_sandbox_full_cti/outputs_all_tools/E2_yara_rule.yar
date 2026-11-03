@@ -1,33 +1,33 @@
 /* ============================================================================
    QUY TẮC YARA PHÁT HIỆN MÃ ĐỘC VÀ TIÊM BỘ NHỚ RAM (.YAR)
-   Chiến dịch: Tricks from the Past deployed via signed ChatGPT and Claude binaries
+   Chiến dịch: Hackers Infect 953 Online Stores With Scanner-Evading JavaScript, Mostly on
    Áp dụng: Quét tệp thực thi PE (.exe, .dll) và bộ nhớ tiến trình (Process Memory)
    ============================================================================ */
 
-rule OpenClaw_Verified_Malware_20261028_090141
+rule OpenClaw_Verified_Malware_20261103_120802
 {
     meta:
         author = "Autonomous CTI Agent (Khang & Phuc Security)"
-        description = "Detects in-memory injection & verified payload from: Tricks from the Past deployed via signed ChatGPT and Claude binar"
-        date = "2026-10-28"
+        description = "Detects in-memory injection & verified payload from: Hackers Infect 953 Online Stores With Scanner-Evading JavaScript,"
+        date = "2026-11-03"
         threat_level = "CRITICAL"
         mitre_attack = "T1204.002, T1059.001, T1055, T1071"
         gatekeeper_threshold = 80
 
     strings:
-        // 2. Chữ ký mã băm nhị phân (Malware Hashes):
-        $sha_0 = "b5c2d20623d4e6647d06a42864edd8629f82c5c384b243fdaeeeca24b3873d64" ascii nocase
-        $sha_1 = "1d0d1368b4d53f3a6322cf40e84e63db" ascii nocase
-        $sha_2 = "dcde1f56048fa18657dc4820397592f7" ascii nocase
+        // 1. Chữ ký PoC khai thác lỗ hổng CVE & Web Shell:
+        $cve_0 = "CVE-2026-48356" ascii nocase
+        $cve_1 = "CVE-2025-54236" ascii nocase
+        $cve_2 = "CVE-2026-109618" ascii nocase
+        $cve_3 = "CVE-2026-109619" ascii nocase
+        $exploit_trav1 = "../" ascii
+        $exploit_trav2 = "%2e%2e" ascii
+        $exploit_cmd = "cmd=" ascii nocase
         // 3. Hạ tầng C2 và Tên miền phát tán:
-        $c2_ip_0 = "51.89.231.85" ascii wide
-        $c2_ip_1 = "51.89.228.250" ascii wide
-        $c2_dom_0 = "GitHub.io" ascii wide nocase
-        $c2_dom_1 = "outlook.com" ascii wide nocase
-        $c2_dom_2 = "digit.dedyn.io" ascii wide nocase
-        $c2_dom_3 = "dedyn.io" ascii wide nocase
-        $c2_dom_4 = "gpt-5-6.github.io" ascii wide nocase
-        $c2_dom_5 = "opus-5-0.github.io" ascii wide nocase
+        $c2_ip_0 = "162.35.99.94" ascii wide
+        $c2_dom_0 = "lanhd6549tdhse.top" ascii wide nocase
+        $c2_dom_1 = "additionalver.com" ascii wide nocase
+        $c2_dom_2 = "deepveindrilling.com" ascii wide nocase
         // 4. Chuỗi gọi hàm tiêm bộ nhớ & vượt mặt phòng thủ (Injection & Evasion):
         $api_mem1 = "VirtualAlloc" ascii nocase
         $api_mem2 = "WriteProcessMemory" ascii nocase

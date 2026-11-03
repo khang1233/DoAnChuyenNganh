@@ -1,27 +1,23 @@
 # =============================================================================
 # SURICATA / SNORT IDS/IPS DEEP PACKET INSPECTION (DPI) RULES
-# Chiến dịch: Tricks from the Past deployed via signed ChatGPT and Claude binaries
+# Chiến dịch: Hackers Infect 953 Online Stores With Scanner-Evading JavaScript, Mostly on
 # Mục đích: Phát hiện & chặn gói tin khai thác lỗ hổng / C2 ngay cả khi Hacker đổi IP
 # =============================================================================
 
 # [LỚP 1A] Chặn kết nối hai chiều tới cụm máy chủ C2 / Scanner đã xác thực (Score > 80):
-drop ip any any -> [51.89.231.85,51.89.228.250] any (msg:"[OPENCLAW-CTI] Outbound Traffic to Verified Malicious C2 IP"; classtype:trojan-activity; sid:9100001; rev:1;)
-drop ip [51.89.231.85,51.89.228.250] any -> $HOME_NET any (msg:"[OPENCLAW-CTI] Inbound Scan/Exploit from Verified Malicious IP"; classtype:attempted-recon; sid:9100002; rev:1;)
+drop ip any any -> [162.35.99.94] any (msg:"[OPENCLAW-CTI] Outbound Traffic to Verified Malicious C2 IP"; classtype:trojan-activity; sid:9100001; rev:1;)
+drop ip [162.35.99.94] any -> $HOME_NET any (msg:"[OPENCLAW-CTI] Inbound Scan/Exploit from Verified Malicious IP"; classtype:attempted-recon; sid:9100002; rev:1;)
 
 # [LỚP 1B] Chặn truy vấn DNS & TLS SNI tới tên miền C2 (Chống kỹ thuật đổi IP Fast-Flux):
-drop dns $HOME_NET any -> any 53 (msg:"[OPENCLAW-CTI] DNS Lookup for Malicious C2 Domain GitHub.io"; dns.query; content:"GitHub.io"; nocase; classtype:trojan-activity; sid:9100003; rev:1;)
-drop tls $HOME_NET any -> any any (msg:"[OPENCLAW-CTI] TLS SNI Connection to Malicious C2 GitHub.io"; tls.sni; content:"GitHub.io"; nocase; classtype:command-and-control; sid:9100004; rev:1;)
-drop dns $HOME_NET any -> any 53 (msg:"[OPENCLAW-CTI] DNS Lookup for Malicious C2 Domain outlook.com"; dns.query; content:"outlook.com"; nocase; classtype:trojan-activity; sid:9100005; rev:1;)
-drop tls $HOME_NET any -> any any (msg:"[OPENCLAW-CTI] TLS SNI Connection to Malicious C2 outlook.com"; tls.sni; content:"outlook.com"; nocase; classtype:command-and-control; sid:9100006; rev:1;)
-drop dns $HOME_NET any -> any 53 (msg:"[OPENCLAW-CTI] DNS Lookup for Malicious C2 Domain digit.dedyn.io"; dns.query; content:"digit.dedyn.io"; nocase; classtype:trojan-activity; sid:9100007; rev:1;)
-drop tls $HOME_NET any -> any any (msg:"[OPENCLAW-CTI] TLS SNI Connection to Malicious C2 digit.dedyn.io"; tls.sni; content:"digit.dedyn.io"; nocase; classtype:command-and-control; sid:9100008; rev:1;)
-drop dns $HOME_NET any -> any 53 (msg:"[OPENCLAW-CTI] DNS Lookup for Malicious C2 Domain dedyn.io"; dns.query; content:"dedyn.io"; nocase; classtype:trojan-activity; sid:9100009; rev:1;)
-drop tls $HOME_NET any -> any any (msg:"[OPENCLAW-CTI] TLS SNI Connection to Malicious C2 dedyn.io"; tls.sni; content:"dedyn.io"; nocase; classtype:command-and-control; sid:9100010; rev:1;)
-drop dns $HOME_NET any -> any 53 (msg:"[OPENCLAW-CTI] DNS Lookup for Malicious C2 Domain gpt-5-6.github.io"; dns.query; content:"gpt-5-6.github.io"; nocase; classtype:trojan-activity; sid:9100011; rev:1;)
-drop tls $HOME_NET any -> any any (msg:"[OPENCLAW-CTI] TLS SNI Connection to Malicious C2 gpt-5-6.github.io"; tls.sni; content:"gpt-5-6.github.io"; nocase; classtype:command-and-control; sid:9100012; rev:1;)
-drop dns $HOME_NET any -> any 53 (msg:"[OPENCLAW-CTI] DNS Lookup for Malicious C2 Domain opus-5-0.github.io"; dns.query; content:"opus-5-0.github.io"; nocase; classtype:trojan-activity; sid:9100013; rev:1;)
-drop tls $HOME_NET any -> any any (msg:"[OPENCLAW-CTI] TLS SNI Connection to Malicious C2 opus-5-0.github.io"; tls.sni; content:"opus-5-0.github.io"; nocase; classtype:command-and-control; sid:9100014; rev:1;)
-drop dns $HOME_NET any -> any 53 (msg:"[OPENCLAW-CTI] DNS Lookup for Malicious C2 Domain calm-piano-floats-313.dedyn.io"; dns.query; content:"calm-piano-floats-313.dedyn.io"; nocase; classtype:trojan-activity; sid:9100015; rev:1;)
-drop tls $HOME_NET any -> any any (msg:"[OPENCLAW-CTI] TLS SNI Connection to Malicious C2 calm-piano-floats-313.dedyn.io"; tls.sni; content:"calm-piano-floats-313.dedyn.io"; nocase; classtype:command-and-control; sid:9100016; rev:1;)
+drop dns $HOME_NET any -> any 53 (msg:"[OPENCLAW-CTI] DNS Lookup for Malicious C2 Domain lanhd6549tdhse.top"; dns.query; content:"lanhd6549tdhse.top"; nocase; classtype:trojan-activity; sid:9100003; rev:1;)
+drop tls $HOME_NET any -> any any (msg:"[OPENCLAW-CTI] TLS SNI Connection to Malicious C2 lanhd6549tdhse.top"; tls.sni; content:"lanhd6549tdhse.top"; nocase; classtype:command-and-control; sid:9100004; rev:1;)
+drop dns $HOME_NET any -> any 53 (msg:"[OPENCLAW-CTI] DNS Lookup for Malicious C2 Domain additionalver.com"; dns.query; content:"additionalver.com"; nocase; classtype:trojan-activity; sid:9100005; rev:1;)
+drop tls $HOME_NET any -> any any (msg:"[OPENCLAW-CTI] TLS SNI Connection to Malicious C2 additionalver.com"; tls.sni; content:"additionalver.com"; nocase; classtype:command-and-control; sid:9100006; rev:1;)
+drop dns $HOME_NET any -> any 53 (msg:"[OPENCLAW-CTI] DNS Lookup for Malicious C2 Domain deepveindrilling.com"; dns.query; content:"deepveindrilling.com"; nocase; classtype:trojan-activity; sid:9100007; rev:1;)
+drop tls $HOME_NET any -> any any (msg:"[OPENCLAW-CTI] TLS SNI Connection to Malicious C2 deepveindrilling.com"; tls.sni; content:"deepveindrilling.com"; nocase; classtype:command-and-control; sid:9100008; rev:1;)
 
 # [LỚP 1C] Deep Packet Inspection (DPI) bắt gói tin khai thác lỗ hổng CVE & Web Exploit (Không phụ thuộc IP):
+drop http $EXTERNAL_NET any -> $HOME_NET any (msg:"[OPENCLAW-CTI] Virtual IPS Shield for CVE-2026-48356 Remote Exploitation"; flow:established,to_server; http.uri; pcre:"/(\.\.\/|%2e%2e|cmd=|exec=|union\s+select|jndi:)/i"; reference:cve,2026-48356; classtype:attempted-admin; sid:9100009; rev:1;)
+drop http $EXTERNAL_NET any -> $HOME_NET any (msg:"[OPENCLAW-CTI] Virtual IPS Shield for CVE-2025-54236 Remote Exploitation"; flow:established,to_server; http.uri; pcre:"/(\.\.\/|%2e%2e|cmd=|exec=|union\s+select|jndi:)/i"; reference:cve,2025-54236; classtype:attempted-admin; sid:9100010; rev:1;)
+drop http $EXTERNAL_NET any -> $HOME_NET any (msg:"[OPENCLAW-CTI] Virtual IPS Shield for CVE-2026-109618 Remote Exploitation"; flow:established,to_server; http.uri; pcre:"/(\.\.\/|%2e%2e|cmd=|exec=|union\s+select|jndi:)/i"; reference:cve,2026-109618; classtype:attempted-admin; sid:9100011; rev:1;)
+drop http $EXTERNAL_NET any -> $HOME_NET any (msg:"[OPENCLAW-CTI] Virtual IPS Shield for CVE-2026-109619 Remote Exploitation"; flow:established,to_server; http.uri; pcre:"/(\.\.\/|%2e%2e|cmd=|exec=|union\s+select|jndi:)/i"; reference:cve,2026-109619; classtype:attempted-admin; sid:9100012; rev:1;)
