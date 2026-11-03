@@ -97,16 +97,28 @@ cti stop
 
 Dưới đây là 5 kịch bản kiểm thử mẫu để bạn bè / tester kiểm tra toàn diện chức năng của hệ thống ngay trên giao diện Web duy nhất http://127.0.0.1:8765:
 
-### KỊCH BẢN 1: QUY TRÌNH PHÒNG THỦ TỰ HÀNH 5 BƯỚC (WIZARD FLOW)
-Mục tiêu: Kiểm tra tính năng phân tích mã nguồn lần đầu, trích xuất lỗ hổng và sinh bộ kỹ năng phòng thủ.
+### KỊCH BẢN 1: QUY TRÌNH PHÒNG THỦ TỰ HÀNH TỪNG BƯỚC (WIZARD FLOW)
+Mục tiêu: Kiểm tra màn hình khởi đầu tối giản (Landing Step 0), cơ chế tự động nhận diện phần cứng, đề xuất mô hình AI mạnh nhất khả thi và tần suất quét thích ứng theo thể loại dự án.
 
-- Bước 1: Mở trình duyệt tại http://127.0.0.1:8765. Giao diện tự động mở mục 5 Bước Tự Hành (Wizard) và khóa vào thư mục dự án mục tiêu.
-- Bước 2: Nhấn nút [ BẮT ĐẦU QUÉT DỰ ÁN ].
-  Quan sát: Terminal hiển thị tiến trình Tác tử AI đọc cây cú pháp AST, nhận diện ngôn ngữ, framework và các Sensitive Sinks (exec, eval, system).
-- Bước 3: Xem kết quả phân tích tại Bước 2:
-  Kiểm tra: Hệ thống hiển thị Ngôn ngữ, Framework, Phiên bản Runtime (ví dụ: Python 3.14, PHP 8.2), danh sách các dòng code nhạy cảm và Phân hệ bảo vệ (Scope A: Web & API Layer).
+- Bước 1 (Màn hình Khởi đầu Step 0): Mở trình duyệt tại http://127.0.0.1:8765.
+  Quan sát:
+  - Giao diện ban đầu hiển thị tối giản, không gây rối mắt: Thanh đếm ngược quét ngầm được tạm ẩn để chờ cấu hình.
+  - Hiển thị Thẻ Dự Án Mục Tiêu kèm đường dẫn thư mục hiện tại.
+  - Hiển thị Thẻ Phần Cứng Máy Tính: Tên GPU, VRAM (ví dụ: AMD Radeon RX 6600 8GB VRAM hoặc NVIDIA/Intel/CPU), tên CPU và tổng dung lượng RAM.
+- Bước 2: Nhấn nút to nổi bật ở chính giữa: [ BẮT ĐẦU QUÉT DỰ ÁN & THIẾT LẬP BẢO VỆ ].
+  Quan sát:
+  - Thanh Stepper 5 bước xuất hiện.
+  - Terminal chạy Live Stream: Tác tử AI đọc cây AST, nhận diện ngôn ngữ, framework, các dòng nhạy cảm Sensitive Sinks (exec, eval, system) và phiên bản runtime.
+- Bước 3 (Kết quả phân tích & Cấu hình thích ứng):
+  Kiểm tra 3 khối thông tin quan trọng:
+  1. Hồ sơ kiến trúc mã nguồn: Ngôn ngữ, Framework, Phiên bản runtime (Python, PHP, Node.js), Phân hệ bảo vệ tự động (Scope A: Web & API Layer).
+  2. Bảng chọn Mô hình AI Thích ứng Phần cứng (Hardware-Aware Model Selector):
+     - Hệ thống phân loại 3 Cấp độ (Tier): Mạnh nhất khả thi -> Cân bằng & tốc độ cao -> Tiết kiệm tài nguyên/CPU mode.
+     - Tự động chọn sẵn mô hình mạnh nhất máy đó có thể chạy (ví dụ máy 8GB VRAM tự động chọn qwen2.5:7b hoặc qwen3:8b; máy mạnh hơn tự động chọn 14B; máy CPU tự động chọn 1.5B hoặc CTI Heuristic). Cho phép người dùng chuyển chọn mô hình tùy ý bằng 1 cú nhấp chuột.
+  3. Tần suất quét CTI tự động thích ứng theo loại dự án (Project Type-Adaptive Cadence):
+     - Tác tử AI tự động nhận diện đặc thù thể loại: Với Web Application (đối mặt trực tiếp Internet), hệ thống đề xuất mặc định Mỗi 6 giờ (kèm dropdown chọn nhanh các mốc demo như Mỗi 2 phút, 5 phút, 15 phút, 1 giờ, 24 giờ).
 - Bước 4: Nhấn nút chuyển sang Bước 3 (Cào báo CTI). Chọn mốc thời gian (1 năm, 3 năm hoặc 5 năm). Nhấn [ BẮT ĐẦU CÀO & ĐỐI CHIẾU ].
-  Quan sát: Live Stream nhật ký tác tử AI phân tích, đối chiếu chéo; nếu phát hiện bài báo khớp đúng phiên bản runtime của dự án, hệ thống sẽ kích hoạt dòng cảnh báo đỏ khẩn cấp và hiển thị các chỉ số IOC (IP C2, CVE, Domain).
+  Quan sát: Live Stream tác tử AI đối chiếu AST với kho bài báo; nếu phát hiện bài báo khớp đúng phiên bản runtime của dự án, hệ thống sẽ kích hoạt dòng cảnh báo đỏ khẩn cấp và hiển thị các chỉ số IOC (IP C2, CVE, Domain).
 - Bước 5: Nhấn nút chuyển sang Bước 4 (Sinh Bộ Kỹ Năng).
   Quan sát: Hệ thống tự động sinh gói kỹ năng agentic-defense-master-web-suite trực tiếp vào thư mục dự án và đồng bộ tới 15 nền tảng AI Agent (Claude, Cursor, Gemini, Copilot...).
 - Bước 6: Chuyển sang Bước 5 (Kiểm thử & Vá mã nguồn):
