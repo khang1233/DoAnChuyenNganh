@@ -343,8 +343,8 @@ def synthesize_and_deploy_skill(target_path: Path, scope_id: str, article_id: st
   ```bash
   python ./defense_skills/{bundle_path.name}/scripts/apply_virtual_patch.py
   ```
-- File cấu hình WAF tương ứng: `./defense_skills/{bundle_path.name}/rules/waf_modsecurity.conf`.
-- Danh sách IP C2 độc hại cần DROP ở tường lửa: `./defense_skills/{bundle_path.name}/rules/firewall_c2_blocklist.txt`.
+- Danh sách chỉ số IP C2 độc hại đối soát: `./defense_skills/{bundle_path.name}/references/c2_ip_indicators.txt`.
+- Bằng chứng đối chiếu tri thức CTI nguyên bản: `./defense_skills/{bundle_path.name}/references/cti_verbatim_report.txt`.
 
 ### BƯỚC 3: TỰ ĐỘNG SỬA TẬN GỐC MÃ NGUỒN (CODE REFACTORING)
 - Đọc file chỉ dẫn tư duy: `./defense_skills/{bundle_path.name}/SKILL.md`.

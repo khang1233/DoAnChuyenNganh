@@ -299,10 +299,10 @@ HTML_PAGE = r"""<!DOCTYPE html>
       background: var(--bg-subtle);
     }
     .NavLink.active {
-      color: var(--primary);
-      background: var(--primary-subtle);
-      border: 1px solid #bfdbfe;
-      font-weight: 600;
+      color: #ffffff !important;
+      background: #2563eb !important;
+      border: 1px solid #1d4ed8 !important;
+      font-weight: 700 !important;
     }
 
     .NavRight {
@@ -970,7 +970,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
     </div>
 
     <div class="NavLinks">
-      <button class="NavLink active" style="background:#2563eb; color:#ffffff; font-weight:700; border:1px solid #1d4ed8;" onclick="switchView('sec-wizard', this)">5 Bước Tự Hành (Wizard)</button>
+      <button class="NavLink active" onclick="switchView('sec-wizard', this)">5 Bước Tự Hành (Wizard)</button>
       <button class="NavLink" onclick="switchView('all', this)">Tất Cả</button>
       <button class="NavLink" onclick="switchView('sec-feed', this)">1. Nguồn Báo</button>
       <button class="NavLink" onclick="switchView('sec-history', this)">Lịch Sử Đã Học (<span id="navHistoryCount">0</span>)</button>
@@ -2222,11 +2222,24 @@ HTML_PAGE = r"""<!DOCTYPE html>
     let webChatHistory = [];
 
     function switchView(sectionId, btnEl) {
-      document.querySelectorAll('.NavLinks .NavLink').forEach(b => b.classList.remove('active'));
-      if (btnEl) btnEl.classList.add('active');
+      document.querySelectorAll('.NavLinks .NavLink').forEach(b => {
+        b.classList.remove('active');
+        b.style.background = '';
+        b.style.color = '';
+        b.style.borderColor = '';
+      });
+      if (btnEl) {
+        btnEl.classList.add('active');
+        btnEl.style.background = '#2563eb';
+        btnEl.style.color = '#ffffff';
+        btnEl.style.borderColor = '#1d4ed8';
+      }
       const ids = ['sec-wizard', 'sec-chat', 'sec-add', 'sec-feed', 'sec-history', 'sec-score', 'sec-defense'];
       if (sectionId === 'all') {
-        const wiz = document.getElementById('sec-wizard'); if (wiz) wiz.style.display = 'block';
+        const wiz = document.getElementById('sec-wizard');
+        if (wiz) {
+          wiz.style.display = wzIsProjectConfigured ? 'none' : 'block';
+        }
         document.getElementById('sec-chat').style.display = 'none';
         document.getElementById('sec-add').style.display = 'none';
         document.getElementById('sec-feed').style.display = 'block';
@@ -5107,6 +5120,8 @@ const elArt = document.getElementById('lblMasterArticlesCount');
             wzIsProjectConfigured = true;
             document.body.classList.remove('wizard-setup-mode');
             document.body.classList.remove('landing-mode');
+            const card0 = document.getElementById('wizardCard0');
+            if (card0) card0.style.display = 'none';
             if (data.config.scope_id) {
               wzScopeId = data.config.scope_id;
               if (typeof switchDefenseScope === 'function') switchDefenseScope(data.config.scope_id);
@@ -5116,9 +5131,10 @@ const elArt = document.getElementById('lblMasterArticlesCount');
             if (autoScanControls) autoScanControls.style.display = 'flex';
             if (autoScanMsg) autoScanMsg.style.display = 'none';
 
-            // Dự án đã bảo vệ -> Mở ngay Kho Kỹ Năng Tác Tử
-            switchView('sec-defense', document.querySelector('.NavLinks .NavLink:nth-child(6)'));
+            // Dự án đã bảo vệ -> Mở trực tiếp màn hình Giám Sát Trực Tiếp Live AI (Tất Cả)
+            switchView('all', document.querySelectorAll('.NavLinks .NavLink')[1]);
           } else {
+            wzIsProjectConfigured = false;
             // Dự án mới chưa cấu hình -> Xóa header trên cùng để không bị trùng lặp, mở Màn hình khởi đầu Step 0
             const container = document.getElementById('projectContextContainer');
             if (container) container.innerHTML = '';
@@ -5157,29 +5173,31 @@ const elArt = document.getElementById('lblMasterArticlesCount');
           <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:6px; padding:12px 18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
             <div>
               <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-                <span style="background:#15803d; color:#ffffff; font-weight:700; font-size:11px; padding:2px 8px; border-radius:3px;">DỰ ÁN ĐÃ BẢO VỆ</span>
+                <span style="background:#15803d; color:#ffffff; font-weight:700; font-size:11px; padding:2px 8px; border-radius:3px;">DỰ ÁN ĐÃ BẢO VỆ (LIVE MONITORING)</span>
                 <span style="font-weight:700; color:#0f172a; font-size:14px;">${data.target_name}</span>
                 <span style="font-family:monospace; color:#475569; font-size:12px;">(${data.target_path})</span>
               </div>
               <div style="font-size:12px; color:#166534;">
-                Phân hệ: <b>${data.config.scope_name || data.config.scope_id}</b> &bull; Gói Kỹ Năng: <b style="font-family:monospace;">${data.config.skill_name}</b> &bull; Trạng thái: <b style="color:#15803d;">PROTECTED</b>
+                Phân hệ: <b>${data.config.scope_name || data.config.scope_id}</b> &bull; Gói Kỹ Năng Tác Tử: <b style="font-family:monospace;">${data.config.skill_name}</b> &bull; Trạng thái: <b style="color:#15803d;">LIVE MONITORING (ĐANG BẢO VỆ)</b>
               </div>
             </div>
             <div style="display:flex; gap:8px; align-items:center;">
-              <button type="button" class="CleanBtn" style="font-size:12px; padding:6px 14px; background:#2563eb; color:#ffffff; border:none; border-radius:4px; font-weight:600; cursor:pointer;" onclick="switchView('sec-defense', document.querySelector('.NavLinks .NavLink:nth-child(6)'))">
-                [ Xem Kỹ Năng Tác Tử ]
+              <button type="button" class="CleanBtn" style="font-size:12px; padding:6px 14px; background:#2563eb; color:#ffffff; border:none; border-radius:4px; font-weight:600; cursor:pointer;" onclick="switchView('all', document.querySelectorAll('.NavLinks .NavLink')[1])">
+                [ Giám Sát Trực Tiếp Live AI ]
               </button>
-              <button type="button" class="CleanBtn" style="font-size:12px; padding:6px 14px; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; border-radius:4px; font-weight:600; cursor:pointer;" onclick="switchView('sec-wizard', document.querySelector('.NavLinks .NavLink')); wizardGotoStep(1);">
+              <button type="button" class="CleanBtn" style="font-size:12px; padding:6px 14px; background:#f0fdf4; color:#15803d; border:1px solid #86efac; border-radius:4px; font-weight:600; cursor:pointer;" onclick="switchView('sec-defense', document.querySelectorAll('.NavLinks .NavLink')[5])">
+                [ Kho Kỹ Năng Tác Tử ]
+              </button>
+              <button type="button" class="CleanBtn" style="font-size:12px; padding:6px 14px; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; border-radius:4px; font-weight:600; cursor:pointer;" onclick="switchView('sec-wizard', document.querySelectorAll('.NavLinks .NavLink')[0]); wizardGotoStep(1);">
                 [ Xem Quy Trình Wizard ]
               </button>
               <button type="button" class="CleanBtn" style="font-size:12px; padding:6px 14px; background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5; border-radius:4px; font-weight:600; cursor:pointer;" onclick="resetProjectDefense()">
-                [ Quét Lại Dự Án ]
+                [ Thiết Lập Lại / Quét Lại Dự Án ]
               </button>
             </div>
           </div>
         `;
       } else {
-        // Dự án chưa cấu hình -> Xóa sạch để giao diện gọn gàng, không bị 2 khung trùng lặp
         container.innerHTML = '';
       }
     }
@@ -5193,6 +5211,7 @@ const elArt = document.getElementById('lblMasterArticlesCount');
           body: JSON.stringify({ target_path: wzTarget })
         });
         const d = await res.json();
+        wzIsProjectConfigured = false;
         await initProjectContext();
       } catch (e) {
         alert("Lỗi đặt lại: " + e);
@@ -7642,7 +7661,7 @@ def api_chat_with_agent(req: ChatAgentRequest):
             "Tôi được trang bị hệ thống Tool-Calling tự động liên kết với 5 nguồn tình báo thực chiến:\n"
             "1. Tra cứu chỉ số danh tiếng IP, Domain, Hash (SHA256/MD5), và CVE trên AlienVault OTX, VirusTotal, AbuseIPDB, GreyNoise, Shodan.\n"
             "2. Đánh giá điểm nguy hại (Fusion Score: 0-100) và đưa ra phán quyết tự động: CHẶN (>80) hay AN TOÀN (<=80).\n"
-            "3. Tự động sinh mã phòng thủ thực chiến: Quy tắc Suricata IPS, Luật WAF ModSecurity, Cấu hình Wazuh/Sigma SIEM, và Gói lệnh OASIS OpenC2 Firewall.\n\n"
+            "3. Tự động đóng gói Kỹ Năng Tác Tử (Agentic Skills): Sinh file SKILL.md, script kiểm thử verify_exploit.py, kịch bản vá mã nguồn và lá chắn phòng vệ tự hành.\n\n"
             "Cách dùng: Hãy nhập trực tiếp một IP (VD: 43.134.165.205), CVE (VD: CVE-2024-21413), Hash mã độc hoặc câu hỏi kỹ thuật để tôi tra cứu thực tế ngay lập tức!"
         )
         history = list(req.history[-10:])
@@ -7984,7 +8003,47 @@ def api_get_project_context(target: str = Query("")):
     cfg_file = p / ".cti_defense.json"
     is_configured = cfg_file.exists()
     cfg_data = {}
-    if is_configured:
+    
+    if not is_configured:
+        ds_dir = p / "defense_skills"
+        has_skills = ds_dir.exists() and any(d.is_dir() for d in ds_dir.iterdir())
+        has_guide = (p / "AGENT_REMEDIATION_GUIDE.md").exists()
+        has_cursor = (p / ".cursor" / "rules").exists() and any(d.is_dir() for d in (p / ".cursor" / "rules").iterdir())
+        has_gemini = (p / ".gemini" / "skills").exists() and any(d.is_dir() for d in (p / ".gemini" / "skills").iterdir())
+        
+        if has_skills or has_guide or has_cursor or has_gemini:
+            found_skill = "agentic-defense-cve-2026-109618-php2shell-exploit-attempt"
+            if has_skills:
+                subdirs = [d.name for d in ds_dir.iterdir() if d.is_dir()]
+                if subdirs:
+                    found_skill = subdirs[0]
+            
+            scope_id = "SCOPE_WEB"
+            scope_name = "Phân hệ Web & API (Lớp Ứng Dụng)"
+            manifest_file = ds_dir / found_skill / "manifest.json"
+            if manifest_file.exists():
+                try:
+                    mdata = json.loads(manifest_file.read_text(encoding="utf-8"))
+                    scope_id = mdata.get("scope_id", scope_id)
+                    scope_name = mdata.get("scope_name", scope_name)
+                except Exception:
+                    pass
+            
+            cfg_data = {
+                "project_name": p.name,
+                "project_path": str(p),
+                "scope_id": scope_id,
+                "scope_name": scope_name,
+                "skill_name": found_skill,
+                "configured_at": datetime.now().isoformat(),
+                "status": "PROTECTED"
+            }
+            try:
+                cfg_file.write_text(json.dumps(cfg_data, indent=2, ensure_ascii=False), encoding="utf-8")
+                is_configured = True
+            except Exception:
+                is_configured = True
+    else:
         try:
             cfg_data = json.loads(cfg_file.read_text(encoding="utf-8"))
         except Exception:
@@ -8007,15 +8066,43 @@ def api_set_target(req: TargetRequest):
 
 @app.post("/api/system/project-reset")
 def api_reset_project(req: TargetRequest):
+    import shutil
     t = req.target_path.strip() or ACTIVE_TARGET_PROJECT
     p = Path(t).resolve()
+    
     cfg_file = p / ".cti_defense.json"
     if cfg_file.exists():
         try:
             cfg_file.unlink()
-        except Exception as e:
-            return {"status": "error", "message": str(e)}
-    return {"status": "success", "message": f"Đã đặt lại cấu hình bảo vệ cho {p.name}"}
+        except Exception:
+            pass
+            
+    ds_dir = p / "defense_skills"
+    if ds_dir.exists():
+        try:
+            shutil.rmtree(ds_dir, ignore_errors=True)
+        except Exception:
+            pass
+            
+    guide_file = p / "AGENT_REMEDIATION_GUIDE.md"
+    if guide_file.exists():
+        try:
+            guide_file.unlink()
+        except Exception:
+            pass
+            
+    for root_extra in [p / ".cursor" / "rules", p / ".gemini" / "skills"]:
+        if root_extra.exists():
+            for item in root_extra.glob("agentic-defense-*"):
+                try:
+                    if item.is_dir():
+                        shutil.rmtree(item, ignore_errors=True)
+                    else:
+                        item.unlink()
+                except Exception:
+                    pass
+
+    return {"status": "success", "message": f"Đã đặt lại cấu hình phòng thủ cho {p.name}. Sẵn sàng quét lại từ đầu."}
 
 @app.get("/api/system/hardware-info")
 def api_get_hardware_info():

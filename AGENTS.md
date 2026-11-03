@@ -51,7 +51,7 @@ All skills in `skills/` must strictly conform to this structure:
 | `manifest.json` | Package metadata, tools schema, engine bindings | Parsed by Agent Loaders |
 | `scripts/verify_exploit.py` | Standalone script to probe target application | Executed via tool-call |
 | `scripts/apply_virtual_patch.py` | Standalone script to activate WAF & Firewall | Executed via tool-call |
-| `rules/*.conf, *.rules, *.xml` | Real production rules for ModSecurity, Suricata, Wazuh | Ingested by defense engines |
+| `references/c2_ip_indicators.txt` | C2 IPs, hashes, and indicators for verification | Read by scripts and agents |
 | `references/cti_verbatim_report.txt` | 100% full-text source article for Ctrl+F grounding | Cross-referenced for audit |
 | `references/xai_audit_trail.json` | Mathematical feature attribution & counterfactuals | Audited for Trust validation |
 | `examples/vulnerable_sample.*` | Negative test fixture (unsafe code before fix) | Read for pattern matching |

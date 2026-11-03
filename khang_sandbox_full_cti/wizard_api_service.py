@@ -217,7 +217,13 @@ def wizard_scan_project(target: str = "", clone_url: str = "") -> Dict[str, Any]
     cfg_file = target_path / ".cti_defense.json"
     is_configured = cfg_file.exists()
     cfg_data = {}
-    if is_configured:
+    if not is_configured:
+        ds_dir = target_path / "defense_skills"
+        has_skills = ds_dir.exists() and any(d.is_dir() for d in ds_dir.iterdir())
+        has_guide = (target_path / "AGENT_REMEDIATION_GUIDE.md").exists()
+        if has_skills or has_guide:
+            is_configured = True
+    if is_configured and cfg_file.exists():
         try:
             cfg_data = json.loads(cfg_file.read_text(encoding="utf-8"))
         except Exception:
