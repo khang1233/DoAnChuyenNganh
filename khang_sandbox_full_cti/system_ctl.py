@@ -199,8 +199,8 @@ def interactive_menu():
             print("  [OK] AI Agent Engine      : Dang san sang nhan dien ma nguon va hoc CTI")
             print()
             print("  * Ghi chu: Ban co the dong cua so nay bat ky luc nao, he thong van tiep tuc")
-            print("    chay ngam. Khi can tat, chay lai file nay hoac bam nut 'Tat He Thong'")
-            print("    truc tiep tren thanh tieu de cua Web Dashboard.")
+            print("    chay ngam. Khi can tat: Nhap dup vao file '2_TAT_HE_THONG.bat',")
+            print("    hoac bam nut 'Tat He Thong' truc tiep tren Web Dashboard.")
         else:
             print("  - He thong hien dang tam tat.")
         print()
