@@ -77,6 +77,42 @@ SCOPE_PROFILES = {
     }
 }
 
+def resolve_scope_profile(scope_id: str) -> dict:
+    """Phân giải cấu hình phân hệ an ninh từ scope_id đơn lẻ, đa phân hệ hoặc SCOPE_ALL."""
+    if not scope_id:
+        return SCOPE_PROFILES["SCOPE_WEB"]
+    if scope_id in SCOPE_PROFILES:
+        return SCOPE_PROFILES[scope_id]
+    if "," in scope_id:
+        parts = [p.strip() for p in scope_id.split(",") if p.strip()]
+        if len(parts) == 1:
+            return SCOPE_PROFILES.get(parts[0], SCOPE_PROFILES["SCOPE_WEB"])
+        all_scopes = ["SCOPE_WEB", "SCOPE_NETWORK", "SCOPE_ENDPOINT", "SCOPE_HARDWARE"]
+        if set(parts) == set(all_scopes):
+            return SCOPE_PROFILES["SCOPE_ALL"]
+        combined_keywords = []
+        combined_patterns = []
+        sub_names = []
+        min_cadence = 86400
+        for s in parts:
+            p = SCOPE_PROFILES.get(s)
+            if p:
+                combined_keywords.extend(p.get("keywords", []))
+                combined_patterns.extend(p.get("file_patterns", []))
+                sub_names.append(p.get("name", s).split(":")[0].strip())
+                if p.get("cadence_sec", 86400) < min_cadence:
+                    min_cadence = p.get("cadence_sec", 86400)
+        return {
+            "id": scope_id,
+            "name": f"Đa Phân Hệ Tích Hợp ({' + '.join(sub_names)})",
+            "cadence_sec": min_cadence,
+            "cadence_label": f"Quét chu kỳ cao nhất ({min_cadence // 60} phút / lần)",
+            "file_patterns": list(dict.fromkeys(combined_patterns)),
+            "keywords": list(dict.fromkeys(combined_keywords)),
+            "focus_feeds": ["TheHackerNews", "CISA US Gov", "Check Point Research"]
+        }
+    return SCOPE_PROFILES.get(scope_id, SCOPE_PROFILES["SCOPE_WEB"])
+
 def detect_project_scope(target_path: Path):
     """Pha 1: Quét mã nguồn dự án đích để xác định công nghệ và Scope phù hợp nhất."""
     target_path = target_path.resolve()

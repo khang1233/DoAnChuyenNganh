@@ -18,7 +18,7 @@ if str(ROOT_DIR) not in sys.path:
 if str(SANDBOX_DIR) not in sys.path:
     sys.path.insert(0, str(SANDBOX_DIR))
 
-from apply_to_project import detect_project_scope, SCOPE_PROFILES, find_optimal_article_for_scope, synthesize_and_deploy_skill
+from apply_to_project import detect_project_scope, SCOPE_PROFILES, find_optimal_article_for_scope, synthesize_and_deploy_skill, resolve_scope_profile
 
 def deep_agent_codebase_scan(target_path: Path) -> Dict[str, Any]:
     """Tác tử AI quét sâu cây AST, tệp cấu hình và định vị điểm nhạy cảm của mã nguồn."""
@@ -197,7 +197,7 @@ def wizard_scan_project(target: str = "", clone_url: str = "") -> Dict[str, Any]
     # Chạy Tác tử AI phân tích kiến trúc mã nguồn
     scan_meta = deep_agent_codebase_scan(target_path)
     scope_id = scan_meta.get("scope_id", "SCOPE_WEB")
-    profile = SCOPE_PROFILES.get(scope_id, SCOPE_PROFILES["SCOPE_WEB"])
+    profile = resolve_scope_profile(scope_id)
     
     # Kết hợp các phát hiện của tác tử
     combined_techs = []
@@ -244,7 +244,7 @@ def wizard_scan_project(target: str = "", clone_url: str = "") -> Dict[str, Any]
 
 def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3) -> Dict[str, Any]:
     """Bước 2: Cào bài báo và lọc tri thức CTI theo đúng mục đích của Scope đã chọn."""
-    profile = SCOPE_PROFILES.get(scope_id, SCOPE_PROFILES["SCOPE_WEB"])
+    profile = resolve_scope_profile(scope_id)
     min_year = 2026 - history_years
     min_date = f"{min_year}-01-01"
 
@@ -367,7 +367,7 @@ def wizard_synthesize_skill(target: str, scope_id: str, article_id: str) -> Dict
     skill_name = synthesize_and_deploy_skill(target_path, scope_id, article_id)
     skill_dir = target_path / "defense_skills" / skill_name
     try:
-        profile = SCOPE_PROFILES.get(scope_id, SCOPE_PROFILES["SCOPE_WEB"])
+        profile = resolve_scope_profile(scope_id)
         cfg_meta = {
             "project_name": target_path.name,
             "project_path": str(target_path.resolve()),
