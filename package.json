@@ -8,7 +8,6 @@
     "cti": "./bin/cli.js"
   },
   "scripts": {
-    "postinstall": "node ./bin/postinstall.js",
     "start": "node ./bin/cli.js",
     "stop": "node ./bin/cli.js stop",
     "status": "node ./bin/cli.js status"
