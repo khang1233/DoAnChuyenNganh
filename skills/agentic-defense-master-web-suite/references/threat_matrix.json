@@ -1,7 +1,7 @@
 {
   "scope": "SCOPE_WEB",
   "technologies": [
-    "PHP Framework (Laravel / WordPress / Custom)"
+    "Python Backend (FastAPI / Django / Flask)"
   ],
   "supported_languages": [
     "JavaScript/TypeScript",
@@ -18,9 +18,9 @@
     "CVE-2019-9879",
     "CVE-2020-1938",
     "CVE-2021-22205",
+    "CVE-2021-28799",
     "CVE-2022-28368",
-    "CVE-2023-22793",
-    "CVE-2023-28121"
+    "CVE-2023-22793"
   ],
   "blocked_c2_ips": 102,
   "total_cti_articles_analyzed": 20,

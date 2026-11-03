@@ -399,6 +399,9 @@ def wizard_synthesize_skill(target: str, scope_id: str, article_id: str) -> Dict
         "trust_score": manifest.get("trust_score", 93.6),
         "manifest": manifest,
         "xai_audit": xai_audit,
+        "living_version": manifest.get("version", "v2.0.0"),
+        "accumulated_articles_count": manifest.get("accumulated_articles_count", 0),
+        "accumulated_iocs_count": manifest.get("accumulated_iocs_count", 0),
         "installed_locations": [
             str(target_path / ".cursor" / "rules" / skill_name),
             str(target_path / ".gemini" / "skills" / skill_name),

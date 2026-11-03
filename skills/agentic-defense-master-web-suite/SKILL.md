@@ -1,18 +1,23 @@
 ---
 name: agentic-defense-master-web-suite
-description: Gói kỹ năng phòng thủ tác tử toàn diện (Master Defense Suite) cho phân hệ SCOPE_WEB (PHP Framework (Laravel / WordPress / Custom)). Tích hợp đa lớp WAF, Tường lửa C2, Kiểm thử đa vector và Quy chuẩn sửa code an toàn cho Node.js, Express, Python.
+description: Gói kỹ năng phòng thủ tác tử toàn diện (Master Defense Suite) cho phân hệ SCOPE_WEB (Python Backend (FastAPI / Django / Flask)). Tích hợp đa lớp WAF, Tường lửa C2, Kiểm thử đa vector và Quy chuẩn sửa code an toàn cho Node.js, Express, Python.
 author: OpenClaw CTI Defense Orchestrator
-version: 2.0.0
+version: 2.254.200
 scope: SCOPE_WEB
 trust_score: 97.5
+evolution_mode: dynamic_living_ingestion
+accumulated_articles: 254
+accumulated_iocs: 1941
 ---
 
-# 🛡️ GÓI KỸ NĂNG PHÒNG THỦ TÁC TỬ TỔNG THỂ (MASTER DEFENSE SUITE)
+# GOI KY NANG PHONG THU TAC TU DONG (LIVING DYNAMIC CTI SKILL)
 
-## 📌 THÔNG TIN ĐỊNH DANH PHÂN HỆ
+## THONG TIN DINH DANH VA TICH LUY TRI THUC SONG
+- Phien ban ky nang song: `2.254.200` (Tich luy lien tuc tu 254 bai bao CTI va 1941 chi so IOC)
+- Trang thai tien hoa: NANG CAP LIVE LIEN TUC THEO THOI GIAN THUC
 - **Mã phân hệ bảo vệ:** `SCOPE_WEB`
-- **Công nghệ đích:** `PHP Framework (Laravel / WordPress / Custom)`
-- **Mã CVE bao phủ:** `CVE-2016-15042, CVE-2019-11510, CVE-2019-9879, CVE-2020-1938, CVE-2021-22205, CVE-2022-28368, CVE-2023-22793, CVE-2023-28121`
+- **Công nghệ đích:** `Python Backend (FastAPI / Django / Flask)`
+- **Mã CVE bao phủ:** `CVE-2016-15042, CVE-2019-11510, CVE-2019-9879, CVE-2020-1938, CVE-2021-22205, CVE-2021-28799, CVE-2022-28368, CVE-2023-22793`
 - **Mức độ tin cậy CTI:** `97.5 / 100 (Evidence-Driven)`
 
 ---
@@ -491,19 +496,27 @@ Duy trì chu kỳ quét 15 phút / lần để tự động nạp các mã CVE m
 ## 🧭 BẢN ĐỒ NGỮ CẢNH DỰ ÁN MỤC TIÊU (TARGET PROJECT ARCHITECTURAL CONTEXT)
 
 > [!IMPORTANT]
-> **Tác tử AI (Claude, Cursor, Codex, Antigravity, Devin, Aider, Continue)**: Dự án `demo_vulnerable_php_app` đã được hệ thống CTI thẩm định ngữ cảnh.
+> **Tác tử AI (Claude, Cursor, Codex, Antigravity, Devin, Aider, Continue)**: Dự án `boxpvp` đã được hệ thống CTI thẩm định ngữ cảnh.
 > Tuyệt đối không suy luận chung chung! Bạn phải đọc ngữ cảnh thực tế của dự án dưới đây để thực hiện refactor:
 
-- **Tên dự án:** `demo_vulnerable_php_app`
+- **Tên dự án:** `boxpvp`
 - **Frameworks nhận diện:** `Custom Web Stack`
-- **Tổng số tệp mã nguồn:** `1 files`
+- **Tổng số tệp mã nguồn:** `119 files`
 
 ### 1. Các File Khởi Chạy Trọng Tâm (Key Entrypoints):
-- `index.php`
+- `dev/netherbox-enchants/src/main/java/netherbox/enchants/listener/ApplyListener.java`
 
 ### 2. Các Điểm Nóng Bảo Mật Thực Tế Cần Rà Soát (Detected Sensitive Sinks):
 Hệ thống phát hiện các hàm thực thi hệ thống hoặc truy vấn cần được bảo vệ theo chuẩn CTI:
-- Chưa phát hiện sink nguy hiểm trực tiếp. Cần rà soát các điểm nhận input từ request người dùng.
+- **Tệp:** `dev/netherbox-features/src/main/java/netherbox/features/BossGui.java`
+  - Dòng 158 [Command Execution / RCE Risk]: `manager.spawn(b);`
+- **Tệp:** `dev/netherbox-features/src/main/java/netherbox/features/BossManager.java`
+  - Dòng 90 [Command Execution / RCE Risk]: `public void spawn(Boss b) {`
+  - Dòng 172 [Command Execution / RCE Risk]: `spawn(b);`
+- **Tệp:** `dev/netherbox-features/src/main/java/netherbox/features/NBBossCommand.java`
+  - Dòng 44 [Command Execution / RCE Risk]: `manager.spawn(b);`
+- **Tệp:** `dev/netherbox-enchants/src/main/java/netherbox/enchants/listener/SwordEffects.java`
+  - Dòng 186 [Command Execution / RCE Risk]: `Skeleton sk = victim.getWorld().spawn(victim.getLocation(), Skeleton.class);`
 
 ### 3. Chỉ Dẫn Hành Động Cụ Thể Cho AI Coding Agent:
 1. Mở trực tiếp các tệp tin trong danh sách Điểm Nóng phía trên.

@@ -242,6 +242,8 @@ def package_master_scope_skill(
     with sqlite3.connect(DB_PATH) as conn:
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
+        total_articles_count = cur.execute("SELECT count(*) FROM articles_archive").fetchone()[0]
+        total_iocs_count = cur.execute("SELECT count(*) FROM ioc_knowledge_base").fetchone()[0]
         articles = cur.execute("""
             SELECT article_id, title, url, sort_ts, content 
             FROM articles_archive 
@@ -253,6 +255,8 @@ def package_master_scope_skill(
             FROM ioc_knowledge_base 
             ORDER BY reputation_score DESC LIMIT 200
         """).fetchall()
+
+    living_version = f"2.{total_articles_count}.{len(db_iocs)}"
 
     all_cves = set()
     all_ips = []
@@ -471,7 +475,10 @@ if __name__ == '__main__':
         "display_name": f"Master Defense Suite for {scope_id}",
         "description": f"Gói kỹ năng phòng thủ tác tử tổng thể cho phân hệ {scope_id} ({tech_str}). Bảo vệ toàn diện đa lớp trước các mã CVE {top_cve_str}.",
         "author": "OpenClaw CTI Defense Orchestrator",
-        "version": "2.0.0",
+        "version": living_version,
+        "evolution_mode": "DYNAMIC_LIVING_INGESTION",
+        "accumulated_articles_count": total_articles_count,
+        "accumulated_iocs_count": total_iocs_count,
         "scope": scope_id,
         "technologies": detected_techs,
         "supported_languages": ["JavaScript/TypeScript", "Python", "Java", "PHP", "Go", "C#/.NET"],
@@ -495,14 +502,19 @@ if __name__ == '__main__':
 name: {skill_slug}
 description: Gói kỹ năng phòng thủ tác tử toàn diện (Master Defense Suite) cho phân hệ {scope_id} ({tech_str}). Tích hợp đa lớp WAF, Tường lửa C2, Kiểm thử đa vector và Quy chuẩn sửa code an toàn cho Node.js, Express, Python.
 author: OpenClaw CTI Defense Orchestrator
-version: 2.0.0
+version: {living_version}
 scope: {scope_id}
 trust_score: 97.5
+evolution_mode: dynamic_living_ingestion
+accumulated_articles: {total_articles_count}
+accumulated_iocs: {total_iocs_count}
 ---
 
-# 🛡️ GÓI KỸ NĂNG PHÒNG THỦ TÁC TỬ TỔNG THỂ (MASTER DEFENSE SUITE)
+# GOI KY NANG PHONG THU TAC TU DONG (LIVING DYNAMIC CTI SKILL)
 
-## 📌 THÔNG TIN ĐỊNH DANH PHÂN HỆ
+## THONG TIN DINH DANH VA TICH LUY TRI THUC SONG
+- Phien ban ky nang song: `{living_version}` (Tich luy lien tuc tu {total_articles_count} bai bao CTI va {total_iocs_count} chi so IOC)
+- Trang thai tien hoa: NANG CAP LIVE LIEN TUC THEO THOI GIAN THUC
 - **Mã phân hệ bảo vệ:** `{scope_id}`
 - **Công nghệ đích:** `{tech_str}`
 - **Mã CVE bao phủ:** `{', '.join(cve_list)}`

@@ -1,10 +1,56 @@
 {
-  "project_name": "demo_vulnerable_php_app",
-  "target_path": "D:\\mkhang\\DoAnChuyenNganh\\target_projects\\demo_vulnerable_php_app",
+  "project_name": "boxpvp",
+  "target_path": "D:\\mkhang\\boxpvp",
   "frameworks": [],
   "entrypoints": [
-    "index.php"
+    "dev/netherbox-enchants/src/main/java/netherbox/enchants/listener/ApplyListener.java"
   ],
-  "sensitive_sinks": [],
-  "total_source_files": 1
+  "sensitive_sinks": [
+    {
+      "file": "dev/netherbox-features/src/main/java/netherbox/features/BossGui.java",
+      "findings": [
+        {
+          "line": 158,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "manager.spawn(b);"
+        }
+      ]
+    },
+    {
+      "file": "dev/netherbox-features/src/main/java/netherbox/features/BossManager.java",
+      "findings": [
+        {
+          "line": 90,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "public void spawn(Boss b) {"
+        },
+        {
+          "line": 172,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "spawn(b);"
+        }
+      ]
+    },
+    {
+      "file": "dev/netherbox-features/src/main/java/netherbox/features/NBBossCommand.java",
+      "findings": [
+        {
+          "line": 44,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "manager.spawn(b);"
+        }
+      ]
+    },
+    {
+      "file": "dev/netherbox-enchants/src/main/java/netherbox/enchants/listener/SwordEffects.java",
+      "findings": [
+        {
+          "line": 186,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "Skeleton sk = victim.getWorld().spawn(victim.getLocation(), Skeleton.class);"
+        }
+      ]
+    }
+  ],
+  "total_source_files": 119
 }

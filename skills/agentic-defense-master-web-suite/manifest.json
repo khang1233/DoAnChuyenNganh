@@ -2,12 +2,15 @@
   "schema_version": "2.0.0",
   "name": "agentic-defense-master-web-suite",
   "display_name": "Master Defense Suite for SCOPE_WEB",
-  "description": "Gói kỹ năng phòng thủ tác tử tổng thể cho phân hệ SCOPE_WEB (PHP Framework (Laravel / WordPress / Custom)). Bảo vệ toàn diện đa lớp trước các mã CVE CVE-2016-15042, CVE-2019-11510, CVE-2019-9879, CVE-2020-1938.",
+  "description": "Gói kỹ năng phòng thủ tác tử tổng thể cho phân hệ SCOPE_WEB (Python Backend (FastAPI / Django / Flask)). Bảo vệ toàn diện đa lớp trước các mã CVE CVE-2016-15042, CVE-2019-11510, CVE-2019-9879, CVE-2020-1938.",
   "author": "OpenClaw CTI Defense Orchestrator",
-  "version": "2.0.0",
+  "version": "2.254.200",
+  "evolution_mode": "DYNAMIC_LIVING_INGESTION",
+  "accumulated_articles_count": 254,
+  "accumulated_iocs_count": 1941,
   "scope": "SCOPE_WEB",
   "technologies": [
-    "PHP Framework (Laravel / WordPress / Custom)"
+    "Python Backend (FastAPI / Django / Flask)"
   ],
   "supported_languages": [
     "JavaScript/TypeScript",

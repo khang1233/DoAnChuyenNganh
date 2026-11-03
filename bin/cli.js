@@ -51,7 +51,7 @@ function checkServerReady(port, callback) {
   });
 
   req.on('error', () => done(false));
-  req.setTimeout(1200, () => {
+  req.setTimeout(3500, () => {
     req.destroy();
     done(false);
   });
@@ -234,12 +234,30 @@ function attachInteractiveConsole(targetDir, webUrl, childProcess = null) {
     } catch (e) {}
   }
 
+  // Neu co childProcess (chay truc tiep boi tien trinh nay), lang nghe exit event truc tiep
+  if (childProcess) {
+    childProcess.on('exit', (code) => {
+      if (!isShuttingDown) {
+        console.log(`\n[THONG BAO] Tien trinh may chu backend da dung (ma thoat: ${code}).`);
+        performCleanExit();
+      }
+    });
+  }
+
   // Giu event loop Node luon hoat dong (khong bao gio tu dong thoat ra CMD prompt)
+  // Khong tu y kill he thong vi timeout tam thoi khi may chu dang xu ly nang
+  let consecutiveFailures = 0;
   setInterval(() => {
     checkServerReady(PORT, (isAlive) => {
-      if (!isAlive && !isShuttingDown) {
-        console.log('\n[THONG BAO] May chu backend da dung.');
-        performCleanExit();
+      if (isAlive) {
+        consecutiveFailures = 0;
+      } else {
+        consecutiveFailures++;
+        // Chi dung neu that bai lien tiep 10 lan (40 giay lien tuc khong phan hoi)
+        if (consecutiveFailures >= 10 && !isShuttingDown) {
+          console.log('\n[THONG BAO] May chu backend da ngat ket noi qua 40 giay.');
+          performCleanExit();
+        }
       }
     });
   }, 4000);

@@ -114,38 +114,58 @@ def resolve_scope_profile(scope_id: str) -> dict:
     return SCOPE_PROFILES.get(scope_id, SCOPE_PROFILES["SCOPE_WEB"])
 
 def detect_project_scope(target_path: Path):
-    """Pha 1: Quét mã nguồn dự án đích để xác định công nghệ và Scope phù hợp nhất."""
+    """Pha 1: Quét mã nguồn dự án đích để xác định công nghệ và Scope phù hợp nhất (Tối ưu 1 lần walk)."""
     target_path = target_path.resolve()
     detected_techs = []
     scores = {"SCOPE_WEB": 0, "SCOPE_NETWORK": 0, "SCOPE_ENDPOINT": 0, "SCOPE_HARDWARE": 0}
     
-    # 1. Quét theo file patterns
-    ignored_dirs = [".git", "node_modules", "venv", ".venv", "dist", "build", ".cursor", ".gemini", "defense_skills"]
+    ignored_dirs = {".git", "node_modules", "vendor", "venv", ".venv", "dist", "build", ".cursor", ".gemini", "defense_skills", "__pycache__"}
+    
+    found_exts = set()
+    found_filenames = set()
+    
+    # Duyệt nhanh cây thư mục tối đa 4 tầng
+    base_depth = len(target_path.parts)
+    for root, dirs, files in os.walk(target_path):
+        current_depth = len(Path(root).parts) - base_depth
+        if current_depth > 4:
+            dirs.clear()
+            continue
+        dirs[:] = [d for d in dirs if d.lower() not in ignored_dirs and not d.startswith('.')]
+        for f in files:
+            fl = f.lower()
+            found_filenames.add(fl)
+            ext = os.path.splitext(fl)[1]
+            if ext:
+                found_exts.add(ext)
+
+    # 1. Đánh giá Scope theo mẫu tệp tin
     for scope_id, profile in SCOPE_PROFILES.items():
         if scope_id == "SCOPE_ALL" or scope_id not in scores:
             continue
-        for pat in profile["file_patterns"]:
-            matches = list(target_path.glob(f"**/{pat}"))
-            valid = [m for m in matches if not any(ign in str(m) for ign in ignored_dirs)]
-            if valid:
-                scores[scope_id] += len(valid) * 2
+        for pat in profile.get("file_patterns", []):
+            pat_l = pat.lower()
+            if pat_l.startswith("*."):
+                target_ext = pat_l[1:]
+                if target_ext in found_exts:
+                    scores[scope_id] += 4
+            elif pat_l in found_filenames:
+                scores[scope_id] += 6
 
     # 2. Định danh công nghệ chi tiết
-    php_files = [p for p in target_path.glob("**/*.php") if not any(ign in str(p) for ign in ignored_dirs)]
-    py_files = [p for p in target_path.glob("**/*.py") if not any(ign in str(p) for ign in ignored_dirs)]
-    if (target_path / "composer.json").exists() or php_files:
+    if "composer.json" in found_filenames or ".php" in found_exts:
         detected_techs.append("PHP Framework (Laravel / WordPress / Custom)")
         scores["SCOPE_WEB"] += 10
-    if (target_path / "package.json").exists():
+    if "package.json" in found_filenames or ".js" in found_exts or ".ts" in found_exts:
         detected_techs.append("Node.js / JavaScript Web Ecosystem")
         scores["SCOPE_WEB"] += 8
-    if (target_path / "requirements.txt").exists() or py_files:
+    if "requirements.txt" in found_filenames or ".py" in found_exts:
         detected_techs.append("Python Backend (FastAPI / Django / Flask)")
         scores["SCOPE_WEB"] += 6
-    if (target_path / "Dockerfile").exists() or (target_path / "docker-compose.yml").exists():
+    if "dockerfile" in found_filenames or "docker-compose.yml" in found_filenames:
         detected_techs.append("Containerized Environment (Docker)")
         scores["SCOPE_NETWORK"] += 10
-    if list(target_path.glob("**/*.c")) or list(target_path.glob("**/*.hex")) or (target_path / "platformio.ini").exists():
+    if ".c" in found_exts or ".hex" in found_exts or "platformio.ini" in found_filenames:
         detected_techs.append("Embedded C/C++ / IoT / Firmware")
         scores["SCOPE_HARDWARE"] += 15
 
