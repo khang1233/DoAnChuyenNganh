@@ -65,6 +65,15 @@ SCOPE_PROFILES = {
         "file_patterns": ["*.bin", "*.hex", "*.elf", "Makefile", "*.c", "*.cpp", "*.h", "platformio.ini", "*.rom"],
         "keywords": ["firmware", "uefi", "bios", "microcode", "bmc", "supply chain", "ics-cert", "scada", "plc", "hardware"],
         "focus_feeds": ["CISA US Gov", "Kaspersky Securelist"]
+    },
+    "SCOPE_ALL": {
+        "id": "SCOPE_ALL",
+        "name": "Toàn Diện: Tất Cả Các Phân Hệ (Full-Spectrum Universal Protection)",
+        "cadence_sec": 21600,
+        "cadence_label": "Quét toàn diện 6 giờ / lần (Web + Mạng + Host + Base)",
+        "file_patterns": ["*.*"],
+        "keywords": ["php", "web", "rce", "botnet", "c2", "ransomware", "firmware", "exploit", "cve-"],
+        "focus_feeds": ["TheHackerNews", "CISA US Gov", "Check Point Research", "Kaspersky Securelist", "The DFIR Report"]
     }
 }
 

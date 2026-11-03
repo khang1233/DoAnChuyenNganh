@@ -494,6 +494,23 @@ def get_adaptive_system_profile() -> Dict[str, Any]:
                 {"sec": 86400, "label": "Mỗi 24 giờ"},
                 {"sec": 604800, "label": "Mỗi 7 ngày (Mặc định cho Phần Cứng/IoT)", "is_default": True}
             ]
+        },
+        "SCOPE_ALL": {
+            "scope_id": "SCOPE_ALL",
+            "scope_name": "Toàn Diện: Tất Cả Các Phân Hệ (Full-Spectrum)",
+            "desc": "Tích hợp toàn diện 100% kho tri thức tình báo: Web, Mạng, Endpoint và Phần cứng.",
+            "default_interval_sec": 21600,
+            "default_label": "Mỗi 6 giờ (Mặc định toàn diện)",
+            "default_history_years": 3,
+            "options": [
+                {"sec": 120, "label": "Mỗi 2 phút (Chế độ Demo / Kiểm thử nhanh)"},
+                {"sec": 300, "label": "Mỗi 5 phút (Kiểm thử tức thời)"},
+                {"sec": 900, "label": "Mỗi 15 phút (Quét PoC Exploit nóng)"},
+                {"sec": 3600, "label": "Mỗi 1 giờ (Giám sát liên tục)"},
+                {"sec": 21600, "label": "Mỗi 6 giờ (Khuyến nghị toàn diện - Mặc định)", "is_default": True},
+                {"sec": 43200, "label": "Mỗi 12 giờ"},
+                {"sec": 86400, "label": "Mỗi 24 giờ / 1 ngày"}
+            ]
         }
     }
 

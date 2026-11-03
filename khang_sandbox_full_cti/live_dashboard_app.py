@@ -1097,224 +1097,297 @@ HTML_PAGE = r"""<!DOCTYPE html>
     <!-- ============================================================== -->
     <section class="CyberBox" id="sec-wizard" style="margin-bottom:24px; border:2px solid #3b82f6; background:#ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
       <div class="BoxLegend" style="background:#2563eb; color:#ffffff; font-weight:700; padding:4px 14px; border-radius:4px; font-size:12px; letter-spacing:0.04em;">
-        WIZARD QUY TRÌNH PHÒNG THỦ TÁC TỬ TỰ HÀNH (5 BƯỚC KHÉP KÍN)
+        WIZARD QUY TRÌNH PHÒNG THỦ TÁC TỬ TỰ HÀNH (6 BƯỚC KHÉP KÍN)
       </div>
 
-      <!-- Stepper Nav Bar (Mặc định ẩn ở Step 0) -->
-      <div id="wizardStepperNav" style="display:none; justify-content:space-between; align-items:center; margin:16px 0 24px 0; background:#f8fafc; padding:12px 18px; border-radius:8px; border:1px solid #e2e8f0; flex-wrap:wrap; gap:8px;">
-        <div id="stepBadge1" class="WizardStepBadge active" style="font-weight:700; padding:6px 14px; border-radius:20px; font-size:12px; background:#2563eb; color:#ffffff;">
-          1. Quét Dự Án
+      <!-- Stepper Nav Bar (6 Bước mạch lạc) -->
+      <div id="wizardStepperNav" style="display:flex; justify-content:space-between; align-items:center; margin:16px 0 24px 0; background:#f8fafc; padding:12px 18px; border-radius:8px; border:1px solid #e2e8f0; flex-wrap:wrap; gap:8px;">
+        <div id="stepBadge1" class="WizardStepBadge active" style="font-weight:700; padding:6px 12px; border-radius:20px; font-size:11.5px; background:#2563eb; color:#ffffff;">
+          1. Quét AST & Điểm Nóng
         </div>
-        <span style="color:#94a3b8; font-weight:bold;">-></span>
-        <div id="stepBadge2" class="WizardStepBadge" style="font-weight:600; padding:6px 14px; border-radius:20px; font-size:12px; background:#e2e8f0; color:#475569;">
-          2. Kết Quả & Cấu Hình
+        <span style="color:#94a3b8; font-weight:bold;">&rarr;</span>
+        <div id="stepBadge2" class="WizardStepBadge" style="font-weight:600; padding:6px 12px; border-radius:20px; font-size:11.5px; background:#e2e8f0; color:#475569;">
+          2. Chọn Model AI
         </div>
-        <span style="color:#94a3b8; font-weight:bold;">-></span>
-        <div id="stepBadge3" class="WizardStepBadge" style="font-weight:600; padding:6px 14px; border-radius:20px; font-size:12px; background:#e2e8f0; color:#475569;">
-          3. Cào Báo Theo Mục Đích
+        <span style="color:#94a3b8; font-weight:bold;">&rarr;</span>
+        <div id="stepBadge3" class="WizardStepBadge" style="font-weight:600; padding:6px 12px; border-radius:20px; font-size:11.5px; background:#e2e8f0; color:#475569;">
+          3. Chọn Scope Phòng Thủ
         </div>
-        <span style="color:#94a3b8; font-weight:bold;">-></span>
-        <div id="stepBadge4" class="WizardStepBadge" style="font-weight:600; padding:6px 14px; border-radius:20px; font-size:12px; background:#e2e8f0; color:#475569;">
-          4. Sinh Gói Kỹ Năng
+        <span style="color:#94a3b8; font-weight:bold;">&rarr;</span>
+        <div id="stepBadge4" class="WizardStepBadge" style="font-weight:600; padding:6px 12px; border-radius:20px; font-size:11.5px; background:#e2e8f0; color:#475569;">
+          4. Thiết Lập Thời Gian
         </div>
-        <span style="color:#94a3b8; font-weight:bold;">-></span>
-        <div id="stepBadge5" class="WizardStepBadge" style="font-weight:600; padding:6px 14px; border-radius:20px; font-size:12px; background:#e2e8f0; color:#475569;">
-          5. Vá Mã Nguồn & Kiểm Thử
+        <span style="color:#94a3b8; font-weight:bold;">&rarr;</span>
+        <div id="stepBadge5" class="WizardStepBadge" style="font-weight:600; padding:6px 12px; border-radius:20px; font-size:11.5px; background:#e2e8f0; color:#475569;">
+          5. Cào Báo & Sinh Kỹ Năng
         </div>
-      </div>
-
-      <!-- STEP 0 CONTAINER: LANDING HERO CARD (CHO DỰ ÁN MỚI) -->
-      <div id="wizardCard0" class="WizardCard" style="display:block; padding:10px 4px;">
-        <div style="text-align:center; max-width:820px; margin:0 auto 26px;">
-          <h2 style="font-size:22px; color:#0f172a; margin-bottom:8px; font-weight:800; letter-spacing:-0.02em;">
-            HỆ THỐNG AN NINH MẠNG TỰ HÀNH TỪ TÌNH BÁO MỐI ĐE DỌA CTI
-          </h2>
-          <p style="font-size:13.5px; color:#475569; line-height:1.6; margin:0;">
-            Tác tử AI phân tích sâu cây AST, bóc tách điểm nhạy cảm, nhận diện phần cứng máy tính và tự động cấu hình đối sách an ninh mạng khép kín cho dự án của bạn.
-          </p>
-        </div>
-
-        <!-- 2 Grid Cards: Target Project & Hardware Specs -->
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:26px;">
-          
-          <!-- Card 1: Target Project -->
-          <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:18px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-              <span style="font-size:11px; font-weight:700; color:#2563eb; background:#eff6ff; border:1px solid #bfdbfe; padding:2px 8px; border-radius:4px;">
-                DỰ ÁN MỤC TIÊU HIỆN TẠI
-              </span>
-              <span id="landingProtectStatusBadge" style="font-size:11px; font-weight:700; color:#b45309; background:#fef3c7; border:1px solid #fde68a; padding:2px 8px; border-radius:4px;">
-                CHƯA THIẾT LẬP BẢO VỆ
-              </span>
-            </div>
-            <div style="margin-bottom:8px;">
-              <span style="font-size:13px; color:#64748b; font-weight:600;">Tên dự án:</span>
-              <span id="landingTargetName" style="font-size:16px; font-weight:700; color:#0f172a; margin-left:6px;">My_Website</span>
-            </div>
-            <div>
-              <span style="font-size:12px; color:#64748b; font-weight:600; display:block; margin-bottom:3px;">Đường dẫn thư mục:</span>
-              <div id="landingTargetPath" style="font-family:monospace; font-size:12px; color:#1e293b; background:#ffffff; border:1px solid #e2e8f0; padding:6px 10px; border-radius:4px; word-break:break-all;">
-                ./target_projects/My_Website
-              </div>
-            </div>
-          </div>
-
-          <!-- Card 2: Hardware Telemetry -->
-          <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:18px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-              <span style="font-size:11px; font-weight:700; color:#15803d; background:#dcfce7; border:1px solid #bbf7d0; padding:2px 8px; border-radius:4px;">
-                PHẦN CỨNG MÁY TÍNH
-              </span>
-              <span id="landingTierBadge" style="font-size:11px; font-weight:700; color:#2563eb; background:#eff6ff; border:1px solid #bfdbfe; padding:2px 8px; border-radius:4px;">
-                CẤU HÌNH TIÊU CHUẨN
-              </span>
-            </div>
-            <div style="font-size:12.5px; line-height:1.7; color:#334155;">
-              <div><b>GPU / Đồ họa:</b> <span id="landingGpuName" style="color:#0f172a; font-weight:600;">AMD Radeon RX 6600 (8.0GB VRAM)</span></div>
-              <div><b>CPU Vi xử lý:</b> <span id="landingCpuName" style="color:#0f172a; font-weight:600;">13th Gen Intel Core i5-13400F</span></div>
-              <div><b>Bộ nhớ RAM:</b> <span id="landingRam" style="color:#0f172a; font-weight:600;">15.8 GB</span></div>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Big Center Button -->
-        <div style="text-align:center; margin:34px 0 24px;">
-          <button type="button" id="btnLandingScan" class="CleanBtn btn-primary" style="padding:16px 54px; font-size:17px; font-weight:700; background:#2563eb; color:#ffffff; border:none; border-radius:8px; cursor:pointer; box-shadow:0 10px 25px -5px rgba(37,99,235,0.35); transition:all 0.2s;" onclick="wizardStartFromLanding()">
-            [ BẮT ĐẦU QUÉT DỰ ÁN &amp; THIẾT LẬP BẢO VỆ ]
-          </button>
-          <div style="margin-top:10px; font-size:12.5px; color:#64748b;">
-            Tác tử AI sẽ tự động đọc cây AST mã nguồn và đề xuất mô hình AI tối ưu nhất cho cấu hình máy tính của bạn.
-          </div>
-        </div>
-
-        <!-- Advanced Options Toggle -->
-        <div style="text-align:center; margin-top:16px;">
-          <a href="javascript:void(0)" onclick="toggleLandingAdvancedOptions()" id="toggleLandingOptLink" style="font-size:12.5px; color:#2563eb; font-weight:600; text-decoration:none;">
-            [+] Tùy chọn nâng cao: Thay đổi thư mục mã nguồn hoặc dán link Git
-          </a>
-        </div>
-
-        <!-- Advanced Options Drawer -->
-        <div id="landingAdvancedDrawer" style="display:none; margin-top:20px; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:8px; padding:18px;">
-          <label class="FieldLabel" style="font-size:12px; font-weight:700; color:#1e293b; margin-bottom:6px; display:block;">
-            THAY ĐỔI ĐƯỜNG DẪN THƯ MỤC TRÊN MÁY TÍNH:
-          </label>
-          <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
-            <input type="text" id="wizardInputTarget" class="CleanInput" style="flex:1; min-width:280px; font-family:monospace; padding:9px 12px; font-size:13px; border:1px solid #cbd5e1; border-radius:6px;" value="./target_projects/My_Website" oninput="debounceValidateFolder()" />
-            <button type="button" id="btnBrowseNativeFolder" class="CleanBtn" style="background:#2563eb; color:#ffffff; font-weight:700; padding:9px 16px; border-radius:6px; border:none; cursor:pointer;" onclick="triggerBrowseNativeFolder()">
-              Duyệt File Explorer Máy Tính...
-            </button>
-            <button type="button" class="CleanBtn" style="background:#ffffff; color:#475569; font-weight:600; padding:9px 12px; border-radius:6px; border:1px solid #cbd5e1; cursor:pointer;" onclick="openDirectoryBrowserModal()">
-              Duyệt Cây Thư Mục
-            </button>
-          </div>
-
-          <div style="margin-bottom:12px;">
-            <label class="FieldLabel" style="font-size:12px; font-weight:600; color:#475569; margin-bottom:4px; display:block;">HOẶC NHẬP LINK GITHUB (TỰ ĐỘNG CLONE):</label>
-            <input type="text" id="wizardInputClone" class="CleanInput" style="width:100%; font-family:monospace; padding:8px 12px; border:1px solid #cbd5e1; border-radius:6px;" placeholder="https://github.com/username/vulnerable-web-app.git" />
-          </div>
-
-          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-            <span style="font-size:12px; color:#64748b; font-weight:700;">CHỌN NHANH DỰ ÁN MẪU:</span>
-            <button type="button" class="CleanBtn" style="font-size:12px; padding:4px 10px; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-weight:600; border-radius:4px; cursor:pointer;" onclick="setWizardTarget('./target_projects/My_Website')">My_Website (PHP + Docker)</button>
-            <button type="button" class="CleanBtn" style="font-size:12px; padding:4px 10px; background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; font-weight:600; border-radius:4px; cursor:pointer;" onclick="setWizardTarget('./target_projects/demo_vulnerable_php_app')">[CANH BAO] Demo Web PHP Lỗi (RCE)</button>
-            <button type="button" class="CleanBtn" style="font-size:12px; padding:4px 10px; background:#f8fafc; color:#334155; border:1px solid #cbd5e1; font-weight:600; border-radius:4px; cursor:pointer;" onclick="setWizardTarget('.')">Đồ Án Hiện Tại</button>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- STEP 1 CONTAINER: AST SCAN IN PROGRESS -->
-      <div id="wizardCard1" class="WizardCard" style="display:none;">
-        <h3 style="font-size:16px; margin-bottom:8px; color:#0f172a;">Bước 1: Tác Tử AI Quét Sâu Cây AST Mã Nguồn &amp; Phân Tích Điểm Nóng</h3>
-        <p style="color:#64748b; font-size:13px; margin-bottom:14px;">
-          Tác tử AI Codebase Inspector đang duyệt toàn bộ cây thư mục mã nguồn, phân tích cú pháp AST và định vị các điểm nhạy cảm...
-        </p>
-        <div id="wzScanAgentTerminal" style="background:#0f172a; color:#38bdf8; font-family:monospace; font-size:12px; padding:16px; border-radius:6px; min-height:160px; max-height:220px; overflow-y:auto; border:1px solid #1e293b; line-height:1.7;">
-          <div style="color:#94a3b8;">[KHỞI TẠO] Đang kết nối tới Codebase Inspector Agent...</div>
+        <span style="color:#94a3b8; font-weight:bold;">&rarr;</span>
+        <div id="stepBadge6" class="WizardStepBadge" style="font-weight:600; padding:6px 12px; border-radius:20px; font-size:11.5px; background:#e2e8f0; color:#475569;">
+          6. Vá & Kiểm Thử
         </div>
       </div>
 
-      <!-- STEP 2 CONTAINER: RESULTS & ADAPTIVE MODEL/CADENCE -->
-      <div id="wizardCard2" class="WizardCard" style="display:none;">
-        <h3 style="font-size:16px; margin-bottom:8px; color:#0f172a;">Bước 2: Kết Quả Phân Tích Mã Nguồn &amp; Cấu Hình Thích Ứng</h3>
+      <!-- ============================================================== -->
+      <!-- BƯỚC 1: QUÉT SÂU AST & ĐỊNH DANH DỰ ÁN                         -->
+      <!-- ============================================================== -->
+      <div id="wizardCard1" class="WizardCard" style="display:block;">
+        <h3 style="font-size:16px; margin-bottom:8px; color:#0f172a;">Bước 1: Quét Sâu Cây AST Mã Nguồn &amp; Định Danh Kiến Trúc Dự Án</h3>
         <p style="color:#64748b; font-size:13px; margin-bottom:16px;">
-          Tác tử AI đã hoàn thành việc rà soát kiến trúc mã nguồn. Dưới đây là hồ sơ chi tiết và các đề xuất tối ưu theo cấu hình máy tính của bạn:
+          Tác tử AI Codebase Inspector sẽ duyệt cây thư mục, đọc cú pháp AST để nhận diện ngôn ngữ, framework, phiên bản môi trường và bóc tách các điểm nóng nhạy cảm.
         </p>
 
-        <!-- 1. HỒ SƠ KIẾN TRÚC MÃ NGUỒN -->
-        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:16px; margin-bottom:18px;">
-          <div style="font-size:13px; font-weight:700; color:#1e293b; margin-bottom:10px; border-bottom:1px solid #e2e8f0; padding-bottom:6px;">
-            1. HỒ SƠ KIẾN TRÚC MÃ NGUỒN (CODEBASE PROFILE)
+        <!-- Thẻ dự án hiện tại -->
+        <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:16px; margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+            <div>
+              <span style="font-size:11px; font-weight:700; color:#2563eb; background:#eff6ff; border:1px solid #bfdbfe; padding:2px 8px; border-radius:4px;">
+                DỰ ÁN MỤC TIÊU
+              </span>
+              <span id="step1TargetName" style="font-size:15px; font-weight:700; color:#0f172a; margin-left:8px;">My_Website</span>
+            </div>
+            <div style="font-size:11.5px; color:#64748b;">
+              <a href="javascript:void(0)" onclick="toggleStep1AdvancedOptions()" id="toggleStep1OptLink" style="color:#2563eb; font-weight:600; text-decoration:none;">
+                [+] Tùy chọn nâng cao: Đổi thư mục hoặc dán link Git
+              </a>
+            </div>
           </div>
+
+          <div style="font-family:monospace; font-size:12.5px; color:#334155; background:#ffffff; border:1px solid #e2e8f0; padding:8px 12px; border-radius:4px; word-break:break-all;">
+            <span style="color:#64748b;">Đường dẫn:</span> <span id="step1TargetPath">./target_projects/My_Website</span>
+          </div>
+
+          <!-- Drawer tùy chọn nâng cao -->
+          <div id="step1AdvancedDrawer" style="display:none; margin-top:14px; padding-top:14px; border-top:1px dashed #cbd5e1;">
+            <label class="FieldLabel" style="font-size:12px; font-weight:700; color:#1e293b; margin-bottom:6px; display:block;">
+              THAY ĐỔI ĐƯỜNG DẪN THƯ MỤC TRÊN MÁY TÍNH:
+            </label>
+            <div style="display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
+              <input type="text" id="wizardInputTarget" class="CleanInput" style="flex:1; min-width:280px; font-family:monospace; padding:8px 12px; font-size:13px; border:1px solid #cbd5e1; border-radius:6px;" value="./target_projects/My_Website" oninput="debounceValidateFolder()" />
+              <button type="button" id="btnBrowseNativeFolder" class="CleanBtn" style="background:#2563eb; color:#ffffff; font-weight:700; padding:8px 14px; border-radius:6px; border:none; cursor:pointer;" onclick="triggerBrowseNativeFolder()">
+                Duyệt File Explorer...
+              </button>
+              <button type="button" class="CleanBtn" style="background:#ffffff; color:#475569; font-weight:600; padding:8px 12px; border-radius:6px; border:1px solid #cbd5e1; cursor:pointer;" onclick="openDirectoryBrowserModal()">
+                Duyệt Cây Thư Mục
+              </button>
+            </div>
+            <div style="margin-bottom:10px;">
+              <label class="FieldLabel" style="font-size:12px; font-weight:600; color:#475569; margin-bottom:4px; display:block;">HOẶC NHẬP LINK GITHUB (TỰ ĐỘNG CLONE):</label>
+              <input type="text" id="wizardInputClone" class="CleanInput" style="width:100%; font-family:monospace; padding:8px 12px; border:1px solid #cbd5e1; border-radius:6px;" placeholder="https://github.com/username/vulnerable-web-app.git" />
+            </div>
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+              <span style="font-size:11.5px; color:#64748b; font-weight:700;">CHỌN NHANH:</span>
+              <button type="button" class="CleanBtn" style="font-size:11.5px; padding:3px 8px; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-weight:600; border-radius:4px; cursor:pointer;" onclick="setWizardTarget('./target_projects/My_Website')">My_Website (PHP)</button>
+              <button type="button" class="CleanBtn" style="font-size:11.5px; padding:3px 8px; background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; font-weight:600; border-radius:4px; cursor:pointer;" onclick="setWizardTarget('./target_projects/demo_vulnerable_php_app')">Demo PHP Lỗi (RCE)</button>
+              <button type="button" class="CleanBtn" style="font-size:11.5px; padding:3px 8px; background:#f8fafc; color:#334155; border:1px solid #cbd5e1; font-weight:600; border-radius:4px; cursor:pointer;" onclick="setWizardTarget('.')">Đồ Án Hiện Tại</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nút Bắt đầu quét -->
+        <div style="text-align:center; margin:18px 0 16px;">
+          <button type="button" id="btnRunStep1" class="CleanBtn btn-primary" style="padding:14px 44px; font-size:16px; font-weight:700; background:#2563eb; color:#ffffff; border:none; border-radius:6px; cursor:pointer; box-shadow:0 6px 16px rgba(37,99,235,0.25); transition:all 0.2s;" onclick="wizardExecuteStep1()">
+            [ BẮT ĐẦU QUÉT DỰ ÁN ]
+          </button>
+          <div style="margin-top:8px; font-size:12.5px; color:#64748b;">
+            Nhấn để Tác tử AI đọc cây cú pháp AST và tự động phát hiện các điểm nóng trong mã nguồn.
+          </div>
+        </div>
+
+        <!-- Live Streaming Terminal -->
+        <div id="wzScanAgentTerminal" style="display:none; background:#0f172a; color:#38bdf8; font-family:monospace; font-size:12px; padding:14px; border-radius:6px; min-height:140px; max-height:200px; overflow-y:auto; border:1px solid #1e293b; line-height:1.7; margin-bottom:16px;">
+          <div style="color:#94a3b8;">[KHỞI TẠO] Sẵn sàng kích hoạt Tác tử AI Codebase Inspector...</div>
+        </div>
+
+        <!-- Khung Kết quả & Điểm mấu chốt (Hiện ra sau khi quét xong) -->
+        <div id="wzScanResultSummary" style="display:none; background:#f8fafc; border:1.5px solid #3b82f6; border-radius:8px; padding:16px; margin-bottom:18px;">
+          <div style="font-size:13px; font-weight:700; color:#1e40af; margin-bottom:10px; border-bottom:1px solid #e2e8f0; padding-bottom:6px;">
+            KẾT QUẢ ĐỊNH DANH MÃ NGUỒN &amp; ĐIỂM MẤU CHỐT CỦA DỰ ÁN
+          </div>
+          
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:10px;">
             <div>
-              <b style="color:#334155; font-size:12.5px;">Thư mục dự án:</b>
-              <div id="wzTargetName" style="font-family:monospace; color:#2563eb; font-weight:600; font-size:12px; word-break:break-all; margin-top:2px;">-</div>
+              <b style="color:#334155; font-size:12.5px;">Ngôn ngữ lập trình chính:</b>
+              <div id="wzLanguagesBadge" style="display:inline-flex; gap:6px; flex-wrap:wrap; margin-left:8px;">-</div>
             </div>
             <div>
-              <b style="color:#334155; font-size:12.5px;">Phân hệ bảo vệ tự động:</b>
-              <div style="margin-top:2px;">
-                <span id="wzScopeBadge" style="font-weight:700; color:#15803d; background:#dcfce7; padding:2px 8px; border-radius:4px; font-size:12px;">Scope A: Web &amp; API Layer</span>
-              </div>
+              <b style="color:#334155; font-size:12.5px;">Frameworks &amp; Công nghệ:</b>
+              <div id="wzTechsBadge" style="display:inline-flex; gap:6px; flex-wrap:wrap; margin-left:8px;">-</div>
             </div>
-          </div>
-
-          <div style="margin-bottom:8px;">
-            <b style="color:#334155; font-size:12.5px;">Ngôn ngữ lập trình chính:</b>
-            <div id="wzLanguagesBadge" style="display:inline-flex; gap:6px; flex-wrap:wrap; margin-left:8px;">-</div>
-          </div>
-
-          <div style="margin-bottom:8px;">
-            <b style="color:#334155; font-size:12.5px;">Frameworks &amp; Công nghệ nhận diện:</b>
-            <div id="wzTechsBadge" style="display:inline-flex; gap:6px; flex-wrap:wrap; margin-left:8px;">-</div>
           </div>
 
           <div style="margin-bottom:10px;">
-            <b style="color:#334155; font-size:12.5px;">Phiên bản Runtime (Deep Context):</b>
+            <b style="color:#334155; font-size:12.5px;">Phiên bản Runtime môi trường:</b>
             <div id="wzRuntimeBadge" style="display:inline-flex; gap:6px; flex-wrap:wrap; margin-left:8px;">-</div>
           </div>
 
-          <!-- SENSITIVE SINKS BOX -->
-          <div style="border-top:1px dashed #cbd5e1; padding-top:10px;">
-            <b style="color:#b91c1c; font-size:12.5px;">Các điểm nhạy cảm AST định vị được (Sensitive Sinks: exec, eval, system, shell_exec):</b>
-            <div id="wzSinksBox" style="font-family:monospace; font-size:11.5px; color:#334155; background:#ffffff; padding:10px; border:1px solid #e2e8f0; border-radius:4px; max-height:110px; overflow-y:auto; margin-top:6px;">
-              Đang phân tích...
+          <!-- Sensitive Sinks Box -->
+          <div style="border-top:1px dashed #cbd5e1; padding-top:10px; margin-bottom:12px;">
+            <b style="color:#b91c1c; font-size:12.5px;">Các điểm gọi hàm nhạy cảm AST định vị được (Sensitive Sinks: exec, eval, system):</b>
+            <div id="wzSinksBox" style="font-family:monospace; font-size:11.5px; color:#334155; background:#ffffff; padding:8px 12px; border:1px solid #e2e8f0; border-radius:4px; max-height:100px; overflow-y:auto; margin-top:6px;">
+              -
             </div>
+          </div>
+
+          <!-- Kết luận tác tử AI -->
+          <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:6px; padding:12px; font-size:13px; color:#1e3a8a; line-height:1.6;">
+            <b>KẾT LUẬN CỦA TÁC TỬ AI:</b>
+            <span id="wzVerdictText">Dự án được xác định là Ứng dụng Web Đa Tầng (Full-Stack Web). Đã tự động gán phân hệ khuyến nghị: Scope A: Web &amp; API Layer.</span>
           </div>
         </div>
 
-        <!-- 2. BẢNG CHỌN MÔ HÌNH AI THÍCH ỨNG PHẦN CỨNG MÁY TÍNH -->
-        <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:16px; margin-bottom:18px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px solid #dcfce7; padding-bottom:6px; flex-wrap:wrap; gap:8px;">
-            <div style="font-size:13px; font-weight:700; color:#166534;">
-              2. CHỌN MÔ HÌNH AI THÍCH ỨNG CẤU HÌNH MÁY TÍNH (HARDWARE-AWARE MODEL SELECTOR)
-            </div>
-            <div id="wzHardwareSummaryTag" style="font-size:11.5px; font-weight:600; color:#15803d; background:#ffffff; border:1px solid #86efac; padding:2px 8px; border-radius:4px;">
-              Đang phát hiện phần cứng...
-            </div>
-          </div>
-          <p style="font-size:12.5px; color:#166534; margin-bottom:12px;">
-            Hệ thống tự động phát hiện năng lực phần cứng máy tính và <b>chọn sẵn mô hình mạnh nhất</b> mà máy bạn có thể chạy mượt mà. Bạn có thể giữ nguyên hoặc nhấp chọn mô hình khác tùy ý:
-          </p>
+        <!-- Nút Tiếp Tục (Khi chưa quét: TỐI MÀU; Khi quét xong: SÁNG MÀU LÊN) -->
+        <div style="display:flex; justify-content:flex-end; margin-top:14px;">
+          <button type="button" id="btnNextFromStep1" class="CleanBtn" style="padding:12px 28px; font-size:14px; font-weight:700; background:#94a3b8; color:#ffffff; border:none; border-radius:6px; cursor:not-allowed; opacity:0.5; transition:all 0.3s;" onclick="if(this.dataset.enabled==='true') wizardGotoStep(2);" disabled title="Hãy nhấn [ BẮT ĐẦU QUÉT DỰ ÁN ] trước để mở khóa bước tiếp theo">
+            [ TIẾP TỤC: CHỌN MÔ HÌNH AI (BƯỚC 2) &rarr; ]
+          </button>
+        </div>
+      </div>
 
-          <!-- Dynamic Container for Model Tiers -->
-          <div id="wzModelTiersContainer" style="display:flex; flex-direction:column; gap:10px;">
-            <!-- Populated dynamically by renderHardwareModelSelector() -->
+      <!-- ============================================================== -->
+      <!-- BƯỚC 2: CHỌN MÔ HÌNH AI THÍCH ỨNG CẤU HÌNH PHẦN CỨNG          -->
+      <!-- ============================================================== -->
+      <div id="wizardCard2" class="WizardCard" style="display:none;">
+        <h3 style="font-size:16px; margin-bottom:8px; color:#0f172a;">Bước 2: Chọn Mô Hình AI Thích Ứng Cấu Hình Phần Cứng (Hardware-Aware Model Selection)</h3>
+        <p style="color:#64748b; font-size:13px; margin-bottom:16px;">
+          Hệ thống tự động phát hiện năng lực CPU, GPU, VRAM và <b>chọn sẵn mô hình mạnh nhất</b> mà máy tính của bạn có thể vận hành trơn tru. Bạn có thể giữ nguyên mặc định hoặc nhấp chọn mô hình khác tùy ý:
+        </p>
+
+        <!-- Thẻ thông số phần cứng -->
+        <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:14px 18px; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div style="font-size:12.5px; color:#334155; line-height:1.7;">
+            <div><b>Card Đồ Họa (GPU):</b> <span id="wzGpuText" style="color:#0f172a; font-weight:600;">AMD Radeon RX 6600 (8.0GB VRAM)</span></div>
+            <div><b>Bộ Vi Xử Lý (CPU):</b> <span id="wzCpuText" style="color:#0f172a; font-weight:600;">13th Gen Intel Core i5-13400F</span> &bull; <b>RAM:</b> <span id="wzRamText" style="color:#0f172a; font-weight:600;">15.8 GB</span></div>
+          </div>
+          <div id="wzHardwareSummaryTag" style="font-size:12px; font-weight:700; color:#15803d; background:#dcfce7; border:1px solid #86efac; padding:4px 12px; border-radius:6px;">
+            CẤU HÌNH ĐỒ HỌA TIÊU CHUẨN
           </div>
         </div>
 
-        <!-- 3. TẦN SUẤT QUÉT CTI TỰ ĐỘNG THÍCH ỨNG THEO LOẠI DỰ ÁN -->
-        <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:16px; margin-bottom:20px;">
-          <div style="font-size:13px; font-weight:700; color:#1e40af; margin-bottom:8px; border-bottom:1px solid #dbeafe; padding-bottom:6px;">
-            3. TẦN SUẤT QUÉT CTI TỰ ĐỘNG THÍCH ỨNG THEO LOẠI DỰ ÁN
+        <!-- Dynamic Container for Model Tiers -->
+        <div id="wzModelTiersContainer" style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
+          <!-- Populated dynamically by renderHardwareModelSelector() -->
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <button type="button" class="CleanBtn" style="padding:10px 18px; border:1px solid #cbd5e1; background:#ffffff; color:#334155; border-radius:6px; cursor:pointer;" onclick="wizardGotoStep(1)">
+            &larr; Quay Lại Bước 1
+          </button>
+          <button type="button" class="CleanBtn btn-primary" style="padding:12px 28px; font-weight:700; background:#2563eb; color:#ffffff; border:none; border-radius:6px; cursor:pointer; box-shadow:0 4px 14px rgba(37,99,235,0.3);" onclick="wizardGotoStep(3)">
+            [ TIẾP TỤC: CHỌN PHÂN HỆ PHÒNG THỦ (BƯỚC 3) &rarr; ]
+          </button>
+        </div>
+      </div>
+
+      <!-- ============================================================== -->
+      <!-- BƯỚC 3: CHỌN PHÂN HỆ BẢO VỆ (SCOPE SELECTION)                  -->
+      <!-- ============================================================== -->
+      <div id="wizardCard3" class="WizardCard" style="display:none;">
+        <h3 style="font-size:16px; margin-bottom:8px; color:#0f172a;">Bước 3: Chọn Phân Hệ Bảo Vệ Mối Đe Dọa (CTI Threat Scope)</h3>
+        <p style="color:#64748b; font-size:13px; margin-bottom:16px;">
+          Tác tử AI đã đối chiếu mã nguồn và <b>tự động chọn sẵn phân hệ khuyến nghị</b> cho dự án của bạn. Ngoài ra, bạn có thể chọn thêm các phân hệ khác hoặc chọn <b>Toàn Diện (Tất Cả)</b> để bảo vệ tối đa:
+        </p>
+
+        <!-- Danh sách Phân hệ Scope -->
+        <div id="scopeSelectionList" style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
+          
+          <!-- Scope A: Web -->
+          <label style="display:flex; align-items:flex-start; gap:12px; padding:12px 16px; border-radius:6px; background:#ffffff; border:1.5px solid #3b82f6; cursor:pointer;">
+            <input type="radio" name="wzScopeRadio" value="SCOPE_WEB" checked onchange="onWizardScopeRadioChange(this.value)" style="margin-top:3px;" />
+            <div style="flex:1;">
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:3px;">
+                <b style="color:#0f172a; font-size:14px;">Scope A: Web &amp; API Layer</b>
+                <span id="scopeWebRecBadge" style="background:#dcfce7; color:#15803d; font-size:11px; font-weight:700; padding:2px 8px; border-radius:4px;">[KHUYẾN NGHỊ TÁC TỬ]</span>
+              </div>
+              <div style="font-size:12.5px; color:#475569; line-height:1.5;">
+                Dành cho các ứng dụng Web (PHP, Node.js, Python, Java). Trọng tâm phòng thủ: SQL Injection, RCE, Webshell, Path Traversal, SSRF, XSS và các lỗ hổng web nóng.
+              </div>
+            </div>
+          </label>
+
+          <!-- Scope B: Network -->
+          <label style="display:flex; align-items:flex-start; gap:12px; padding:12px 16px; border-radius:6px; background:#ffffff; border:1px solid #cbd5e1; cursor:pointer;">
+            <input type="radio" name="wzScopeRadio" value="SCOPE_NETWORK" onchange="onWizardScopeRadioChange(this.value)" style="margin-top:3px;" />
+            <div style="flex:1;">
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:3px;">
+                <b style="color:#0f172a; font-size:14px;">Scope B: Network &amp; Perimeter C2</b>
+              </div>
+              <div style="font-size:12.5px; color:#475569; line-height:1.5;">
+                Dành cho hạ tầng mạng, Docker, Nginx, VPN, Gateway và tường lửa biên. Trọng tâm: Botnet Mirai, C2 churn rate, DDoS, quét cổng và brute-force.
+              </div>
+            </div>
+          </label>
+
+          <!-- Scope C: Endpoint -->
+          <label style="display:flex; align-items:flex-start; gap:12px; padding:12px 16px; border-radius:6px; background:#ffffff; border:1px solid #cbd5e1; cursor:pointer;">
+            <input type="radio" name="wzScopeRadio" value="SCOPE_ENDPOINT" onchange="onWizardScopeRadioChange(this.value)" style="margin-top:3px;" />
+            <div style="flex:1;">
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:3px;">
+                <b style="color:#0f172a; font-size:14px;">Scope C: Endpoint &amp; Host Identity</b>
+              </div>
+              <div style="font-size:12.5px; color:#475569; line-height:1.5;">
+                Dành cho ứng dụng Desktop, Active Directory, máy chủ nội bộ. Trọng tâm: Ransomware, leo thang đặc quyền, đánh cắp mật khẩu (Mimikatz), EDR evasion.
+              </div>
+            </div>
+          </label>
+
+          <!-- Scope D: Hardware -->
+          <label style="display:flex; align-items:flex-start; gap:12px; padding:12px 16px; border-radius:6px; background:#ffffff; border:1px solid #cbd5e1; cursor:pointer;">
+            <input type="radio" name="wzScopeRadio" value="SCOPE_HARDWARE" onchange="onWizardScopeRadioChange(this.value)" style="margin-top:3px;" />
+            <div style="flex:1;">
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:3px;">
+                <b style="color:#0f172a; font-size:14px;">Scope D: Hardware, Firmware &amp; Base Layer</b>
+              </div>
+              <div style="font-size:12.5px; color:#475569; line-height:1.5;">
+                Dành cho thiết bị nhúng, IoT, vi điều khiển, SCADA, BIOS/UEFI. Trọng tâm: Supply chain, lỗ hổng vi mã, can thiệp bộ nhớ phần cứng.
+              </div>
+            </div>
+          </label>
+
+          <!-- SCOPE_ALL: Universal -->
+          <label style="display:flex; align-items:flex-start; gap:12px; padding:14px 16px; border-radius:6px; background:#faf5ff; border:1.5px solid #a855f7; cursor:pointer;">
+            <input type="radio" name="wzScopeRadio" value="SCOPE_ALL" onchange="onWizardScopeRadioChange(this.value)" style="margin-top:3px;" />
+            <div style="flex:1;">
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:3px;">
+                <b style="color:#6b21a8; font-size:14px;">TOÀN DIỆN: TẤT CẢ CÁC PHÂN HỆ (Full-Spectrum Universal Protection)</b>
+                <span style="background:#f3e8ff; color:#7e22ce; font-size:11px; font-weight:700; padding:2px 8px; border-radius:4px;">[BẢO VỆ TỐI ĐA]</span>
+              </div>
+              <div style="font-size:12.5px; color:#581c87; line-height:1.5;">
+                Tích hợp toàn bộ 100% tri thức tình báo từ tất cả các phân hệ (Web + Mạng + Endpoint + Phần cứng). Dành cho người dùng muốn hệ thống kiểm soát toàn diện mọi bề mặt tấn công.
+              </div>
+            </div>
+          </label>
+
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <button type="button" class="CleanBtn" style="padding:10px 18px; border:1px solid #cbd5e1; background:#ffffff; color:#334155; border-radius:6px; cursor:pointer;" onclick="wizardGotoStep(2)">
+            &larr; Quay Lại Bước 2
+          </button>
+          <button type="button" class="CleanBtn btn-primary" style="padding:12px 28px; font-weight:700; background:#2563eb; color:#ffffff; border:none; border-radius:6px; cursor:pointer; box-shadow:0 4px 14px rgba(37,99,235,0.3);" onclick="wizardGotoStep(4)">
+            [ TIẾP TỤC: THIẾT LẬP THỜI GIAN (BƯỚC 4) &rarr; ]
+          </button>
+        </div>
+      </div>
+
+      <!-- ============================================================== -->
+      <!-- BƯỚC 4: THIẾT LẬP THỜI GIAN (CADENCE & HISTORY)                -->
+      <!-- ============================================================== -->
+      <div id="wizardCard4" class="WizardCard" style="display:none;">
+        <h3 style="font-size:16px; margin-bottom:8px; color:#0f172a;">Bước 4: Thiết Lập Thời Gian Quét CTI &amp; Mốc Lịch Sử Bài Báo</h3>
+        <p style="color:#64748b; font-size:13px; margin-bottom:16px;">
+          Tác tử AI tự động tính toán tần suất quét ngầm và độ sâu bài báo dựa trên đặc tính của Phân hệ đã chọn ở Bước 3:
+        </p>
+
+        <!-- 1. Tần suất quét ngầm thích ứng -->
+        <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:16px; margin-bottom:16px;">
+          <div style="font-size:13px; font-weight:700; color:#1e40af; margin-bottom:8px;">
+            1. TẦN SUẤT TỰ ĐỘNG QUÉT BÀI BÁO MỚI (BACKGROUND CADENCE)
           </div>
           <div id="wzCadenceAdviceBox" style="font-size:12.5px; color:#1e3a8a; line-height:1.6; margin-bottom:12px;">
-            Tác tử AI nhận diện: Dự án thuộc thể loại <b>Web Application</b> (đối mặt trực tiếp với Internet, rủi ro zero-day cao) -> Đề xuất tần suất quét ngầm tối ưu: <b>Mỗi 6 giờ</b> (Mặc định).
+            Dự án Web Application đối mặt trực tiếp với Internet công cộng &rarr; Đề xuất tối ưu: <b>Mỗi 6 giờ</b> (Mặc định).
           </div>
           <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
-            <label style="font-size:12.5px; font-weight:600; color:#1e293b;">Tần suất quét định kỳ:</label>
+            <label style="font-size:12.5px; font-weight:600; color:#1e293b;">Chu kỳ quét ngầm:</label>
             <select id="wzCadenceSelect" class="CleanSelect" style="font-weight:600; padding:6px 14px; font-size:13px; border-color:#93c5fd; background:#ffffff; color:#0f172a;" onchange="onWizardCadenceChange(this.value)">
               <option value="120">Mỗi 2 phút (Chế độ Demo / Kiểm thử nhanh)</option>
               <option value="300">Mỗi 5 phút (Kiểm thử tức thời)</option>
@@ -1329,40 +1402,50 @@ HTML_PAGE = r"""<!DOCTYPE html>
           </div>
         </div>
 
-        <div style="display:flex; gap:12px; flex-wrap:wrap;">
-          <button type="button" class="CleanBtn btn-primary" style="padding:12px 26px; font-weight:700; background:#2563eb; color:#ffffff; border:none; border-radius:6px; cursor:pointer;" onclick="wizardGotoStep(3)">
-            TỚI BƯỚC TIẾP THEO: CÀO BÁO CTI &amp; ĐỐI SOÁT TRI THỨC ->
+        <!-- 2. Mốc thời gian cào báo quá khứ -->
+        <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:16px; margin-bottom:20px;">
+          <div style="font-size:13px; font-weight:700; color:#334155; margin-bottom:8px;">
+            2. MỐC THỜI GIAN KHO TÌNH BÁO QUÁ KHỨ (HISTORY DEPTH)
+          </div>
+          <div style="display:flex; gap:20px; align-items:center; flex-wrap:wrap;">
+            <label style="font-size:13px; cursor:pointer;"><input type="radio" name="wzHistory" value="1"> 1 Năm gần nhất (2025 - 2026)</label>
+            <label style="font-size:13px; cursor:pointer;"><input type="radio" name="wzHistory" value="3" checked> 3 Năm (2024 - 2026, Khuyến nghị chuẩn)</label>
+            <label style="font-size:13px; cursor:pointer;"><input type="radio" name="wzHistory" value="5"> 5 Năm (2022 - 2026, Deep Audit toàn diện)</label>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <button type="button" class="CleanBtn" style="padding:10px 18px; border:1px solid #cbd5e1; background:#ffffff; color:#334155; border-radius:6px; cursor:pointer;" onclick="wizardGotoStep(3)">
+            &larr; Quay Lại Bước 3
           </button>
-          <button type="button" class="CleanBtn" style="padding:12px 18px; border:1px solid #cbd5e1; background:#ffffff; color:#334155; border-radius:6px; cursor:pointer;" onclick="wizardGotoStep(0)">
-            Quay Lại Màn Hình Khởi Đầu
+          <button type="button" class="CleanBtn btn-primary" style="padding:12px 28px; font-weight:700; background:#2563eb; color:#ffffff; border:none; border-radius:6px; cursor:pointer; box-shadow:0 4px 14px rgba(37,99,235,0.3);" onclick="wizardGotoStep(5)">
+            [ TIẾP TỤC: CÀO BÁO &amp; ĐỐI SOÁT (BƯỚC 5) &rarr; ]
           </button>
         </div>
       </div>
 
-      <!-- STEP 3 CONTAINER -->
-      <div id="wizardCard3" class="WizardCard" style="display:none;">
-        <h3 style="font-size:16px; margin-bottom:8px; color:#0f172a;">Bước 3: Tác Tử CTI Phân Tích &amp; Lọc Tri Thức Mối Đe Dọa Theo Mục Đích</h3>
+      <!-- ============================================================== -->
+      <!-- BƯỚC 5: CÀO BÁO, ĐỐI SOÁT & SINH KỸ NĂNG                       -->
+      <!-- ============================================================== -->
+      <div id="wizardCard5" class="WizardCard" style="display:none;">
+        <h3 style="font-size:16px; margin-bottom:8px; color:#0f172a;">Bước 5: Cào Báo Tình Báo CTI &amp; Sinh Gói Kỹ Năng Tác Tử</h3>
         <p style="color:#64748b; font-size:13px; margin-bottom:14px;">
-          Tác tử CTI kích hoạt phân tích cây AST của mã nguồn đích, đối soát trực tiếp với kho tình báo an ninh mạng, loại bỏ 100% CTI không liên quan và chỉ bóc tách các chỉ số đe dọa trực tiếp đến dự án.
+          Tác tử CTI kích hoạt phân tích cây AST của mã nguồn đích, đối soát trực tiếp với kho tình báo an ninh mạng theo Scope và mốc thời gian đã chọn:
         </p>
 
-        <div style="display:flex; gap:20px; align-items:center; margin-bottom:16px; background:#f8fafc; padding:12px 16px; border-radius:6px; border:1px solid #e2e8f0; flex-wrap:wrap;">
-          <b style="font-size:13px; color:#334155;">Khoảng thời gian tình báo:</b>
-          <label style="font-size:13px; cursor:pointer;"><input type="radio" name="wzHistory" value="1"> 1 Năm gần nhất</label>
-          <label style="font-size:13px; cursor:pointer;"><input type="radio" name="wzHistory" value="3" checked> 3 Năm (2024 - 2026, Khuyến nghị)</label>
-          <label style="font-size:13px; cursor:pointer;"><input type="radio" name="wzHistory" value="5"> 5 Năm (Deep Audit)</label>
-          <button type="button" id="btnRunCrawl" class="CleanBtn btn-primary" style="padding:8px 18px; font-size:13px; font-weight:700; background:#2563eb; color:#ffffff; border:none; border-radius:4px; cursor:pointer;" onclick="wizardExecuteCrawl()">
-            [ BẮT ĐẦU CÀO &amp; ĐỐI CHIẾU ]
+        <div style="text-align:center; margin-bottom:16px;">
+          <button type="button" id="btnRunCrawl" class="CleanBtn btn-primary" style="padding:12px 36px; font-size:15px; font-weight:700; background:#2563eb; color:#ffffff; border:none; border-radius:6px; cursor:pointer; box-shadow:0 4px 14px rgba(37,99,235,0.3);" onclick="wizardExecuteCrawl()">
+            [ BẮT ĐẦU CÀO BÁO &amp; ĐỐI CHIẾU TRI THỨC CTI ]
           </button>
         </div>
 
-        <!-- LIVE STREAMING AGENT CONSOLE -->
-        <div id="wzAgentLogTerminal" style="display:none; background:#0f172a; color:#38bdf8; font-family:monospace; font-size:12px; padding:14px; border-radius:6px; max-height:200px; overflow-y:auto; margin-bottom:16px; border:1px solid #1e293b; line-height:1.6;">
+        <!-- Live Streaming Agent Terminal -->
+        <div id="wzAgentLogTerminal" style="display:none; background:#0f172a; color:#38bdf8; font-family:monospace; font-size:12px; padding:14px; border-radius:6px; max-height:180px; overflow-y:auto; margin-bottom:16px; border:1px solid #1e293b; line-height:1.6;">
         </div>
 
-        <!-- AGENT ANALYSIS RESULT CARD -->
+        <!-- Agent Analysis Result Card -->
         <div id="wzCrawlResultBox" style="display:none; background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; padding:16px; margin-bottom:16px;">
-          <div style="color:#15803d; font-weight:700; font-size:13.5px; margin-bottom:8px;">[OK] TÁC TỬ CTI ĐÃ PHÂN TÍCH VÀ ĐỐI SOÁT TRI THỨC THÀNH CÔNG:</div>
+          <div style="color:#15803d; font-weight:700; font-size:13.5px; margin-bottom:8px;">[OK] TÁC TỬ CTI ĐÃ ĐỐI SOÁT TRI THỨC THÀNH CÔNG:</div>
           <div style="margin-bottom:6px; font-size:13px; color:#334155;">
             - Số bài báo đe dọa trực tiếp: <b id="wzTotalArts" style="color:#0f172a;">1</b> bài | Số chỉ số IOC bóc tách thực tế cho dự án: <b id="wzTotalIocs" style="color:#b91c1c;">8</b> IOCs.
           </div>
@@ -1375,122 +1458,109 @@ HTML_PAGE = r"""<!DOCTYPE html>
           <div style="padding:12px; background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; margin-bottom:8px;">
             <b id="wzBestTitle" style="color:#b91c1c; font-size:13.5px; display:block; margin-bottom:4px;">-</b>
             <div id="wzBestCves" style="font-family:monospace; color:#2563eb; font-size:12px; margin-bottom:6px;">-</div>
-            <p id="wzExcerpt" style="font-size:12px; color:#64748b; line-height:1.5; font-style:italic; margin-bottom:10px;">-</p>
-            
-            <!-- Quick View Buttons for Scoped Articles and OSINT Score Table -->
-            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; border-top:1px dashed #e2e8f0; padding-top:8px;">
-              <button type="button" class="CleanBtn" style="font-size:12px; font-weight:600; padding:6px 12px; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; border-radius:4px; cursor:pointer;" onclick="viewArticleById(wzBestArticleId, false)">
-                [ Xem Bài Báo &amp; Highlight Văn Bản Gốc ]
-              </button>
-              <button type="button" class="CleanBtn" style="font-size:12px; font-weight:600; padding:6px 12px; background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; border-radius:4px; cursor:pointer;" onclick="switchView('sec-score', document.querySelectorAll('.NavLink')[4])">
-                [ Xem Bảng Điểm IOC 5 Nguồn OSINT Của Scope ]
-              </button>
-              <button type="button" class="CleanBtn" style="font-size:12px; font-weight:600; padding:6px 12px; background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; border-radius:4px; cursor:pointer;" onclick="switchView('sec-history', document.querySelectorAll('.NavLink')[3])">
-                [ Xem Danh Sách Bài Báo Đã Học (${wzScopeId}) ]
-              </button>
-            </div>
+            <p id="wzExcerpt" style="font-size:12px; color:#64748b; line-height:1.5; font-style:italic; margin-bottom:8px;">-</p>
           </div>
         </div>
 
-        <div style="display:flex; gap:12px; flex-wrap:wrap;">
-          <button type="button" id="btnNextStep4" class="CleanBtn btn-primary" style="padding:10px 22px; font-weight:700; background:#2563eb; color:#ffffff; border:none; border-radius:6px; cursor:pointer;" onclick="wizardExecuteStep4()" disabled>
-            TỚI BƯỚC TIẾP THEO: SINH BỘ KỸ NĂNG TÁC TỬ (SKILL.MD) ->
-          </button>
-          <button type="button" class="CleanBtn" style="padding:10px 18px; border:1px solid #cbd5e1; background:#ffffff; color:#334155; border-radius:6px; cursor:pointer;" onclick="wizardGotoStep(2)">Quay Lại Bước 2</button>
-        </div>
-      </div>
-
-      <!-- STEP 4 CONTAINER -->
-      <div id="wizardCard4" class="WizardCard" style="display:none;">
-        <h3 style="font-size:16px; margin-bottom:8px; color:#0f172a;">Bước 4: Sinh Gói Kỹ Năng Tác Tử Động (xAI Agentic Skill Package)</h3>
-        <p style="color:#64748b; font-size:13px; margin-bottom:14px;">
-          Đóng gói tri thức thành trọn bộ 5 thành phần: SKILL.md, Scripts, Rules, References (xAI), Examples.
-        </p>
-
-        <div id="wzSkillResultBox" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; padding:14px; margin-bottom:16px;">
+        <!-- Skill Synthesis Button & Status -->
+        <div id="wzSkillSection" style="display:none; margin-bottom:20px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:16px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
             <div>
-              <b style="font-size:14px; color:#0f172a;">Gói Kỹ Năng:</b> <span id="wzSkillName" style="font-family:monospace; color:#2563eb; font-weight:bold;">-</span>
+              <b style="font-size:14px; color:#166534;">Gói Kỹ Năng:</b> <span id="wzSkillName" style="font-family:monospace; color:#15803d; font-weight:bold;">-</span>
             </div>
-            <div style="font-size:13px; font-weight:bold; background:#eff6ff; color:#1d4ed8; padding:3px 10px; border-radius:4px; border:1px solid #bfdbfe;">
+            <div style="font-size:12.5px; font-weight:bold; background:#dcfce7; color:#15803d; padding:3px 10px; border-radius:4px; border:1px solid #86efac;">
               TRUST SCORE: <span id="wzTrustScore">93.6</span> / 100 (Dual-Loop 100% TP / 0% FP)
             </div>
           </div>
-
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
-            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:4px; padding:10px; font-size:12px;">
-              <b style="color:#334155;">CẤU TRÚC GÓI KỸ NĂNG 5 THÀNH PHẦN:</b>
-              <ul style="margin-left:18px; margin-top:6px; line-height:1.6; color:#475569;">
-                <li><code>manifest.json</code>: Schema định danh công cụ & quyền</li>
-                <li><code>SKILL.md</code>: Hướng dẫn tư duy & quy trình SOP cho AI</li>
-                <li><code>scripts/</code>: <code>verify_exploit.py</code>, <code>apply_virtual_patch.py</code></li>
-                <li><code>rules/</code>: WAF ModSecurity, Suricata DPI, Firewall blocklist</li>
-                <li><code>references/</code>: Toàn văn CTI, STIX 2.1, vết kiểm toán xAI</li>
-                <li><code>examples/</code>: Code mẫu dính lỗi vs. Code mẫu an toàn</li>
-              </ul>
-            </div>
-            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:4px; padding:10px; font-size:12px;">
-              <b style="color:#334155;">ĐÃ TỰ ĐỘNG CÀI ĐẶT 15 NỀN TẢNG AGENT LỚN:</b>
-              <ul style="margin-left:18px; margin-top:6px; line-height:1.6; color:#15803d; font-family:monospace; max-height:120px; overflow-y:auto;">
-                <li>[OK] Claude Code: CLAUDE.md &amp; .claude/skills/</li>
-                <li>[OK] Cursor: .cursor/rules/*.mdc &amp; .cursorrules</li>
-                <li>[OK] OpenAI Codex &amp; ChatGPT: CODEX.md &amp; OPENAI.md</li>
-                <li>[OK] Antigravity &amp; Gemini: .gemini/skills/ &amp; rules/</li>
-                <li>[OK] Aider AI: .aider.conf.yml &amp; CONVENTIONS.md</li>
-                <li>[OK] Cline &amp; Roo Code: .clinerules &amp; .roomodes</li>
-                <li>[OK] Continue.dev: .continue/config.json &amp; prompts/</li>
-                <li>[OK] Devin AI: DEVIN.md &amp; .devin/instructions.md</li>
-                <li>[OK] Windsurf Cascade: .windsurfrules</li>
-                <li>[OK] GitHub Copilot: .github/copilot-instructions.md</li>
-                <li>[OK] JetBrains AI / Junie: .jetbrains/ai-instructions.md</li>
-                <li>[OK] Zed Editor: .zed/settings.json</li>
-                <li>[OK] Amazon Q &amp; Sourcegraph Cody</li>
-                <li>[OK] defense_skills/<span class="wzShortSkill">skill</span>/ (Universal RFC)</li>
-                <li>[OK] AGENT_REMEDIATION_GUIDE.md (Master SOP)</li>
-              </ul>
-            </div>
+          <div style="font-size:12.5px; color:#166534; line-height:1.5; margin-bottom:12px;">
+            Đã tự động biên dịch và đồng bộ tới 15 nền tảng Agent (Claude, Cursor, Gemini, Copilot...) và lưu trạng thái dự án vào <code>.cti_defense.json</code>.
+          </div>
+          <div style="text-align:center;">
+            <button type="button" id="btnNextStep6" class="CleanBtn btn-primary" style="padding:12px 32px; font-weight:700; background:#15803d; color:#ffffff; border:none; border-radius:6px; cursor:pointer;" onclick="wizardGotoStep(6)">
+              [ TIẾP TỤC: VÁ MÃ NGUỒN &amp; KIỂM THỬ THỰC CHIẾN (BƯỚC 6) &rarr; ]
+            </button>
           </div>
         </div>
 
-        <div style="display:flex; gap:12px;">
-          <button type="button" class="CleanBtn btn-primary" style="padding:10px 22px; font-weight:700;" onclick="wizardGotoStep(5)">
-            TỚI BƯỚC TIẾP THEO: VÁ MÃ NGUỒN & KIỂM THỬ ->
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <button type="button" class="CleanBtn" style="padding:10px 18px; border:1px solid #cbd5e1; background:#ffffff; color:#334155; border-radius:6px; cursor:pointer;" onclick="wizardGotoStep(4)">
+            &larr; Quay Lại Bước 4
           </button>
-          <button type="button" class="CleanBtn" onclick="wizardGotoStep(3)">Quay Lại Bước 3</button>
+          <button type="button" id="btnNextStep5ToSkill" class="CleanBtn btn-primary" style="padding:12px 28px; font-weight:700; background:#2563eb; color:#ffffff; border:none; border-radius:6px; cursor:pointer;" onclick="wizardExecuteStep5Skill()" disabled>
+            [ SINH GÓI KỸ NĂNG TÁC TỬ (SKILL.MD) &rarr; ]
+          </button>
         </div>
       </div>
 
-      <!-- STEP 5 CONTAINER -->
-      <div id="wizardCard5" class="WizardCard" style="display:none;">
-        <h3 style="font-size:16px; margin-bottom:8px; color:#0f172a;">Bước 5: Hành Động Hậu Kỹ Năng (Post-Skill Action Protocol)</h3>
-        <p style="color:#64748b; font-size:13px; margin-bottom:14px;">
-          Từ gói kỹ năng đã sinh, AI Agent thực hiện kiểm thử thực nghiệm, kích hoạt lá chắn WAF và tự động vá tận gốc mã nguồn.
+      <!-- ============================================================== -->
+      <!-- BƯỚC 6: VÁ MÃ NGUỒN, LỊCH SỬ & KIỂM THỬ WAF                     -->
+      <!-- ============================================================== -->
+      <div id="wizardCard6" class="WizardCard" style="display:none;">
+        <h3 style="font-size:16px; margin-bottom:8px; color:#0f172a;">Bước 6: Vá Mã Nguồn Tự Hành, Lịch Sử &amp; Kiểm Thử WAF Thực Chiến</h3>
+        <p style="color:#64748b; font-size:13px; margin-bottom:16px;">
+          Quy trình 3 hành động kiểm thử khép kín: Thử nghiệm khai thác &rarr; Kích hoạt WAF &amp; Firewall &rarr; Tự động vá mã nguồn và tái kiểm thử xác nhận an toàn:
         </p>
 
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px; margin-bottom:16px;">
-          <button type="button" class="CleanBtn" style="padding:10px 12px; font-size:12.5px; font-weight:600; text-align:left; background:#fef2f2; border:1px solid #fca5a5; color:#991b1b;" onclick="wizardRunProbe()">
-            1. Chạy Probe Kiểm Thử (verify_exploit.py)
-          </button>
-          <button type="button" class="CleanBtn" style="padding:10px 12px; font-size:12.5px; font-weight:600; text-align:left; background:#fffbeb; border:1px solid #fcd34d; color:#92400e;" onclick="wizardRunVirtualPatch()">
-            2. Bật Lá Chắn WAF Proxy (Cổng 8766)
-          </button>
-          <button type="button" class="CleanBtn" style="padding:10px 12px; font-size:12.5px; font-weight:600; text-align:left; background:#f0fdf4; border:1px solid #86efac; color:#166534;" onclick="wizardRunRemediate()">
-            3. Tự Động Vá Mã Nguồn (Auto-Refactor)
-          </button>
-          <button type="button" class="CleanBtn" style="padding:10px 12px; font-size:12.5px; font-weight:600; text-align:left; background:#eff6ff; border:1px solid #93c5fd; color:#1e40af;" onclick="wizardRunPostVerify()">
-            4. Tái Kiểm Thử Xác Nhận An Toàn
-          </button>
+        <!-- 3 Hành động thực thi -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:12px; margin-bottom:16px;">
+          <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:6px; padding:14px; text-align:center;">
+            <b style="color:#991b1b; font-size:13px; display:block; margin-bottom:6px;">1. KIỂM THỬ KHAI THÁC</b>
+            <p style="font-size:11.5px; color:#7f1d1d; margin-bottom:10px;">Gửi probe kiểm tra lỗ hổng RCE.</p>
+            <button type="button" class="CleanBtn" style="font-size:12px; font-weight:700; padding:8px 14px; background:#b91c1c; color:#ffffff; border:none; border-radius:4px; cursor:pointer;" onclick="wizardRunProbe()">
+              Chạy Thử Probe
+            </button>
+          </div>
+
+          <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:6px; padding:14px; text-align:center;">
+            <b style="color:#1e40af; font-size:13px; display:block; margin-bottom:6px;">2. KÍCH HOẠT LÁ CHẮN</b>
+            <p style="font-size:11.5px; color:#1e3a8a; margin-bottom:10px;">Bật WAF ModSecurity &amp; Firewall.</p>
+            <button type="button" class="CleanBtn" style="font-size:12px; font-weight:700; padding:8px 14px; background:#2563eb; color:#ffffff; border:none; border-radius:4px; cursor:pointer;" onclick="wizardRunVirtualPatch()">
+              Kích Hoạt WAF &amp; Netsh
+            </button>
+          </div>
+
+          <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:6px; padding:14px; text-align:center;">
+            <b style="color:#166534; font-size:13px; display:block; margin-bottom:6px;">3. TỰ ĐỘNG VÁ CODE</b>
+            <p style="font-size:11.5px; color:#14532d; margin-bottom:10px;">Sửa code sang whitelist &amp; tái kiểm thử.</p>
+            <button type="button" class="CleanBtn" style="font-size:12px; font-weight:700; padding:8px 14px; background:#15803d; color:#ffffff; border:none; border-radius:4px; cursor:pointer;" onclick="wizardRunRemediate()">
+              Tự Động Vá Mã Nguồn
+            </button>
+          </div>
         </div>
 
-        <div id="wzActionLogBox" style="background:#0f172a; color:#38bdf8; font-family:monospace; font-size:12px; padding:14px; border-radius:6px; min-height:120px; white-space:pre-wrap; margin-bottom:16px;">
-[*] Trạng thái: Sẵn sàng thực thi 4 thao tác hậu kỹ năng. Hãy bấm vào nút hành động phía trên...
+        <!-- Terminal log kết quả hành động -->
+        <div id="wzActionLogBox" style="background:#0f172a; color:#4ade80; font-family:monospace; font-size:12px; padding:14px; border-radius:6px; min-height:90px; max-height:160px; overflow-y:auto; border:1px solid #1e293b; line-height:1.6; margin-bottom:18px;">
+          [SẴN SÀNG] Chọn một trong 3 hành động kiểm thử phía trên để tác tử AI thực thi trực tiếp trên hệ thống...
         </div>
 
-        <div style="display:flex; gap:12px;">
-          <button type="button" class="CleanBtn btn-primary" onclick="alert('CHÚC MỪNG: Chu trình 5 pha tự hành đã hoàn tất toàn diện!')">
-            [OK] HOÀN TẤT TOÀN BỘ QUY TRÌNH
+        <!-- KHU VỰC TRUY CẬP LỊCH SỬ & DỮ LIỆU ĐÃ HỌC -->
+        <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:16px; margin-bottom:18px;">
+          <b style="font-size:13px; color:#0f172a; display:block; margin-bottom:8px;">
+            KHU VỰC TRUY CẬP DỮ LIỆU &amp; LỊCH SỬ HỆ THỐNG:
+          </b>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button type="button" class="CleanBtn" style="font-size:12px; font-weight:600; padding:8px 14px; background:#ffffff; color:#1d4ed8; border:1px solid #bfdbfe; border-radius:4px; cursor:pointer;" onclick="switchView('sec-history', document.querySelectorAll('.NavLink')[3])">
+              [ Xem Toàn Bộ Lịch Sử Bài Báo Đã Học (<span id="step6HistoryCount">0</span>) ]
+            </button>
+            <button type="button" class="CleanBtn" style="font-size:12px; font-weight:600; padding:8px 14px; background:#ffffff; color:#15803d; border:1px solid #bbf7d0; border-radius:4px; cursor:pointer;" onclick="switchView('sec-score', document.querySelectorAll('.NavLink')[4])">
+              [ Xem Bảng Điểm IOC 5 Nguồn OSINT ]
+            </button>
+            <button type="button" class="CleanBtn" style="font-size:12px; font-weight:600; padding:8px 14px; background:#ffffff; color:#7e22ce; border:1px solid #e9d5ff; border-radius:4px; cursor:pointer;" onclick="switchView('sec-defense', document.querySelectorAll('.NavLink')[5])">
+              [ Xem Kho Kỹ Năng Tác Tử Phòng Thủ ]
+            </button>
+            <button type="button" class="CleanBtn" style="font-size:12px; font-weight:600; padding:8px 14px; background:#eff6ff; color:#2563eb; border:1px solid #93c5fd; border-radius:4px; cursor:pointer;" onclick="switchView('sec-chat', document.querySelectorAll('.NavLink')[6])">
+              [ Chat Trực Tiếp Với AI Agent ]
+            </button>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <button type="button" class="CleanBtn" style="padding:10px 18px; border:1px solid #cbd5e1; background:#ffffff; color:#334155; border-radius:6px; cursor:pointer;" onclick="wizardGotoStep(5)">
+            &larr; Quay Lại Bước 5
           </button>
-          <button type="button" class="CleanBtn" onclick="wizardGotoStep(1)">Bắt Đầu Lại Từ Đầu</button>
+          <button type="button" class="CleanBtn" style="padding:10px 18px; border:1px solid #fca5a5; background:#fef2f2; color:#b91c1c; border-radius:6px; cursor:pointer;" onclick="resetProjectDefense()">
+            [ Hoàn Tất &amp; Quét Lại Từ Đầu ]
+          </button>
         </div>
       </div>
     </section>
@@ -2069,14 +2139,14 @@ HTML_PAGE = r"""<!DOCTYPE html>
 
           // Cập nhật thông tin phần cứng lên Landing Card Step 0
           if (data.hardware) {
-            const lGpu = document.getElementById('landingGpuName');
-            const lCpu = document.getElementById('landingCpuName');
-            const lRam = document.getElementById('landingRam');
-            const lTier = document.getElementById('landingTierBadge');
-            if (lGpu) lGpu.textContent = data.hardware.gpu_name + (data.hardware.vram_gb ? ' (' + data.hardware.vram_gb + 'GB VRAM)' : '');
-            if (lCpu) lCpu.textContent = data.hardware.cpu_name || 'CPU Đa Nhân';
-            if (lRam) lRam.textContent = (data.hardware.ram_gb || 16.0) + ' GB';
-            if (lTier) lTier.textContent = (data.hardware.tier_title || 'CẤU HÌNH TIÊU CHUẨN').toUpperCase();
+            const wzGpu = document.getElementById('wzGpuText');
+            const wzCpu = document.getElementById('wzCpuText');
+            const wzRam = document.getElementById('wzRamText');
+            const wzTier = document.getElementById('wzHardwareSummaryTag');
+            if (wzGpu) wzGpu.textContent = data.hardware.gpu_name + (data.hardware.vram_gb ? ' (' + data.hardware.vram_gb + 'GB VRAM)' : '');
+            if (wzCpu) wzCpu.textContent = data.hardware.cpu_name || 'CPU Đa Nhân';
+            if (wzRam) wzRam.textContent = (data.hardware.ram_gb || 16.0) + ' GB';
+            if (wzTier) wzTier.textContent = (data.hardware.tier_title || 'CẤU HÌNH TIÊU CHUẨN').toUpperCase();
           }
           
           if (chatLegend && data.hardware) {
@@ -4845,12 +4915,26 @@ const elArt = document.getElementById('lblMasterArticlesCount');
     // =========================================================================
     // WIZARD INTERACTIVE CONTROLLER JAVASCRIPT
     // =========================================================================
-    let wzCurrentStep = 0;
+    let wzCurrentStep = 1;
     let wzTarget = "./target_projects/My_Website";
     let wzScopeId = "SCOPE_WEB";
     let wzBestArticleId = "thn-79d0e8ee";
     let wzSkillName = "agentic-defense-cve-2026-php2shell";
     let detectedSystemModelData = null;
+    let wzScanCompleted = false;
+
+    function toggleStep1AdvancedOptions() {
+      const drawer = document.getElementById("step1AdvancedDrawer");
+      const link = document.getElementById("toggleStep1OptLink");
+      if (!drawer) return;
+      if (drawer.style.display === "none" || !drawer.style.display) {
+        drawer.style.display = "block";
+        if (link) link.textContent = "[-] Thu gọn tùy chọn nâng cao";
+      } else {
+        drawer.style.display = "none";
+        if (link) link.textContent = "[+] Tùy chọn nâng cao: Đổi thư mục hoặc dán link Git";
+      }
+    }
 
     function toggleLandingAdvancedOptions() {
       const drawer = document.getElementById("landingAdvancedDrawer");
@@ -4884,11 +4968,10 @@ const elArt = document.getElementById('lblMasterArticlesCount');
 
           renderProjectDefenseHeader(data);
 
-          // Cập nhật thông tin lên Landing Card Step 0
-          const lTarget = document.getElementById('landingTargetName');
-          const lPath = document.getElementById('landingTargetPath');
-          if (lTarget) lTarget.textContent = data.target_name || 'Dự Án Mã Nguồn';
-          if (lPath) lPath.textContent = data.target_path || wzTarget;
+          const s1Target = document.getElementById('step1TargetName');
+          const s1Path = document.getElementById('step1TargetPath');
+          if (s1Target) s1Target.textContent = data.target_name || 'Dự Án Mã Nguồn';
+          if (s1Path) s1Path.textContent = data.target_path || wzTarget;
 
           if (detectedSystemHardware) {
             const lGpu = document.getElementById('landingGpuName');
@@ -4922,7 +5005,7 @@ const elArt = document.getElementById('lblMasterArticlesCount');
             if (autoScanMsg) autoScanMsg.style.display = 'inline-flex';
 
             switchView('sec-wizard', document.querySelector('.NavLinks .NavLink'));
-            wizardGotoStep(0);
+            wizardGotoStep(1);
           }
         } else {
           switchView('sec-wizard', document.querySelector('.NavLinks .NavLink'));
@@ -4966,25 +5049,8 @@ const elArt = document.getElementById('lblMasterArticlesCount');
           </div>
         `;
       } else {
-        container.innerHTML = `
-          <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:6px; padding:12px 18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-            <div>
-              <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-                <span style="background:#2563eb; color:#ffffff; font-weight:700; font-size:11px; padding:2px 8px; border-radius:3px;">DỰ ÁN MỤC TIÊU</span>
-                <span style="font-weight:700; color:#0f172a; font-size:14px;">${data.target_name}</span>
-                <span style="font-family:monospace; color:#475569; font-size:12px;">(${data.target_path})</span>
-              </div>
-              <div style="font-size:12px; color:#1e40af;">
-                Dự án chưa được bảo vệ. Nhấn <b>[ Bắt Đầu Quét Dự Án ]</b> bên dưới để AI Agent phân tích AST, trích xuất điểm nhạy cảm và sinh gói kỹ năng phòng thủ.
-              </div>
-            </div>
-            <div>
-              <button type="button" class="CleanBtn" style="font-size:12px; padding:7px 16px; background:#2563eb; color:#ffffff; border:none; border-radius:4px; font-weight:700; cursor:pointer;" onclick="switchView('sec-wizard', document.querySelector('.NavLinks .NavLink')); wizardGotoStep(1);">
-                [ BẮT ĐẦU QUÉT DỰ ÁN ]
-              </button>
-            </div>
-          </div>
-        `;
+        // Dự án chưa cấu hình -> Xóa sạch để giao diện gọn gàng, không bị 2 khung trùng lặp
+        container.innerHTML = '';
       }
     }
 
@@ -5005,29 +5071,10 @@ const elArt = document.getElementById('lblMasterArticlesCount');
 
     function wizardGotoStep(stepNum) {
       wzCurrentStep = stepNum;
-      const card0 = document.getElementById("wizardCard0");
       const stepperNav = document.getElementById("wizardStepperNav");
-      const autoScanControls = document.getElementById("autoScanStripControls");
-      const autoScanMsg = document.getElementById("autoScanPendingMsg");
-
-      if (stepNum === 0) {
-        if (card0) card0.style.display = "block";
-        if (stepperNav) stepperNav.style.display = "none";
-        if (autoScanControls) autoScanControls.style.display = "none";
-        if (autoScanMsg) autoScanMsg.style.display = "inline-flex";
-        for (let i = 1; i <= 5; i++) {
-          const card = document.getElementById("wizardCard" + i);
-          if (card) card.style.display = "none";
-        }
-        const st = document.getElementById("statusText");
-        if (st) st.textContent = "Sẵn sàng quét dự án và nhận diện môi trường.";
-        return;
-      }
-
-      if (card0) card0.style.display = "none";
       if (stepperNav) stepperNav.style.display = "flex";
 
-      for (let i = 1; i <= 5; i++) {
+      for (let i = 1; i <= 6; i++) {
         const card = document.getElementById("wizardCard" + i);
         const badge = document.getElementById("stepBadge" + i);
         if (card) card.style.display = (i === stepNum) ? "block" : "none";
@@ -5047,17 +5094,91 @@ const elArt = document.getElementById('lblMasterArticlesCount');
           }
         }
       }
+
+      if (stepNum === 2) {
+        renderHardwareModelSelector();
+      } else if (stepNum === 3) {
+        syncScopeSelectorUI();
+      } else if (stepNum === 4) {
+        renderAdaptiveCadence(wzScopeId);
+      } else if (stepNum === 6) {
+        const hCount = document.getElementById("step6HistoryCount");
+        const navH = document.getElementById("navHistoryCount");
+        if (hCount && navH) hCount.textContent = navH.textContent;
+      }
+
       const stepDescriptions = [
-        "Màn hình khởi đầu: Nhận diện cấu hình máy & dự án.",
-        "Bước 1: Tác tử AI đọc cây AST mã nguồn & định vị điểm nhạy cảm.",
-        "Bước 2: Kết quả phân tích & Chọn mô hình AI thích ứng phần cứng.",
-        "Bước 3: Lọc tình báo an ninh mạng mục tiêu cho phân hệ.",
-        "Bước 4: Sinh Gói Kỹ Năng Tác Tử Phòng Thủ (SKILL.md).",
-        "Bước 5: Kiểm thử khai thác & Vá mã nguồn tự hành."
+        "",
+        "Bước 1: Quét cây cú pháp AST & Nhận diện điểm nhạy cảm mã nguồn.",
+        "Bước 2: Chọn Mô hình AI thích ứng phần cứng máy tính.",
+        "Bước 3: Chọn Phân hệ bảo vệ mối đe dọa (CTI Threat Scope).",
+        "Bước 4: Thiết lập thời gian quét CTI & Mốc bài báo quá khứ.",
+        "Bước 5: Cào báo CTI, Đối soát AST & Sinh gói kỹ năng tác tử.",
+        "Bước 6: Vá mã nguồn, Khu vực xử lý, Lịch sử & Kiểm thử WAF."
       ];
       const st = document.getElementById("statusText");
       if (st && stepDescriptions[stepNum]) {
         st.textContent = stepDescriptions[stepNum];
+      }
+    }
+
+    function syncScopeSelectorUI() {
+      const radios = document.getElementsByName("wzScopeRadio");
+      radios.forEach(r => {
+        if (r.value === wzScopeId) {
+          r.checked = true;
+          r.parentElement.style.borderColor = "#3b82f6";
+          r.parentElement.style.borderWidth = "1.5px";
+        } else {
+          r.parentElement.style.borderColor = "#cbd5e1";
+          r.parentElement.style.borderWidth = "1px";
+        }
+      });
+      const badge = document.getElementById("scopeWebRecBadge");
+      if (badge) {
+        badge.style.display = (wzScopeId === "SCOPE_WEB" || !wzScopeId) ? "inline-block" : "none";
+      }
+    }
+
+    function onWizardScopeRadioChange(val) {
+      wzScopeId = val;
+      syncScopeSelectorUI();
+      updateLiveTicker(`Đã chọn phân hệ phòng thủ: ${val}`);
+    }
+
+    async function wizardExecuteStep5Skill() {
+      const btn = document.getElementById("btnNextStep5ToSkill");
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = "[ ĐANG ĐÓNG GÓI KỸ NĂNG TÁC TỬ... ]";
+      }
+      try {
+        const res = await fetch("/api/wizard/synthesize", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({ target: wzTarget, scope_id: wzScopeId, article_id: wzBestArticleId })
+        });
+        const d = await res.json();
+        if (d.status === "success") {
+          wzSkillName = d.skill_name;
+          document.getElementById("wzSkillName").textContent = d.skill_name;
+          document.getElementById("wzTrustScore").textContent = d.trust_score || "95.0";
+          document.getElementById("wzSkillSection").style.display = "block";
+          if (btn) {
+            btn.style.display = "none";
+          }
+          // Bật timer quét ngầm trên StatusStrip vì dự án đã có cấu hình bảo vệ
+          const autoScanControls = document.getElementById("autoScanStripControls");
+          const autoScanMsg = document.getElementById("autoScanPendingMsg");
+          if (autoScanControls) autoScanControls.style.display = "flex";
+          if (autoScanMsg) autoScanMsg.style.display = "none";
+        }
+      } catch (e) {
+        alert("Lỗi đóng gói: " + e);
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = "[ SINH GÓI KỸ NĂNG TÁC TỬ (SKILL.MD) -> ]";
+        }
       }
     }
 
@@ -5411,7 +5532,18 @@ const elArt = document.getElementById('lblMasterArticlesCount');
       const targetVal = document.getElementById("wizardInputTarget").value.trim();
       const cloneVal = document.getElementById("wizardInputClone").value.trim();
       const btn = document.getElementById("btnRunStep1");
+      const nextBtn = document.getElementById("btnNextFromStep1");
       const term = document.getElementById("wzScanAgentTerminal");
+      const resSummary = document.getElementById("wzScanResultSummary");
+
+      if (nextBtn) {
+        nextBtn.disabled = true;
+        nextBtn.dataset.enabled = "false";
+        nextBtn.style.background = "#94a3b8";
+        nextBtn.style.cursor = "not-allowed";
+        nextBtn.style.opacity = "0.5";
+        nextBtn.style.boxShadow = "none";
+      }
       
       if (btn) {
         btn.disabled = true;
@@ -5513,17 +5645,32 @@ const elArt = document.getElementById('lblMasterArticlesCount');
                 term.scrollTop = term.scrollHeight;
               }
               i++;
-              setTimeout(printScanLog, 140);
+              setTimeout(printScanLog, 90);
             } else {
               if (btn) {
                 btn.disabled = false;
-                btn.textContent = "[ BẮT ĐẦU QUÉT DỰ ÁN ]";
+                btn.textContent = "[ QUÉT LẠI DỰ ÁN ]";
               }
-              setTimeout(() => {
-                renderHardwareModelSelector();
-                renderAdaptiveCadence(wzScopeId);
-                wizardGotoStep(2);
-              }, 400);
+              wzScanCompleted = true;
+
+              // Hiển thị khung kết quả & Điểm mấu chốt
+              if (resSummary) resSummary.style.display = "block";
+
+              const verdictEl = document.getElementById("wzVerdictText");
+              if (verdictEl) {
+                verdictEl.textContent = `Dự án được định danh là: ${d.detected_techs && d.detected_techs.length > 0 ? d.detected_techs.join(', ') : 'Ứng dụng Đa Tầng'}. Phát hiện ${d.sensitive_sinks ? d.sensitive_sinks.length : 0} điểm nhạy cảm. Phân hệ bảo vệ khuyến nghị tối ưu nhất: ${d.scope_name}.`;
+              }
+
+              // SÁNG MÀU NÚT TIẾP TỤC ĐỂ NGƯỜI DÙNG BẤM QUA BƯỚC 2
+              if (nextBtn) {
+                nextBtn.disabled = false;
+                nextBtn.dataset.enabled = "true";
+                nextBtn.style.background = "#2563eb";
+                nextBtn.style.cursor = "pointer";
+                nextBtn.style.opacity = "1";
+                nextBtn.style.boxShadow = "0 4px 14px rgba(37,99,235,0.4)";
+                nextBtn.title = "Nhấn để tiếp tục tới bước Chọn Mô Hình AI";
+              }
             }
           }
           printScanLog();
