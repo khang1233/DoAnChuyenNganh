@@ -35,8 +35,27 @@ from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 import uvicorn
 
+import os
+
 REPO_ROOT = Path(__file__).resolve().parents[1] / "ai-devsecops-agent"
 SANDBOX_DIR = Path(__file__).resolve().parent
+ROOT_PROJECT_DIR = Path(__file__).resolve().parents[1]
+
+ACTIVE_TARGET_PROJECT = os.environ.get("CTI_TARGET_PROJECT", "")
+for idx, arg in enumerate(sys.argv):
+    if arg == "--target" and idx + 1 < len(sys.argv):
+        ACTIVE_TARGET_PROJECT = sys.argv[idx + 1]
+        break
+    elif arg.startswith("--target="):
+        ACTIVE_TARGET_PROJECT = arg.split("=", 1)[1]
+        break
+
+if not ACTIVE_TARGET_PROJECT:
+    sample_p = ROOT_PROJECT_DIR / "target_projects" / "My_Website"
+    if sample_p.exists():
+        ACTIVE_TARGET_PROJECT = str(sample_p)
+    else:
+        ACTIVE_TARGET_PROJECT = str(Path.cwd())
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 if str(SANDBOX_DIR) not in sys.path:
@@ -945,6 +964,9 @@ HTML_PAGE = r"""<!DOCTYPE html>
   </nav>
 
   <div class="MainWrap">
+
+    <!-- KHUNG ĐIỀU HƯỚNG VÀ TRẠNG THÁI DỰ ÁN MỤC TIÊU -->
+    <div id="projectContextContainer" style="margin-bottom:14px;"></div>
 
     <!-- THANH TRẠNG THÁI -->
     <div class="StatusStrip">
@@ -4683,8 +4705,7 @@ const elArt = document.getElementById('lblMasterArticlesCount');
       switchDefenseScope('MASTER');
       fetchLiveDefenseStatus();
       setInterval(fetchLiveDefenseStatus, 3500);
-      switchView('sec-wizard', document.querySelector('.NavLinks .NavLink'));
-      wizardGotoStep(1);
+      await initProjectContext();
     });
   
     // =========================================================================
@@ -4695,6 +4716,111 @@ const elArt = document.getElementById('lblMasterArticlesCount');
     let wzScopeId = "SCOPE_WEB";
     let wzBestArticleId = "thn-79d0e8ee";
     let wzSkillName = "agentic-defense-cve-2026-php2shell";
+
+    async function initProjectContext() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const queryTarget = urlParams.get('target') || '';
+      try {
+        const res = await fetch('/api/system/project-context?target=' + encodeURIComponent(queryTarget));
+        const data = await res.json();
+        if (data && data.target_path) {
+          wzTarget = data.target_path;
+          const targetInp = document.getElementById('wizardInputTarget');
+          if (targetInp) targetInp.value = data.target_path;
+          if (typeof validateTargetFolder === 'function') validateTargetFolder(data.target_path);
+
+          renderProjectDefenseHeader(data);
+
+          if (data.is_configured && data.config) {
+            if (data.config.scope_id) {
+              wzScopeId = data.config.scope_id;
+              if (typeof switchDefenseScope === 'function') switchDefenseScope(data.config.scope_id);
+            }
+            // Dự án đã bảo vệ -> Mở ngay Kho Kỹ Năng Tác Tử
+            switchView('sec-defense', document.querySelector('.NavLinks .NavLink:nth-child(6)'));
+          } else {
+            // Dự án mới chưa cấu hình -> Mở Wizard Bước 1
+            switchView('sec-wizard', document.querySelector('.NavLinks .NavLink'));
+            wizardGotoStep(1);
+          }
+        } else {
+          switchView('sec-wizard', document.querySelector('.NavLinks .NavLink'));
+          wizardGotoStep(1);
+        }
+      } catch (e) {
+        console.error('Loi khoi tao ngu canh du an:', e);
+        switchView('sec-wizard', document.querySelector('.NavLinks .NavLink'));
+        wizardGotoStep(1);
+      }
+    }
+
+    function renderProjectDefenseHeader(data) {
+      const container = document.getElementById('projectContextContainer');
+      if (!container) return;
+
+      if (data.is_configured && data.config) {
+        container.innerHTML = `
+          <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:6px; padding:12px 18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div>
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                <span style="background:#15803d; color:#ffffff; font-weight:700; font-size:11px; padding:2px 8px; border-radius:3px;">DỰ ÁN ĐÃ BẢO VỆ</span>
+                <span style="font-weight:700; color:#0f172a; font-size:14px;">${data.target_name}</span>
+                <span style="font-family:monospace; color:#475569; font-size:12px;">(${data.target_path})</span>
+              </div>
+              <div style="font-size:12px; color:#166534;">
+                Phân hệ: <b>${data.config.scope_name || data.config.scope_id}</b> &bull; Gói Kỹ Năng: <b style="font-family:monospace;">${data.config.skill_name}</b> &bull; Trạng thái: <b style="color:#15803d;">PROTECTED</b>
+              </div>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <button type="button" class="CleanBtn" style="font-size:12px; padding:6px 14px; background:#2563eb; color:#ffffff; border:none; border-radius:4px; font-weight:600; cursor:pointer;" onclick="switchView('sec-defense', document.querySelector('.NavLinks .NavLink:nth-child(6)'))">
+                [ Xem Kỹ Năng Tác Tử ]
+              </button>
+              <button type="button" class="CleanBtn" style="font-size:12px; padding:6px 14px; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; border-radius:4px; font-weight:600; cursor:pointer;" onclick="switchView('sec-wizard', document.querySelector('.NavLinks .NavLink')); wizardGotoStep(1);">
+                [ Xem Quy Trình Wizard ]
+              </button>
+              <button type="button" class="CleanBtn" style="font-size:12px; padding:6px 14px; background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5; border-radius:4px; font-weight:600; cursor:pointer;" onclick="resetProjectDefense()">
+                [ Quét Lại Dự Án ]
+              </button>
+            </div>
+          </div>
+        `;
+      } else {
+        container.innerHTML = `
+          <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:6px; padding:12px 18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div>
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                <span style="background:#2563eb; color:#ffffff; font-weight:700; font-size:11px; padding:2px 8px; border-radius:3px;">DỰ ÁN MỤC TIÊU</span>
+                <span style="font-weight:700; color:#0f172a; font-size:14px;">${data.target_name}</span>
+                <span style="font-family:monospace; color:#475569; font-size:12px;">(${data.target_path})</span>
+              </div>
+              <div style="font-size:12px; color:#1e40af;">
+                Dự án chưa được bảo vệ. Nhấn <b>[ Bắt Đầu Quét Dự Án ]</b> bên dưới để AI Agent phân tích AST, trích xuất điểm nhạy cảm và sinh gói kỹ năng phòng thủ.
+              </div>
+            </div>
+            <div>
+              <button type="button" class="CleanBtn" style="font-size:12px; padding:7px 16px; background:#2563eb; color:#ffffff; border:none; border-radius:4px; font-weight:700; cursor:pointer;" onclick="switchView('sec-wizard', document.querySelector('.NavLinks .NavLink')); wizardGotoStep(1);">
+                [ BẮT ĐẦU QUÉT DỰ ÁN ]
+              </button>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    async function resetProjectDefense() {
+      if (!confirm("Bạn có chắc chắn muốn đặt lại cấu hình phòng thủ và quét lại dự án này từ đầu không?")) return;
+      try {
+        const res = await fetch('/api/system/project-reset', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ target_path: wzTarget })
+        });
+        const d = await res.json();
+        await initProjectContext();
+      } catch (e) {
+        alert("Lỗi đặt lại: " + e);
+      }
+    }
 
     function wizardGotoStep(stepNum) {
       wzCurrentStep = stepNum;
@@ -6807,6 +6933,53 @@ class ServerAutonomousDaemon:
 server_daemon = ServerAutonomousDaemon()
 
 
+
+class TargetRequest(BaseModel):
+    target_path: str = ""
+
+@app.get("/api/system/project-context")
+def api_get_project_context(target: str = Query("")):
+    global ACTIVE_TARGET_PROJECT
+    raw = target.strip() or ACTIVE_TARGET_PROJECT or str(Path.cwd())
+    p = Path(raw).resolve()
+    if not p.exists():
+        p = (Path(__file__).resolve().parents[1] / "target_projects" / "My_Website").resolve()
+    
+    cfg_file = p / ".cti_defense.json"
+    is_configured = cfg_file.exists()
+    cfg_data = {}
+    if is_configured:
+        try:
+            cfg_data = json.loads(cfg_file.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+            
+    return {
+        "target_path": str(p),
+        "target_name": p.name,
+        "is_configured": is_configured,
+        "config": cfg_data
+    }
+
+@app.post("/api/system/set-target")
+def api_set_target(req: TargetRequest):
+    global ACTIVE_TARGET_PROJECT
+    t = req.target_path.strip()
+    if t:
+        ACTIVE_TARGET_PROJECT = t
+    return api_get_project_context(ACTIVE_TARGET_PROJECT)
+
+@app.post("/api/system/project-reset")
+def api_reset_project(req: TargetRequest):
+    t = req.target_path.strip() or ACTIVE_TARGET_PROJECT
+    p = Path(t).resolve()
+    cfg_file = p / ".cti_defense.json"
+    if cfg_file.exists():
+        try:
+            cfg_file.unlink()
+        except Exception as e:
+            return {"status": "error", "message": str(e)}
+    return {"status": "success", "message": f"Đã đặt lại cấu hình bảo vệ cho {p.name}"}
 
 @app.get("/api/system/hardware-info")
 def api_get_hardware_info():

@@ -122,15 +122,36 @@ function printStatus() {
 
 function startSystem() {
   const pyCmd = findPythonCommand();
+  const targetDir = path.resolve(process.cwd());
 
   // Kiem tra neu dang chay san roi
   checkServerReady(PORT, (alreadyRunning) => {
     if (alreadyRunning) {
       console.log('==============================================================================');
       console.log('  HE THONG CTI DEFENSE DANG HOAT DONG SAN TAI: http://127.0.0.1:8765');
+      console.log(`  Thu muc du an : ${targetDir}`);
       console.log('==============================================================================');
-      console.log('[*] Dang mo trinh duyet...');
-      openBrowser('http://127.0.0.1:8765');
+      console.log('[*] Dang cap nhat thu muc du an toi may chu...');
+
+      const postData = JSON.stringify({ target_path: targetDir });
+      const req = http.request({
+        hostname: '127.0.0.1',
+        port: PORT,
+        path: '/api/system/set-target',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(postData)
+        }
+      }, () => {
+        console.log('[*] Dang mo trinh duyet...');
+        openBrowser(`http://127.0.0.1:8765/?target=${encodeURIComponent(targetDir)}`);
+      });
+      req.on('error', () => {
+        openBrowser(`http://127.0.0.1:8765/?target=${encodeURIComponent(targetDir)}`);
+      });
+      req.write(postData);
+      req.end();
       return;
     }
 
@@ -138,7 +159,8 @@ function startSystem() {
     console.log('  DANG KHOI DONG HE THONG CTI AGENTIC DEFENSE...');
     console.log('==============================================================================');
     console.log(`[*] Su dung trinh thong dich Python: ${pyCmd}`);
-    console.log(`[*] Thu muc goc: ${ROOT_DIR}`);
+    console.log(`[*] Thu muc goc he thong: ${ROOT_DIR}`);
+    console.log(`[*] Thu muc du an muc tieu: ${targetDir}`);
 
     // Kiem tra thu muc Sandbox
     if (!fs.existsSync(APP_FILE)) {
@@ -154,10 +176,11 @@ function startSystem() {
       }
     } catch (e) {}
 
-    // Khoi dong live_dashboard_app.py
+    // Khoi dong live_dashboard_app.py voi tham so --target
     console.log('[*] Dang khoi chay Live Dashboard & WAF Proxy (Cong 8765 & 8766)...');
-    const child = spawn(pyCmd, [APP_FILE], {
+    const child = spawn(pyCmd, [APP_FILE, '--target', targetDir], {
       cwd: SANDBOX_DIR,
+      env: { ...process.env, CTI_TARGET_PROJECT: targetDir },
       stdio: ['ignore', 'pipe', 'pipe'],
       detached: false
     });
@@ -176,48 +199,57 @@ function startSystem() {
     });
 
     // Cho den khi server san sang
-    pollServerReady(PORT, 25, 600, (isReady) => {
+    pollServerReady(PORT, 30, 600, (isReady) => {
       if (isReady) {
         console.clear ? console.clear() : console.log('\n'.repeat(10));
         console.log('==============================================================================');
         console.log('  HE THONG AN NINH MANG TU HANH CTI AGENTIC DEFENSE (KHOI DONG THANH CONG)');
         console.log('==============================================================================');
         console.log('');
-        console.log('  [OK] CTI Defense Engine & WAF Reverse Proxy dang hoat dong tai cong 8766.');
+        console.log(`  [OK] Thu muc du an : ${targetDir}`);
+        console.log('  [OK] CTI Defense Engine & WAF Reverse Proxy hoat dong tai cong 8766.');
         console.log('  [OK] Da tu dong mo trinh duyet Web Dashboard.');
         console.log('');
         console.log('  ==========================================================================');
         console.log('  DUONG LINK TRUY CAP TRUC TIEP:');
         console.log('');
-        console.log('       http://127.0.0.1:8765');
+        console.log(`       http://127.0.0.1:8765/?target=${encodeURIComponent(targetDir)}`);
         console.log('');
         console.log('  ==========================================================================');
         console.log('');
-        console.log('  * BUOC 1 TREN WEB LA: [ QUET DU AN (SCAN CODEBASE) ]');
-        console.log('    Chi can nhap duong dan thu muc hoac link Git, he thong se tu dong lam het.');
+        console.log('  * CO CHE HOAT DONG:');
+        console.log('    - Lan dau tien: Giao dien khoa vao thu muc tren, nhan [ BAT DAU QUET DU AN ]');
+        console.log('      de AI Agent phan tich AST, chon moc thoi gian, cào tinh bao va dong goi.');
+        console.log('    - Cac lan tiep theo: He thong nhan dien da co cau hinh va mo ngay Bang Phong Thu.');
         console.log('');
         console.log('  * CAC LENH HO TRO:');
-        console.log('    - cti-defense         : Khoi dong & mo Dashboard');
-        console.log('    - cti-defense stop    : Tat he thong');
-        console.log('    - cti-defense status  : Kiem tra trang thai');
+        console.log('    - cti             : Khoi dong & mo Dashboard cho thu muc hien tai');
+        console.log('    - cti stop        : Tat he thong');
+        console.log('    - cti status      : Kiem tra trang thai');
         console.log('==============================================================================');
         console.log('');
-        console.log('Nhan Ctrl+C de dung he thong.');
+        console.log('Nhan Ctrl+C hoac dong cua so nay de tat he thong.');
 
-        openBrowser('http://127.0.0.1:8765');
+        openBrowser(`http://127.0.0.1:8765/?target=${encodeURIComponent(targetDir)}`);
       } else {
         console.error('[LOI] Qua thoi gian cho may chu khoi dong. Chi tiet log:');
         console.error(stdoutData.slice(-500));
       }
     });
 
-    process.on('SIGINT', () => {
+    const cleanShutdown = () => {
       console.log('\n[*] Dang dung he thong...');
       try {
         child.kill();
       } catch (e) {}
       stopSystem();
       process.exit(0);
+    };
+
+    process.on('SIGINT', cleanShutdown);
+    process.on('SIGTERM', cleanShutdown);
+    process.on('exit', () => {
+      stopSystem();
     });
   });
 }

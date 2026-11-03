@@ -165,9 +165,20 @@ def wizard_scan_project(target: str = "", clone_url: str = "") -> Dict[str, Any]
     if not combined_techs:
         combined_techs = ["Full-Stack Web Ecosystem", "Custom Backend"]
 
+    cfg_file = target_path / ".cti_defense.json"
+    is_configured = cfg_file.exists()
+    cfg_data = {}
+    if is_configured:
+        try:
+            cfg_data = json.loads(cfg_file.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+
     return {
         "status": "success",
         "target_path": str(target_path),
+        "is_configured": is_configured,
+        "config": cfg_data,
         "target_name": target_path.name,
         "scope_id": scope_id,
         "scope_name": profile["name"],
@@ -296,6 +307,21 @@ def wizard_synthesize_skill(target: str, scope_id: str, article_id: str) -> Dict
     target_path = Path(target)
     skill_name = synthesize_and_deploy_skill(target_path, scope_id, article_id)
     skill_dir = target_path / "defense_skills" / skill_name
+    try:
+        profile = SCOPE_PROFILES.get(scope_id, SCOPE_PROFILES["SCOPE_WEB"])
+        cfg_meta = {
+            "project_name": target_path.name,
+            "project_path": str(target_path.resolve()),
+            "scope_id": scope_id,
+            "scope_name": profile["name"],
+            "skill_name": skill_name,
+            "article_id": article_id,
+            "configured_at": datetime.now().isoformat(),
+            "status": "PROTECTED"
+        }
+        (target_path / ".cti_defense.json").write_text(json.dumps(cfg_meta, indent=2, ensure_ascii=False), encoding="utf-8")
+    except Exception as e:
+        pass
     
     # Đọc manifest và xai audit
     manifest = {}

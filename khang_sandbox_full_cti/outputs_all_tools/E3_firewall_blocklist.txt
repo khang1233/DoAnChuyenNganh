@@ -1,2 +1,9 @@
-# [LỖ HỔNG PHẦN MỀM CVE-2026-83548] Báo cáo cảnh báo lỗ hổng ứng dụng, không có IP C2 máy chủ cố định.
-# Đối sách mạng ưu tiên: Sử dụng ModSecurity WAF & Suricata DPI để chặn HTTP Payload (Xem Tab WAF & Tab Suricata).
+block drop quick from any to 51.89.231.85 # Score=90/100 (AlienVault OTX + Abuse.ch/VT + AbuseIPDB + Shodan + GreyNoise (5-Layer Fusion))
+block drop quick from any to 51.89.228.250 # Score=90/100 (AlienVault OTX + Abuse.ch/VT + AbuseIPDB + Shodan + GreyNoise (5-Layer Fusion))
+block drop quick from any to GitHub.io # Score=89/100 (AlienVault OTX + Abuse.ch MalwareBazaar/OpenPhish + VT)
+block drop quick from any to outlook.com # Score=89/100 (AlienVault OTX + Abuse.ch MalwareBazaar/OpenPhish + VT)
+block drop quick from any to digit.dedyn.io # Score=89/100 (AlienVault OTX + Abuse.ch MalwareBazaar/OpenPhish + VT)
+block drop quick from any to dedyn.io # Score=98/100 (AlienVault OTX + Abuse.ch MalwareBazaar/OpenPhish + VT)
+block drop quick from any to gpt-5-6.github.io # Score=89/100 (AlienVault OTX + Abuse.ch MalwareBazaar/OpenPhish + VT)
+block drop quick from any to opus-5-0.github.io # Score=89/100 (AlienVault OTX + Abuse.ch MalwareBazaar/OpenPhish + VT)
+block drop quick from any to calm-piano-floats-313.dedyn.io # Score=89/100 (AlienVault OTX + Abuse.ch MalwareBazaar/OpenPhish + VT)

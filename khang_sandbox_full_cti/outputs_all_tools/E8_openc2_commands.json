@@ -1,33 +1,310 @@
 {
   "protocol": "OASIS OpenC2 v1.0 (Open Command and Control) over OpenClaw Local Bridge",
-  "campaign": "[CVE-2026-83548] SonicWall SMA1000 Appliances — SonicWall SMA1000 Appliances Server-Side Request Forgery Vulnerability",
-  "generated_at_utc": "2026-10-16T07:00:53Z",
-  "total_commands": 1,
+  "campaign": "Tricks from the Past deployed via signed ChatGPT and Claude binaries",
+  "generated_at_utc": "2026-10-28T09:01:41Z",
+  "total_commands": 12,
   "openc2_messages": [
     {
       "header": {
         "version": "1.0",
         "msg_type": "request",
-        "request_id": "openc2-a0d4f187",
-        "created": "2026-10-16T07:00:53Z",
+        "request_id": "openc2-7625f64a",
+        "created": "2026-10-28T09:01:41Z",
         "sender": "OpenClaw-Local-CTI-Agent"
       },
       "command": {
-        "action": "mitigate",
+        "action": "deny",
         "target": {
-          "vulnerability": "CVE-2026-83548"
+          "ipv4_net": "51.89.231.85/32"
         },
         "actuator": {
-          "waf_and_suricata_ips": {
-            "virtual_patching": true,
-            "mode": "prevention_block"
+          "network_firewall": {
+            "host": "DESKTOP-88HC5JH",
+            "engine": "Windows Defender Advanced Firewall / Linux Netfilter"
           }
         },
         "args": {
-          "mitre_techniques": [
-            "T1190",
-            "T1110"
-          ]
+          "direction": "both",
+          "drop_method": "silent_drop",
+          "reputation_score": 90
+        }
+      }
+    },
+    {
+      "header": {
+        "version": "1.0",
+        "msg_type": "request",
+        "request_id": "openc2-e5e6fcb3",
+        "created": "2026-10-28T09:01:41Z",
+        "sender": "OpenClaw-Local-CTI-Agent"
+      },
+      "command": {
+        "action": "deny",
+        "target": {
+          "ipv4_net": "51.89.228.250/32"
+        },
+        "actuator": {
+          "network_firewall": {
+            "host": "DESKTOP-88HC5JH",
+            "engine": "Windows Defender Advanced Firewall / Linux Netfilter"
+          }
+        },
+        "args": {
+          "direction": "both",
+          "drop_method": "silent_drop",
+          "reputation_score": 90
+        }
+      }
+    },
+    {
+      "header": {
+        "version": "1.0",
+        "msg_type": "request",
+        "request_id": "openc2-cf691d3a",
+        "created": "2026-10-28T09:01:41Z",
+        "sender": "OpenClaw-Local-CTI-Agent"
+      },
+      "command": {
+        "action": "contain",
+        "target": {
+          "domain_name": "GitHub.io"
+        },
+        "actuator": {
+          "dns_sinkhole_and_ips": {
+            "sinkhole_ip": "0.0.0.0",
+            "inspect_tls_sni": true
+          }
+        },
+        "args": {
+          "reputation_score": 89
+        }
+      }
+    },
+    {
+      "header": {
+        "version": "1.0",
+        "msg_type": "request",
+        "request_id": "openc2-b5e37d84",
+        "created": "2026-10-28T09:01:41Z",
+        "sender": "OpenClaw-Local-CTI-Agent"
+      },
+      "command": {
+        "action": "contain",
+        "target": {
+          "domain_name": "outlook.com"
+        },
+        "actuator": {
+          "dns_sinkhole_and_ips": {
+            "sinkhole_ip": "0.0.0.0",
+            "inspect_tls_sni": true
+          }
+        },
+        "args": {
+          "reputation_score": 89
+        }
+      }
+    },
+    {
+      "header": {
+        "version": "1.0",
+        "msg_type": "request",
+        "request_id": "openc2-14a3c805",
+        "created": "2026-10-28T09:01:41Z",
+        "sender": "OpenClaw-Local-CTI-Agent"
+      },
+      "command": {
+        "action": "contain",
+        "target": {
+          "domain_name": "digit.dedyn.io"
+        },
+        "actuator": {
+          "dns_sinkhole_and_ips": {
+            "sinkhole_ip": "0.0.0.0",
+            "inspect_tls_sni": true
+          }
+        },
+        "args": {
+          "reputation_score": 89
+        }
+      }
+    },
+    {
+      "header": {
+        "version": "1.0",
+        "msg_type": "request",
+        "request_id": "openc2-c7f6535f",
+        "created": "2026-10-28T09:01:41Z",
+        "sender": "OpenClaw-Local-CTI-Agent"
+      },
+      "command": {
+        "action": "contain",
+        "target": {
+          "domain_name": "dedyn.io"
+        },
+        "actuator": {
+          "dns_sinkhole_and_ips": {
+            "sinkhole_ip": "0.0.0.0",
+            "inspect_tls_sni": true
+          }
+        },
+        "args": {
+          "reputation_score": 98
+        }
+      }
+    },
+    {
+      "header": {
+        "version": "1.0",
+        "msg_type": "request",
+        "request_id": "openc2-0c7798b1",
+        "created": "2026-10-28T09:01:41Z",
+        "sender": "OpenClaw-Local-CTI-Agent"
+      },
+      "command": {
+        "action": "contain",
+        "target": {
+          "domain_name": "gpt-5-6.github.io"
+        },
+        "actuator": {
+          "dns_sinkhole_and_ips": {
+            "sinkhole_ip": "0.0.0.0",
+            "inspect_tls_sni": true
+          }
+        },
+        "args": {
+          "reputation_score": 89
+        }
+      }
+    },
+    {
+      "header": {
+        "version": "1.0",
+        "msg_type": "request",
+        "request_id": "openc2-d31e12b9",
+        "created": "2026-10-28T09:01:41Z",
+        "sender": "OpenClaw-Local-CTI-Agent"
+      },
+      "command": {
+        "action": "contain",
+        "target": {
+          "domain_name": "opus-5-0.github.io"
+        },
+        "actuator": {
+          "dns_sinkhole_and_ips": {
+            "sinkhole_ip": "0.0.0.0",
+            "inspect_tls_sni": true
+          }
+        },
+        "args": {
+          "reputation_score": 89
+        }
+      }
+    },
+    {
+      "header": {
+        "version": "1.0",
+        "msg_type": "request",
+        "request_id": "openc2-7b30cfaa",
+        "created": "2026-10-28T09:01:41Z",
+        "sender": "OpenClaw-Local-CTI-Agent"
+      },
+      "command": {
+        "action": "contain",
+        "target": {
+          "domain_name": "calm-piano-floats-313.dedyn.io"
+        },
+        "actuator": {
+          "dns_sinkhole_and_ips": {
+            "sinkhole_ip": "0.0.0.0",
+            "inspect_tls_sni": true
+          }
+        },
+        "args": {
+          "reputation_score": 89
+        }
+      }
+    },
+    {
+      "header": {
+        "version": "1.0",
+        "msg_type": "request",
+        "request_id": "openc2-6dd1be51",
+        "created": "2026-10-28T09:01:41Z",
+        "sender": "OpenClaw-Local-CTI-Agent"
+      },
+      "command": {
+        "action": "remediate",
+        "target": {
+          "file": {
+            "hashes": {
+              "sha256": "b5c2d20623d4e6647d06a42864edd8629f82c5c384b243fdaeeeca24b3873d64"
+            }
+          }
+        },
+        "actuator": {
+          "edr_and_applocker": {
+            "process_termination": true,
+            "quarantine_file": true
+          }
+        },
+        "args": {
+          "reputation_score": 94
+        }
+      }
+    },
+    {
+      "header": {
+        "version": "1.0",
+        "msg_type": "request",
+        "request_id": "openc2-0cbfc719",
+        "created": "2026-10-28T09:01:41Z",
+        "sender": "OpenClaw-Local-CTI-Agent"
+      },
+      "command": {
+        "action": "remediate",
+        "target": {
+          "file": {
+            "hashes": {
+              "md5": "1d0d1368b4d53f3a6322cf40e84e63db"
+            }
+          }
+        },
+        "actuator": {
+          "edr_and_applocker": {
+            "process_termination": true,
+            "quarantine_file": true
+          }
+        },
+        "args": {
+          "reputation_score": 94
+        }
+      }
+    },
+    {
+      "header": {
+        "version": "1.0",
+        "msg_type": "request",
+        "request_id": "openc2-6a6f5087",
+        "created": "2026-10-28T09:01:41Z",
+        "sender": "OpenClaw-Local-CTI-Agent"
+      },
+      "command": {
+        "action": "remediate",
+        "target": {
+          "file": {
+            "hashes": {
+              "md5": "dcde1f56048fa18657dc4820397592f7"
+            }
+          }
+        },
+        "actuator": {
+          "edr_and_applocker": {
+            "process_termination": true,
+            "quarantine_file": true
+          }
+        },
+        "args": {
+          "reputation_score": 94
         }
       }
     }

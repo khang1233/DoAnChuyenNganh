@@ -1,7 +1,7 @@
 @echo off
 :: SCRIPT DONG BO TUONG LUA WINDOWS DEFENDER CHUAN SOC ENTERPRISE
-:: Tong hop 176 IP C2 nguy hai tu he thong CTI Autonomous Agent
-:: Thoi gian bien dich: 2026-10-28 14:19:26
+:: Tong hop 181 IP C2 nguy hai tu he thong CTI Autonomous Agent
+:: Thoi gian bien dich: 2026-11-03 12:47:15
 
 echo [CTI AGENT] Dang ap dung quy tac chan ket noi outbound/inbound toi C2 Servers...
 netsh advfirewall firewall add rule name="CTI_BLOCK_216_73_160_59" dir=out action=block remoteip=216.73.160.59 >nul
@@ -258,10 +258,6 @@ netsh advfirewall firewall add rule name="CTI_BLOCK_208_83_239_114" dir=out acti
 netsh advfirewall firewall add rule name="CTI_BLOCK_208_83_239_114" dir=in action=block remoteip=208.83.239.114 >nul
 netsh advfirewall firewall add rule name="CTI_BLOCK_149_248_47_234" dir=out action=block remoteip=149.248.47.234 >nul
 netsh advfirewall firewall add rule name="CTI_BLOCK_149_248_47_234" dir=in action=block remoteip=149.248.47.234 >nul
-netsh advfirewall firewall add rule name="CTI_BLOCK_51_89_231_85" dir=out action=block remoteip=51.89.231.85 >nul
-netsh advfirewall firewall add rule name="CTI_BLOCK_51_89_231_85" dir=in action=block remoteip=51.89.231.85 >nul
-netsh advfirewall firewall add rule name="CTI_BLOCK_51_89_228_250" dir=out action=block remoteip=51.89.228.250 >nul
-netsh advfirewall firewall add rule name="CTI_BLOCK_51_89_228_250" dir=in action=block remoteip=51.89.228.250 >nul
 netsh advfirewall firewall add rule name="CTI_BLOCK_100_64_0_0" dir=out action=block remoteip=100.64.0.0 >nul
 netsh advfirewall firewall add rule name="CTI_BLOCK_100_64_0_0" dir=in action=block remoteip=100.64.0.0 >nul
 netsh advfirewall firewall add rule name="CTI_BLOCK_176_97_114_232" dir=out action=block remoteip=176.97.114.232 >nul
@@ -356,4 +352,18 @@ netsh advfirewall firewall add rule name="CTI_BLOCK_104_248_126_159" dir=out act
 netsh advfirewall firewall add rule name="CTI_BLOCK_104_248_126_159" dir=in action=block remoteip=104.248.126.159 >nul
 netsh advfirewall firewall add rule name="CTI_BLOCK_94_154_43_7" dir=out action=block remoteip=94.154.43.7 >nul
 netsh advfirewall firewall add rule name="CTI_BLOCK_94_154_43_7" dir=in action=block remoteip=94.154.43.7 >nul
+netsh advfirewall firewall add rule name="CTI_BLOCK_51_89_231_85" dir=out action=block remoteip=51.89.231.85 >nul
+netsh advfirewall firewall add rule name="CTI_BLOCK_51_89_231_85" dir=in action=block remoteip=51.89.231.85 >nul
+netsh advfirewall firewall add rule name="CTI_BLOCK_51_89_228_250" dir=out action=block remoteip=51.89.228.250 >nul
+netsh advfirewall firewall add rule name="CTI_BLOCK_51_89_228_250" dir=in action=block remoteip=51.89.228.250 >nul
+netsh advfirewall firewall add rule name="CTI_BLOCK_68_65_122_203" dir=out action=block remoteip=68.65.122.203 >nul
+netsh advfirewall firewall add rule name="CTI_BLOCK_68_65_122_203" dir=in action=block remoteip=68.65.122.203 >nul
+netsh advfirewall firewall add rule name="CTI_BLOCK_104_194_158_65" dir=out action=block remoteip=104.194.158.65 >nul
+netsh advfirewall firewall add rule name="CTI_BLOCK_104_194_158_65" dir=in action=block remoteip=104.194.158.65 >nul
+netsh advfirewall firewall add rule name="CTI_BLOCK_185_186_245_144" dir=out action=block remoteip=185.186.245.144 >nul
+netsh advfirewall firewall add rule name="CTI_BLOCK_185_186_245_144" dir=in action=block remoteip=185.186.245.144 >nul
+netsh advfirewall firewall add rule name="CTI_BLOCK_85_215_73_250" dir=out action=block remoteip=85.215.73.250 >nul
+netsh advfirewall firewall add rule name="CTI_BLOCK_85_215_73_250" dir=in action=block remoteip=85.215.73.250 >nul
+netsh advfirewall firewall add rule name="CTI_BLOCK_45_194_90_57" dir=out action=block remoteip=45.194.90.57 >nul
+netsh advfirewall firewall add rule name="CTI_BLOCK_45_194_90_57" dir=in action=block remoteip=45.194.90.57 >nul
 echo [CTI AGENT] Hoan tat ap dung rule Windows Defender Firewall!

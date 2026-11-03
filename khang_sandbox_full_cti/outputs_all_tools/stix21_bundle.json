@@ -1,45 +1,238 @@
 {
   "type": "bundle",
-  "id": "bundle--d8915ad5-0198-5723-a343-eafe2f8aa8da",
+  "id": "bundle--c0dc483d-fe1f-54c3-8f5d-78041ef35a0d",
   "spec_version": "2.1",
   "objects": [
     {
       "type": "identity",
       "spec_version": "2.1",
       "id": "identity--b710dc12-7879-5046-bb5b-e2e390e31ed1",
-      "created": "2026-10-16T07:00:53Z",
-      "modified": "2026-10-16T07:00:53Z",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
       "name": "Autonomous CTI AI Agent System",
       "identity_class": "system"
     },
     {
-      "type": "vulnerability",
+      "type": "indicator",
       "spec_version": "2.1",
-      "id": "vulnerability--df10ccda-dfb7-50bd-934a-41b6e5c54671",
-      "created": "2026-10-16T07:00:53Z",
-      "modified": "2026-10-16T07:00:53Z",
-      "name": "CVE-2026-83548",
-      "description": "Extracted CVE vulnerability identifier from security report",
+      "id": "indicator--b12a7801-943e-5651-9dbf-c3ee8a3136c7",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "name": "Malicious IP: 51.89.231.85",
+      "description": "Extracted IP indicator '51.89.231[.]85' from security report | Source: AlienVault OTX + Abuse.ch/VT + AbuseIPDB + Shodan + GreyNoise (5-Layer Fusion) (Reputation Score: 90/100)",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[ipv4-addr:value = '51.89.231.85']",
+      "pattern_type": "stix",
+      "valid_from": "2026-10-28T09:01:41Z",
+      "confidence": 90
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--fc9e0717-f769-5285-85dc-01ec147db425",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "name": "Malicious IP: 51.89.228.250",
+      "description": "Extracted IP indicator '51.89.228[.]250' from security report | Source: AlienVault OTX + Abuse.ch/VT + AbuseIPDB + Shodan + GreyNoise (5-Layer Fusion) (Reputation Score: 90/100)",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[ipv4-addr:value = '51.89.228.250']",
+      "pattern_type": "stix",
+      "valid_from": "2026-10-28T09:01:41Z",
+      "confidence": 90
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--5a54e42f-79c6-51f5-9502-23f841c6c41c",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "name": "Malicious DOMAIN: GitHub.io",
+      "description": "Extracted defanged domain 'GitHub[.]io' from security report | Source: AlienVault OTX + Abuse.ch MalwareBazaar/OpenPhish + VT (Reputation Score: 89/100)",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[domain-name:value = 'GitHub.io']",
+      "pattern_type": "stix",
+      "valid_from": "2026-10-28T09:01:41Z",
+      "confidence": 89
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--e7391b94-0f54-500e-aa65-d29a22b76bc6",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "name": "Malicious DOMAIN: outlook.com",
+      "description": "Extracted defanged domain 'outlook[.]com' from security report | Source: AlienVault OTX + Abuse.ch MalwareBazaar/OpenPhish + VT (Reputation Score: 89/100)",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[domain-name:value = 'outlook.com']",
+      "pattern_type": "stix",
+      "valid_from": "2026-10-28T09:01:41Z",
+      "confidence": 89
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--8cb31e0a-b109-5280-b1c2-af9c0a687dc3",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "name": "Malicious DOMAIN: digit.dedyn.io",
+      "description": "Extracted defanged domain 'digit.dedyn[.]io' from security report | Source: AlienVault OTX + Abuse.ch MalwareBazaar/OpenPhish + VT (Reputation Score: 89/100)",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[domain-name:value = 'digit.dedyn.io']",
+      "pattern_type": "stix",
+      "valid_from": "2026-10-28T09:01:41Z",
+      "confidence": 89
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--f183887c-bb6b-5e5f-bee4-8d1f540a6d5f",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "name": "Malicious DOMAIN: dedyn.io",
+      "description": "Extracted defanged domain 'dedyn[.]io' from security report | Source: AlienVault OTX + Abuse.ch MalwareBazaar/OpenPhish + VT (Reputation Score: 98/100)",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[domain-name:value = 'dedyn.io']",
+      "pattern_type": "stix",
+      "valid_from": "2026-10-28T09:01:41Z",
+      "confidence": 98
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--a35b9f6a-71f2-5e60-a8fb-8733fd713f3a",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "name": "Malicious DOMAIN: gpt-5-6.github.io",
+      "description": "Extracted defanged domain 'gpt-5-6.github[.]io' from security report | Source: AlienVault OTX + Abuse.ch MalwareBazaar/OpenPhish + VT (Reputation Score: 89/100)",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[domain-name:value = 'gpt-5-6.github.io']",
+      "pattern_type": "stix",
+      "valid_from": "2026-10-28T09:01:41Z",
+      "confidence": 89
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--3e235541-71f2-51ee-8c26-f7615f4dcfe1",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "name": "Malicious DOMAIN: opus-5-0.github.io",
+      "description": "Extracted defanged domain 'opus-5-0.github[.]io' from security report | Source: AlienVault OTX + Abuse.ch MalwareBazaar/OpenPhish + VT (Reputation Score: 89/100)",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[domain-name:value = 'opus-5-0.github.io']",
+      "pattern_type": "stix",
+      "valid_from": "2026-10-28T09:01:41Z",
+      "confidence": 89
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--538f889c-4aa7-5c06-845b-985b03be102d",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "name": "Malicious DOMAIN: calm-piano-floats-313.dedyn.io",
+      "description": "Extracted defanged domain 'calm-piano-floats-313.dedyn[.]io' from security report | Source: AlienVault OTX + Abuse.ch MalwareBazaar/OpenPhish + VT (Reputation Score: 89/100)",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[domain-name:value = 'calm-piano-floats-313.dedyn.io']",
+      "pattern_type": "stix",
+      "valid_from": "2026-10-28T09:01:41Z",
+      "confidence": 89
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--2e85b81a-aff8-52ab-bcbc-6234ff6e95de",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "name": "Malicious SHA256: b5c2d20623d4e6647d06a42864edd8629f82c5c384b243fdaeeeca24b3873d64",
+      "description": "Extracted SHA256 payload hash from security report | Source: AlienVault OTX + Abuse.ch MalwareBazaar/OpenPhish + VT (Reputation Score: 94/100)",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[file:hashes.'SHA-256' = 'b5c2d20623d4e6647d06a42864edd8629f82c5c384b243fdaeeeca24b3873d64']",
+      "pattern_type": "stix",
+      "valid_from": "2026-10-28T09:01:41Z",
+      "confidence": 94
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--05a6f7b2-b16d-5f8f-a871-18196503b1a3",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "name": "Malicious MD5: 1d0d1368b4d53f3a6322cf40e84e63db",
+      "description": "Extracted MD5 binary hash from security report | Source: AlienVault OTX + Abuse.ch MalwareBazaar/OpenPhish + VT (Reputation Score: 94/100)",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[file:hashes.MD5 = '1d0d1368b4d53f3a6322cf40e84e63db']",
+      "pattern_type": "stix",
+      "valid_from": "2026-10-28T09:01:41Z",
+      "confidence": 94
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--3ef84a4e-65c9-530f-a192-4348c247acc0",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "name": "Malicious MD5: dcde1f56048fa18657dc4820397592f7",
+      "description": "Extracted MD5 binary hash from security report | Source: AlienVault OTX + Abuse.ch MalwareBazaar/OpenPhish + VT (Reputation Score: 94/100)",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[file:hashes.MD5 = 'dcde1f56048fa18657dc4820397592f7']",
+      "pattern_type": "stix",
+      "valid_from": "2026-10-28T09:01:41Z",
+      "confidence": 94
+    },
+    {
+      "type": "attack-pattern",
+      "spec_version": "2.1",
+      "id": "attack-pattern--e8e59d1f-3f6a-57f2-98ed-22b9b9a6d440",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "name": "T1071.001 - Application Layer Protocol: Web Protocols",
+      "description": "Tactic: Command and Control (TA0011) | Evidence: Kết nối về máy chủ điều khiển C2 / IP quét lỗ hổng đã xác thực qua VirusTotal, AbuseIPDB & Shodan.",
       "external_references": [
         {
-          "source_name": "cve",
-          "external_id": "CVE-2026-83548"
+          "source_name": "mitre-attack",
+          "external_id": "T1071.001",
+          "url": "https://attack.mitre.org/techniques/T1071/001/"
         }
       ]
     },
     {
       "type": "attack-pattern",
       "spec_version": "2.1",
-      "id": "attack-pattern--315c1acd-b8f9-5ea9-b00a-8acf086abe16",
-      "created": "2026-10-16T07:00:53Z",
-      "modified": "2026-10-16T07:00:53Z",
-      "name": "T1190 - Exploit Public-Facing Application",
-      "description": "Tactic: Initial Access (TA0001) | Evidence: Khai thác lỗ hổng phần mềm máy chủ công khai (CVE / RCE / API Exploit).",
+      "id": "attack-pattern--3c876f53-bbfb-57e8-9de6-8c88a8bc1d01",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "name": "T1059 - Command and Scripting Interpreter",
+      "description": "Tactic: Execution (TA0002) | Evidence: Thực thi mã độc, shellcode hoặc tập lệnh hậu khai thác trên hệ thống mục tiêu.",
       "external_references": [
         {
           "source_name": "mitre-attack",
-          "external_id": "T1190",
-          "url": "https://attack.mitre.org/techniques/T1190/"
+          "external_id": "T1059",
+          "url": "https://attack.mitre.org/techniques/T1059/"
         }
       ]
     },
@@ -47,8 +240,8 @@
       "type": "attack-pattern",
       "spec_version": "2.1",
       "id": "attack-pattern--5ba2a24c-250a-5554-a45e-ec48bce20700",
-      "created": "2026-10-16T07:00:53Z",
-      "modified": "2026-10-16T07:00:53Z",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
       "name": "T1110 - Brute Force / Credential Stuffing",
       "description": "Tactic: Credential Access (TA0006) | Evidence: Rà quét cổng quản trị (SSH/RDP/VPN) và dò mật khẩu hoặc đánh cắp phiên xác thực.",
       "external_references": [
@@ -60,14 +253,646 @@
       ]
     },
     {
+      "type": "attack-pattern",
+      "spec_version": "2.1",
+      "id": "attack-pattern--2dceba92-89aa-5e55-87d0-967bb6ce0e4a",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "name": "T1021 - Remote Services (SMB/RDP/SSH Lateral Movement)",
+      "description": "Tactic: Lateral Movement (TA0008) | Evidence: Di chuyển ngang trong mạng nội bộ qua các giao thức quản trị từ xa.",
+      "external_references": [
+        {
+          "source_name": "mitre-attack",
+          "external_id": "T1021",
+          "url": "https://attack.mitre.org/techniques/T1021/"
+        }
+      ]
+    },
+    {
+      "type": "attack-pattern",
+      "spec_version": "2.1",
+      "id": "attack-pattern--96cc1bb1-c3fb-504e-9a98-e7495e39555e",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "name": "T1486 - Data Encrypted for Impact (Ransomware)",
+      "description": "Tactic: Impact (TA0040) | Evidence: Mã hóa dữ liệu tống tiền hoặc xóa bản sao lưu hệ thống (Shadow Copies).",
+      "external_references": [
+        {
+          "source_name": "mitre-attack",
+          "external_id": "T1486",
+          "url": "https://attack.mitre.org/techniques/T1486/"
+        }
+      ]
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--cfc4bbe2-e2e9-5584-8a1e-0c47ce7d5b5a",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--b12a7801-943e-5651-9dbf-c3ee8a3136c7",
+      "target_ref": "attack-pattern--e8e59d1f-3f6a-57f2-98ed-22b9b9a6d440"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--8bb4bec0-a8b8-559a-aecb-527207877ec8",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--b12a7801-943e-5651-9dbf-c3ee8a3136c7",
+      "target_ref": "attack-pattern--3c876f53-bbfb-57e8-9de6-8c88a8bc1d01"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--6f7232e4-749c-5b66-af71-9293a12b4ea3",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--b12a7801-943e-5651-9dbf-c3ee8a3136c7",
+      "target_ref": "attack-pattern--5ba2a24c-250a-5554-a45e-ec48bce20700"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--4beddcc4-c3db-5eba-af4f-ce96a52d280b",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--b12a7801-943e-5651-9dbf-c3ee8a3136c7",
+      "target_ref": "attack-pattern--2dceba92-89aa-5e55-87d0-967bb6ce0e4a"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--d50d7d8e-dcee-5452-8682-0d1b2c689d77",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--b12a7801-943e-5651-9dbf-c3ee8a3136c7",
+      "target_ref": "attack-pattern--96cc1bb1-c3fb-504e-9a98-e7495e39555e"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--e7fe6230-2766-5f39-bfc4-8ecad238ef6c",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--fc9e0717-f769-5285-85dc-01ec147db425",
+      "target_ref": "attack-pattern--e8e59d1f-3f6a-57f2-98ed-22b9b9a6d440"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--326826fa-79f9-524a-ac37-67c8b5ff6842",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--fc9e0717-f769-5285-85dc-01ec147db425",
+      "target_ref": "attack-pattern--3c876f53-bbfb-57e8-9de6-8c88a8bc1d01"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--ae203cad-4dbd-51e0-bf1c-c3a3868fef86",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--fc9e0717-f769-5285-85dc-01ec147db425",
+      "target_ref": "attack-pattern--5ba2a24c-250a-5554-a45e-ec48bce20700"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--1ec0c202-13d5-57e7-9348-bab73ade28ea",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--fc9e0717-f769-5285-85dc-01ec147db425",
+      "target_ref": "attack-pattern--2dceba92-89aa-5e55-87d0-967bb6ce0e4a"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--faa59fdf-883f-5a7f-bdaa-f0d98c7b9134",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--fc9e0717-f769-5285-85dc-01ec147db425",
+      "target_ref": "attack-pattern--96cc1bb1-c3fb-504e-9a98-e7495e39555e"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--7ca88bbd-4f4e-5547-9542-9f9628531545",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--5a54e42f-79c6-51f5-9502-23f841c6c41c",
+      "target_ref": "attack-pattern--e8e59d1f-3f6a-57f2-98ed-22b9b9a6d440"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--2b60f71e-9a61-582e-969c-bd002bb27ccd",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--5a54e42f-79c6-51f5-9502-23f841c6c41c",
+      "target_ref": "attack-pattern--3c876f53-bbfb-57e8-9de6-8c88a8bc1d01"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--39c0fed1-27f3-5d56-a0b1-68fd5bd89e1e",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--5a54e42f-79c6-51f5-9502-23f841c6c41c",
+      "target_ref": "attack-pattern--5ba2a24c-250a-5554-a45e-ec48bce20700"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--b74d216d-1369-556f-89ae-46ba71426baf",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--5a54e42f-79c6-51f5-9502-23f841c6c41c",
+      "target_ref": "attack-pattern--2dceba92-89aa-5e55-87d0-967bb6ce0e4a"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--880cf66c-6d45-5987-b2cd-d080656ce887",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--5a54e42f-79c6-51f5-9502-23f841c6c41c",
+      "target_ref": "attack-pattern--96cc1bb1-c3fb-504e-9a98-e7495e39555e"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--25a46616-880d-5acf-8dda-48264d9c65d5",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--e7391b94-0f54-500e-aa65-d29a22b76bc6",
+      "target_ref": "attack-pattern--e8e59d1f-3f6a-57f2-98ed-22b9b9a6d440"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--93e5b5e3-568d-555e-8ca2-9e82e421edb9",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--e7391b94-0f54-500e-aa65-d29a22b76bc6",
+      "target_ref": "attack-pattern--3c876f53-bbfb-57e8-9de6-8c88a8bc1d01"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--043bbb5a-5282-5a04-a4ae-db4b8a3a12b9",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--e7391b94-0f54-500e-aa65-d29a22b76bc6",
+      "target_ref": "attack-pattern--5ba2a24c-250a-5554-a45e-ec48bce20700"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--5a69771c-5a50-53e8-9f50-296602ad1d35",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--e7391b94-0f54-500e-aa65-d29a22b76bc6",
+      "target_ref": "attack-pattern--2dceba92-89aa-5e55-87d0-967bb6ce0e4a"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--1b4f5081-de9f-5cd3-a7b9-97061ba8cce0",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--e7391b94-0f54-500e-aa65-d29a22b76bc6",
+      "target_ref": "attack-pattern--96cc1bb1-c3fb-504e-9a98-e7495e39555e"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--a37fadf7-4908-5a2e-9028-5e6beb79fa44",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--8cb31e0a-b109-5280-b1c2-af9c0a687dc3",
+      "target_ref": "attack-pattern--e8e59d1f-3f6a-57f2-98ed-22b9b9a6d440"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--0bab8999-f78f-528e-ad05-5088dd78fcab",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--8cb31e0a-b109-5280-b1c2-af9c0a687dc3",
+      "target_ref": "attack-pattern--3c876f53-bbfb-57e8-9de6-8c88a8bc1d01"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--b757f864-271e-564c-a3ad-6fa9fb545bf5",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--8cb31e0a-b109-5280-b1c2-af9c0a687dc3",
+      "target_ref": "attack-pattern--5ba2a24c-250a-5554-a45e-ec48bce20700"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--cb129b63-0edd-5a9f-97fd-ce64f7beffa0",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--8cb31e0a-b109-5280-b1c2-af9c0a687dc3",
+      "target_ref": "attack-pattern--2dceba92-89aa-5e55-87d0-967bb6ce0e4a"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--db35c211-e477-5a3e-8ef4-ba834f662b81",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--8cb31e0a-b109-5280-b1c2-af9c0a687dc3",
+      "target_ref": "attack-pattern--96cc1bb1-c3fb-504e-9a98-e7495e39555e"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--f7bf9e0b-5d0b-5bc1-a540-91237fcb310f",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--f183887c-bb6b-5e5f-bee4-8d1f540a6d5f",
+      "target_ref": "attack-pattern--e8e59d1f-3f6a-57f2-98ed-22b9b9a6d440"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--e5799efa-4633-5848-9c55-619ad203c0ff",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--f183887c-bb6b-5e5f-bee4-8d1f540a6d5f",
+      "target_ref": "attack-pattern--3c876f53-bbfb-57e8-9de6-8c88a8bc1d01"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--1a040051-6352-5f21-bb69-7ece7a5feb4d",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--f183887c-bb6b-5e5f-bee4-8d1f540a6d5f",
+      "target_ref": "attack-pattern--5ba2a24c-250a-5554-a45e-ec48bce20700"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--bc4d3370-bce5-513d-8c6f-72895da3cc3e",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--f183887c-bb6b-5e5f-bee4-8d1f540a6d5f",
+      "target_ref": "attack-pattern--2dceba92-89aa-5e55-87d0-967bb6ce0e4a"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--af8e8909-f5d9-510d-9d1f-ce1ca6a553b4",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--f183887c-bb6b-5e5f-bee4-8d1f540a6d5f",
+      "target_ref": "attack-pattern--96cc1bb1-c3fb-504e-9a98-e7495e39555e"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--fd805401-496d-5934-b177-0fa037c708e9",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--a35b9f6a-71f2-5e60-a8fb-8733fd713f3a",
+      "target_ref": "attack-pattern--e8e59d1f-3f6a-57f2-98ed-22b9b9a6d440"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--cbcec99b-6930-588f-8dd2-ef6632d66bfd",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--a35b9f6a-71f2-5e60-a8fb-8733fd713f3a",
+      "target_ref": "attack-pattern--3c876f53-bbfb-57e8-9de6-8c88a8bc1d01"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--3b58516d-7210-5491-8064-b35e838f3f64",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--a35b9f6a-71f2-5e60-a8fb-8733fd713f3a",
+      "target_ref": "attack-pattern--5ba2a24c-250a-5554-a45e-ec48bce20700"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--54062717-7a2b-54e8-9bf4-5a5b16eebb2b",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--a35b9f6a-71f2-5e60-a8fb-8733fd713f3a",
+      "target_ref": "attack-pattern--2dceba92-89aa-5e55-87d0-967bb6ce0e4a"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--237fe4bd-b2c7-52cd-bc9b-aa80ad716659",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--a35b9f6a-71f2-5e60-a8fb-8733fd713f3a",
+      "target_ref": "attack-pattern--96cc1bb1-c3fb-504e-9a98-e7495e39555e"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--1ec1339c-a519-5dea-b7eb-5526fe8d63d3",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--3e235541-71f2-51ee-8c26-f7615f4dcfe1",
+      "target_ref": "attack-pattern--e8e59d1f-3f6a-57f2-98ed-22b9b9a6d440"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--39067744-dc0d-5f32-a524-4500069607e7",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--3e235541-71f2-51ee-8c26-f7615f4dcfe1",
+      "target_ref": "attack-pattern--3c876f53-bbfb-57e8-9de6-8c88a8bc1d01"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--d2ae4adb-791d-5c31-96ef-e1619bab9db0",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--3e235541-71f2-51ee-8c26-f7615f4dcfe1",
+      "target_ref": "attack-pattern--5ba2a24c-250a-5554-a45e-ec48bce20700"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--872f0843-472c-5a1a-a96c-5135d6cc763d",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--3e235541-71f2-51ee-8c26-f7615f4dcfe1",
+      "target_ref": "attack-pattern--2dceba92-89aa-5e55-87d0-967bb6ce0e4a"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--799cc0f7-26fc-500f-b515-542477a2b866",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--3e235541-71f2-51ee-8c26-f7615f4dcfe1",
+      "target_ref": "attack-pattern--96cc1bb1-c3fb-504e-9a98-e7495e39555e"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--e97068e1-8c56-55ce-b44d-56d144c7f828",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--538f889c-4aa7-5c06-845b-985b03be102d",
+      "target_ref": "attack-pattern--e8e59d1f-3f6a-57f2-98ed-22b9b9a6d440"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--9493fad1-865c-5950-9997-3c8b579485e2",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--538f889c-4aa7-5c06-845b-985b03be102d",
+      "target_ref": "attack-pattern--3c876f53-bbfb-57e8-9de6-8c88a8bc1d01"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--c4ea6b2d-8dcb-5250-8d06-e90995f3774e",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--538f889c-4aa7-5c06-845b-985b03be102d",
+      "target_ref": "attack-pattern--5ba2a24c-250a-5554-a45e-ec48bce20700"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--4537bb45-5943-51f3-936c-de471e6fd152",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--538f889c-4aa7-5c06-845b-985b03be102d",
+      "target_ref": "attack-pattern--2dceba92-89aa-5e55-87d0-967bb6ce0e4a"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--cb2123b3-e6f2-541f-a9cc-beec844f2f7c",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--538f889c-4aa7-5c06-845b-985b03be102d",
+      "target_ref": "attack-pattern--96cc1bb1-c3fb-504e-9a98-e7495e39555e"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--63ff6678-59ac-5cf3-a44e-97c6c85ab101",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--2e85b81a-aff8-52ab-bcbc-6234ff6e95de",
+      "target_ref": "attack-pattern--e8e59d1f-3f6a-57f2-98ed-22b9b9a6d440"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--b8b00fe3-a951-5ef9-a2ef-7c2063344e87",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--2e85b81a-aff8-52ab-bcbc-6234ff6e95de",
+      "target_ref": "attack-pattern--3c876f53-bbfb-57e8-9de6-8c88a8bc1d01"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--64014e70-f6fc-5039-9e27-842f7987f7d8",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--2e85b81a-aff8-52ab-bcbc-6234ff6e95de",
+      "target_ref": "attack-pattern--5ba2a24c-250a-5554-a45e-ec48bce20700"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--1552926a-494e-5718-a5f6-a54c936155d5",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--2e85b81a-aff8-52ab-bcbc-6234ff6e95de",
+      "target_ref": "attack-pattern--2dceba92-89aa-5e55-87d0-967bb6ce0e4a"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--2e037894-70ec-59d4-b50d-91debfd0cdab",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--2e85b81a-aff8-52ab-bcbc-6234ff6e95de",
+      "target_ref": "attack-pattern--96cc1bb1-c3fb-504e-9a98-e7495e39555e"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--fdf73c23-22a7-57e2-9538-38ddd5d5057f",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--05a6f7b2-b16d-5f8f-a871-18196503b1a3",
+      "target_ref": "attack-pattern--e8e59d1f-3f6a-57f2-98ed-22b9b9a6d440"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--508d1df9-34ad-52c2-a672-72bcc75cd0c4",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--05a6f7b2-b16d-5f8f-a871-18196503b1a3",
+      "target_ref": "attack-pattern--3c876f53-bbfb-57e8-9de6-8c88a8bc1d01"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--6816cb6e-d14a-58a0-b4a7-5e5f76cada15",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--05a6f7b2-b16d-5f8f-a871-18196503b1a3",
+      "target_ref": "attack-pattern--5ba2a24c-250a-5554-a45e-ec48bce20700"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--86e09959-2a74-5162-893c-e7100774a08b",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--05a6f7b2-b16d-5f8f-a871-18196503b1a3",
+      "target_ref": "attack-pattern--2dceba92-89aa-5e55-87d0-967bb6ce0e4a"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--c9ddc139-71bf-560d-a534-9da49bd70d3e",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--05a6f7b2-b16d-5f8f-a871-18196503b1a3",
+      "target_ref": "attack-pattern--96cc1bb1-c3fb-504e-9a98-e7495e39555e"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--62b84baa-25ae-5e5f-8e24-cdc23166ed88",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--3ef84a4e-65c9-530f-a192-4348c247acc0",
+      "target_ref": "attack-pattern--e8e59d1f-3f6a-57f2-98ed-22b9b9a6d440"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--e90f4158-bea4-56df-a740-71ace53d3874",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--3ef84a4e-65c9-530f-a192-4348c247acc0",
+      "target_ref": "attack-pattern--3c876f53-bbfb-57e8-9de6-8c88a8bc1d01"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--438ad7a0-3f65-5bcb-8314-8cbe4da2ee48",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--3ef84a4e-65c9-530f-a192-4348c247acc0",
+      "target_ref": "attack-pattern--5ba2a24c-250a-5554-a45e-ec48bce20700"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--071c19ca-0d3e-548c-ba89-ac9b4581866f",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--3ef84a4e-65c9-530f-a192-4348c247acc0",
+      "target_ref": "attack-pattern--2dceba92-89aa-5e55-87d0-967bb6ce0e4a"
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--c8694738-b379-5624-8224-fb90a98de199",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--3ef84a4e-65c9-530f-a192-4348c247acc0",
+      "target_ref": "attack-pattern--96cc1bb1-c3fb-504e-9a98-e7495e39555e"
+    },
+    {
       "type": "report",
       "spec_version": "2.1",
-      "id": "report--fdc8adcf-677d-57a4-93cd-5999cca534f9",
-      "created": "2026-10-16T07:00:53Z",
-      "modified": "2026-10-16T07:00:53Z",
-      "name": "[CVE-2026-83548] SonicWall SMA1000 Appliances — SonicWall SMA1000 Appliances Server-Side Request Forgery Vulnerability",
-      "description": "1. **Bản chất cuộc tấn công**: Tấn công **Server-Side Request Forgery (SSRF)** qua lỗ hổng **CVE-2026-83548** trên SonicWall SMA1000 Appliances, cho phép kẻ tấn công không xác thực thực hiện các thao tác trái phép từ phía máy chủ.  \n2. **Chặn IP/Domain**: Chặn **IP/Domain liên quan đến SonicWall SMA1000** (nếu có) tại **OpenC2** và **Suricata IPS**, đặc biệt theo dõi các kết nối đến **CVE-2026-83548**.  \n3. **Vá lỗ hổng & quét hành vi**: Vá **CVE-2026-83548** trên **WAF** và quét hành vi **T1190 (Exploit Public-Facing Application)** qua **YARA** và **SIEM** để phát hiện các yêu cầu SSRF bất thường.  \n4. **Khuyến nghị khẩn cấp**: **Ngừng sử dụng SonicWall SMA1000** nếu không thể vá lỗ hổng, tuân thủ **BOD 26-04** của CISA, đánh giá rủi ro và cập nhật phần mềm ngay lập tức.",
-      "published": "2026-10-16T07:00:53Z",
+      "id": "report--1ccf94ba-9f5e-5f58-af0d-da564776ae7b",
+      "created": "2026-10-28T09:01:41Z",
+      "modified": "2026-10-28T09:01:41Z",
+      "name": "Tricks from the Past deployed via signed ChatGPT and Claude binaries",
+      "description": "### Phương án phòng thủ\n\n1. **Bản chất cuộc tấn công trong bài báo này là gì (nhắm vào đâu, dùng lỗ hổng hay mã độc nào)?**\n   - Cuộc tấn công nhắm vào người dùng AI tools như ChatGPT và Claude. Mã độc được đặt cạnh các tệp thực thi hợp pháp từ OpenAI và Anthropic, sử dụng kỹ thuật DLL sideloading để lừa dối hệ thống.\n\n2. **Cần chặn ngay những IP/Domain nào ở Tường lửa OpenC2 & Suricata IPS?**\n   - IP: 51.89.231.85, IP: 51.89.228.250\n   - Domain: digit.dedyn.io, dedyn.io, calm-piano-floats-313.dedyn.io\n\n3. **Cần vá ảo (WAF) lỗ hổng CVE nào hoặc quét YARA/SIEM hành vi gì trên máy trạm?**\n   - Vá lỗ hổng CVE liên quan đến kỹ thuật DLL sideloading.\n   - Quét YARA/SIEM hành vi tải và chạy mã độc từ các URL được liệt kê.\n\n4. **Khuyến nghị khẩn cấp cho Quản trị viên hệ thống.**\n   - Kiểm tra và chặn tất cả các URL và IP được liệt kê trong danh sách IOC.\n   - Cập nhật WAF để chặn các URL giả mạo.\n   - Quét toàn bộ hệ thống bằng YARA/SIEM để phát hiện hành vi bất thường.\n   - Tăng cường giám sát hoạt động mạng và hệ thống.\n   - Thực hiện đào tạo cho nhân viên về nhận biết và phòng tránh tấn công AI.",
+      "published": "2026-10-28T09:01:41Z",
       "created_by_ref": "identity--b710dc12-7879-5046-bb5b-e2e390e31ed1",
       "report_types": [
         "threat-report",
@@ -76,9 +901,83 @@
       ],
       "object_refs": [
         "identity--b710dc12-7879-5046-bb5b-e2e390e31ed1",
-        "vulnerability--df10ccda-dfb7-50bd-934a-41b6e5c54671",
-        "attack-pattern--315c1acd-b8f9-5ea9-b00a-8acf086abe16",
-        "attack-pattern--5ba2a24c-250a-5554-a45e-ec48bce20700"
+        "indicator--b12a7801-943e-5651-9dbf-c3ee8a3136c7",
+        "indicator--fc9e0717-f769-5285-85dc-01ec147db425",
+        "indicator--5a54e42f-79c6-51f5-9502-23f841c6c41c",
+        "indicator--e7391b94-0f54-500e-aa65-d29a22b76bc6",
+        "indicator--8cb31e0a-b109-5280-b1c2-af9c0a687dc3",
+        "indicator--f183887c-bb6b-5e5f-bee4-8d1f540a6d5f",
+        "indicator--a35b9f6a-71f2-5e60-a8fb-8733fd713f3a",
+        "indicator--3e235541-71f2-51ee-8c26-f7615f4dcfe1",
+        "indicator--538f889c-4aa7-5c06-845b-985b03be102d",
+        "indicator--2e85b81a-aff8-52ab-bcbc-6234ff6e95de",
+        "indicator--05a6f7b2-b16d-5f8f-a871-18196503b1a3",
+        "indicator--3ef84a4e-65c9-530f-a192-4348c247acc0",
+        "attack-pattern--e8e59d1f-3f6a-57f2-98ed-22b9b9a6d440",
+        "attack-pattern--3c876f53-bbfb-57e8-9de6-8c88a8bc1d01",
+        "attack-pattern--5ba2a24c-250a-5554-a45e-ec48bce20700",
+        "attack-pattern--2dceba92-89aa-5e55-87d0-967bb6ce0e4a",
+        "attack-pattern--96cc1bb1-c3fb-504e-9a98-e7495e39555e",
+        "relationship--cfc4bbe2-e2e9-5584-8a1e-0c47ce7d5b5a",
+        "relationship--8bb4bec0-a8b8-559a-aecb-527207877ec8",
+        "relationship--6f7232e4-749c-5b66-af71-9293a12b4ea3",
+        "relationship--4beddcc4-c3db-5eba-af4f-ce96a52d280b",
+        "relationship--d50d7d8e-dcee-5452-8682-0d1b2c689d77",
+        "relationship--e7fe6230-2766-5f39-bfc4-8ecad238ef6c",
+        "relationship--326826fa-79f9-524a-ac37-67c8b5ff6842",
+        "relationship--ae203cad-4dbd-51e0-bf1c-c3a3868fef86",
+        "relationship--1ec0c202-13d5-57e7-9348-bab73ade28ea",
+        "relationship--faa59fdf-883f-5a7f-bdaa-f0d98c7b9134",
+        "relationship--7ca88bbd-4f4e-5547-9542-9f9628531545",
+        "relationship--2b60f71e-9a61-582e-969c-bd002bb27ccd",
+        "relationship--39c0fed1-27f3-5d56-a0b1-68fd5bd89e1e",
+        "relationship--b74d216d-1369-556f-89ae-46ba71426baf",
+        "relationship--880cf66c-6d45-5987-b2cd-d080656ce887",
+        "relationship--25a46616-880d-5acf-8dda-48264d9c65d5",
+        "relationship--93e5b5e3-568d-555e-8ca2-9e82e421edb9",
+        "relationship--043bbb5a-5282-5a04-a4ae-db4b8a3a12b9",
+        "relationship--5a69771c-5a50-53e8-9f50-296602ad1d35",
+        "relationship--1b4f5081-de9f-5cd3-a7b9-97061ba8cce0",
+        "relationship--a37fadf7-4908-5a2e-9028-5e6beb79fa44",
+        "relationship--0bab8999-f78f-528e-ad05-5088dd78fcab",
+        "relationship--b757f864-271e-564c-a3ad-6fa9fb545bf5",
+        "relationship--cb129b63-0edd-5a9f-97fd-ce64f7beffa0",
+        "relationship--db35c211-e477-5a3e-8ef4-ba834f662b81",
+        "relationship--f7bf9e0b-5d0b-5bc1-a540-91237fcb310f",
+        "relationship--e5799efa-4633-5848-9c55-619ad203c0ff",
+        "relationship--1a040051-6352-5f21-bb69-7ece7a5feb4d",
+        "relationship--bc4d3370-bce5-513d-8c6f-72895da3cc3e",
+        "relationship--af8e8909-f5d9-510d-9d1f-ce1ca6a553b4",
+        "relationship--fd805401-496d-5934-b177-0fa037c708e9",
+        "relationship--cbcec99b-6930-588f-8dd2-ef6632d66bfd",
+        "relationship--3b58516d-7210-5491-8064-b35e838f3f64",
+        "relationship--54062717-7a2b-54e8-9bf4-5a5b16eebb2b",
+        "relationship--237fe4bd-b2c7-52cd-bc9b-aa80ad716659",
+        "relationship--1ec1339c-a519-5dea-b7eb-5526fe8d63d3",
+        "relationship--39067744-dc0d-5f32-a524-4500069607e7",
+        "relationship--d2ae4adb-791d-5c31-96ef-e1619bab9db0",
+        "relationship--872f0843-472c-5a1a-a96c-5135d6cc763d",
+        "relationship--799cc0f7-26fc-500f-b515-542477a2b866",
+        "relationship--e97068e1-8c56-55ce-b44d-56d144c7f828",
+        "relationship--9493fad1-865c-5950-9997-3c8b579485e2",
+        "relationship--c4ea6b2d-8dcb-5250-8d06-e90995f3774e",
+        "relationship--4537bb45-5943-51f3-936c-de471e6fd152",
+        "relationship--cb2123b3-e6f2-541f-a9cc-beec844f2f7c",
+        "relationship--63ff6678-59ac-5cf3-a44e-97c6c85ab101",
+        "relationship--b8b00fe3-a951-5ef9-a2ef-7c2063344e87",
+        "relationship--64014e70-f6fc-5039-9e27-842f7987f7d8",
+        "relationship--1552926a-494e-5718-a5f6-a54c936155d5",
+        "relationship--2e037894-70ec-59d4-b50d-91debfd0cdab",
+        "relationship--fdf73c23-22a7-57e2-9538-38ddd5d5057f",
+        "relationship--508d1df9-34ad-52c2-a672-72bcc75cd0c4",
+        "relationship--6816cb6e-d14a-58a0-b4a7-5e5f76cada15",
+        "relationship--86e09959-2a74-5162-893c-e7100774a08b",
+        "relationship--c9ddc139-71bf-560d-a534-9da49bd70d3e",
+        "relationship--62b84baa-25ae-5e5f-8e24-cdc23166ed88",
+        "relationship--e90f4158-bea4-56df-a740-71ace53d3874",
+        "relationship--438ad7a0-3f65-5bcb-8314-8cbe4da2ee48",
+        "relationship--071c19ca-0d3e-548c-ba89-ac9b4581866f",
+        "relationship--c8694738-b379-5624-8224-fb90a98de199"
       ]
     }
   ]

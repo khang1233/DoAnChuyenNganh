@@ -82,7 +82,7 @@ def start_ollama_if_needed():
             except Exception:
                 pass
 
-def start_system():
+def start_system(target_dir: str = ""):
     """Khởi động hệ thống CTI Dashboard và WAF Proxy chạy ngầm độc lập."""
     print("=" * 78)
     print("  DANG KHOI DONG HE THONG AN NINH MANG TU HANH CTI AGENTIC DEFENSE...")
@@ -103,8 +103,12 @@ def start_system():
     env["PYTHONIOENCODING"] = "utf-8"
 
     try:
+        cmd_args = [sys.executable, str(APP_FILE)]
+        if target_dir:
+            cmd_args.extend(["--target", target_dir])
+            env["CTI_TARGET_PROJECT"] = target_dir
         subprocess.Popen(
-            [sys.executable, str(APP_FILE)],
+            cmd_args,
             cwd=str(SANDBOX_DIR),
             env=env,
             stdout=subprocess.DEVNULL,
@@ -122,11 +126,13 @@ def start_system():
     if ready:
         print("[OK] He thong da san sang!")
         time.sleep(0.5)
-        webbrowser.open("http://127.0.0.1:8765")
+        url = f"http://127.0.0.1:8765/?target={target_dir}" if target_dir else "http://127.0.0.1:8765"
+        webbrowser.open(url)
         return True
     else:
         print("[CANH BAO] Server can them thoi gian khoi dong cac mo hinh AI...")
-        webbrowser.open("http://127.0.0.1:8765")
+        url = f"http://127.0.0.1:8765/?target={target_dir}" if target_dir else "http://127.0.0.1:8765"
+        webbrowser.open(url)
         return True
 
 def stop_system():
@@ -224,7 +230,7 @@ def interactive_menu():
 
         if not choice or choice in ("1", "m"):
             if is_running:
-                webbrowser.open("http://127.0.0.1:8765")
+                webbrowser.open('http://127.0.0.1:8765')
             else:
                 start_system()
         elif choice in ("2", "t"):
@@ -256,7 +262,8 @@ def main():
         start_system()
     else:
         # Nếu đang chạy, mở ngay browser
-        webbrowser.open("http://127.0.0.1:8765")
+        url = f"http://127.0.0.1:8765/?target={target_dir}" if target_dir else "http://127.0.0.1:8765"
+        webbrowser.open(url)
 
     # Mở bảng điều khiển tương tác
     interactive_menu()

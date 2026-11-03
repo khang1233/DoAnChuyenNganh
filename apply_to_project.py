@@ -15,6 +15,7 @@ Quy trình tự động hóa khép kín 5 pha:
 
 import os
 import sys
+import json
 import shutil
 import sqlite3
 import argparse
@@ -261,7 +262,7 @@ def synthesize_and_deploy_skill(target_path: Path, scope_id: str, article_id: st
 
 ---
 
-## 🎯 NHIỆM VỤ DÀNH CHO AI AGENT (5 BƯỚC HÀNH ĐỘNG KHÉP KÍN):
+## [NHIEM VU DANG KY] NHIEM VU DANH CHO AI AGENT (5 BƯỚC HÀNH ĐỘNG KHÉP KÍN):
 
 ### BƯỚC 1: KIỂM THỬ ĐIỂM YẾU BAN ĐẦU (ACTIVE PROBE AUDIT)
 - Chạy script kiểm thử đa vector tự động để phát hiện lỗ hổng:
@@ -305,6 +306,21 @@ def synthesize_and_deploy_skill(target_path: Path, scope_id: str, article_id: st
 - Khi phát hiện bài báo mới đe dọa công nghệ của dự án, chu trình 5 bước trên sẽ tự động lặp lại.
 """, encoding="utf-8")
     print(f"[+] Đã tạo file kịch bản hành động hậu kỹ năng: {guide_file.name}")
+    try:
+        defense_meta = {
+            "project_name": target_path.name,
+            "project_path": str(target_path.resolve()),
+            "scope_id": scope_id,
+            "scope_name": profile["name"],
+            "skill_name": bundle_path.name,
+            "article_id": best_article_id if "best_article_id" in locals() else "",
+            "configured_at": datetime.now().isoformat(),
+            "status": "PROTECTED"
+        }
+        (target_path / ".cti_defense.json").write_text(json.dumps(defense_meta, indent=2, ensure_ascii=False), encoding="utf-8")
+        print(f"[+] Đã lưu cấu hình dự án bảo vệ: {target_path / '.cti_defense.json'}")
+    except Exception as e:
+        print(f"[-] Lỗi lưu .cti_defense.json: {e}")
     return bundle_path.name
 
 
@@ -336,7 +352,7 @@ def main():
         target_path = Path(args.target).resolve()
 
     print("=" * 75)
-    print("🚀 AUTONOMOUS CTI & AGENTIC DEFENSE LIFECYCLE (5-STAGE PROTOCOL)")
+    print("[+] AUTONOMOUS CTI & AGENTIC DEFENSE LIFECYCLE (5-STAGE PROTOCOL)")
     print("=" * 75)
 
     # Pha 1: Quét và lập hồ sơ Scope
@@ -365,7 +381,7 @@ def main():
 
     # Pha 5: Kịch bản hậu kỹ năng
     print("\n" + "=" * 75)
-    print("🎉 HOÀN TẤT THIẾT LẬP! HỆ THỐNG ĐÃ KẾT NỐI VÀO DỰ ÁN THÀNH CÔNG.")
+    print("[+] HOÀN TẤT THIẾT LẬP! HỆ THỐNG ĐÃ KẾT NỐI VÀO DỰ ÁN THÀNH CÔNG.")
     print("=" * 75)
     print(f"1. Gói kỹ năng tác tử: defense_skills/{skill_name}/")
     print(f"2. File hướng dẫn 5 bước hành động: {target_path / 'AGENT_REMEDIATION_GUIDE.md'}")

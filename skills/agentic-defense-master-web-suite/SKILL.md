@@ -1,6 +1,6 @@
 ---
 name: agentic-defense-master-web-suite
-description: Gói kỹ năng phòng thủ tác tử toàn diện (Master Defense Suite) cho phân hệ SCOPE_WEB (PHP Framework (Laravel / WordPress / Custom), Node.js / JavaScript Web Ecosystem, Python Backend (FastAPI / Django / Flask)). Tích hợp đa lớp WAF, Tường lửa C2, Kiểm thử đa vector và Quy chuẩn sửa code an toàn cho Node.js, Express, Python.
+description: Gói kỹ năng phòng thủ tác tử toàn diện (Master Defense Suite) cho phân hệ SCOPE_WEB (PHP Framework (Laravel / WordPress / Custom)). Tích hợp đa lớp WAF, Tường lửa C2, Kiểm thử đa vector và Quy chuẩn sửa code an toàn cho Node.js, Express, Python.
 author: OpenClaw CTI Defense Orchestrator
 version: 2.0.0
 scope: SCOPE_WEB
@@ -11,8 +11,8 @@ trust_score: 97.5
 
 ## 📌 THÔNG TIN ĐỊNH DANH PHÂN HỆ
 - **Mã phân hệ bảo vệ:** `SCOPE_WEB`
-- **Công nghệ đích:** `PHP Framework (Laravel / WordPress / Custom), Node.js / JavaScript Web Ecosystem, Python Backend (FastAPI / Django / Flask)`
-- **Mã CVE bao phủ:** `CVE-2016-15042, CVE-2017-7921, CVE-2019-11510, CVE-2019-9879, CVE-2020-1938, CVE-2020-25078, CVE-2020-25169, CVE-2021-22205`
+- **Công nghệ đích:** `PHP Framework (Laravel / WordPress / Custom)`
+- **Mã CVE bao phủ:** `CVE-2016-15042, CVE-2019-11510, CVE-2019-9879, CVE-2020-1938, CVE-2021-22205, CVE-2022-28368, CVE-2023-22793, CVE-2023-28121`
 - **Mức độ tin cậy CTI:** `97.5 / 100 (Evidence-Driven)`
 
 ---
@@ -20,7 +20,7 @@ trust_score: 97.5
 ## 🎯 4 TRỤ CỘT PHÒNG THỦ ĐA LỚP (DEFENSE-IN-DEPTH)
 
 1. **Lớp 1: Biên mạng & Tường lửa C2 (Perimeter Shield)**
-   - Chặn đứng 100% kết nối đến danh sách `100` địa chỉ IP C2 độc hại đã phát hiện từ CTI feeds.
+   - Chặn đứng 100% kết nối đến danh sách `102` địa chỉ IP C2 độc hại đã phát hiện từ CTI feeds.
    - File cấu hình: `rules/firewall_c2_blocklist.txt`
 
 2. **Lớp 2: Lá chắn ảo WAF ModSecurity (Virtual Patching)**
@@ -491,34 +491,19 @@ Duy trì chu kỳ quét 15 phút / lần để tự động nạp các mã CVE m
 ## 🧭 BẢN ĐỒ NGỮ CẢNH DỰ ÁN MỤC TIÊU (TARGET PROJECT ARCHITECTURAL CONTEXT)
 
 > [!IMPORTANT]
-> **Tác tử AI (Claude, Cursor, Codex, Antigravity, Devin, Aider, Continue)**: Dự án `My_Website` đã được hệ thống CTI thẩm định ngữ cảnh.
+> **Tác tử AI (Claude, Cursor, Codex, Antigravity, Devin, Aider, Continue)**: Dự án `demo_vulnerable_php_app` đã được hệ thống CTI thẩm định ngữ cảnh.
 > Tuyệt đối không suy luận chung chung! Bạn phải đọc ngữ cảnh thực tế của dự án dưới đây để thực hiện refactor:
 
-- **Tên dự án:** `My_Website`
-- **Frameworks nhận diện:** `express, react, vite, discord.py, requests`
-- **Tổng số tệp mã nguồn:** `72 files`
+- **Tên dự án:** `demo_vulnerable_php_app`
+- **Frameworks nhận diện:** `Custom Web Stack`
+- **Tổng số tệp mã nguồn:** `1 files`
 
 ### 1. Các File Khởi Chạy Trọng Tâm (Key Entrypoints):
-- `botdiscord/app.py`
-- `frontend/src/App.jsx`
-- `frontend/src/main.jsx`
-- `frontend/src/components/AppHeader.jsx`
-- `frontend/src/components/AppSidebar.jsx`
-- `frontend/src/components/MinecraftBotViews.jsx`
-- `botdiscord/ptkngu/bot.py`
-- `botdiscord/token_manager_tool/modules/server_checker.py`
+- `index.php`
 
 ### 2. Các Điểm Nóng Bảo Mật Thực Tế Cần Rà Soát (Detected Sensitive Sinks):
 Hệ thống phát hiện các hàm thực thi hệ thống hoặc truy vấn cần được bảo vệ theo chuẩn CTI:
-- **Tệp:** `backend/src/admin/vpsMonitor.js`
-  - Dòng 3 [Command Execution / RCE Risk]: `import { exec, execSync } from 'child_process';`
-  - Dòng 6 [Command Execution / RCE Risk]: `const execAsync = util.promisify(exec);`
-  - Dòng 229 [Command Execution / RCE Risk]: `exec('pm2 jlist', { encoding: 'utf-8', timeout: 4000, stdio: ['pipe', 'pipe', 'ignore'] }, (err, std`
-  - Dòng 276 [Command Execution / RCE Risk]: `const { stdout, stderr } = await execAsync(cmd, { timeout: 10000 });`
-- **Tệp:** `backend/src/discord/discordManager.js`
-  - Dòng 2 [Command Execution / RCE Risk]: `import { spawn } from 'child_process';`
-  - Dòng 455 [Command Execution / RCE Risk]: `const scoutProc = spawn(pyCmd, [PROXY_SCOUT_SCRIPT, PROXY_POOL_FILE], {`
-  - Dòng 682 [Command Execution / RCE Risk]: `const pyProcess = spawn(pyCmd, pyArgs, { shell: false });`
+- Chưa phát hiện sink nguy hiểm trực tiếp. Cần rà soát các điểm nhận input từ request người dùng.
 
 ### 3. Chỉ Dẫn Hành Động Cụ Thể Cho AI Coding Agent:
 1. Mở trực tiếp các tệp tin trong danh sách Điểm Nóng phía trên.
