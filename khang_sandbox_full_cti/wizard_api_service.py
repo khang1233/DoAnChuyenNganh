@@ -305,7 +305,7 @@ def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3) -> Di
 
         # Bóc tách chi tiết từng bài báo để AI xử lý tuần tự trực tiếp trên giao diện
         enriched_articles = []
-        for r in matched_rows[:12]:
+        for r in matched_rows:
             c_text = r["content"] or ""
             r_cves = re.findall(r"\bCVE-\d{4}-\d{4,7}\b", r["title"] + " " + c_text)
             r_cves = list(dict.fromkeys(r_cves))

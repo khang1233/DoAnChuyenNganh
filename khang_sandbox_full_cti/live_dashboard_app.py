@@ -1525,24 +1525,40 @@ HTML_PAGE = r"""<!DOCTYPE html>
         <div id="wzAgentLogTerminal" style="display:none; background:#0f172a; color:#38bdf8; font-family:monospace; font-size:12px; padding:14px; border-radius:6px; max-height:160px; overflow-y:auto; margin-bottom:16px; border:1px solid #1e293b; line-height:1.6;">
         </div>
 
-        <!-- KHUNG DANH SÁCH BÀI BÁO ĐƯỢC QUÉT & TIẾN TRÌNH AI XỬ LÝ TỪNG BÀI -->
+        <!-- KHUNG HÀNG ĐỢI TÌNH BÁO CTI & TIẾN TRÌNH AI XỬ LÝ (CHUẨN LIVE SERVER) -->
         <div id="wzScannedArticlesSection" style="display:none; margin-bottom:18px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:16px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
-            <div style="font-size:13px; font-weight:700; color:#0f172a;">
-              DANH SÁCH BÀI BÁO TÌNH BÁO CTI ĐƯỢC QUÉT CHO DỰ ÁN (<span id="wzArticlesCountHeader">0</span>)
+            <div style="font-size:13.5px; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:8px;">
+              <span>HÀNG ĐỢI TÌNH BÁO CTI DỰ ÁN</span>
+              <span id="wzArticlesCountHeader" style="font-size:12px; background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:4px; font-weight:700;">0 bài</span>
             </div>
             <div id="wzProgressStatusText" style="font-size:12px; font-weight:700; color:#2563eb;">
               Đang chuẩn bị...
             </div>
           </div>
 
-          <!-- Thanh tiến độ xử lý từng bài của AI -->
-          <div style="background:#e2e8f0; border-radius:4px; height:8px; width:100%; overflow:hidden; margin-bottom:14px;">
+          <!-- Thanh tiến độ tổng quan -->
+          <div style="background:#e2e8f0; border-radius:4px; height:8px; width:100%; overflow:hidden; margin-bottom:12px;">
             <div id="wzProgressBar" style="width:0%; height:100%; background:linear-gradient(90deg, #2563eb, #16a34a); transition:width 0.3s ease;"></div>
           </div>
 
-          <!-- Danh sách thẻ bài báo trực quan -->
-          <div id="wzArticlesQueueList" style="display:flex; flex-direction:column; gap:10px; max-height:380px; overflow-y:auto; padding-right:4px;">
+          <!-- Thanh phân loại trạng thái: ĐANG XỬ LÝ, CHỜ XỬ LÝ, ĐÃ XỬ LÝ -->
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px; padding:10px 14px; background:#ffffff; border:1px solid #e2e8f0; border-radius:6px;">
+            <div style="display:flex; gap:16px; font-size:12.5px; font-weight:600; align-items:center;">
+              <span style="color:#16a34a;">Đã xử lý: <b id="wzStatCompletedCount">0</b></span>
+              <span style="color:#2563eb;">Đang xử lý: <b id="wzStatProcessingCount">0</b></span>
+              <span style="color:#64748b;">Chờ xử lý: <b id="wzStatPendingCount">0</b></span>
+            </div>
+            <div style="display:flex; gap:6px;" id="wzQueueFilterButtons">
+              <button type="button" class="CleanBtn wzFilterBtn active" onclick="filterWzQueue('ALL', this)" style="font-size:11.5px; padding:4px 10px; background:#2563eb; color:#fff; border-radius:4px; border:1px solid #1d4ed8; font-weight:600;">Tất Cả (<span id="wzFilterAllCount">0</span>)</button>
+              <button type="button" class="CleanBtn wzFilterBtn" onclick="filterWzQueue('PROCESSING', this)" style="font-size:11.5px; padding:4px 10px; background:#f1f5f9; color:#1e293b; border-radius:4px; border:1px solid #cbd5e1; font-weight:600;">Đang Xử Lý (<span id="wzFilterProcCount">0</span>)</button>
+              <button type="button" class="CleanBtn wzFilterBtn" onclick="filterWzQueue('PENDING', this)" style="font-size:11.5px; padding:4px 10px; background:#f1f5f9; color:#1e293b; border-radius:4px; border:1px solid #cbd5e1; font-weight:600;">Chờ Xử Lý (<span id="wzFilterPendCount">0</span>)</button>
+              <button type="button" class="CleanBtn wzFilterBtn" onclick="filterWzQueue('COMPLETED', this)" style="font-size:11.5px; padding:4px 10px; background:#f1f5f9; color:#1e293b; border-radius:4px; border:1px solid #cbd5e1; font-weight:600;">Đã Xử Lý (<span id="wzFilterDoneCount">0</span>)</button>
+            </div>
+          </div>
+
+          <!-- Danh sách thẻ bài báo trực quan có phân loại trạng thái -->
+          <div id="wzArticlesQueueList" style="display:flex; flex-direction:column; gap:10px; max-height:420px; overflow-y:auto; padding-right:4px;">
           </div>
         </div>
 
@@ -2234,19 +2250,30 @@ HTML_PAGE = r"""<!DOCTYPE html>
         btnEl.style.color = '#ffffff';
         btnEl.style.borderColor = '#1d4ed8';
       }
-      const ids = ['sec-wizard', 'sec-chat', 'sec-add', 'sec-feed', 'sec-history', 'sec-score', 'sec-defense'];
-      if (sectionId === 'all') {
+      const isMainWorkflow = (sectionId === 'all' || sectionId === 'sec-wizard' || sectionId === 'sec-feed' || sectionId === 'sec-history' || sectionId === 'sec-score' || sectionId === 'sec-defense');
+      if (isMainWorkflow) {
         const wiz = document.getElementById('sec-wizard');
-        if (wiz) {
-          wiz.style.display = wzIsProjectConfigured ? 'none' : 'block';
+        if (wiz) wiz.style.display = 'block';
+        const chat = document.getElementById('sec-chat');
+        if (chat) chat.style.display = 'none';
+        const add = document.getElementById('sec-add');
+        if (add) add.style.display = 'none';
+
+        const feed = document.getElementById('sec-feed');
+        if (feed) feed.style.display = 'block';
+        const hist = document.getElementById('sec-history');
+        if (hist) hist.style.display = 'block';
+        const score = document.getElementById('sec-score');
+        if (score) score.style.display = 'block';
+        const defense = document.getElementById('sec-defense');
+        if (defense) defense.style.display = 'block';
+
+        if (sectionId !== 'all') {
+          const targetEl = document.getElementById(sectionId);
+          if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-        document.getElementById('sec-chat').style.display = 'none';
-        document.getElementById('sec-add').style.display = 'none';
-        document.getElementById('sec-feed').style.display = 'block';
-        document.getElementById('sec-history').style.display = 'block';
-        document.getElementById('sec-score').style.display = 'block';
-        document.getElementById('sec-defense').style.display = 'block';
       } else {
+        const ids = ['sec-wizard', 'sec-chat', 'sec-add', 'sec-feed', 'sec-history', 'sec-score', 'sec-defense'];
         ids.forEach(id => {
           const el = document.getElementById(id);
           if (el) el.style.display = (id === sectionId) ? 'block' : 'none';
@@ -6099,22 +6126,62 @@ let wzIsProjectConfigured = false;
       }
     }
 
+    let wzCurrentQueueFilter = 'ALL';
+
+    function filterWzQueue(filterMode, btnEl) {
+      wzCurrentQueueFilter = filterMode;
+      document.querySelectorAll('#wzQueueFilterButtons .wzFilterBtn').forEach(b => {
+        b.classList.remove('active');
+        b.style.background = '#f1f5f9';
+        b.style.color = '#1e293b';
+        b.style.borderColor = '#cbd5e1';
+      });
+      if (btnEl) {
+        btnEl.classList.add('active');
+        btnEl.style.background = '#2563eb';
+        btnEl.style.color = '#ffffff';
+        btnEl.style.borderColor = '#1d4ed8';
+      }
+      applyWzQueueFilterVisibility();
+    }
+
+    function applyWzQueueFilterVisibility() {
+      const container = document.getElementById('wzArticlesQueueList');
+      if (!container) return;
+      const cards = container.children;
+      for (let i = 0; i < cards.length; i++) {
+        const c = cards[i];
+        const st = c.getAttribute('data-status') || 'pending';
+        if (wzCurrentQueueFilter === 'ALL') {
+          c.style.display = 'block';
+        } else if (wzCurrentQueueFilter === 'PROCESSING') {
+          c.style.display = (st === 'processing') ? 'block' : 'none';
+        } else if (wzCurrentQueueFilter === 'PENDING') {
+          c.style.display = (st === 'pending') ? 'block' : 'none';
+        } else if (wzCurrentQueueFilter === 'COMPLETED') {
+          c.style.display = (st === 'completed') ? 'block' : 'none';
+        }
+      }
+    }
+
     function renderArticleQueueItem(art, idx) {
       const cveChips = (art.cves || []).map(c => `<span style="background:#fee2e2; color:#b91c1c; font-weight:700; padding:2px 6px; border-radius:4px; font-size:11px; margin-right:4px;">[${c}]</span>`).join("");
       const ipChip = (art.sample_ips && art.sample_ips.length) ? `<span style="background:#f1f5f9; color:#475569; font-weight:600; padding:2px 6px; border-radius:4px; font-size:11px; margin-right:4px;">C2: ${art.sample_ips[0]}</span>` : "";
       const riskColor = art.risk_level === "CRITICAL" ? "#b91c1c" : "#d97706";
       const riskBg = art.risk_level === "CRITICAL" ? "#fef2f2" : "#fffbeb";
+      const seqStr = String(idx + 1).padStart(3, '0');
 
       return `
-        <div id="wzArtCard_${idx}" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; padding:12px 14px; transition:all 0.3s ease;">
+        <div id="wzArtCard_${idx}" data-status="pending" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; padding:12px 14px; transition:all 0.3s ease;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
             <div style="display:flex; align-items:center; gap:6px;">
-              <span style="font-size:11px; font-weight:700; background:#eff6ff; color:#1d4ed8; padding:2px 8px; border-radius:4px;">${art.source_name || 'CTI Feed'}</span>
+              <span style="font-family:monospace; font-weight:700; font-size:11px; color:#2563eb; background:#eff6ff; padding:2px 6px; border-radius:3px;">#${seqStr}</span>
+              <span style="font-size:11px; font-weight:700; background:#f8fafc; color:#1e293b; padding:2px 8px; border-radius:4px; border:1px solid #e2e8f0;">${art.source_name || 'CTI Feed'}</span>
               <span style="font-size:11px; color:#64748b;">${art.published_date || ''}</span>
               <span style="font-size:10.5px; font-weight:700; background:${riskBg}; color:${riskColor}; padding:2px 6px; border-radius:4px;">${art.risk_level || 'HIGH'}</span>
             </div>
             <div id="wzArtBadge_${idx}" style="font-size:11px; font-weight:700; background:#f1f5f9; color:#64748b; padding:2px 8px; border-radius:4px; border:1px solid #cbd5e1;">
-              CHỜ AI XỬ LÝ
+              CHỜ XỬ LÝ
             </div>
           </div>
           <div style="font-size:13px; font-weight:700; color:#0f172a; margin-bottom:6px; line-height:1.4;">
@@ -6172,13 +6239,35 @@ let wzIsProjectConfigured = false;
 
           // Hiển thị khung danh sách bài báo đã quét
           if (articlesSection) articlesSection.style.display = "block";
-          if (countHeader) countHeader.textContent = `${queueArticles.length} bài nổi bật / ${d.matched_articles_count} bài trong phân hệ`;
+          const total = queueArticles.length;
+          if (countHeader) countHeader.textContent = `${total} bài trong phân hệ`;
+
+          let completedCount = 0;
+          let processingCount = 0;
+          let pendingCount = total;
+
+          const elStatDone = document.getElementById("wzStatCompletedCount");
+          const elStatProc = document.getElementById("wzStatProcessingCount");
+          const elStatPend = document.getElementById("wzStatPendingCount");
+          const elFiltAll = document.getElementById("wzFilterAllCount");
+          const elFiltProc = document.getElementById("wzFilterProcCount");
+          const elFiltPend = document.getElementById("wzFilterPendCount");
+          const elFiltDone = document.getElementById("wzFilterDoneCount");
+
+          if (elStatDone) elStatDone.textContent = "0";
+          if (elStatProc) elStatProc.textContent = "0";
+          if (elStatPend) elStatPend.textContent = String(total);
+          if (elFiltAll) elFiltAll.textContent = String(total);
+          if (elFiltProc) elFiltProc.textContent = "0";
+          if (elFiltPend) elFiltPend.textContent = String(total);
+          if (elFiltDone) elFiltDone.textContent = "0";
+
           if (progressBar) {
             progressBar.style.width = "0%";
             progressBar.style.background = "linear-gradient(90deg, #2563eb, #16a34a)";
           }
           if (progressStatus) {
-            progressStatus.textContent = `Tìm thấy ${queueArticles.length} bài báo đe dọa trực tiếp. AI bắt đầu phân tích...`;
+            progressStatus.textContent = `Hàng đợi sẵn sàng ${total} bài báo CTI. AI bắt đầu đối soát tuần tự...`;
             progressStatus.style.color = "#2563eb";
           }
           if (articlesListEl) {
@@ -6188,7 +6277,7 @@ let wzIsProjectConfigured = false;
           const initLog = document.createElement("div");
           initLog.style.color = "#4ade80";
           initLog.style.marginBottom = "4px";
-          initLog.textContent = `[CTI SCAN HOÀN TẤT] Tìm thấy ${d.matched_articles_count} bài báo thuộc phân hệ [${d.scope_name}]. Bắt đầu nạp và xử lý tuần tự ${queueArticles.length} bài báo trọng tâm:`;
+          initLog.textContent = `[CTI SCAN HOÀN TẤT] Tìm thấy ${d.matched_articles_count} bài báo thuộc phân hệ [${d.scope_name}]. Bắt đầu nạp và xử lý toàn bộ ${total} bài báo trong hàng đợi:`;
           if (term) {
             term.appendChild(initLog);
             term.scrollTop = term.scrollHeight;
@@ -6196,16 +6285,16 @@ let wzIsProjectConfigured = false;
 
           // 2. AI XỬ LÝ TUẦN TỰ TỪNG BÀI BÁO (STREAMING LIVE)
           let currentIdx = 0;
-          const total = queueArticles.length;
 
           function processNextArticle() {
             if (currentIdx < total) {
               const art = queueArticles[currentIdx];
               
-              // Đổi trạng thái thẻ sang 'AI ĐANG ĐỌC & BÓC TÁCH'
+              // Đổi trạng thái thẻ sang 'ĐANG XỬ LÝ...'
               const cardEl = document.getElementById(`wzArtCard_${currentIdx}`);
               const badgeEl = document.getElementById(`wzArtBadge_${currentIdx}`);
               if (cardEl) {
+                cardEl.setAttribute("data-status", "processing");
                 cardEl.style.border = "2px solid #3b82f6";
                 cardEl.style.background = "#eff6ff";
                 cardEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -6214,8 +6303,18 @@ let wzIsProjectConfigured = false;
                 badgeEl.style.background = "#dbeafe";
                 badgeEl.style.color = "#1d4ed8";
                 badgeEl.style.border = "1px solid #93c5fd";
-                badgeEl.textContent = "AI ĐANG ĐỐI SOÁT AST & TRÍCH XUẤT IOC...";
+                badgeEl.textContent = "ĐANG XỬ LÝ...";
               }
+
+              processingCount = 1;
+              pendingCount = total - completedCount - processingCount;
+              if (elStatProc) elStatProc.textContent = "1";
+              if (elStatPend) elStatPend.textContent = String(pendingCount);
+              if (elFiltProc) elFiltProc.textContent = "1";
+              if (elFiltPend) elFiltPend.textContent = String(pendingCount);
+
+              applyWzQueueFilterVisibility();
+
               if (progressStatus) {
                 progressStatus.textContent = `Đang xử lý bài báo ${currentIdx + 1} / ${total}: "${(art.title || '').slice(0, 40)}..."`;
               }
@@ -6230,9 +6329,10 @@ let wzIsProjectConfigured = false;
                 term.scrollTop = term.scrollHeight;
               }
 
-              // Thời gian AI xử lý từng bài (450ms)
+              // Thời gian AI xử lý từng bài (1.8s)
               setTimeout(() => {
                 if (cardEl) {
+                  cardEl.setAttribute("data-status", "completed");
                   cardEl.style.border = "1px solid #86efac";
                   cardEl.style.background = "#ffffff";
                 }
@@ -6240,7 +6340,7 @@ let wzIsProjectConfigured = false;
                   badgeEl.style.background = "#dcfce7";
                   badgeEl.style.color = "#15803d";
                   badgeEl.style.border = "1px solid #86efac";
-                  badgeEl.textContent = `ĐÃ NẠP VÀO SKILL (+${art.ioc_count} IOCs)`;
+                  badgeEl.textContent = `ĐÃ XỬ LÝ (+${art.ioc_count} IOCs)`;
                 }
                 const rulesEl = document.getElementById(`wzArtRules_${currentIdx}`);
                 if (rulesEl) rulesEl.style.display = "block";
@@ -6255,8 +6355,21 @@ let wzIsProjectConfigured = false;
                   term.scrollTop = term.scrollHeight;
                 }
 
-                const pct = Math.round(((currentIdx + 1) / total) * 100);
+                completedCount++;
+                processingCount = 0;
+                pendingCount = total - completedCount;
+
+                if (elStatDone) elStatDone.textContent = String(completedCount);
+                if (elStatProc) elStatProc.textContent = "0";
+                if (elStatPend) elStatPend.textContent = String(pendingCount);
+                if (elFiltDone) elFiltDone.textContent = String(completedCount);
+                if (elFiltProc) elFiltProc.textContent = "0";
+                if (elFiltPend) elFiltPend.textContent = String(pendingCount);
+
+                const pct = Math.round((completedCount / total) * 100);
                 if (progressBar) progressBar.style.width = pct + "%";
+
+                applyWzQueueFilterVisibility();
 
                 currentIdx++;
                 processNextArticle();
@@ -6265,7 +6378,7 @@ let wzIsProjectConfigured = false;
             } else {
               // 3. HOÀN TẤT XỬ LÝ TOÀN BỘ BÀI BÁO
               if (progressStatus) {
-                progressStatus.textContent = `Hoàn tất xử lý ${total} bài báo (+${d.matched_articles_count - total} bài trong phân hệ)`;
+                progressStatus.textContent = `Hoàn tất xử lý toàn bộ ${total} bài báo trong phân hệ`;
                 progressStatus.style.color = "#16a34a";
               }
               if (progressBar) {
