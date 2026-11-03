@@ -7,17 +7,21 @@
 
 Hệ thống **Autonomous CTI Agentic Defense** là giải pháp an ninh mạng tự hành thế hệ mới dành cho lập trình viên và kỹ sư DevSecOps. Hệ thống giải quyết bài toán cốt lõi: **Biến các thông tin an ninh mạng thô từ báo cáo quốc tế (CTI) thành các hành động phòng thủ thực thi tức thời trên mã nguồn dự án**.
 
-### 1.1. Các Thành Phần Chính
+Toàn bộ hệ thống được gom trọn vẹn vào **DUY NHẤT 1 TRANG WEB QUẢN TRỊ TRUNG TÂM**:
+**http://127.0.0.1:8765**
+
+Người dùng và tester không cần phải mở nhiều trang web hay nhớ nhiều cổng mạng phức tạp. Mọi hoạt động từ quét mã nguồn, cào bài báo CTI, sinh gói kỹ năng tác tử, trò chuyện với AI Agent đến việc kích hoạt và kiểm thử lá chắn WAF đều được tích hợp đầy đủ ngay trong 1 giao diện web duy nhất này.
+
+### 1.1. Các Thành Phần Chính Được Tích Hợp
 - **Bộ Cào và Lọc Tình Báo Tự Động (CTI Multi-Source Engine)**: Tự động thu thập dữ liệu an ninh mạng từ các nguồn uy tín thế giới (TheHackerNews, CISA US-CERT, Check Point Research, BleepingComputer, The DFIR Report).
 - **Bộ Quét Mã Nguồn Chuyên Sâu (Codebase Inspector)**: Đọc cây AST, phân tích phiên bản Runtime môi trường (Python 3.14, Node.js 20+, PHP 8.2), định vị các điểm nóng nhạy cảm (Sensitive Sinks: exec, eval, system).
 - **Tác Tử AI So Khớp & Đóng Gói Kỹ Năng (Threat Matcher & Agentic Skill Synthesizer)**: Đối chiếu ngữ cảnh dự án với kho tri thức, kích hoạt cảnh báo đỏ khi phát hiện lỗi trùng phiên bản, và tự động sinh gói kỹ năng phòng thủ đa nền tảng (SKILL.md, rules, scripts).
-- **Lá Chắn Mạng Trực Tiếp (WAF Reverse Proxy & Firewall)**: Kích hoạt ModSecurity WAF và Tường lửa Windows Blocklist ngăn chặn ngay lập tức các địa chỉ IP C2 độc hại.
+- **Bảng Điều Khiển & Kiểm Thử WAF Tích Hợp (Embedded WAF Console)**: Đã tích hợp sẵn màn hình console và các nút bắn gói tin thử nghiệm trực tiếp trên giao diện web để xác minh khả năng chặn đứng payload độc hại (mã 403 Forbidden). Cổng mạng 8766 chỉ là cổng socket proxy chạy ngầm bên dưới của WAF, hệ thống tự động quản lý ngầm mà người dùng không cần phải mở hay quản lý riêng.
 - **Tự Động Vá Mã Nguồn & Tái Kiểm Thử (Auto-Remediation & Verification)**: Tự động chuẩn hóa mã nguồn, triệt tiêu lỗ hổng (True Positive = 0) và đảm bảo không gây gián đoạn nghiệp vụ (False Positive = 0.0%).
 
-### 1.2. Các Cổng Mạng Và Địa Chỉ Truy Cập Mặc Định
-- **Giao diện Web Quản trị (Dashboard)**: http://127.0.0.1:8765
-- **WAF Reverse Proxy L7 (Lá chắn bảo vệ)**: http://127.0.0.1:8766
-- **Ollama GPU Server (Nếu có)**: http://127.0.0.1:11434
+### 1.2. Địa Chỉ Truy Cập Duy Nhất Của Hệ Thống
+- **Địa chỉ Web Quản Trị Trung Tâm**: http://127.0.0.1:8765
+*(Khởi động tự động bằng lệnh dòng lệnh `cti` tại bất kỳ thư mục dự án nào)*
 
 ---
 
@@ -26,7 +30,7 @@ Hệ thống **Autonomous CTI Agentic Defense** là giải pháp an ninh mạng 
 ### 2.1. Yêu Cầu Phần Cứng & Phần Mềm
 - **Hệ điều hành**: Windows 10 / Windows 11 (hỗ trợ cả Linux và macOS).
 - **Python**: Phiên bản 3.10 trở lên (khuyến nghị Python 3.10 đến 3.14).
-  Lưu ý quan trọng: Khi cài đặt Python, bắt buộc phải tích chọn vào ô "Add Python to PATH".
+  *Lưu ý quan trọng*: Khi cài đặt Python, bắt buộc phải tích chọn vào ô "Add Python to PATH".
 - **Node.js**: Phiên bản 16 trở lên (dùng để liên kết lệnh dòng lệnh cti).
 - **RAM**: Tối thiểu 4 GB (khuyến nghị 8 GB trở lên).
 
@@ -62,12 +66,12 @@ Bạn chỉ cần mở CMD ngay tại **thư mục dự án bạn muốn bảo v
 ```bash
 cti
 ```
-(Hoặc có thể gõ cti-defense)
+*(Hoặc có thể gõ cti-defense)*
 
 **Hệ thống sẽ tự động**:
 1. Nhận diện đường dẫn thư mục hiện tại của bạn.
-2. Khởi động Web Dashboard và WAF Reverse Proxy chạy ngầm.
-3. In ra thông tin trạng thái và đường link truy cập.
+2. Khởi động Web Dashboard duy nhất và các tiến trình nền.
+3. In ra thông tin trạng thái và địa chỉ truy cập duy nhất.
 4. Tự động mở trình duyệt Web tại http://127.0.0.1:8765.
 
 **Cách tắt hệ thống**:
@@ -79,26 +83,26 @@ cti stop
 
 ### Cách 2: Sử Dụng File Batch 1-Click
 - **Bật hệ thống**: Click đúp chuột vào file 1_BAT_HE_THONG.bat ở thư mục gốc. Hệ thống tự kiểm tra môi trường, bật server và mở trình duyệt.
-- **Tắt hệ thống**: Click đúp chuột vào file 2_TAT_HE_THONG.bat. Hệ thống sẽ giải phóng toàn bộ tiến trình, giải phóng bộ nhớ RAM, GPU và đóng các cổng mạng 8765, 8766 ngay lập tức.
+- **Tắt hệ thống**: Click đúp chuột vào file 2_TAT_HE_THONG.bat. Hệ thống sẽ giải phóng toàn bộ tiến trình, giải phóng bộ nhớ RAM, GPU và đóng các cổng mạng ngay lập tức.
 
 ---
 
-## 4. KỊCH BẢN KIỂM THỬ DÀNH CHO TESTER (STEP-BY-STEP)
+## 4. KỊCH BẢN KIỂM THỬ DÀNH CHO TESTER (STEP-BY-STEP TRÊN 1 WEB DUY NHẤT)
 
-Dưới đây là 5 kịch bản kiểm thử mẫu để bạn bè / tester kiểm tra toàn diện chức năng của hệ thống:
+Dưới đây là 5 kịch bản kiểm thử mẫu để bạn bè / tester kiểm tra toàn diện chức năng của hệ thống ngay trên giao diện Web duy nhất `http://127.0.0.1:8765`:
 
 ### KỊCH BẢN 1: QUY TRÌNH PHÒNG THỦ TỰ HÀNH 5 BƯỚC (WIZARD FLOW)
 **Mục tiêu**: Kiểm tra tính năng phân tích mã nguồn lần đầu, trích xuất lỗ hổng và sinh bộ kỹ năng phòng thủ.
 
 - **Bước 1**: Mở trình duyệt tại http://127.0.0.1:8765. Giao diện tự động mở mục 5 Bước Tự Hành (Wizard) và khóa vào thư mục dự án mục tiêu.
 - **Bước 2**: Nhấn nút [ BẮT ĐẦU QUÉT DỰ ÁN ].
-  Quan sát: Terminal hiển thị tiến trình Tác tử AI đọc cây cú pháp AST, nhận diện ngôn ngữ, framework và các Sensitive Sinks (exec, eval, system).
+  *Quan sát*: Terminal hiển thị tiến trình Tác tử AI đọc cây cú pháp AST, nhận diện ngôn ngữ, framework và các Sensitive Sinks (exec, eval, system).
 - **Bước 3**: Xem kết quả phân tích tại Bước 2:
-  Kiểm tra: Hệ thống hiển thị Ngôn ngữ, Framework, Phiên bản Runtime (ví dụ: Python 3.14, PHP 8.2), danh sách các dòng code nhạy cảm và Phân hệ bảo vệ (Scope A: Web & API Layer).
+  *Kiểm tra*: Hệ thống hiển thị Ngôn ngữ, Framework, Phiên bản Runtime (ví dụ: Python 3.14, PHP 8.2), danh sách các dòng code nhạy cảm và Phân hệ bảo vệ (Scope A: Web & API Layer).
 - **Bước 4**: Nhấn nút chuyển sang Bước 3 (Cào báo CTI). Chọn mốc thời gian (1 năm, 3 năm hoặc 5 năm). Nhấn [ BẮT ĐẦU CÀO & ĐỐI CHIẾU ].
-  Quan sát: Live Stream nhật ký tác tử AI phân tích, đối chiếu chéo; nếu phát hiện bài báo khớp đúng phiên bản runtime của dự án, hệ thống sẽ kích hoạt dòng cảnh báo đỏ khẩn cấp và hiển thị các chỉ số IOC (IP C2, CVE, Domain).
+  *Quan sát*: Live Stream nhật ký tác tử AI phân tích, đối chiếu chéo; nếu phát hiện bài báo khớp đúng phiên bản runtime của dự án, hệ thống sẽ kích hoạt dòng cảnh báo đỏ khẩn cấp và hiển thị các chỉ số IOC (IP C2, CVE, Domain).
 - **Bước 5**: Nhấn nút chuyển sang Bước 4 (Sinh Bộ Kỹ Năng).
-  Quan sát: Hệ thống tự động sinh gói kỹ năng agentic-defense-master-web-suite trực tiếp vào thư mục dự án và đồng bộ tới 15 nền tảng AI Agent (Claude, Cursor, Gemini, Copilot...).
+  *Quan sát*: Hệ thống tự động sinh gói kỹ năng agentic-defense-master-web-suite trực tiếp vào thư mục dự án và đồng bộ tới 15 nền tảng AI Agent (Claude, Cursor, Gemini, Copilot...).
 - **Bước 6**: Chuyển sang Bước 5 (Kiểm thử & Vá mã nguồn):
   1. Bấm nút kiểm thử [ Chạy Thử Probe Kiểm Tra Lỗ Hổng ]: Terminal trả về kết quả True Positive (xác nhận endpoint có lỗi RCE).
   2. Bấm nút [ Kích Hoạt Lá Chắn WAF & Firewall ]: Bật lá chắn mạng tức thời.
@@ -125,21 +129,23 @@ Dưới đây là 5 kịch bản kiểm thử mẫu để bạn bè / tester ki�
   - Tự động mở mục Wizard Bước 1 và khóa đúng vào đường dẫn của thư mục mới này.
   - Người dùng có thể tiến hành quét và sinh bộ kỹ năng độc lập cho riêng dự án mới mà không ảnh hưởng tới dự án cũ.
 
-### KỊCH BẢN 4: KIỂM THỬ LÁ CHẮN WAF REVERSE PROXY L7
-**Mục tiêu**: Xác minh WAF Proxy L7 chặn đứng payload tấn công khai thác.
+### KỊCH BẢN 4: KIỂM THỬ LÁ CHẮN WAF TRỰC TIẾP TRÊN GIAO DIỆN WEB
+**Mục tiêu**: Xác minh WAF chặn đứng payload tấn công mà không cần mở trang web khác.
 
-- **Bước 1**: Đảm bảo hệ thống đang bật (WAF đang hoạt động tại cổng 8766).
-- **Bước 2**: Mở trình duyệt và truy cập gói tin bình thường:
-  http://127.0.0.1:8766/
-  Kết quả: Trang web hiển thị phản hồi bình thường.
-- **Bước 3**: Gửi một gói tin mang vector tấn công Remote Code Execution hoặc SQL Injection:
-  http://127.0.0.1:8766/?cmd=cat%20/etc/passwd
-  Kết quả: WAF Reverse Proxy L7 chặn đứng ngay lập tức với mã lỗi 403 Forbidden và thông báo tấn công bị từ chối.
+- **Bước 1**: Ngay trên giao diện Web http://127.0.0.1:8765, nhấp vào tab **3. Kho Kỹ Năng Tác Tử (Agentic Skills)** trên thanh điều hướng đầu trang.
+- **Bước 2**: Cuộn xuống mục **CONSOLE THỬ NGHIỆM TẤN CÔNG WAF THỰC TẾ**, bạn sẽ thấy các nút bấm kiểm thử được tích hợp sẵn:
+  - `[ Thử Nghiệm Tấn Công RCE ]` -> Gửi gói tin giả lập Remote Code Execution.
+  - `[ Thử Nghiệm Tấn Công SQLi ]` -> Gửi gói tin giả lập SQL Injection.
+  - `[ Thử Nghiệm Path Traversal ]` -> Gửi gói tin giả lập đọc trộm file hệ thống.
+  - `[ Thử Nghiệm Gói Tin Sạch (Clean Traffic) ]` -> Gửi gói tin người dùng thông thường.
+- **Bước 3**: Quan sát màn hình Console hiển thị kết quả kiểm thử ngay lập tức:
+  - Với các gói tin tấn công: Máy chủ WAF phản hồi **CHẶN ĐỨNG (403 FORBIDDEN - DROP PAYLOAD)** kèm mã quy tắc ModSecurity vi phạm và thời gian xử lý (< 2ms).
+  - Với gói tin sạch: Phản hồi **THÔNG QUA (200 OK - CLEAN TRAFFIC)** đảm bảo tính năng nghiệp vụ của ứng dụng hoạt động thông suốt.
 
 ### KỊCH BẢN 5: KIỂM THỬ TRỢ LÝ TRÒ CHUYỆN AI AGENT
-**Mục tiêu**: Kiểm tra khả năng tra cứu chỉ số an ninh mạng bằng ngôn ngữ tự nhiên.
+**Mục tiêu**: Kiểm tra khả năng tra cứu chỉ số an ninh mạng bằng ngôn ngữ tự nhiên ngay trong giao diện Web.
 
-- **Bước 1**: Nhấp vào tab Chat AI Agent trên thanh điều hướng đầu trang.
+- **Bước 1**: Nhấp vào tab **Chat AI Agent** trên thanh điều hướng đầu trang.
 - **Bước 2**: Bấm các nút câu hỏi mẫu có sẵn hoặc nhập nội dung tùy ý:
   - "Kiểm tra mức độ nguy hiểm của IP 43.134.165.205"
   - "Liệt kê các lỗ hổng CVE nguy hiểm nhất trong kho bài báo"
@@ -157,8 +163,9 @@ Khi nghiệm thu hoặc kiểm thử đồ án, tester có thể đối chiếu 
 | Tính Tự Hành (Autonomous) | Tự động hóa từ cào báo đến phân tích, cấu hình WAF và vá code không cần can thiệp thủ công | ĐẠT (100% Khép kín) |
 | Bảo Vệ Ngữ Cảnh Dự Án | Tự động nhận diện cây AST, phiên bản runtime (Python, Node, PHP) và Sensitive Sinks | ĐẠT (Độ sâu chi tiết từng dòng code) |
 | Lưu Trữ Cấu Hình | Nhớ trạng thái dự án bằng .cti_defense.json, mở ngay màn hình bảo vệ khi tái khởi động | ĐẠT (Tự động chuyển view) |
+| Trải Nghiệm All-in-One | Toàn bộ tính năng từ quản lý, cào báo, chat AI đến kiểm thử WAF dồn gọn trong 1 Web duy nhất | ĐẠT (http://127.0.0.1:8765) |
 | Độ Chính Xác Đối Soát xAI | True Positive = 100%, False Positive = 0.0%, Whitelist RFC1918 an toàn | ĐẠT (Xác minh qua script probe) |
-| Lá Chắn Mạng Trực Tiếp | WAF Reverse Proxy L7 cổng 8766 chặn đứng RCE, SQLi, Path Traversal | ĐẠT (Mã phản hồi 403 Forbidden) |
+| Lá Chắn WAF Tích Hợp | Đánh chặn trực tiếp RCE, SQLi, Path Traversal với mã 403 Forbidden hiển thị lên Console | ĐẠT (Tích hợp Console trên Web) |
 | Giao Diện & Trải Nghiệm | 100% Monospace chuẩn Cyber Terminal, không sử dụng emoji/icon, tiếng Việt dễ hiểu | ĐẠT (Chuẩn mực học thuật) |
 
 ---
@@ -168,8 +175,8 @@ Khi nghiệm thu hoặc kiểm thử đồ án, tester có thể đối chiếu 
 1. Lỗi 'python' is not recognized as an internal or external command:
    - Nguyên nhân: Khi cài đặt Python chưa tích chọn "Add Python to PATH".
    - Khắc phục: Tải lại bộ cài Python từ python.org, chọn Modify -> tích chọn Add Python to environment variables.
-2. Lỗi cổng 8765 hoặc 8766 đang bị chiếm dụng:
-   - Khắc phục: Chạy lệnh cti stop hoặc click đúp vào 2_TAT_HE_THONG.bat. Hệ thống sẽ tự động quét và giải phóng các cổng bị kẹt.
+2. Lỗi cổng mạng đang bị chiếm dụng:
+   - Khắc phục: Chạy lệnh cti stop hoặc click đúp vào 2_TAT_HE_THONG.bat. Hệ thống sẽ tự động quét và giải phóng các cổng bị kẹt trong 1 giây.
 3. Không có kết nối Internet khi cào bài báo mới:
    - Giải pháp: Hệ thống đã được tích hợp sẵn CSDL sao lưu ngoại tuyến (cti_multi_source_archive_full_corpus.sqlite) gồm hơn 200 bài báo và hàng ngàn chỉ số IOC thực tế. Khi mất mạng, hệ thống tự động sử dụng kho dữ liệu cục bộ để phân tích mà không bị gián đoạn.
 
