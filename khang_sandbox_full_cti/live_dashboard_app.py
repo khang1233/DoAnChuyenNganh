@@ -1128,6 +1128,62 @@ HTML_PAGE = r"""<!DOCTYPE html>
       </div>
 
       <!-- ============================================================== -->
+      <!-- BƯỚC 0: MÀN HÌNH KHỞI ĐẦU TỐI GIẢN (NÚT HÌNH TRÒN CHÍNH GIỮA) -->
+      <!-- ============================================================== -->
+      <div id="wizardCard0" class="WizardCard" style="display:block; text-align:center; padding:30px 15px;">
+        <div style="max-width:720px; margin:0 auto; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:32px 24px; box-shadow:0 4px 20px rgba(0,0,0,0.04);">
+          
+          <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#2563eb; margin-bottom:6px;">
+            HỆ THỐNG AN NINH MẠNG TỰ HÀNH CTI AGENTIC DEFENSE
+          </div>
+          
+          <h2 style="font-size:22px; font-weight:800; color:#0f172a; margin-bottom:12px;">
+            Thiết Lập Phòng Thủ Ngữ Cảnh Dự Án
+          </h2>
+
+          <!-- Thẻ tóm tắt dự án & phần cứng -->
+          <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:12px 18px; margin-bottom:28px; display:inline-flex; align-items:center; gap:16px; flex-wrap:wrap; justify-content:center; font-size:13px; color:#334155;">
+            <div>
+              Dự án mục tiêu: <b id="landingTargetName" style="color:#0f172a;">-</b>
+              <span id="landingTargetPath" style="font-family:monospace; color:#64748b; font-size:11.5px; margin-left:4px;">(-)</span>
+            </div>
+            <div style="color:#cbd5e1;">|</div>
+            <div>
+              Phần cứng: <b id="landingHardwareSummary" style="color:#2563eb;">-</b>
+            </div>
+          </div>
+
+          <!-- NÚT HÌNH TRÒN TO CHÍNH GIỮA (CIRCULAR SCAN BUTTON) -->
+          <div style="display:flex; justify-content:center; align-items:center; margin:15px 0 25px 0;">
+            <button type="button" id="btnLandingCircularScan" onclick="startLandingScan()" style="
+              width: 195px;
+              height: 195px;
+              border-radius: 50%;
+              background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+              border: 5px solid #bfdbfe;
+              color: #ffffff;
+              cursor: pointer;
+              box-shadow: 0 12px 32px rgba(37, 99, 235, 0.35);
+              transition: all 0.25s ease-in-out;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              outline: none;
+            " onmouseover="this.style.transform='scale(1.06)'; this.style.boxShadow='0 18px 40px rgba(37,99,235,0.45)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 12px 32px rgba(37,99,235,0.35)';">
+              <span style="font-size:13px; font-weight:700; letter-spacing:1px; opacity:0.9; text-transform:uppercase;">BẮT ĐẦU</span>
+              <span style="font-size:21px; font-weight:900; letter-spacing:1.5px; margin-top:2px; text-transform:uppercase;">QUÉT DỰ ÁN</span>
+              <span style="font-size:11px; opacity:0.8; margin-top:4px;">(Click để phân tích AST)</span>
+            </button>
+          </div>
+
+          <p style="font-size:12.5px; color:#64748b; margin:0; line-height:1.6;">
+            Nhấn vào nút tròn để Tác tử AI đọc cây cú pháp AST, định vị điểm nhạy cảm và bắt đầu quy trình phòng thủ tự hành 6 bước.
+          </p>
+        </div>
+      </div>
+
+      <!-- ============================================================== -->
       <!-- BƯỚC 1: QUÉT SÂU AST & ĐỊNH DANH DỰ ÁN                         -->
       <!-- ============================================================== -->
       <div id="wizardCard1" class="WizardCard" style="display:block;">
@@ -4998,14 +5054,21 @@ const elArt = document.getElementById('lblMasterArticlesCount');
             switchView('sec-defense', document.querySelector('.NavLinks .NavLink:nth-child(6)'));
           } else {
             // Dự án mới chưa cấu hình -> Xóa header trên cùng để không bị trùng lặp, mở Màn hình khởi đầu Step 0
-            container.innerHTML = '';
+            const container = document.getElementById('projectContextContainer');
+            if (container) container.innerHTML = '';
+
             const autoScanControls = document.getElementById('autoScanStripControls');
             const autoScanMsg = document.getElementById('autoScanPendingMsg');
             if (autoScanControls) autoScanControls.style.display = 'none';
             if (autoScanMsg) autoScanMsg.style.display = 'inline-flex';
 
+            const lTarget = document.getElementById('landingTargetName');
+            const lPath = document.getElementById('landingTargetPath');
+            if (lTarget) lTarget.textContent = data.target_name || 'Dự Án Mục Tiêu';
+            if (lPath) lPath.textContent = data.target_path || wzTarget;
+
             switchView('sec-wizard', document.querySelector('.NavLinks .NavLink'));
-            wizardGotoStep(1);
+            wizardGotoStep(0);
           }
         } else {
           switchView('sec-wizard', document.querySelector('.NavLinks .NavLink'));
@@ -5069,10 +5132,22 @@ const elArt = document.getElementById('lblMasterArticlesCount');
       }
     }
 
-    function wizardGotoStep(stepNum) {
+        function startLandingScan() {
+      wizardGotoStep(1);
+      setTimeout(() => {
+        wizardExecuteStep1();
+      }, 150);
+    }
+
+function wizardGotoStep(stepNum) {
       wzCurrentStep = stepNum;
       const stepperNav = document.getElementById("wizardStepperNav");
-      if (stepperNav) stepperNav.style.display = "flex";
+      if (stepperNav) {
+        stepperNav.style.display = (stepNum === 0) ? "none" : "flex";
+      }
+
+      const card0 = document.getElementById("wizardCard0");
+      if (card0) card0.style.display = (stepNum === 0) ? "block" : "none";
 
       for (let i = 1; i <= 6; i++) {
         const card = document.getElementById("wizardCard" + i);
