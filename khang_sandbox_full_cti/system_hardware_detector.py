@@ -328,9 +328,9 @@ def get_adaptive_system_profile() -> Dict[str, Any]:
                 "badge": "MẠNH NHẤT - KHUYẾN NGHỊ MẶC ĐỊNH",
                 "desc": "Khả năng suy luận logic chuyên sâu, phân tích cấu trúc mã nguồn phức tạp và sinh kịch bản phòng thủ nhiều lớp.",
                 "recommended": True,
-                "intelligence": 96,
-                "speed_tps": 28,
-                "vram_gb": 11.5
+                "intelligence": 78,
+                "speed_tps": 18,
+                "vram_gb": 11.2
             },
             {
                 "id": "deepseek-r1:14b",
@@ -338,9 +338,9 @@ def get_adaptive_system_profile() -> Dict[str, Any]:
                 "badge": "SUY LUẬN CHUỖI TƯ DUY",
                 "desc": "Tư duy chuỗi CoT phân tích nguồn gốc lỗ hổng và đối soát tri thức tình báo với độ chính xác học thuật cao.",
                 "recommended": False,
-                "intelligence": 98,
-                "speed_tps": 24,
-                "vram_gb": 12.0
+                "intelligence": 82,
+                "speed_tps": 16,
+                "vram_gb": 11.8
             },
             {
                 "id": "qwen2.5:7b",
@@ -348,9 +348,9 @@ def get_adaptive_system_profile() -> Dict[str, Any]:
                 "badge": "CÂN BẰNG TỐC ĐỘ",
                 "desc": "Phiên bản 7B cân bằng hoàn hảo giữa tốc độ và độ chính xác phân tích cú pháp mã nguồn.",
                 "recommended": False,
-                "intelligence": 92,
-                "speed_tps": 48,
-                "vram_gb": 6.8
+                "intelligence": 68,
+                "speed_tps": 28,
+                "vram_gb": 5.8
             }
         ]
     elif is_gpu and vram >= 6.5:
@@ -402,9 +402,9 @@ def get_adaptive_system_profile() -> Dict[str, Any]:
                 "badge": "MẠNH NHẤT - KHUYẾN NGHỊ MẶC ĐỊNH",
                 "desc": "Mô hình thế hệ mới của Google, kích thước nhỏ gọn nhưng khả năng hiểu mã nguồn xuất sắc.",
                 "recommended": True,
-                "intelligence": 85,
-                "speed_tps": 95,
-                "vram_gb": 3.8
+                "intelligence": 56,
+                "speed_tps": 48,
+                "vram_gb": 3.6
             },
             {
                 "id": "qwen2.5:3b",
@@ -412,8 +412,8 @@ def get_adaptive_system_profile() -> Dict[str, Any]:
                 "badge": "TỐI ƯU VRAM",
                 "desc": "Dung lượng nhẹ chỉ ~2GB VRAM, phản hồi dưới 1 giây, hoạt động ổn định trên GPU phổ thông.",
                 "recommended": False,
-                "intelligence": 80,
-                "speed_tps": 110,
+                "intelligence": 52,
+                "speed_tps": 55,
                 "vram_gb": 2.8
             },
             {
@@ -422,9 +422,9 @@ def get_adaptive_system_profile() -> Dict[str, Any]:
                 "badge": "TỐC ĐỘ CAO",
                 "desc": "Mô hình chuyên trách phân loại nhanh mức độ nghiêm trọng và trích xuất IoC với độ trễ thấp.",
                 "recommended": False,
-                "intelligence": 83,
-                "speed_tps": 105,
-                "vram_gb": 3.4
+                "intelligence": 55,
+                "speed_tps": 52,
+                "vram_gb": 3.3
             }
         ]
     else:
@@ -437,20 +437,21 @@ def get_adaptive_system_profile() -> Dict[str, Any]:
                 "id": "qwen2.5:1.5b",
                 "name": "Qwen 2.5 (1.5B Ultra-Light)",
                 "badge": "MẠNH NHẤT - KHUYẾN NGHỊ MẶC ĐỊNH",
-                "desc": "Mô hình siêu nhẹ chỉ chiếm 1GB RAM, chạy êm ái trên mọi CPU mà không bị đơ giật.",
+                "desc": "Mô hình siêu nhẹ chỉ chiếm 1.5GB RAM, chạy mượt mà trên bộ xử lý CPU qua tập lệnh AVX2.",
                 "recommended": True,
-                "intelligence": 70,
-                "speed_tps": 140,
-                "vram_gb": 1.5
+                "intelligence": 42,
+                "speed_tps": 30,
+                "vram_gb": 0.0
             },
             {
                 "id": "cti-heuristic-engine",
-                "name": "CTI Heuristic Engine (Thuật Toán Đối Soát Tĩnh)",
+                "name": "CTI Heuristic Engine (Thuật Toán Đối Soát Tĩnh AST)",
                 "badge": "0% GPU • KHÔNG TỐN TÀI NGUYÊN",
-                "desc": "Phân tích AST tĩnh bằng bộ luật chuyên gia OASIS/MITRE ATT&CK, phản hồi tức thời <2ms.",
+                "desc": "Động cơ đối soát tĩnh cây AST, không dùng mạng nơ-ron, nhận diện tức thì mẫu CWE và IoC bằng quy tắc tĩnh.",
                 "recommended": False,
-                "intelligence": 88,
-                "speed_tps": 500,
+                "is_heuristic": True,
+                "coverage_pct": 94,
+                "latency_ms": 2,
                 "vram_gb": 0.0
             }
         ]
