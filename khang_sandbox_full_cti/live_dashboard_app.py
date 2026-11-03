@@ -1196,6 +1196,11 @@ HTML_PAGE = r"""<!DOCTYPE html>
           </div>
 
           <div style="margin-bottom:10px;">
+            <b style="color:#334155;">Phiên bản Môi trường &amp; Runtime (Deep Context):</b>
+            <div id="wzRuntimeBadge" style="display:inline-flex; gap:6px; flex-wrap:wrap; margin-left:8px;">-</div>
+          </div>
+
+          <div style="margin-bottom:10px;">
             <b style="color:#334155;">Phân hệ bảo vệ gán tự động:</b> 
             <span id="wzScopeBadge" style="font-weight:700; color:#15803d; background:#dcfce7; padding:2px 8px; border-radius:4px; margin-left:8px;">-</span>
             <span style="font-size:12px; color:#64748b; margin-left:8px;">(Chu kỳ khuyến nghị: <span id="wzCadenceLabel" style="color:#b45309; font-weight:600;">-</span>)</span>
@@ -5127,6 +5132,24 @@ const elArt = document.getElementById('lblMasterArticlesCount');
               sp.textContent = t;
               techsBox.appendChild(sp);
             });
+          }
+
+          // Render runtime versions
+          const rtBox = document.getElementById("wzRuntimeBadge");
+          if (rtBox) {
+            rtBox.innerHTML = "";
+            const rts = d.runtime_versions || {};
+            const keys = Object.keys(rts);
+            if (keys.length > 0) {
+              keys.forEach(k => {
+                const sp = document.createElement("span");
+                sp.style.cssText = "background:#fef3c7; color:#92400e; border:1px solid #fde68a; padding:2px 8px; border-radius:4px; font-size:12px; font-weight:700;";
+                sp.textContent = k + ": " + rts[k];
+                rtBox.appendChild(sp);
+              });
+            } else {
+              rtBox.innerHTML = `<span style="color:#64748b; font-size:12px;">Mặc định môi trường máy</span>`;
+            }
           }
 
           // Render sensitive sinks

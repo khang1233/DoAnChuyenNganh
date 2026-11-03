@@ -31,6 +31,7 @@ def deep_agent_codebase_scan(target_path: Path) -> Dict[str, Any]:
     databases = []
     infra = []
     sensitive_sinks = []
+    runtime_versions = {}
     
     ext_map = {
         ".php": "PHP",
@@ -75,6 +76,8 @@ def deep_agent_codebase_scan(target_path: Path) -> Dict[str, Any]:
                     if "mysql" in deps or "mysql2" in deps: databases.append("MySQL")
                     if "pg" in deps: databases.append("PostgreSQL")
                     if "mongodb" in deps or "mongoose" in deps: databases.append("MongoDB")
+                    if "engines" in pkg and "node" in pkg["engines"]:
+                        runtime_versions["Node.js"] = str(pkg["engines"]["node"])
                 except Exception:
                     pass
             elif fl == "composer.json":
@@ -84,10 +87,48 @@ def deep_agent_codebase_scan(target_path: Path) -> Dict[str, Any]:
                     if "laravel/framework" in reqs: frameworks.append("Laravel Framework")
                     if "symfony/framework-bundle" in reqs: frameworks.append("Symfony")
                     if "magento/product-community-edition" in reqs or "magento" in str(comp).lower(): frameworks.append("Magento E-Commerce")
+                    if "require" in comp and "php" in comp["require"]:
+                        runtime_versions["PHP"] = str(comp["require"]["php"])
                 except Exception:
                     pass
             elif fl in ("dockerfile", "docker-compose.yml", "docker-compose.yaml"):
                 if "Docker Container" not in infra: infra.append("Docker Container")
+                try:
+                    doc_text = (Path(root) / f).read_text(encoding='utf-8', errors='ignore')
+                    from_matches = re.findall(r"(?i)^FROM\s+([a-zA-Z0-9_\-/\.]+:[a-zA-Z0-9_\-\.]+)", doc_text, re.MULTILINE)
+                    if from_matches:
+                        runtime_versions["Docker Base Image"] = from_matches[0]
+                        img_l = from_matches[0].lower()
+                        if "python" in img_l:
+                            runtime_versions["Python"] = from_matches[0].split(":")[-1].replace("-slim", "").replace("-alpine", "")
+                        elif "php" in img_l:
+                            runtime_versions["PHP"] = from_matches[0].split(":")[-1].replace("-apache", "").replace("-fpm", "")
+                        elif "node" in img_l:
+                            runtime_versions["Node.js"] = from_matches[0].split(":")[-1].replace("-alpine", "")
+                except Exception:
+                    pass
+            elif fl == "requirements.txt":
+                try:
+                    req_lines = (Path(root) / f).read_text(encoding='utf-8', errors='ignore').splitlines()
+                    for rl in req_lines:
+                        rl = rl.strip().lower()
+                        if rl.startswith("fastapi"): frameworks.append("FastAPI")
+                        elif rl.startswith("django"): frameworks.append("Django")
+                        elif rl.startswith("flask"): frameworks.append("Flask")
+                        elif rl.startswith("torch") or rl.startswith("tensorflow"): frameworks.append("AI/ML Deep Learning")
+                        elif rl.startswith("celery"): frameworks.append("Celery Task Queue")
+                        elif any(k in rl for k in ["psycopg", "asyncpg"]): databases.append("PostgreSQL")
+                        elif "pymongo" in rl: databases.append("MongoDB")
+                        elif "redis" in rl: databases.append("Redis")
+                except Exception:
+                    pass
+            elif fl in ("runtime.txt", ".python-version"):
+                try:
+                    v_str = (Path(root) / f).read_text(encoding='utf-8', errors='ignore').strip()
+                    if v_str:
+                        runtime_versions["Python Runtime"] = v_str
+                except Exception:
+                    pass
 
             if ext in (".php", ".js", ".py") and len(sensitive_sinks) < 6:
                 try:
@@ -103,6 +144,13 @@ def deep_agent_codebase_scan(target_path: Path) -> Dict[str, Any]:
 
     top_langs = sorted(languages.items(), key=lambda x: x[1], reverse=True)
     lang_labels = [f"{lang} ({cnt})" for lang, cnt in top_langs[:5]]
+    
+    if languages.get("Python", 0) > 0 and "Python" not in runtime_versions and "Python Runtime" not in runtime_versions:
+        runtime_versions["Python Runtime"] = f"{sys.version_info.major}.{sys.version_info.minor}"
+    if languages.get("PHP", 0) > 0 and "PHP" not in runtime_versions:
+        runtime_versions["PHP Runtime"] = "8.2+"
+    if languages.get("JavaScript", 0) > 0 and "Node.js" not in runtime_versions:
+        runtime_versions["Node.js Runtime"] = "20+" 
     
     is_web = any(l in languages for l in ["PHP", "JavaScript", "TypeScript", "HTML"]) or len(frameworks) > 0
     scope_id = "SCOPE_WEB" if is_web else "SCOPE_NETWORK"
@@ -124,6 +172,7 @@ def deep_agent_codebase_scan(target_path: Path) -> Dict[str, Any]:
         "databases": list(dict.fromkeys(databases)),
         "infra": list(dict.fromkeys(infra)),
         "sensitive_sinks": sensitive_sinks,
+        "runtime_versions": runtime_versions,
         "scope_id": scope_id,
         "scope_name": scope_name,
         "agent_logs": agent_logs
@@ -187,6 +236,7 @@ def wizard_scan_project(target: str = "", clone_url: str = "") -> Dict[str, Any]
         "languages": scan_meta.get("languages", []),
         "frameworks": scan_meta.get("frameworks", []),
         "sensitive_sinks": scan_meta.get("sensitive_sinks", []),
+        "runtime_versions": scan_meta.get("runtime_versions", {}),
         "total_files": scan_meta.get("total_files", 0),
         "agent_logs": scan_meta.get("agent_logs", []),
         "keywords": profile["keywords"][:6]
@@ -271,9 +321,18 @@ def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3) -> Di
 
     techs_str = ", ".join(techs) if techs else "Web & API Ecosystem"
     
+    # Kiem tra xem bai bao hoac CVE co phu hop voi phien ban runtime hoac framework khong
+    version_match = False
+    art_full_text = (art_dict.get("title", "") + " " + art_dict.get("content", "")).lower()
+    for tech_item in techs:
+        if tech_item.lower() in art_full_text:
+            version_match = True
+            break
+
     agent_logs = [
         "[CTI AGENT 1 KICH HOAT] Dang khoi tao mo hinh phan tich ngu canh du an...",
         f"[AST CODEBASE SCAN] Quet cay cu phap AST: Nhan dien ngan xep [{techs_str}], phat hien cac Sensitive Sinks (execAsync, eval, system).",
+        (f"[CANH BAO DO KHAN CAP] Phat hien lo hong CVE tuong thich truc tiep voi phien ban va ham nhay cam cua du an: {best_art_title}!" if version_match else "[DOI CHIEU TIEU CHUAN] Doi chieu bo ma tran tinh bao voi ma nguon."),
         f"[LOC TINH BAO THEO SCOPE] Chon moc {history_years} nam: Loc duoc {matched_count} bai bao thuoc phan he [{profile['name']}].",
         f"[MOI DE DOA TRUC TIEP] '{best_art_title}' (Nguon: {art_dict.get('source_name', 'OSINT')}).",
         f"[BOC TACH IOCs THUC TE] Trich xuat {raw_iocs['total']} chi so de doa (IP C2: {len(raw_iocs['sample_ips'])}, Domain: {len(raw_iocs['sample_domains'])}, CVE: {len(cves)}).",
