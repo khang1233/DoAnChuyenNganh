@@ -928,9 +928,32 @@ HTML_PAGE = r"""<!DOCTYPE html>
       color: #ffffff;
       border-color: var(--primary);
     }
-  </style>
+  
+    /* ========================================================= */
+    /* LANDING MODE: AN TOAN BO THANH DIEU HUONG, MODEL & TICKER */
+    /* ========================================================= */
+    body.landing-mode .NavLinks,
+    body.landing-mode .NavRight,
+    body.landing-mode .StatusStrip,
+    body.landing-mode #wizardStepperNav,
+    body.landing-mode #wizardBoxLegend,
+    body.landing-mode #projectContextContainer {
+      display: none !important;
+    }
+    body.landing-mode #sec-wizard {
+      border: none !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+    }
+    body.landing-mode .TopNav {
+      justify-content: center !important;
+      border-bottom: 1px solid #f1f5f9 !important;
+      padding: 16px 20px !important;
+    }
+</style>
 </head>
-<body>
+<body class="landing-mode">
 
   <!-- TOP NAVBAR -->
   <nav class="TopNav">
@@ -1014,7 +1037,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
 
     <!-- KHUNG CHAT TRỰC TIẾP VỚI LOCAL AI AGENT -->
     <section class="CyberBox" id="sec-chat" style="display:none; max-width:820px; margin:0 auto 26px;">
-      <div class="BoxLegend" id="chatBoxLegend">TRỢ LÝ AI AGENT (ĐANG TẢI PHẦN CỨNG)</div>
+      <div id="wizardBoxLegend" class="BoxLegend" id="chatBoxLegend">TRỢ LÝ AI AGENT (ĐANG TẢI PHẦN CỨNG)</div>
 
       <div id="chatLogBox" style="background:var(--bg-subtle); border:1px solid var(--border-main); border-radius:6px; height:320px; overflow-y:auto; padding:14px 16px; margin-bottom:14px; display:flex; flex-direction:column; gap:12px; font-size:13.5px;">
         <div style="padding:10px 14px; border-left:3px solid var(--primary); background:#ffffff; border-radius:0 6px 6px 0; border:1px solid var(--border-main); border-left:3px solid var(--primary);">
@@ -1096,7 +1119,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
     <!-- MỤC 0: WIZARD QUY TRÌNH PHÒNG THỦ TỰ HÀNH 5 BƯỚC              -->
     <!-- ============================================================== -->
     <section class="CyberBox" id="sec-wizard" style="margin-bottom:24px; border:2px solid #3b82f6; background:#ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
-      <div class="BoxLegend" style="background:#2563eb; color:#ffffff; font-weight:700; padding:4px 14px; border-radius:4px; font-size:12px; letter-spacing:0.04em;">
+      <div id="wizardBoxLegend" class="BoxLegend" style="background:#2563eb; color:#ffffff; font-weight:700; padding:4px 14px; border-radius:4px; font-size:12px; letter-spacing:0.04em;">
         WIZARD QUY TRÌNH PHÒNG THỦ TÁC TỬ TỰ HÀNH (6 BƯỚC KHÉP KÍN)
       </div>
 
@@ -5041,6 +5064,7 @@ const elArt = document.getElementById('lblMasterArticlesCount');
           }
 
           if (data.is_configured && data.config) {
+            document.body.classList.remove('landing-mode');
             if (data.config.scope_id) {
               wzScopeId = data.config.scope_id;
               if (typeof switchDefenseScope === 'function') switchDefenseScope(data.config.scope_id);
@@ -5067,6 +5091,7 @@ const elArt = document.getElementById('lblMasterArticlesCount');
             if (lTarget) lTarget.textContent = data.target_name || 'Dự Án Mục Tiêu';
             if (lPath) lPath.textContent = data.target_path || wzTarget;
 
+            document.body.classList.add('landing-mode');
             switchView('sec-wizard', document.querySelector('.NavLinks .NavLink'));
             wizardGotoStep(0);
           }
@@ -5133,6 +5158,24 @@ const elArt = document.getElementById('lblMasterArticlesCount');
     }
 
         function startLandingScan() {
+      document.body.classList.remove('landing-mode');
+      const card0 = document.getElementById('wizardCard0');
+      if (card0) card0.style.display = 'none';
+
+      const stepperNav = document.getElementById('wizardStepperNav');
+      if (stepperNav) stepperNav.style.display = 'flex';
+
+      const wizardLegend = document.getElementById('wizardBoxLegend');
+      if (wizardLegend) wizardLegend.style.display = 'block';
+
+      const wizardBox = document.getElementById('sec-wizard');
+      if (wizardBox) {
+        wizardBox.style.border = '';
+        wizardBox.style.background = '';
+        wizardBox.style.padding = '';
+        wizardBox.style.boxShadow = '';
+      }
+
       wizardGotoStep(1);
       setTimeout(() => {
         wizardExecuteStep1();
