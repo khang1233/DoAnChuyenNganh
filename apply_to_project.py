@@ -122,6 +122,8 @@ def detect_project_scope(target_path: Path):
     # 1. Quét theo file patterns
     ignored_dirs = [".git", "node_modules", "venv", ".venv", "dist", "build", ".cursor", ".gemini", "defense_skills"]
     for scope_id, profile in SCOPE_PROFILES.items():
+        if scope_id == "SCOPE_ALL" or scope_id not in scores:
+            continue
         for pat in profile["file_patterns"]:
             matches = list(target_path.glob(f"**/{pat}"))
             valid = [m for m in matches if not any(ign in str(m) for ign in ignored_dirs)]

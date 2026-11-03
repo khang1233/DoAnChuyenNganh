@@ -951,9 +951,16 @@ HTML_PAGE = r"""<!DOCTYPE html>
       border-bottom: 1px solid #f1f5f9 !important;
       padding: 16px 20px !important;
     }
+
+    /* WIZARD SETUP MODE: An thanh dieu huong, model & chuc nang trong cac buoc cau hinh dau (Buoc 0 den 4) */
+    body.wizard-setup-mode .NavLinks,
+    body.wizard-setup-mode .NavRight,
+    body.wizard-setup-mode #projectContextContainer {
+      display: none !important;
+    }
 </style>
 </head>
-<body class="landing-mode">
+<body class="landing-mode wizard-setup-mode">
 
   <!-- TOP NAVBAR -->
   <nav class="TopNav">
@@ -5060,6 +5067,8 @@ const elArt = document.getElementById('lblMasterArticlesCount');
           }
 
           if (data.is_configured && data.config) {
+            wzIsProjectConfigured = true;
+            document.body.classList.remove('wizard-setup-mode');
             document.body.classList.remove('landing-mode');
             if (data.config.scope_id) {
               wzScopeId = data.config.scope_id;
@@ -5178,8 +5187,18 @@ const elArt = document.getElementById('lblMasterArticlesCount');
       }, 150);
     }
 
-function wizardGotoStep(stepNum) {
+let wzIsProjectConfigured = false;
+
+    function wizardGotoStep(stepNum) {
       wzCurrentStep = stepNum;
+      
+      // Chi hien cac tab dieu huong tren cung khi vao Buoc 5 (Cao bao) tro di hoac du an da hoan tat bao ve
+      if (stepNum >= 5 || wzIsProjectConfigured) {
+        document.body.classList.remove("wizard-setup-mode");
+      } else {
+        document.body.classList.add("wizard-setup-mode");
+      }
+
       const stepperNav = document.getElementById("wizardStepperNav");
       if (stepperNav) {
         stepperNav.style.display = (stepNum === 0) ? "none" : "flex";
@@ -6074,11 +6093,11 @@ function wizardGotoStep(stepNum) {
               const elExcerpt = document.getElementById("wzExcerpt");
               if (elExcerpt) elExcerpt.textContent = d.content_excerpt;
 
-              const nextBtn = document.getElementById("btnNextStep4");
-              if (nextBtn) {
-                nextBtn.disabled = false;
-                nextBtn.style.background = "#2563eb";
-                nextBtn.scrollIntoView({ behavior: "smooth", block: "nearest" });
+              const skillBtn = document.getElementById("btnNextStep5ToSkill");
+              if (skillBtn) {
+                skillBtn.disabled = false;
+                skillBtn.style.background = "#2563eb";
+                skillBtn.scrollIntoView({ behavior: "smooth", block: "nearest" });
               }
               // Tự động đồng bộ Scope vào toàn bộ Kho Tri Thức, Bảng Điểm IOC và Lịch Sử Bài Báo
               if (typeof selectTargetScope === 'function') {
@@ -7375,11 +7394,21 @@ def api_wizard_scan(req: WizardScanReq):
 
 @app.post("/api/wizard/crawl-scope")
 def api_wizard_crawl_scope(req: WizardCrawlReq):
-    return wizard_crawl_scope(target=req.target, scope_id=req.scope_id, history_years=req.history_years)
+    try:
+        return wizard_crawl_scope(target=req.target, scope_id=req.scope_id, history_years=req.history_years)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return {"status": "error", "message": f"Lỗi cào báo CTI: {str(e)}"}
 
 @app.post("/api/wizard/synthesize")
 def api_wizard_synthesize(req: WizardSynthReq):
-    return wizard_synthesize_skill(target=req.target, scope_id=req.scope_id, article_id=req.article_id)
+    try:
+        return wizard_synthesize_skill(target=req.target, scope_id=req.scope_id, article_id=req.article_id)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return {"status": "error", "message": f"Lỗi đóng gói kỹ năng tác tử: {str(e)}"}
 
 @app.post("/api/wizard/verify-exploit")
 def api_wizard_verify(req: WizardActReq):
