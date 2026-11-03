@@ -218,6 +218,27 @@ def wizard_scan_project(target: str = "", clone_url: str = "") -> Dict[str, Any]
     is_configured = cfg_file.exists()
     cfg_data = {}
     if not is_configured:
+        try:
+            db_p = SANDBOX_DIR / "cti_multi_source_archive.sqlite"
+            if db_p.exists():
+                with sqlite3.connect(db_p) as conn:
+                    conn.row_factory = sqlite3.Row
+                    row = conn.execute("SELECT * FROM project_defense_registry WHERE target_path = ?", (str(target_path.resolve()),)).fetchone()
+                    if row and row["is_configured"]:
+                        is_configured = True
+                        cfg_data = {
+                            "project_name": row["target_name"] or target_path.name,
+                            "project_path": row["target_path"] or str(target_path.resolve()),
+                            "scope_id": row["scope_id"] or scope_id,
+                            "scope_name": row["scope_name"] or profile["name"],
+                            "skill_name": row["skill_name"] or "agentic-defense-master-web-suite",
+                            "scan_interval_sec": row["scan_interval_sec"] or 21600,
+                            "configured_at": row["configured_at"] or "",
+                            "status": "PROTECTED"
+                        }
+        except Exception:
+            pass
+    if not is_configured:
         ds_dir = target_path / "defense_skills"
         has_skills = ds_dir.exists() and any(d.is_dir() for d in ds_dir.iterdir())
         has_guide = (target_path / "AGENT_REMEDIATION_GUIDE.md").exists()

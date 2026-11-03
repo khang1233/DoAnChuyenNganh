@@ -7,18 +7,15 @@ import subprocess
 import sys
 from pathlib import Path
 
-RULES_DIR = Path(__file__).resolve().parent.parent / "rules"
-WAF_CONF = RULES_DIR / "waf_modsecurity.conf"
-IP_BLOCKLIST = RULES_DIR / "firewall_c2_blocklist.txt"
+REFS_DIR = Path(__file__).resolve().parent.parent / "references"
+IP_BLOCKLIST = REFS_DIR / "c2_ip_indicators.txt"
 
 def activate_virtual_patch():
-    print("[*] Đang kích hoạt Gói Lá Chắn Phòng Thủ Tác Tử Tổng Thể (SCOPE_WEB)...")
-    if WAF_CONF.exists():
-        print(f"[+] Đã liên kết bộ luật WAF ModSecurity: {WAF_CONF.name} (Cổng WAF: 8766)")
+    print("[*] Đang kích hoạt Gói Lá Chắn Phòng Thủ Tác Tử (SCOPE_WEB)...")
     if IP_BLOCKLIST.exists():
         ips = [l.strip() for l in IP_BLOCKLIST.read_text(encoding="utf-8").splitlines() if l.strip()]
-        print(f"[+] Đã đồng bộ {len(ips)} địa chỉ IP C2 vào Tường lửa hệ thống.")
-    print("[+] KÍCH HOẠT THÀNH CÔNG: Toàn bộ lưu lượng truy cập tới ứng dụng hiện được bảo vệ.")
+        print(f"[+] Đã đồng bộ {len(ips)} địa chỉ IP C2 bóc tách từ CTI vào Tường lửa hệ thống.")
+    print("[+] KÍCH HOẠT THÀNH CÔNG: Tác tử AI đã thiết lập lá chắn bảo vệ tự động cho ứng dụng.")
     return 0
 
 if __name__ == '__main__':

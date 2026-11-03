@@ -181,5 +181,4 @@ netsh advfirewall firewall delete rule name="CTI_BLOCK_104_194_158_65" >nul 2>&1
 netsh advfirewall firewall delete rule name="CTI_BLOCK_185_186_245_144" >nul 2>&1
 netsh advfirewall firewall delete rule name="CTI_BLOCK_85_215_73_250" >nul 2>&1
 netsh advfirewall firewall delete rule name="CTI_BLOCK_45_194_90_57" >nul 2>&1
-netsh advfirewall firewall delete rule name="CTI_BLOCK_162_35_99_94" >nul 2>&1
 echo [CTI AGENT] Da go bo toan bo rule thu nghiem khoi Windows Defender Firewall!

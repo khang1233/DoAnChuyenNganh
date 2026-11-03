@@ -1,22 +1,22 @@
 ---
 name: agentic-defense-master-web-suite
-description: Gói kỹ năng phòng thủ tác tử toàn diện (Master Defense Suite) cho phân hệ SCOPE_WEB (Python Backend (FastAPI / Django / Flask)). Tích hợp đa lớp WAF, Tường lửa C2, Kiểm thử đa vector và Quy chuẩn sửa code an toàn cho Node.js, Express, Python.
+description: Gói kỹ năng phòng thủ tác tử toàn diện (Master Defense Suite) cho phân hệ SCOPE_WEB (PHP Framework (Laravel / WordPress / Custom), Node.js / JavaScript Web Ecosystem, Python Backend (FastAPI / Django / Flask), Containerized Environment (Docker)). Tích hợp đa lớp WAF, Tường lửa C2, Kiểm thử đa vector và Quy chuẩn sửa code an toàn cho Node.js, Express, Python.
 author: OpenClaw CTI Defense Orchestrator
 version: 2.254.200
 scope: SCOPE_WEB
 trust_score: 97.5
 evolution_mode: dynamic_living_ingestion
 accumulated_articles: 254
-accumulated_iocs: 1941
+accumulated_iocs: 1945
 ---
 
 # GOI KY NANG PHONG THU TAC TU DONG (LIVING DYNAMIC CTI SKILL)
 
 ## THONG TIN DINH DANH VA TICH LUY TRI THUC SONG
-- Phien ban ky nang song: `2.254.200` (Tich luy lien tuc tu 254 bai bao CTI va 1941 chi so IOC)
+- Phien ban ky nang song: `2.254.200` (Tich luy lien tuc tu 254 bai bao CTI va 1945 chi so IOC)
 - Trang thai tien hoa: NANG CAP LIVE LIEN TUC THEO THOI GIAN THUC
 - **Mã phân hệ bảo vệ:** `SCOPE_WEB`
-- **Công nghệ đích:** `Python Backend (FastAPI / Django / Flask)`
+- **Công nghệ đích:** `PHP Framework (Laravel / WordPress / Custom), Node.js / JavaScript Web Ecosystem, Python Backend (FastAPI / Django / Flask), Containerized Environment (Docker)`
 - **Mã CVE bao phủ:** `CVE-2016-15042, CVE-2019-11510, CVE-2019-9879, CVE-2020-1938, CVE-2021-22205, CVE-2021-28799, CVE-2022-28368, CVE-2023-22793`
 - **Mức độ tin cậy CTI:** `97.5 / 100 (Evidence-Driven)`
 
@@ -25,7 +25,7 @@ accumulated_iocs: 1941
 ## 🎯 4 TRỤ CỘT PHÒNG THỦ ĐA LỚP (DEFENSE-IN-DEPTH)
 
 1. **Lớp 1: Biên mạng & Tường lửa C2 (Perimeter Shield)**
-   - Chặn đứng 100% kết nối đến danh sách `102` địa chỉ IP C2 độc hại đã phát hiện từ CTI feeds.
+   - Chặn đứng 100% kết nối đến danh sách `103` địa chỉ IP C2 độc hại đã phát hiện từ CTI feeds.
    - File cấu hình: `rules/firewall_c2_blocklist.txt`
 
 2. **Lớp 2: Lá chắn ảo WAF ModSecurity (Virtual Patching)**
@@ -496,27 +496,38 @@ Duy trì chu kỳ quét 15 phút / lần để tự động nạp các mã CVE m
 ## 🧭 BẢN ĐỒ NGỮ CẢNH DỰ ÁN MỤC TIÊU (TARGET PROJECT ARCHITECTURAL CONTEXT)
 
 > [!IMPORTANT]
-> **Tác tử AI (Claude, Cursor, Codex, Antigravity, Devin, Aider, Continue)**: Dự án `boxpvp` đã được hệ thống CTI thẩm định ngữ cảnh.
+> **Tác tử AI (Claude, Cursor, Codex, Antigravity, Devin, Aider, Continue)**: Dự án `testCTI` đã được hệ thống CTI thẩm định ngữ cảnh.
 > Tuyệt đối không suy luận chung chung! Bạn phải đọc ngữ cảnh thực tế của dự án dưới đây để thực hiện refactor:
 
-- **Tên dự án:** `boxpvp`
-- **Frameworks nhận diện:** `Custom Web Stack`
-- **Tổng số tệp mã nguồn:** `119 files`
+- **Tên dự án:** `testCTI`
+- **Frameworks nhận diện:** `express, react, vite, discord.py, requests, fastapi`
+- **Tổng số tệp mã nguồn:** `6442 files`
 
 ### 1. Các File Khởi Chạy Trọng Tâm (Key Entrypoints):
-- `dev/netherbox-enchants/src/main/java/netherbox/enchants/listener/ApplyListener.java`
+- `botdiscord/app.py`
+- `DoAnChuyenNganh/apply_to_project.py`
+- `scripts/fix_app_header.py`
+- `scripts/replace_all_remaining_selects.js`
+- `scripts/update_app_jsx.py`
+- `frontend/src/App.jsx`
+- `frontend/src/main.jsx`
+- `frontend/src/components/AppHeader.jsx`
 
 ### 2. Các Điểm Nóng Bảo Mật Thực Tế Cần Rà Soát (Detected Sensitive Sinks):
 Hệ thống phát hiện các hàm thực thi hệ thống hoặc truy vấn cần được bảo vệ theo chuẩn CTI:
-- **Tệp:** `dev/netherbox-features/src/main/java/netherbox/features/BossGui.java`
-  - Dòng 158 [Command Execution / RCE Risk]: `manager.spawn(b);`
-- **Tệp:** `dev/netherbox-features/src/main/java/netherbox/features/BossManager.java`
-  - Dòng 90 [Command Execution / RCE Risk]: `public void spawn(Boss b) {`
-  - Dòng 172 [Command Execution / RCE Risk]: `spawn(b);`
-- **Tệp:** `dev/netherbox-features/src/main/java/netherbox/features/NBBossCommand.java`
-  - Dòng 44 [Command Execution / RCE Risk]: `manager.spawn(b);`
-- **Tệp:** `dev/netherbox-enchants/src/main/java/netherbox/enchants/listener/SwordEffects.java`
-  - Dòng 186 [Command Execution / RCE Risk]: `Skeleton sk = victim.getWorld().spawn(victim.getLocation(), Skeleton.class);`
+- **Tệp:** `DoAnChuyenNganh/ai-devsecops-agent/sync.py`
+  - Dòng 9 [Command Execution / RCE Risk]: `result = subprocess.run(cmd, shell=True, text=True, capture_output=True)`
+- **Tệp:** `DoAnChuyenNganh/docker_security_tool/app_web.py`
+  - Dòng 43 [Command Execution / RCE Risk]: `res = subprocess.run(["docker", "inspect", target_type], capture_output=True, text=True, timeout=3)`
+- **Tệp:** `DoAnChuyenNganh/docker_security_tool/demo.py`
+  - Dòng 16 [Command Execution / RCE Risk]: `os.system("cls" if os.name == "nt" else "clear")`
+  - Dòng 19 [Command Execution / RCE Risk]: `return subprocess.run([sys.executable, SCANNER_SCRIPT] + args, cwd=TOOL_DIR)`
+- **Tệp:** `DoAnChuyenNganh/docker_security_tool/docker_security_scanner.py`
+  - Dòng 672 [Command Execution / RCE Risk]: `res = subprocess.run(["docker", "inspect", args.target], capture_output=True, text=True)`
+- **Tệp:** `DoAnChuyenNganh/khang_sandbox_full_cti/agentic_defense_skill_engine.py`
+  - Dòng 555 [Command Execution / RCE Risk]: `"   - **Đối với RCE / Command Injection:** Cấm gọi trực tiếp `exec()`, `system()`, `Runtime.getRunti`
+- **Tệp:** `DoAnChuyenNganh/khang_sandbox_full_cti/check_completed.py`
+  - Dòng 6 [Possible Raw SQL Concatenation]: `rows = conn.execute("SELECT article_id, source_name, title, sort_ts, processing_time_sec, last_analy`
 
 ### 3. Chỉ Dẫn Hành Động Cụ Thể Cho AI Coding Agent:
 1. Mở trực tiếp các tệp tin trong danh sách Điểm Nóng phía trên.

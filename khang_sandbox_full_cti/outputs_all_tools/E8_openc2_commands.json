@@ -1,15 +1,15 @@
 {
   "protocol": "OASIS OpenC2 v1.0 (Open Command and Control) over OpenClaw Local Bridge",
   "campaign": "Hackers Infect 953 Online Stores With Scanner-Evading JavaScript, Mostly on Magento",
-  "generated_at_utc": "2026-11-03T12:08:02Z",
+  "generated_at_utc": "2026-11-03T12:14:33Z",
   "total_commands": 8,
   "openc2_messages": [
     {
       "header": {
         "version": "1.0",
         "msg_type": "request",
-        "request_id": "openc2-bd9824cc",
-        "created": "2026-11-03T12:08:02Z",
+        "request_id": "openc2-f133d4b8",
+        "created": "2026-11-03T12:14:33Z",
         "sender": "OpenClaw-Local-CTI-Agent"
       },
       "command": {
@@ -34,8 +34,8 @@
       "header": {
         "version": "1.0",
         "msg_type": "request",
-        "request_id": "openc2-ac8824a7",
-        "created": "2026-11-03T12:08:02Z",
+        "request_id": "openc2-bb6d5f51",
+        "created": "2026-11-03T12:14:33Z",
         "sender": "OpenClaw-Local-CTI-Agent"
       },
       "command": {
@@ -58,8 +58,8 @@
       "header": {
         "version": "1.0",
         "msg_type": "request",
-        "request_id": "openc2-0d0fb606",
-        "created": "2026-11-03T12:08:02Z",
+        "request_id": "openc2-86ee52b7",
+        "created": "2026-11-03T12:14:33Z",
         "sender": "OpenClaw-Local-CTI-Agent"
       },
       "command": {
@@ -82,8 +82,8 @@
       "header": {
         "version": "1.0",
         "msg_type": "request",
-        "request_id": "openc2-947f8c10",
-        "created": "2026-11-03T12:08:02Z",
+        "request_id": "openc2-e83395ed",
+        "created": "2026-11-03T12:14:33Z",
         "sender": "OpenClaw-Local-CTI-Agent"
       },
       "command": {
@@ -106,8 +106,8 @@
       "header": {
         "version": "1.0",
         "msg_type": "request",
-        "request_id": "openc2-95af2c8c",
-        "created": "2026-11-03T12:08:02Z",
+        "request_id": "openc2-cc97453f",
+        "created": "2026-11-03T12:14:33Z",
         "sender": "OpenClaw-Local-CTI-Agent"
       },
       "command": {
@@ -135,8 +135,8 @@
       "header": {
         "version": "1.0",
         "msg_type": "request",
-        "request_id": "openc2-d898fa79",
-        "created": "2026-11-03T12:08:02Z",
+        "request_id": "openc2-8e3509ee",
+        "created": "2026-11-03T12:14:33Z",
         "sender": "OpenClaw-Local-CTI-Agent"
       },
       "command": {
@@ -164,8 +164,8 @@
       "header": {
         "version": "1.0",
         "msg_type": "request",
-        "request_id": "openc2-09670b43",
-        "created": "2026-11-03T12:08:02Z",
+        "request_id": "openc2-b4e9adb6",
+        "created": "2026-11-03T12:14:33Z",
         "sender": "OpenClaw-Local-CTI-Agent"
       },
       "command": {
@@ -193,8 +193,8 @@
       "header": {
         "version": "1.0",
         "msg_type": "request",
-        "request_id": "openc2-ee4681f3",
-        "created": "2026-11-03T12:08:02Z",
+        "request_id": "openc2-64e1badb",
+        "created": "2026-11-03T12:14:33Z",
         "sender": "OpenClaw-Local-CTI-Agent"
       },
       "command": {

@@ -10,6 +10,8 @@ import time
 import socket
 import subprocess
 import webbrowser
+import json
+import urllib.parse
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
@@ -18,6 +20,26 @@ APP_FILE = SANDBOX_DIR / "live_dashboard_app.py"
 PORT = 8765
 WAF_PORT = 8766
 OLLAMA_PORT = 11434
+
+def get_default_target_project() -> str:
+    """Xác định đường dẫn dự án đích mặc định hoặc đã được cấu hình gần nhất."""
+    last_cfg = SANDBOX_DIR / "last_active_project.json"
+    if last_cfg.exists():
+        try:
+            data = json.loads(last_cfg.read_text(encoding="utf-8"))
+            tp = data.get("target_path")
+            if tp and Path(tp).exists():
+                return str(Path(tp).resolve())
+        except Exception:
+            pass
+    cti_cand = Path("D:/mkhang/testCTI")
+    if cti_cand.exists():
+        return str(cti_cand.resolve())
+    sample_p = ROOT_DIR / "target_projects" / "My_Website"
+    if sample_p.exists():
+        return str(sample_p.resolve())
+    return ""
+
 
 def is_port_listening(port: int, host: str = "127.0.0.1") -> bool:
     """Kiểm tra cực nhanh (0.01s) xem cổng có đang mở không."""
@@ -84,6 +106,8 @@ def start_ollama_if_needed():
 
 def start_system(target_dir: str = ""):
     """Khởi động hệ thống CTI Dashboard và WAF Proxy chạy ngầm độc lập."""
+    if not target_dir:
+        target_dir = get_default_target_project()
     print("=" * 78)
     print("  DANG KHOI DONG HE THONG AN NINH MANG TU HANH CTI AGENTIC DEFENSE...")
     print("=" * 78)
@@ -126,12 +150,12 @@ def start_system(target_dir: str = ""):
     if ready:
         print("[OK] He thong da san sang!")
         time.sleep(0.5)
-        url = f"http://127.0.0.1:8765/?target={target_dir}" if target_dir else "http://127.0.0.1:8765"
+        url = f"http://127.0.0.1:8765/?target={urllib.parse.quote(target_dir)}" if target_dir else "http://127.0.0.1:8765"
         webbrowser.open(url)
         return True
     else:
         print("[CANH BAO] Server can them thoi gian khoi dong cac mo hinh AI...")
-        url = f"http://127.0.0.1:8765/?target={target_dir}" if target_dir else "http://127.0.0.1:8765"
+        url = f"http://127.0.0.1:8765/?target={urllib.parse.quote(target_dir)}" if target_dir else "http://127.0.0.1:8765"
         webbrowser.open(url)
         return True
 
@@ -242,27 +266,37 @@ def interactive_menu():
             break
 
 def main():
+    target_dir = get_default_target_project()
+    for idx, a in enumerate(sys.argv):
+        if a == "--target" and idx + 1 < len(sys.argv):
+            target_dir = sys.argv[idx + 1]
+            break
+        elif a.startswith("--target="):
+            target_dir = a.split("=", 1)[1]
+            break
+
     # Kiểm tra cờ tham số dòng lệnh nếu gọi từ CLI
-    if len(sys.argv) > 1:
+    if len(sys.argv) > 1 and sys.argv[1].lower() in ("stop", "status", "restart"):
         cmd = sys.argv[1].lower()
         if cmd == "stop":
             stop_system()
             return
         elif cmd == "status":
             alive = is_port_listening(PORT)
-            print(f"CTI Defense Status: {'ONLINE (http://127.0.0.1:8765)' if alive else 'OFFLINE'}")
+            status_text = "ONLINE (http://127.0.0.1:8765)" if alive else "OFFLINE"
+            print(f"CTI Defense Status: {status_text}")
             return
         elif cmd == "restart":
             stop_system()
-            start_system()
+            start_system(target_dir)
             return
 
     # Nếu hệ thống chưa chạy, tự khởi động ngay
     if not is_port_listening(PORT):
-        start_system()
+        start_system(target_dir)
     else:
         # Nếu đang chạy, mở ngay browser
-        url = f"http://127.0.0.1:8765/?target={target_dir}" if target_dir else "http://127.0.0.1:8765"
+        url = f"http://127.0.0.1:8765/?target={urllib.parse.quote(target_dir)}" if target_dir else "http://127.0.0.1:8765"
         webbrowser.open(url)
 
     # Mở bảng điều khiển tương tác

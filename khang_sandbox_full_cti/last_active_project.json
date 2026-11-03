@@ -1,0 +1,11 @@
+{
+  "project_name": "testCTI",
+  "project_path": "D:\\mkhang\\testCTI",
+  "scope_id": "SCOPE_WEB",
+  "scope_name": "Scope A: Web & API Layer",
+  "skill_name": "agentic-defense-master-web-suite",
+  "article_id": "",
+  "scan_interval_sec": 21600,
+  "configured_at": "2026-11-03T19:36:28.708345",
+  "status": "PROTECTED"
+}

@@ -4,7 +4,7 @@
    Áp dụng: Quét tệp thực thi PE (.exe, .dll) và bộ nhớ tiến trình (Process Memory)
    ============================================================================ */
 
-rule OpenClaw_Verified_Malware_20261103_120802
+rule OpenClaw_Verified_Malware_20261103_121433
 {
     meta:
         author = "Autonomous CTI Agent (Khang & Phuc Security)"

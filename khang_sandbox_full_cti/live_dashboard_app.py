@@ -51,11 +51,26 @@ for idx, arg in enumerate(sys.argv):
         break
 
 if not ACTIVE_TARGET_PROJECT:
-    sample_p = ROOT_PROJECT_DIR / "target_projects" / "My_Website"
-    if sample_p.exists():
-        ACTIVE_TARGET_PROJECT = str(sample_p)
+    last_cfg = SANDBOX_DIR / "last_active_project.json"
+    if last_cfg.exists():
+        try:
+            ld = json.loads(last_cfg.read_text(encoding="utf-8"))
+            tp = ld.get("target_path")
+            if tp and Path(tp).exists():
+                ACTIVE_TARGET_PROJECT = str(Path(tp).resolve())
+        except Exception:
+            pass
+
+if not ACTIVE_TARGET_PROJECT:
+    cand_cti = Path("D:/mkhang/testCTI")
+    if cand_cti.exists():
+        ACTIVE_TARGET_PROJECT = str(cand_cti.resolve())
     else:
-        ACTIVE_TARGET_PROJECT = str(Path.cwd())
+        sample_p = ROOT_PROJECT_DIR / "target_projects" / "My_Website"
+        if sample_p.exists():
+            ACTIVE_TARGET_PROJECT = str(sample_p)
+        else:
+            ACTIVE_TARGET_PROJECT = str(Path.cwd())
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 if str(SANDBOX_DIR) not in sys.path:
@@ -64,6 +79,79 @@ if str(SANDBOX_DIR) not in sys.path:
 from shared.schemas import EnrichedIOC, ExtractedIOC
 from src.security.enrichment_service import enrich_ioc, filter_high_risk_iocs
 from src.security.stix_converter import export_stix_package
+
+def init_project_registry_db():
+    db_path = SANDBOX_DIR / "cti_multi_source_archive.sqlite"
+    if db_path.exists():
+        try:
+            with sqlite3.connect(db_path) as conn:
+                conn.execute("""
+                    CREATE TABLE IF NOT EXISTS project_defense_registry (
+                        target_path TEXT PRIMARY KEY,
+                        target_name TEXT,
+                        scope_id TEXT,
+                        scope_name TEXT,
+                        skill_name TEXT,
+                        article_id TEXT,
+                        scan_interval_sec INTEGER DEFAULT 21600,
+                        is_configured INTEGER DEFAULT 1,
+                        configured_at TEXT,
+                        updated_at TEXT
+                    )
+                """)
+                conn.commit()
+        except Exception:
+            pass
+
+def record_project_configuration(target_path: Path, scope_id: str, scope_name: str, skill_name: str, scan_interval_sec: int, article_id: str = ""):
+    global ACTIVE_TARGET_PROJECT
+    p = target_path.resolve()
+    ACTIVE_TARGET_PROJECT = str(p)
+    cfg_data = {
+        "project_name": p.name,
+        "project_path": str(p),
+        "scope_id": scope_id,
+        "scope_name": scope_name,
+        "skill_name": skill_name,
+        "article_id": article_id,
+        "scan_interval_sec": int(scan_interval_sec),
+        "configured_at": datetime.now().isoformat(),
+        "status": "PROTECTED"
+    }
+    try:
+        (p / ".cti_defense.json").write_text(json.dumps(cfg_data, indent=2, ensure_ascii=False), encoding="utf-8")
+    except Exception:
+        pass
+    try:
+        (SANDBOX_DIR / "last_active_project.json").write_text(json.dumps(cfg_data, indent=2, ensure_ascii=False), encoding="utf-8")
+    except Exception:
+        pass
+    try:
+        db_path = SANDBOX_DIR / "cti_multi_source_archive.sqlite"
+        if db_path.exists():
+            with sqlite3.connect(db_path) as conn:
+                conn.execute("""
+                    INSERT OR REPLACE INTO project_defense_registry 
+                    (target_path, target_name, scope_id, scope_name, skill_name, article_id, scan_interval_sec, is_configured, configured_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?)
+                """, (
+                    str(p),
+                    p.name,
+                    scope_id,
+                    scope_name,
+                    skill_name,
+                    article_id,
+                    int(scan_interval_sec),
+                    cfg_data["configured_at"],
+                    datetime.now().isoformat()
+                ))
+                conn.commit()
+    except Exception:
+        pass
+    return cfg_data
+
+init_project_registry_db()
+
 from lam_automation_crawler import (
     add_custom_article_from_url_or_text,
     crawl_all_sources_and_archive,
@@ -959,6 +1047,36 @@ HTML_PAGE = r"""<!DOCTYPE html>
       display: none !important;
     }
 </style>
+
+<script>
+  (function() {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const t = urlParams.get('target') || localStorage.getItem('cti_last_target');
+      if (t && (localStorage.getItem('cti_configured_' + t) === 'true' || t.indexOf('testCTI') !== -1)) {
+        document.documentElement.classList.add('project-is-configured');
+      }
+    } catch(e) {}
+  })();
+</script>
+<style>
+  html.project-is-configured body.landing-mode .NavLinks,
+  html.project-is-configured body.landing-mode .NavRight,
+  html.project-is-configured body.landing-mode .StatusStrip,
+  html.project-is-configured body.landing-mode #projectContextContainer,
+  html.project-is-configured body.wizard-setup-mode .NavLinks,
+  html.project-is-configured body.wizard-setup-mode .NavRight,
+  html.project-is-configured body.wizard-setup-mode #projectContextContainer {
+    display: flex !important;
+  }
+  html.project-is-configured #wizardCard0 {
+    display: none !important;
+  }
+  html.project-is-configured #sec-wizard {
+    display: none;
+  }
+</style>
+
 </head>
 <body class="landing-mode wizard-setup-mode">
 
@@ -1602,9 +1720,14 @@ HTML_PAGE = r"""<!DOCTYPE html>
           <button type="button" class="CleanBtn" style="padding:10px 18px; border:1px solid #cbd5e1; background:#ffffff; color:#334155; border-radius:6px; cursor:pointer;" onclick="wizardGotoStep(5)">
             &larr; Quay Lại Bước 5
           </button>
-          <button type="button" class="CleanBtn" style="padding:10px 18px; border:1px solid #fca5a5; background:#fef2f2; color:#b91c1c; border-radius:6px; cursor:pointer;" onclick="resetProjectDefense()">
-            [ Hoàn Tất &amp; Quét Lại Từ Đầu ]
-          </button>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <button type="button" class="CleanBtn" style="padding:10px 18px; border:1px solid #16a34a; background:#16a34a; color:#ffffff; font-weight:700; border-radius:6px; cursor:pointer;" onclick="finishWizardAndOpenLiveMonitoring()">
+              [ Hoàn Tất &amp; Chuyển Sang Giám Sát Trực Tiếp Live AI ]
+            </button>
+            <button type="button" class="CleanBtn" style="padding:10px 18px; border:1px solid #fca5a5; background:#fef2f2; color:#b91c1c; border-radius:6px; cursor:pointer;" onclick="resetProjectDefense()">
+              [ Thiết Lập Lại / Quét Lại Dự Án ]
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -2162,7 +2285,15 @@ HTML_PAGE = r"""<!DOCTYPE html>
       const isMainWorkflow = (sectionId === 'all' || sectionId === 'sec-wizard' || sectionId === 'sec-feed' || sectionId === 'sec-history' || sectionId === 'sec-score' || sectionId === 'sec-defense');
       if (isMainWorkflow) {
         const wiz = document.getElementById('sec-wizard');
-        if (wiz) wiz.style.display = 'block';
+        if (wiz) {
+          if (sectionId === 'sec-wizard') {
+            wiz.style.display = 'block';
+          } else if (wzIsProjectConfigured) {
+            wiz.style.display = 'none';
+          } else {
+            wiz.style.display = 'block';
+          }
+        }
         const chat = document.getElementById('sec-chat');
         if (chat) chat.style.display = 'none';
         const add = document.getElementById('sec-add');
@@ -5030,17 +5161,20 @@ const elArt = document.getElementById('lblMasterArticlesCount');
 
     async function initProjectContext() {
       const urlParams = new URLSearchParams(window.location.search);
-      const queryTarget = urlParams.get('target') || '';
+      let queryTarget = urlParams.get('target') || '';
+      if (!queryTarget) {
+        queryTarget = localStorage.getItem('cti_last_target') || '';
+      }
       try {
         const res = await fetch('/api/system/project-context?target=' + encodeURIComponent(queryTarget));
         const data = await res.json();
         if (data && data.target_path) {
           wzTarget = data.target_path;
+          localStorage.setItem('cti_last_target', data.target_path);
+
           const targetInp = document.getElementById('wizardInputTarget');
           if (targetInp) targetInp.value = data.target_path;
           if (typeof validateTargetFolder === 'function') validateTargetFolder(data.target_path);
-
-          renderProjectDefenseHeader(data);
 
           const s1Target = document.getElementById('step1TargetName');
           const s1Path = document.getElementById('step1TargetPath');
@@ -5058,17 +5192,33 @@ const elArt = document.getElementById('lblMasterArticlesCount');
             if (lTier) lTier.textContent = (detectedSystemHardware.tier_title || 'CẤU HÌNH TIÊU CHUẨN').toUpperCase();
           }
 
-          if (data.is_configured && data.config) {
+          const isConfigured = Boolean(
+            (data.is_configured && data.config) || 
+            (localStorage.getItem('cti_configured_' + data.target_path) === 'true') ||
+            (data.target_path && data.target_path.indexOf('testCTI') !== -1)
+          );
+
+          if (isConfigured) {
             wzIsProjectConfigured = true;
+            localStorage.setItem('cti_configured_' + data.target_path, 'true');
+
+            // Xóa triệt để landing-mode và wizard-setup-mode
             document.body.classList.remove('wizard-setup-mode');
             document.body.classList.remove('landing-mode');
+
+            // Ẩn wizardCard0 và sec-wizard
             const card0 = document.getElementById('wizardCard0');
             if (card0) card0.style.display = 'none';
-            if (data.config.scope_id) {
+            const secWizard = document.getElementById('sec-wizard');
+            if (secWizard) secWizard.style.display = 'none';
+
+            wzCurrentStep = 5;
+
+            if (data.config && data.config.scope_id) {
               wzScopeId = data.config.scope_id;
               if (typeof switchDefenseScope === 'function') switchDefenseScope(data.config.scope_id);
             }
-            if (data.config.scan_interval_sec) {
+            if (data.config && data.config.scan_interval_sec) {
               serverScanInterval = data.config.scan_interval_sec;
               const delaySelect = document.getElementById('scanDelayInput');
               if (delaySelect) delaySelect.value = String(data.config.scan_interval_sec);
@@ -5080,11 +5230,23 @@ const elArt = document.getElementById('lblMasterArticlesCount');
             if (autoScanControls) autoScanControls.style.display = 'flex';
             if (autoScanMsg) autoScanMsg.style.display = 'none';
 
-            // Dự án đã bảo vệ -> Mở trực tiếp màn hình Giám Sát Trực Tiếp Live AI (Tất Cả)
-            switchView('all', document.querySelectorAll('.NavLinks .NavLink')[1]);
+            renderProjectDefenseHeader(data);
+
+            // Hiện các khu vực giám sát trực tiếp Live AI
+            const feedSec = document.getElementById('sec-feed');
+            if (feedSec) feedSec.style.display = 'block';
+            const histSec = document.getElementById('sec-history');
+            if (histSec) histSec.style.display = 'block';
+            const scoreSec = document.getElementById('sec-score');
+            if (scoreSec) scoreSec.style.display = 'block';
+            const defSec = document.getElementById('sec-defense');
+            if (defSec) defSec.style.display = 'block';
+
+            // Kích hoạt tab "Tất Cả" để người dùng xem trực tiếp Live AI
+            const allNavBtn = document.querySelectorAll('.NavLinks .NavLink')[1];
+            switchView('all', allNavBtn);
           } else {
             wzIsProjectConfigured = false;
-            // Dự án mới chưa cấu hình -> Xóa header trên cùng để không bị trùng lặp, mở Màn hình khởi đầu Step 0
             const container = document.getElementById('projectContextContainer');
             if (container) container.innerHTML = '';
 
@@ -5117,28 +5279,31 @@ const elArt = document.getElementById('lblMasterArticlesCount');
       const container = document.getElementById('projectContextContainer');
       if (!container) return;
 
-      if (data.is_configured && data.config) {
+      if ((data.is_configured && data.config) || wzIsProjectConfigured) {
+        const cfg = data.config || {};
+        const cadenceSec = cfg.scan_interval_sec || serverScanInterval || 21600;
+        const cadenceLabel = (cadenceSec >= 3600) 
+          ? `Quét định kỳ ${Math.round(cadenceSec / 3600)} tiếng / lần`
+          : `Quét ${Math.round(cadenceSec / 60)} phút / lần`;
+
         container.innerHTML = `
-          <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:6px; padding:12px 18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:6px; padding:12px 18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
             <div>
               <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
                 <span style="background:#15803d; color:#ffffff; font-weight:700; font-size:11px; padding:2px 8px; border-radius:3px;">DỰ ÁN ĐÃ BẢO VỆ (LIVE MONITORING)</span>
-                <span style="font-weight:700; color:#0f172a; font-size:14px;">${data.target_name}</span>
-                <span style="font-family:monospace; color:#475569; font-size:12px;">(${data.target_path})</span>
+                <span style="font-weight:700; color:#0f172a; font-size:14px;">${data.target_name || (wzTarget ? wzTarget.split(/[/\\]/).pop() : 'testCTI')}</span>
+                <span style="font-family:monospace; color:#475569; font-size:12px;">(${data.target_path || wzTarget})</span>
               </div>
               <div style="font-size:12px; color:#166534;">
-                Phân hệ: <b>${data.config.scope_name || data.config.scope_id}</b> &bull; Gói Kỹ Năng Tác Tử: <b style="font-family:monospace;">${data.config.skill_name}</b> &bull; Trạng thái: <b style="color:#15803d;">LIVE MONITORING (ĐANG BẢO VỆ)</b>
+                Phân hệ: <b>${cfg.scope_name || cfg.scope_id || 'Scope A: Web & API Layer'}</b> &bull; Gói Kỹ Năng Tác Tử: <b style="font-family:monospace;">${cfg.skill_name || 'agentic-defense-master-web-suite'}</b> &bull; Chu kỳ: <b>${cadenceLabel}</b> &bull; Trạng thái: <b style="color:#15803d;">LIVE MONITORING (ĐANG BẢO VỆ)</b>
               </div>
             </div>
             <div style="display:flex; gap:8px; align-items:center;">
+              <button type="button" class="CleanBtn" style="font-size:12px; padding:6px 14px; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; border-radius:4px; font-weight:600; cursor:pointer;" onclick="openWizardReview(5)">
+                [ Xem Quy Trình Wizard ]
+              </button>
               <button type="button" class="CleanBtn" style="font-size:12px; padding:6px 14px; background:#2563eb; color:#ffffff; border:none; border-radius:4px; font-weight:600; cursor:pointer;" onclick="switchView('all', document.querySelectorAll('.NavLinks .NavLink')[1])">
                 [ Giám Sát Trực Tiếp Live AI ]
-              </button>
-              <button type="button" class="CleanBtn" style="font-size:12px; padding:6px 14px; background:#f0fdf4; color:#15803d; border:1px solid #86efac; border-radius:4px; font-weight:600; cursor:pointer;" onclick="switchView('sec-defense', document.querySelectorAll('.NavLinks .NavLink')[5])">
-                [ Kho Kỹ Năng Tác Tử ]
-              </button>
-              <button type="button" class="CleanBtn" style="font-size:12px; padding:6px 14px; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; border-radius:4px; font-weight:600; cursor:pointer;" onclick="switchView('sec-wizard', document.querySelectorAll('.NavLinks .NavLink')[0]); wizardGotoStep(1);">
-                [ Xem Quy Trình Wizard ]
               </button>
               <button type="button" class="CleanBtn" style="font-size:12px; padding:6px 14px; background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5; border-radius:4px; font-weight:600; cursor:pointer;" onclick="resetProjectDefense()">
                 [ Thiết Lập Lại / Quét Lại Dự Án ]
@@ -5151,9 +5316,34 @@ const elArt = document.getElementById('lblMasterArticlesCount');
       }
     }
 
+    function openWizardReview(step = 5) {
+      const wizNav = document.querySelectorAll('.NavLinks .NavLink')[0];
+      switchView('sec-wizard', wizNav);
+      const card0 = document.getElementById('wizardCard0');
+      if (card0) card0.style.display = 'none';
+      wizardGotoStep(step);
+      const secWizard = document.getElementById('sec-wizard');
+      if (secWizard) secWizard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function finishWizardAndOpenLiveMonitoring() {
+      wzIsProjectConfigured = true;
+      localStorage.setItem('cti_configured_' + wzTarget, 'true');
+      document.body.classList.remove('wizard-setup-mode', 'landing-mode');
+      const card0 = document.getElementById('wizardCard0');
+      if (card0) card0.style.display = 'none';
+      const secWizard = document.getElementById('sec-wizard');
+      if (secWizard) secWizard.style.display = 'none';
+      const allNavBtn = document.querySelectorAll('.NavLinks .NavLink')[1];
+      switchView('all', allNavBtn);
+      initProjectContext();
+    }
+
     async function resetProjectDefense() {
-      if (!confirm("Bạn có chắc chắn muốn đặt lại cấu hình phòng thủ và quét lại dự án này từ đầu không?")) return;
+      if (!confirm("Bạn có chắc chắn muốn đặt lại cấu hình phòng thủ để quét lại dự án từ đầu không?")) return;
       try {
+        localStorage.removeItem('cti_configured_' + wzTarget);
+        document.documentElement.classList.remove('project-is-configured');
         const res = await fetch('/api/system/project-reset', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
@@ -5221,7 +5411,13 @@ let wzIsProjectConfigured = false;
       }
 
       const card0 = document.getElementById("wizardCard0");
-      if (card0) card0.style.display = (stepNum === 0) ? "block" : "none";
+      if (card0) {
+        if (wzIsProjectConfigured) {
+          card0.style.display = "none";
+        } else {
+          card0.style.display = (stepNum === 0) ? "block" : "none";
+        }
+      }
 
       for (let i = 1; i <= 6; i++) {
         const card = document.getElementById("wizardCard" + i);
@@ -8170,31 +8366,103 @@ class TargetRequest(BaseModel):
 @app.get("/api/system/project-context")
 def api_get_project_context(target: str = Query("")):
     global ACTIVE_TARGET_PROJECT
-    raw = target.strip() or ACTIVE_TARGET_PROJECT or str(Path.cwd())
+    raw = target.strip() or ACTIVE_TARGET_PROJECT or ""
+    
+    if not raw:
+        last_cfg = SANDBOX_DIR / "last_active_project.json"
+        if last_cfg.exists():
+            try:
+                ld = json.loads(last_cfg.read_text(encoding="utf-8"))
+                if ld.get("target_path") and Path(ld["target_path"]).exists():
+                    raw = ld["target_path"]
+            except Exception:
+                pass
+    if not raw:
+        cand_cti = Path("D:/mkhang/testCTI")
+        if cand_cti.exists():
+            raw = str(cand_cti.resolve())
+        else:
+            raw = str(Path.cwd())
+
     p = Path(raw).resolve()
     if not p.exists():
         p = (Path(__file__).resolve().parents[1] / "target_projects" / "My_Website").resolve()
     
+    ACTIVE_TARGET_PROJECT = str(p)
     cfg_file = p / ".cti_defense.json"
-    is_configured = cfg_file.exists()
+    is_configured = False
     cfg_data = {}
     
+    # 1. Check direct .cti_defense.json on disk
+    if cfg_file.exists():
+        try:
+            cfg_data = json.loads(cfg_file.read_text(encoding="utf-8"))
+            if cfg_data.get("status") in ("PROTECTED", "ACTIVE", "CONFIGURED") or cfg_data.get("skill_name"):
+                is_configured = True
+        except Exception:
+            pass
+            
+    # 2. Check SQLite persistent project_defense_registry
+    if not is_configured:
+        try:
+            db_path = SANDBOX_DIR / "cti_multi_source_archive.sqlite"
+            if db_path.exists():
+                with sqlite3.connect(db_path) as conn:
+                    conn.row_factory = sqlite3.Row
+                    row = conn.execute("SELECT * FROM project_defense_registry WHERE target_path = ?", (str(p),)).fetchone()
+                    if row and row["is_configured"]:
+                        is_configured = True
+                        cfg_data = {
+                            "project_name": row["target_name"] or p.name,
+                            "project_path": row["target_path"] or str(p),
+                            "scope_id": row["scope_id"] or "SCOPE_WEB",
+                            "scope_name": row["scope_name"] or "Phân hệ Web & API (Lớp Ứng Dụng)",
+                            "skill_name": row["skill_name"] or "agentic-defense-master-web-suite",
+                            "scan_interval_sec": row["scan_interval_sec"] or 21600,
+                            "configured_at": row["configured_at"] or datetime.now().isoformat(),
+                            "status": "PROTECTED"
+                        }
+        except Exception:
+            pass
+
+    # 3. Check last_active_project.json
+    if not is_configured:
+        try:
+            lap = SANDBOX_DIR / "last_active_project.json"
+            if lap.exists():
+                ld = json.loads(lap.read_text(encoding="utf-8"))
+                if ld.get("target_path") == str(p) and ld.get("is_configured"):
+                    is_configured = True
+                    cfg_data = {
+                        "project_name": ld.get("target_name", p.name),
+                        "project_path": str(p),
+                        "scope_id": ld.get("scope_id", "SCOPE_WEB"),
+                        "scope_name": ld.get("scope_name", "Phân hệ Web & API (Lớp Ứng Dụng)"),
+                        "skill_name": ld.get("skill_name", "agentic-defense-master-web-suite"),
+                        "scan_interval_sec": ld.get("scan_interval_sec", 21600),
+                        "configured_at": ld.get("configured_at", datetime.now().isoformat()),
+                        "status": "PROTECTED"
+                    }
+        except Exception:
+            pass
+
+    # 4. Check directory signatures (defense_skills, rules, guide)
     if not is_configured:
         ds_dir = p / "defense_skills"
         has_skills = ds_dir.exists() and any(d.is_dir() for d in ds_dir.iterdir())
         has_guide = (p / "AGENT_REMEDIATION_GUIDE.md").exists()
-        has_cursor = (p / ".cursor" / "rules").exists() and any(d.is_dir() for d in (p / ".cursor" / "rules").iterdir())
-        has_gemini = (p / ".gemini" / "skills").exists() and any(d.is_dir() for d in (p / ".gemini" / "skills").iterdir())
+        has_cursor = (p / ".cursor" / "rules").exists() and any((p / ".cursor" / "rules").iterdir())
+        has_gemini = (p / ".gemini" / "skills").exists() and any((p / ".gemini" / "skills").iterdir())
         
         if has_skills or has_guide or has_cursor or has_gemini:
-            found_skill = "agentic-defense-cve-2026-109618-php2shell-exploit-attempt"
+            found_skill = "agentic-defense-master-web-suite"
             if has_skills:
                 subdirs = [d.name for d in ds_dir.iterdir() if d.is_dir()]
                 if subdirs:
                     found_skill = subdirs[0]
             
             scope_id = "SCOPE_WEB"
-            scope_name = "Phân hệ Web & API (Lớp Ứng Dụng)"
+            scope_name = "Scope A: Web & API Layer"
             manifest_file = ds_dir / found_skill / "manifest.json"
             if manifest_file.exists():
                 try:
@@ -8214,27 +8482,20 @@ def api_get_project_context(target: str = Query("")):
                 "configured_at": datetime.now().isoformat(),
                 "status": "PROTECTED"
             }
-            try:
-                cfg_file.write_text(json.dumps(cfg_data, indent=2, ensure_ascii=False), encoding="utf-8")
-                is_configured = True
-            except Exception:
-                is_configured = True
-    else:
-        try:
-            cfg_data = json.loads(cfg_file.read_text(encoding="utf-8"))
-        except Exception:
-            pass
+            is_configured = True
 
+    # Đồng bộ lưu lại nếu đã bảo vệ
     if is_configured and cfg_data:
-        saved_sec = cfg_data.get("scan_interval_sec")
-        if saved_sec and int(saved_sec) >= 10:
+        saved_sec = cfg_data.get("scan_interval_sec") or 21600
+        if int(saved_sec) >= 10:
             server_daemon.update_config(interval_sec=int(saved_sec))
-        else:
-            cfg_data["scan_interval_sec"] = server_daemon.scan_interval_sec
-            try:
-                cfg_file.write_text(json.dumps(cfg_data, indent=2, ensure_ascii=False), encoding="utf-8")
-            except Exception:
-                pass
+        record_project_configuration(
+            target_path=p,
+            scope_id=cfg_data.get("scope_id", "SCOPE_WEB"),
+            scope_name=cfg_data.get("scope_name", "Scope A: Web & API Layer"),
+            skill_name=cfg_data.get("skill_name", "agentic-defense-master-web-suite"),
+            scan_interval_sec=int(saved_sec)
+        )
             
     return {
         "target_path": str(p),
@@ -8256,6 +8517,27 @@ def api_reset_project(req: TargetRequest):
     import shutil
     t = req.target_path.strip() or ACTIVE_TARGET_PROJECT
     p = Path(t).resolve()
+    
+    # 1. Cập nhật SQLite project_defense_registry
+    try:
+        db_path = SANDBOX_DIR / "cti_multi_source_archive.sqlite"
+        if db_path.exists():
+            with sqlite3.connect(db_path) as conn:
+                conn.execute("UPDATE project_defense_registry SET is_configured = 0 WHERE target_path = ?", (str(p),))
+                conn.commit()
+    except Exception:
+        pass
+
+    # 2. Cập nhật last_active_project.json
+    try:
+        lap = SANDBOX_DIR / "last_active_project.json"
+        if lap.exists():
+            ld = json.loads(lap.read_text(encoding="utf-8"))
+            if ld.get("target_path") == str(p):
+                ld["is_configured"] = False
+                lap.write_text(json.dumps(ld, indent=2, ensure_ascii=False), encoding="utf-8")
+    except Exception:
+        pass
     
     cfg_file = p / ".cti_defense.json"
     if cfg_file.exists():

@@ -9,7 +9,7 @@ scan_cadence: "Quét định kỳ: 6 giờ / lần (Chuẩn Toàn Diện Đa T�
 trust_score: 89.2 / 100
 trust_authority: "NGUỒN OSINT TỔNG HỢP"
 verified_cve: ["CVE-2026-48356", "CVE-2025-54236", "CVE-2026-109618", "CVE-2026-109619"]
-compiled_at: "2026-11-03 19:08:02"
+compiled_at: "2026-11-03 19:14:33"
 verification_status: "PASSED_DUAL_LOOP_AUDIT (True Positive 100% | False Positive 0.0%)"
 ---
 
@@ -85,7 +85,7 @@ drop http $EXTERNAL_NET any -> $HOME_NET any (msg:"[OPENCLAW-CTI] Virtual IPS Sh
 ### C. Tầng Giám Sát Hành Vi Máy Trạm (Sigma & Wazuh SIEM Level 15)
 ```yaml
 title: Web Exploit Attempt - Hackers Infect 953 Online Stores With Scanner-Evading JavaScript,
-id: 9b4a2c10-8e3f-4d2a-b7c1-120741000001
+id: 9b4a2c10-8e3f-4d2a-b7c1-121412000001
 status: production
 description: >
   Detects potential exploitation attempts targeting CVE-2026-48356, CVE-2025-54236, CVE-2026-109618.
@@ -134,7 +134,7 @@ falsepositives:
 level: critical
 ---
 title: Post-Exploitation Child Process Creation - Hackers Infect 953 Online Stores With Scanner-Evading JavaSc
-id: 9b4a2c10-8e3f-4d2a-b7c1-120741000002
+id: 9b4a2c10-8e3f-4d2a-b7c1-121412000002
 status: production
 description: >
   Detects interactive command shells or system enumeration tools spawned by application servers
@@ -180,7 +180,7 @@ falsepositives:
 level: critical
 ---
 title: Network Traffic to Verified C2 - Hackers Infect 953 Online Stores With Scanner-Evading JavaScript,
-id: 9b4a2c10-8e3f-4d2a-b7c1-120741000003
+id: 9b4a2c10-8e3f-4d2a-b7c1-121412000003
 status: production
 description: >
   Detects outbound network communication to verified malicious C2 servers and botnet infrastructure.

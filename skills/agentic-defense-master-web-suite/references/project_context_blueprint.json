@@ -1,56 +1,2159 @@
 {
-  "project_name": "boxpvp",
-  "target_path": "D:\\mkhang\\boxpvp",
-  "frameworks": [],
+  "project_name": "testCTI",
+  "target_path": "D:\\mkhang\\testCTI",
+  "frameworks": [
+    "express",
+    "react",
+    "vite",
+    "discord.py",
+    "requests",
+    "fastapi"
+  ],
   "entrypoints": [
-    "dev/netherbox-enchants/src/main/java/netherbox/enchants/listener/ApplyListener.java"
+    "botdiscord/app.py",
+    "DoAnChuyenNganh/apply_to_project.py",
+    "scripts/fix_app_header.py",
+    "scripts/replace_all_remaining_selects.js",
+    "scripts/update_app_jsx.py",
+    "frontend/src/App.jsx",
+    "frontend/src/main.jsx",
+    "frontend/src/components/AppHeader.jsx",
+    "frontend/src/components/AppSidebar.jsx",
+    "frontend/src/components/MinecraftBotViews.jsx",
+    "DoAnChuyenNganh/docker_security_tool/app_web.py",
+    "DoAnChuyenNganh/khang_sandbox_full_cti/live_dashboard_app.py",
+    "DoAnChuyenNganh/skills/agentic-defense-cve-2026-109618-php2shell-exploit-attempt/scripts/apply_virtual_patch.py",
+    "botdiscord/ptkngu/bot.py",
+    "botdiscord/token_manager_tool/modules/server_checker.py",
+    "botdiscord/ptkngu/token_manager_tool/modules/server_checker.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/aiohttp/web_app.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/aiohttp/web_server.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/certifi/__main__.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/charset_normalizer/__main__.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/discord/appinfo.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/discord/__main__.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/httpx/_main.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/openai/__main__.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/pydantic/error_wrappers.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/pydantic/main.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/tqdm/_main.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/tqdm/__main__.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/websocket/_app.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/websockets/server.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/websockets/__main__.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/zope/interface/common/mapping.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/zope/interface/common/tests/basemapping.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/websockets/asyncio/server.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/websockets/legacy/server.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/websockets/sync/server.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/websocket/tests/echo-server.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/websocket/tests/test_app.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/pydantic/v1/error_wrappers.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/pydantic/v1/main.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/openai/types/realtime/input_audio_buffer_append_event.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/openai/types/realtime/input_audio_buffer_append_event_param.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/openai/types/realtime/realtime_mcp_approval_request.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/openai/types/realtime/realtime_mcp_approval_request_param.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/openai/types/realtime/realtime_mcp_approval_response.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/openai/types/realtime/realtime_mcp_approval_response_param.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/openai/types/realtime/realtime_server_event.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/openai/types/beta/realtime/input_audio_buffer_append_event.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/openai/types/beta/realtime/input_audio_buffer_append_event_param.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/openai/types/beta/realtime/realtime_server_event.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/openai/cli/_api/_main.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/openai/cli/_tools/_main.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/discord/types/appinfo.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/discord/ext/commands/bot.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/Cryptodome/SelfTest/__main__.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/Crypto/SelfTest/__main__.py",
+    "botdiscord/ptkngu/.local/lib/python3.8/site-packages/charset_normalizer/cli/__main__.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/aiohttp/web_app.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/aiohttp/web_server.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/certifi/__main__.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/charset_normalizer/__main__.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/curl_cffi/__main__.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/discord/appinfo.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/discord/__main__.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/dotenv/main.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/dotenv/__main__.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/httpx/_main.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/imageio/__main__.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/markdown_it/main.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/PIL/__main__.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/pydantic/error_wrappers.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/pydantic/main.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/pygments/__main__.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/rich/__main__.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/tqdm/_main.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/tqdm/__main__.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/websocket/_app.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/websockets/server.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/websockets/__main__.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/zope/interface/common/mapping.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/zope/interface/common/tests/basemapping.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/websockets/asyncio/server.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/websockets/legacy/server.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/websockets/sync/server.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/websocket/tests/echo-server.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/websocket/tests/test_app.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/pygments/formatters/_mapping.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/pygments/lexers/robotframework.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/pygments/lexers/_mapping.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/pygments/styles/_mapping.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/pydantic/v1/error_wrappers.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/pydantic/v1/main.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/openai/types/realtime/input_audio_buffer_append_event.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/openai/types/realtime/input_audio_buffer_append_event_param.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/openai/types/realtime/realtime_mcp_approval_request.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/openai/types/realtime/realtime_mcp_approval_request_param.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/openai/types/realtime/realtime_mcp_approval_response.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/openai/types/realtime/realtime_mcp_approval_response_param.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/openai/types/realtime/realtime_server_event.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/openai/types/responses/apply_patch_tool.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/openai/types/responses/apply_patch_tool_param.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/openai/types/responses/container_network_policy_domain_secret.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/openai/types/responses/container_network_policy_domain_secret_param.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/openai/types/responses/responses_server_event.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/openai/types/responses/response_apply_patch_tool_call.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/openai/types/responses/response_apply_patch_tool_call_output.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/openai/types/responses/tool_choice_apply_patch.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/openai/types/responses/tool_choice_apply_patch_param.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/openai/types/beta/realtime/input_audio_buffer_append_event.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/openai/types/beta/realtime/input_audio_buffer_append_event_param.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/openai/types/beta/realtime/realtime_server_event.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/f2py/__main__.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/lib/_index_tricks_impl.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/_core/tests/test_indexerrors.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/_core/tests/test_indexing.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/typing/tests/data/pass/index_tricks.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/lib/tests/test_index_tricks.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/imageio/core/legacy_plugin_wrapper.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/discord/types/appinfo.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/discord/ext/commands/bot.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/Cryptodome/SelfTest/__main__.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/Crypto/SelfTest/__main__.py",
+    "botdiscord/ptkngu/.local/lib/python3.14/site-packages/charset_normalizer/cli/__main__.py",
+    "backend/src/server.js",
+    "backend/src/bot/botManager.js",
+    "backend/src/discord/app.py",
+    "backend/src/tempmail/customSmtpServer.js"
   ],
   "sensitive_sinks": [
     {
-      "file": "dev/netherbox-features/src/main/java/netherbox/features/BossGui.java",
+      "file": "DoAnChuyenNganh/ai-devsecops-agent/sync.py",
       "findings": [
+        {
+          "line": 9,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "result = subprocess.run(cmd, shell=True, text=True, capture_output=True)"
+        }
+      ]
+    },
+    {
+      "file": "DoAnChuyenNganh/docker_security_tool/app_web.py",
+      "findings": [
+        {
+          "line": 43,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "res = subprocess.run([\"docker\", \"inspect\", target_type], capture_output=True, text=True, timeout=3)"
+        }
+      ]
+    },
+    {
+      "file": "DoAnChuyenNganh/docker_security_tool/demo.py",
+      "findings": [
+        {
+          "line": 16,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "os.system(\"cls\" if os.name == \"nt\" else \"clear\")"
+        },
+        {
+          "line": 19,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "return subprocess.run([sys.executable, SCANNER_SCRIPT] + args, cwd=TOOL_DIR)"
+        }
+      ]
+    },
+    {
+      "file": "DoAnChuyenNganh/docker_security_tool/docker_security_scanner.py",
+      "findings": [
+        {
+          "line": 672,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "res = subprocess.run([\"docker\", \"inspect\", args.target], capture_output=True, text=True)"
+        }
+      ]
+    },
+    {
+      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/agentic_defense_skill_engine.py",
+      "findings": [
+        {
+          "line": 555,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "\"   - **Đối với RCE / Command Injection:** Cấm gọi trực tiếp `exec()`, `system()`, `Runtime.getRunti"
+        }
+      ]
+    },
+    {
+      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/check_completed.py",
+      "findings": [
+        {
+          "line": 6,
+          "type": "Possible Raw SQL Concatenation",
+          "snippet": "rows = conn.execute(\"SELECT article_id, source_name, title, sort_ts, processing_time_sec, last_analy"
+        }
+      ]
+    },
+    {
+      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/check_daily_stats.py",
+      "findings": [
+        {
+          "line": 8,
+          "type": "Possible Raw SQL Concatenation",
+          "snippet": "rows = conn.execute(\"SELECT source_name, count(*) as cnt FROM articles_archive GROUP BY source_name "
+        }
+      ]
+    },
+    {
+      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/check_malware.py",
+      "findings": [
+        {
+          "line": 9,
+          "type": "Possible Raw SQL Concatenation",
+          "snippet": "hashes = conn.execute(\"SELECT ioc_type, ioc_value, reputation_score, source_title FROM ioc_knowledge"
+        },
+        {
+          "line": 17,
+          "type": "Possible Raw SQL Concatenation",
+          "snippet": "articles = conn.execute(\"SELECT article_id, source_name, title, sort_ts, status, content FROM articl"
+        }
+      ]
+    },
+    {
+      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/check_security_tools.py",
+      "findings": [
+        {
+          "line": 37,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "out = subprocess.check_output(\"netsh advfirewall show currentprofile state\", shell=True).decode('cp4"
+        }
+      ]
+    },
+    {
+      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/check_stuck.py",
+      "findings": [
+        {
+          "line": 6,
+          "type": "Possible Raw SQL Concatenation",
+          "snippet": "rows = conn.execute(\"SELECT article_id, title, status, processing_time_sec, is_historical, fetched_a"
+        },
+        {
+          "line": 11,
+          "type": "Possible Raw SQL Concatenation",
+          "snippet": "all_rows = conn.execute(\"SELECT status, count(*) FROM articles_archive GROUP BY status\").fetchall()"
+        }
+      ]
+    },
+    {
+      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/ingest_3_year_data.py",
+      "findings": [
+        {
+          "line": 255,
+          "type": "Possible Raw SQL Concatenation",
+          "snippet": "total = conn.execute(\"SELECT count(*) FROM articles_archive\").fetchone()[0]"
+        }
+      ]
+    },
+    {
+      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/ingest_and_triage_full_3year_corpus.py",
+      "findings": [
+        {
+          "line": 169,
+          "type": "Possible Raw SQL Concatenation",
+          "snippet": "existing_urls = set(r[0] for r in conn.execute(\"SELECT url FROM articles_archive\").fetchall())"
+        },
+        {
+          "line": 170,
+          "type": "Possible Raw SQL Concatenation",
+          "snippet": "existing_ids = set(r[0] for r in conn.execute(\"SELECT article_id FROM articles_archive\").fetchall())"
+        },
+        {
+          "line": 248,
+          "type": "Possible Raw SQL Concatenation",
+          "snippet": "total_arts = conn.execute(\"SELECT count(*) FROM articles_archive\").fetchone()[0]"
+        },
+        {
+          "line": 249,
+          "type": "Possible Raw SQL Concatenation",
+          "snippet": "y24 = conn.execute(\"SELECT count(*) FROM articles_archive WHERE published_date LIKE '2024%'\").fetcho"
+        }
+      ]
+    },
+    {
+      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/lam_automation_crawler.py",
+      "findings": [
+        {
+          "line": 780,
+          "type": "Possible Raw SQL Concatenation",
+          "snippet": "total_in_db = conn.execute(\"SELECT COUNT(*) FROM articles_archive\").fetchone()[0]"
+        },
+        {
+          "line": 1073,
+          "type": "Possible Raw SQL Concatenation",
+          "snippet": "art_total = conn.execute(\"SELECT COUNT(*) FROM articles_archive\").fetchone()[0]"
+        },
+        {
+          "line": 1074,
+          "type": "Possible Raw SQL Concatenation",
+          "snippet": "ioc_total = conn.execute(\"SELECT COUNT(*) FROM ioc_knowledge_base\").fetchone()[0]"
+        },
+        {
+          "line": 1075,
+          "type": "Possible Raw SQL Concatenation",
+          "snippet": "ioc_blocked = conn.execute(\"SELECT COUNT(*) FROM ioc_knowledge_base WHERE is_malicious = 1\").fetchon"
+        }
+      ]
+    },
+    {
+      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/live_dashboard_app.py",
+      "findings": [
+        {
+          "line": 2757,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "while ((ipMatch = ipRegex.exec(art.content)) !== null) {"
+        },
+        {
+          "line": 2849,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "while ((pIpMatch = ipRegex.exec(p)) !== null) {"
+        },
+        {
+          "line": 4808,
+          "type": "Possible Raw SQL Concatenation",
+          "snippet": "cumulative_ips = [r[0] for r in conn.execute(\"SELECT DISTINCT ioc_value FROM ioc_knowledge_base WHER"
+        },
+        {
+          "line": 4809,
+          "type": "Possible Raw SQL Concatenation",
+          "snippet": "cumulative_doms = [r[0] for r in conn.execute(\"SELECT DISTINCT ioc_value FROM ioc_knowledge_base WHE"
+        }
+      ]
+    },
+    {
+      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/live_defense_orchestrator.py",
+      "findings": [
+        {
+          "line": 67,
+          "type": "Possible Raw SQL Concatenation",
+          "snippet": "total_articles = conn.execute(\"SELECT count(*) FROM articles_archive\").fetchone()[0]"
+        },
+        {
+          "line": 508,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "proc = subprocess.run("
+        },
+        {
+          "line": 544,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "proc = subprocess.run("
+        },
+        {
+          "line": 565,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "proc = subprocess.run("
+        }
+      ]
+    },
+    {
+      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/openclaw_firewall_bridge.py",
+      "findings": [
+        {
+          "line": 933,
+          "type": "Possible Raw SQL Concatenation",
+          "snippet": "rows = conn.execute(\"SELECT rule_name, ioc_value FROM active_firewall_rules\").fetchall()"
+        },
+        {
+          "line": 938,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "proc = subprocess.run(cmd, capture_output=True, text=True, timeout=5)"
+        },
+        {
+          "line": 943,
+          "type": "Possible Raw SQL Concatenation",
+          "snippet": "conn.execute(\"DELETE FROM active_firewall_rules\")"
+        },
+        {
+          "line": 976,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "proc = subprocess.run(cmd, capture_output=True, text=True, timeout=5)"
+        }
+      ]
+    },
+    {
+      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/phuc_core_ai_agent.py",
+      "findings": [
+        {
+          "line": 160,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.Popen("
+        },
+        {
+          "line": 162,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "stdout=subprocess.DEVNULL,"
+        },
+        {
+          "line": 163,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "stderr=subprocess.DEVNULL,"
+        }
+      ]
+    },
+    {
+      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/reset_stuck.py",
+      "findings": [
+        {
+          "line": 6,
+          "type": "Possible Raw SQL Concatenation",
+          "snippet": "conn.execute(\"UPDATE articles_archive SET status = 'pending' WHERE status = 'processing'\")"
+        },
+        {
+          "line": 8,
+          "type": "Possible Raw SQL Concatenation",
+          "snippet": "counts = conn.execute(\"SELECT status, count(*) FROM articles_archive GROUP BY status\").fetchall()"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.8/site-packages/typing_extensions.py",
+      "findings": [
+        {
+          "line": 1300,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "(unless you are familiar with how eval() and exec() work).  The"
+        },
+        {
+          "line": 2465,
+          "type": "Possible Raw SQL Concatenation",
+          "snippet": "query(\"SELECT * FROM table\")  # ok"
+        },
+        {
+          "line": 2466,
+          "type": "Possible Raw SQL Concatenation",
+          "snippet": "query(f\"SELECT * FROM {input()}\")  # not ok"
+        },
+        {
+          "line": 4279,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "# as a way of emulating annotation scopes when calling `eval()`"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.8/site-packages/aenum/test.py",
+      "findings": [
+        {
+          "line": 7089,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec('from aenum import *', scope, scope)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.8/site-packages/aenum/test_stdlib_tests.py",
+      "findings": [
+        {
+          "line": 2507,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec(code, global_ns, local_ls)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.8/site-packages/anyio/to_process.py",
+      "findings": [
+        {
+          "line": 143,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "command, stdin=subprocess.PIPE, stdout=subprocess.PIPE"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.8/site-packages/attr/_make.py",
+      "findings": [
+        {
+          "line": 223,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "eval(bytecode, globs, locs)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.8/site-packages/cffi/pkgconfig.py",
+      "findings": [
+        {
+          "line": 33,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "pc = subprocess.Popen(a, stdout=subprocess.PIPE, stderr=subprocess.PIPE)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.8/site-packages/cffi/recompiler.py",
+      "findings": [
+        {
+          "line": 78,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "flags = eval(self.flags, G_FLAGS)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.8/site-packages/cffi/setuptools_ext.py",
+      "findings": [
+        {
+          "line": 25,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec(code, glob, glob)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.8/site-packages/discord/player.py",
+      "findings": [
+        {
+          "line": 160,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "piping_stdin = subprocess_kwargs.get('stdin') == subprocess.PIPE"
+        },
+        {
+          "line": 166,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "if stderr == subprocess.PIPE:"
+        },
+        {
+          "line": 167,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "warnings.warn('Passing subprocess.PIPE does nothing', DeprecationWarning, stacklevel=3)"
+        },
+        {
+          "line": 178,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "kwargs = {'stdout': subprocess.PIPE, 'stderr': subprocess.PIPE if piping_stderr else stderr}"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.8/site-packages/discord/utils.py",
+      "findings": [
+        {
+          "line": 1145,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "evaluated = evaluate_annotation(eval(tp, globals, locals), globals, locals, cache)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.8/site-packages/munch/__init__.py",
+      "findings": [
+        {
+          "line": 194,
+          "type": "Command Execution / RCE Risk",
+          "snippet": ">>> eval(repr(b))"
+        },
+        {
+          "line": 200,
+          "type": "Command Execution / RCE Risk",
+          "snippet": ">>> eval(repr(with_spaces))"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.8/site-packages/tqdm/cli.py",
+      "findings": [
+        {
+          "line": 38,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "return eval(f'\"{val}\"').encode()"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.8/site-packages/tqdm/std.py",
+      "findings": [
+        {
+          "line": 87,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "# context, disallowing `spawn()`/`forkserver()`"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.8/site-packages/websockets/version.py",
+      "findings": [
+        {
+          "line": 54,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "description = subprocess.run("
+        },
+        {
+          "line": 62,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "# subprocess.run raises FileNotFoundError if git isn't on $PATH."
+        },
+        {
+          "line": 65,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.CalledProcessError,"
+        },
+        {
+          "line": 66,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.TimeoutExpired,"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.8/site-packages/zope/interface/tests/test_advice.py",
+      "findings": [
+        {
+          "line": 69,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec(_FUNKY_EXEC, _globals, _locals)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.8/site-packages/zope/interface/tests/test_declarations.py",
+      "findings": [
+        {
+          "line": 39,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec(code, globs, locs)"
+        },
+        {
+          "line": 2083,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec(CODE, globs, locs)"
+        },
+        {
+          "line": 2099,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec(CODE, globs, locs)"
+        },
+        {
+          "line": 2110,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec(CODE, globs)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.8/site-packages/pydantic/v1/utils.py",
+      "findings": [
+        {
+          "line": 194,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "eval('__IPYTHON__')"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.8/site-packages/pydantic/_internal/_typing_extra.py",
+      "findings": [
+        {
+          "line": 323,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "(unless you are familiar with how eval() and exec() work).  The"
+        },
+        {
+          "line": 356,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "# the globalns and localns order so that eval() looks into"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.8/site-packages/pycparser/ply/cpp.py",
+      "findings": [
+        {
+          "line": 600,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "result = eval(expr)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.8/site-packages/pycparser/ply/lex.py",
+      "findings": [
+        {
+          "line": 215,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec('import %s' % tabfile)"
+        },
+        {
+          "line": 1039,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec('import %s' % pkgname)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.8/site-packages/pycparser/ply/yacc.py",
+      "findings": [
+        {
+          "line": 1562,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "c = eval(s)"
+        },
+        {
+          "line": 1982,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec('import %s' % module)"
+        },
+        {
+          "line": 3254,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec('import %s' % pkgname)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.8/site-packages/openai/cli/_tools/migrate.py",
+      "findings": [
+        {
+          "line": 39,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.check_call([grit_path, *args.unknown_args])"
+        },
+        {
+          "line": 40,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "except subprocess.CalledProcessError:"
+        },
+        {
+          "line": 55,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.check_call([grit_path, \"apply\", \"openai\", *args.unknown_args])"
+        },
+        {
+          "line": 56,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "except subprocess.CalledProcessError:"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.8/site-packages/curl_cffi/requests/session.py",
+      "findings": [
+        {
+          "line": 575,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "gevent.get_hub().threadpool.spawn(c.perform).get()  # type: ignore"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.8/site-packages/anyio/abc/_subprocesses.py",
+      "findings": [
+        {
+          "line": 11,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "\"\"\"An asynchronous version of :class:`subprocess.Popen`.\"\"\""
+        },
+        {
+          "line": 29,
+          "type": "Command Execution / RCE Risk",
+          "snippet": ".. seealso:: :meth:`subprocess.Popen.terminate`"
+        },
+        {
+          "line": 40,
+          "type": "Command Execution / RCE Risk",
+          "snippet": ".. seealso:: :meth:`subprocess.Popen.kill`"
+        },
+        {
+          "line": 46,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "Send a signal to the subprocess."
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.8/site-packages/anyio/_backends/_asyncio.py",
+      "findings": [
+        {
+          "line": 952,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "_process: asyncio.subprocess.Process"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.8/site-packages/anyio/_core/_subprocesses.py",
+      "findings": [
+        {
+          "line": 43,
+          "type": "Command Execution / RCE Risk",
+          "snippet": ".. seealso:: :func:`subprocess.run`"
+        },
+        {
+          "line": 48,
+          "type": "Command Execution / RCE Risk",
+          "snippet": ":param stdout: one of :data:`subprocess.PIPE`, :data:`subprocess.DEVNULL`,"
+        },
+        {
+          "line": 50,
+          "type": "Command Execution / RCE Risk",
+          "snippet": ":param stderr: one of :data:`subprocess.PIPE`, :data:`subprocess.DEVNULL`,"
+        },
+        {
+          "line": 51,
+          "type": "Command Execution / RCE Risk",
+          "snippet": ":data:`subprocess.STDOUT`, a file-like object, or `None`"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/decorator.py",
+      "findings": [
+        {
+          "line": 185,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec(code, evaldict)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/typing_extensions.py",
+      "findings": [
+        {
+          "line": 1485,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "(unless you are familiar with how eval() and exec() work).  The"
+        },
+        {
+          "line": 2312,
+          "type": "Possible Raw SQL Concatenation",
+          "snippet": "query(\"SELECT * FROM table\")  # ok"
+        },
+        {
+          "line": 2313,
+          "type": "Possible Raw SQL Concatenation",
+          "snippet": "query(f\"SELECT * FROM {input()}\")  # not ok"
+        },
+        {
+          "line": 4029,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "# as a way of emulating annotation scopes when calling `eval()`"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/aenum/test.py",
+      "findings": [
+        {
+          "line": 7078,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec('from aenum import *', scope, scope)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/aenum/test_stdlib_tests.py",
+      "findings": [
+        {
+          "line": 2507,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec(code, global_ns, local_ls)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/anyio/to_interpreter.py",
+      "findings": [
+        {
+          "line": 123,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exc_info = _interpreters.exec(self._interpreter_id, _run_func)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/anyio/to_process.py",
+      "findings": [
+        {
+          "line": 151,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "command, stdin=subprocess.PIPE, stdout=subprocess.PIPE"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/attr/_make.py",
+      "findings": [
+        {
+          "line": 227,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "eval(bytecode, globs, locs)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/cffi/pkgconfig.py",
+      "findings": [
+        {
+          "line": 33,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "pc = subprocess.Popen(a, stdout=subprocess.PIPE, stderr=subprocess.PIPE)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/cffi/recompiler.py",
+      "findings": [
+        {
+          "line": 78,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "flags = eval(self.flags, G_FLAGS)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/cffi/setuptools_ext.py",
+      "findings": [
+        {
+          "line": 26,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec(code, glob, glob)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/discord/player.py",
+      "findings": [
+        {
+          "line": 160,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "piping_stdin = subprocess_kwargs.get('stdin') == subprocess.PIPE"
+        },
+        {
+          "line": 166,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "if stderr == subprocess.PIPE:"
+        },
+        {
+          "line": 167,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "warnings.warn('Passing subprocess.PIPE does nothing', DeprecationWarning, stacklevel=3)"
+        },
+        {
+          "line": 178,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "kwargs = {'stdout': subprocess.PIPE, 'stderr': subprocess.PIPE if piping_stderr else stderr}"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/discord/utils.py",
+      "findings": [
+        {
+          "line": 1145,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "evaluated = evaluate_annotation(eval(tp, globals, locals), globals, locals, cache)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/imageio_ffmpeg/_io.py",
+      "findings": [
+        {
+          "line": 48,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "p = subprocess.run("
+        },
+        {
+          "line": 50,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "stdin=subprocess.PIPE,"
+        },
+        {
+          "line": 51,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "stdout=subprocess.PIPE,"
+        },
+        {
+          "line": 52,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "stderr=subprocess.PIPE,"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/imageio_ffmpeg/_utils.py",
+      "findings": [
+        {
+          "line": 83,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "startupinfo = subprocess.STARTUPINFO()"
+        },
+        {
+          "line": 84,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW"
+        },
+        {
+          "line": 109,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.check_call("
+        },
+        {
+          "line": 110,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "cmd, stdout=null, stderr=subprocess.STDOUT, **_popen_kwargs()"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/moviepy/config.py",
+      "findings": [
+        {
+          "line": 102,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec(in_file)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/moviepy/editor.py",
+      "findings": [
+        {
+          "line": 87,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec(\"VideoClip.%s = %s\" % (method.split('.')[1], method))"
+        },
+        {
+          "line": 97,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec(\"AudioClip.%s = %s\" % (method.split('.')[1], method))"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/munch/__init__.py",
+      "findings": [
+        {
+          "line": 194,
+          "type": "Command Execution / RCE Risk",
+          "snippet": ">>> eval(repr(b))"
+        },
+        {
+          "line": 200,
+          "type": "Command Execution / RCE Risk",
+          "snippet": ">>> eval(repr(with_spaces))"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/conftest.py",
+      "findings": [
+        {
+          "line": 116,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "tr.line(\"code that re-enables the GIL should do so in a subprocess.\")"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/PIL/EpsImagePlugin.py",
+      "findings": [
+        {
+          "line": 61,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.check_call([\"gs\", \"--version\"], stdout=subprocess.DEVNULL)"
+        },
+        {
+          "line": 157,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "startupinfo = subprocess.STARTUPINFO()"
+        },
         {
           "line": 158,
           "type": "Command Execution / RCE Risk",
-          "snippet": "manager.spawn(b);"
-        }
-      ]
-    },
-    {
-      "file": "dev/netherbox-features/src/main/java/netherbox/features/BossManager.java",
-      "findings": [
-        {
-          "line": 90,
-          "type": "Command Execution / RCE Risk",
-          "snippet": "public void spawn(Boss b) {"
+          "snippet": "startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW"
         },
         {
-          "line": 172,
+          "line": 159,
           "type": "Command Execution / RCE Risk",
-          "snippet": "spawn(b);"
+          "snippet": "subprocess.check_call(command, startupinfo=startupinfo)"
         }
       ]
     },
     {
-      "file": "dev/netherbox-features/src/main/java/netherbox/features/NBBossCommand.java",
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/PIL/GifImagePlugin.py",
+      "findings": [
+        {
+          "line": 888,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.check_call("
+        },
+        {
+          "line": 889,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "[\"ppmtogif\", tempfile], stdout=f, stderr=subprocess.DEVNULL"
+        },
+        {
+          "line": 896,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "quant_proc = subprocess.Popen("
+        },
+        {
+          "line": 897,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "quant_cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/PIL/Image.py",
+      "findings": [
+        {
+          "line": 3640,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "def eval(image: Image, *args: Callable[[int], float]) -> Image:"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/PIL/ImageGrab.py",
+      "findings": [
+        {
+          "line": 51,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.call(args + [\"-x\", filepath])"
+        },
+        {
+          "line": 62,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.call("
+        },
+        {
+          "line": 128,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.call(args + [filepath])"
+        },
+        {
+          "line": 148,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "p = subprocess.run("
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/PIL/ImageMath.py",
+      "findings": [
+        {
+          "line": 269,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "Evaluates an image expression. This uses Python's ``eval()`` function to process"
+        },
+        {
+          "line": 310,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "out = builtins.eval(expression, {\"__builtins\": {\"abs\": abs}}, args)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/PIL/ImageShow.py",
+      "findings": [
+        {
+          "line": 120,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "os.system(self.get_command(path, **options))  # nosec"
+        },
+        {
+          "line": 146,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.Popen("
+        },
+        {
+          "line": 177,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.call([\"open\", \"-a\", \"Preview.app\", path])"
+        },
+        {
+          "line": 182,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.Popen("
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/PIL/JpegImagePlugin.py",
+      "findings": [
+        {
+          "line": 474,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.check_call([\"djpeg\", \"-outfile\", path, self.filename])"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/rich/ansi.py",
+      "findings": [
+        {
+          "line": 229,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "pty.spawn(sys.argv[1:], read)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/tqdm/cli.py",
+      "findings": [
+        {
+          "line": 38,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "return eval(f'\"{val}\"').encode()"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/tqdm/std.py",
+      "findings": [
+        {
+          "line": 87,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "# context, disallowing `spawn()`/`forkserver()`"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/typing_inspection/typing_objects.py",
+      "findings": [
+        {
+          "line": 101,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec(func_code, globals_, locals_)"
+        },
+        {
+          "line": 133,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec(func_code, globals_, locals_)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/websockets/cli.py",
+      "findings": [
+        {
+          "line": 167,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "os.system(\"\")"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/websockets/version.py",
+      "findings": [
+        {
+          "line": 54,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "description = subprocess.run("
+        },
+        {
+          "line": 62,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "# subprocess.run raises FileNotFoundError if git isn't on $PATH."
+        },
+        {
+          "line": 65,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.CalledProcessError,"
+        },
+        {
+          "line": 66,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.TimeoutExpired,"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/zope/interface/tests/test_advice.py",
+      "findings": [
+        {
+          "line": 69,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec(_FUNKY_EXEC, _globals, _locals)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/zope/interface/tests/test_declarations.py",
+      "findings": [
+        {
+          "line": 59,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec(code, globs, locs)"
+        },
+        {
+          "line": 2030,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec(CODE, globs, locs)"
+        },
+        {
+          "line": 2045,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec(CODE, globs, locs)"
+        },
+        {
+          "line": 2055,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec(CODE, globs)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/pygments/formatters/img.py",
+      "findings": [
+        {
+          "line": 93,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "proc = subprocess.Popen(['fc-list', f\"{name}:style={style}\", 'file'],"
+        },
+        {
+          "line": 94,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "stdout=subprocess.PIPE, stderr=None)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/pygments/formatters/__init__.py",
+      "findings": [
+        {
+          "line": 91,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "this method is equivalent to running ``eval()`` on the input file. The formatter is"
+        },
+        {
+          "line": 103,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec(f.read(), custom_namespace)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/pygments/lexers/_julia_builtins.py",
+      "findings": [
+        {
+          "line": 150,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "v = eval(Symbol(compl.mod))"
+        },
+        {
+          "line": 361,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "v = eval(Symbol(compl.mod))"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/pygments/lexers/_scilab_builtins.py",
+      "findings": [
+        {
+          "line": 3061,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "s = subprocess.Popen(['scilab', '-nwni'], stdin=subprocess.PIPE,"
+        },
+        {
+          "line": 3062,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "stdout=subprocess.PIPE, stderr=subprocess.PIPE)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/pygments/lexers/__init__.py",
+      "findings": [
+        {
+          "line": 154,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec(f.read(), custom_namespace)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/pydantic/v1/utils.py",
+      "findings": [
+        {
+          "line": 195,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "eval('__IPYTHON__')"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/pydantic/_internal/_git.py",
+      "findings": [
+        {
+          "line": 17,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.check_output(['git', '--help'])"
+        },
+        {
+          "line": 19,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "except subprocess.CalledProcessError:"
+        },
+        {
+          "line": 27,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "return subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'], cwd=dir).decode('utf-8').str"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/pydantic/_internal/_namespace_utils.py",
+      "findings": [
+        {
+          "line": 37,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "return eval(typ, *ns)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/pydantic/_internal/_typing_extra.py",
+      "findings": [
+        {
+          "line": 694,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "(unless you are familiar with how eval() and exec() work).  The"
+        },
+        {
+          "line": 727,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "# the globalns and localns order so that eval() looks into"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/f2py/auxfuncs.py",
+      "findings": [
+        {
+          "line": 632,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "return eval(f\"{l1}:{' and '.join(l2)}\")"
+        },
+        {
+          "line": 640,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "return eval(f\"{l1}:{' or '.join(l2)}\")"
+        },
+        {
+          "line": 644,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "return eval('lambda v,f=f:not f(v)')"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/f2py/capi_maps.py",
+      "findings": [
+        {
+          "line": 159,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "d = eval(f.read().lower(), {}, {})"
+        },
+        {
+          "line": 296,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "ret['size'] = repr(eval(ret['size']))"
+        },
+        {
+          "line": 449,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "v = eval(v, {}, {})"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/f2py/crackfortran.py",
+      "findings": [
+        {
+          "line": 1329,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "v = eval(initexpr, {}, params)"
+        },
+        {
+          "line": 2271,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "r = eval(e, g, l)"
+        },
+        {
+          "line": 2559,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "value = eval(value, {}, params)"
+        },
+        {
+          "line": 2637,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "l = str(eval(l, {}, params))"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/tests/test_configtool.py",
+      "findings": [
+        {
+          "line": 23,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "p = subprocess.run(['numpy-config', arg], capture_output=True, text=True)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/tests/test_lazyloading.py",
+      "findings": [
+        {
+          "line": 35,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "p = subprocess.run("
+        },
+        {
+          "line": 37,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "stdout=subprocess.PIPE,"
+        },
+        {
+          "line": 38,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "stderr=subprocess.STDOUT,"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/tests/test_public_api.py",
+      "findings": [
+        {
+          "line": 65,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "result = subprocess.check_output(exe)"
+        },
+        {
+          "line": 405,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "eval(module_name)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/tests/test_reloading.py",
+      "findings": [
+        {
+          "line": 69,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "p = subprocess.run("
+        },
+        {
+          "line": 71,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "stdout=subprocess.PIPE,"
+        },
+        {
+          "line": 72,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "stderr=subprocess.STDOUT,"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/tests/test_scripts.py",
+      "findings": [
+        {
+          "line": 41,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "stdout = subprocess.check_output([f2py_cmd, '-v'])"
+        },
+        {
+          "line": 47,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "stdout = subprocess.check_output([sys.executable, '-mnumpy.f2py', '-v'])"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/_core/arrayprint.py",
+      "findings": [
+        {
+          "line": 1568,
+          "type": "Command Execution / RCE Risk",
+          "snippet": ">>> assert eval(dtype_short_repr(dt)) == dt"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/_pyinstaller/tests/test_pyinstaller.py",
+      "findings": [
+        {
+          "line": 34,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "p = subprocess.run([str(exe)], check=True, stdout=subprocess.PIPE)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/_core/tests/test_arrayprint.py",
+      "findings": [
+        {
+          "line": 339,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "assert_equal(eval(repr(a), vars(np)), a)"
+        },
+        {
+          "line": 340,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "assert_equal(eval(repr(a[0]), {'np': np}), a[0])"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/_core/tests/test_cpu_features.py",
+      "findings": [
+        {
+          "line": 31,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "auxv = subprocess.check_output(['/bin/true'], env={\"LD_SHOW_AUXV\": \"1\"})"
+        },
+        {
+          "line": 110,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "auxv = subprocess.check_output(['/bin/true'], env={\"LD_SHOW_AUXV\": \"1\"})"
+        },
+        {
+          "line": 164,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "return subprocess.run("
+        },
+        {
+          "line": 179,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "except subprocess.CalledProcessError as e:"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/_core/tests/test_cython.py",
+      "findings": [
+        {
+          "line": 55,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.check_call([\"meson\", \"--version\"])"
+        },
+        {
+          "line": 61,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.check_call([\"meson\", \"setup\","
+        },
+        {
+          "line": 68,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.check_call([\"meson\", \"setup\","
+        },
+        {
+          "line": 73,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.check_call([\"meson\", \"compile\", \"-vv\"], cwd=build_dir)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/_core/tests/test_dtype.py",
+      "findings": [
+        {
+          "line": 1070,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "assert_equal(np.dtype(eval(str(dt))), dt)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/_core/tests/test_limited_api.py",
+      "findings": [
+        {
+          "line": 53,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.check_call([\"meson\", \"--version\"])"
+        },
+        {
+          "line": 59,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.check_call([\"meson\", \"setup\","
+        },
+        {
+          "line": 67,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.check_call([\"meson\", \"setup\", \"--werror\","
+        },
+        {
+          "line": 72,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.check_call("
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/_core/tests/test_multiarray.py",
+      "findings": [
+        {
+          "line": 1663,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "assert_array_equal(eval(repr(xx), {\"np\": np, \"array\": np.array}), xx)"
+        },
+        {
+          "line": 4080,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "MyType = eval(\"type('MyType', (base,), class_namespace)\","
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/_core/tests/test_nditer.py",
+      "findings": [
+        {
+          "line": 2097,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "res = subprocess.check_output([sys.executable, \"-c\", code],"
+        },
+        {
+          "line": 2098,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "stderr=subprocess.STDOUT, text=True)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/_core/tests/test_records.py",
+      "findings": [
+        {
+          "line": 170,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "recordarr_r = eval(\"np.\" + repr(recordarr), {'np': np})"
+        },
+        {
+          "line": 171,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "recarr_r = eval(\"np.\" + repr(recarr), {'np': np})"
+        },
+        {
+          "line": 173,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "recordview_r = eval(\"np.\" + repr(recordview), {'np': np, 'numpy': np})"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/_core/tests/test_scalarmath.py",
+      "findings": [
+        {
+          "line": 618,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "#            val2 = eval(val_repr)"
+        },
+        {
+          "line": 644,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "val2 = t(eval(val_repr))"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/_core/tests/test_simd.py",
+      "findings": [
+        {
+          "line": 244,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "func = eval(intrin)"
+        },
+        {
+          "line": 512,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "func = eval(intrin[:3])"
+        },
+        {
+          "line": 642,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "func = eval(intrin)"
+        },
+        {
+          "line": 703,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "npyv_load_tillz, npyv_load_till = eval(intrin)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/_core/tests/test_umath.py",
+      "findings": [
+        {
+          "line": 512,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "a, b, divisors = eval(ex_val)"
+        },
+        {
+          "line": 576,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "a = eval(ex_val)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/_core/tests/test_umath_accuracy.py",
+      "findings": [
+        {
+          "line": 77,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "dtype=eval(datatype))"
+        },
+        {
+          "line": 80,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "dtype=eval(datatype))"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/typing/tests/data/pass/random.py",
+      "findings": [
+        {
+          "line": 61,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "seed_seq.spawn(10)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/testing/_private/utils.py",
+      "findings": [
+        {
+          "line": 1346,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec(astr, dict)"
+        },
+        {
+          "line": 1478,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "output = subprocess.run(cmd, capture_output=True, text=True)"
+        },
+        {
+          "line": 1480,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "except (OSError, subprocess.SubprocessError):"
+        },
+        {
+          "line": 1632,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec(code, globs, locs)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/random/tests/test_direct.py",
+      "findings": [
+        {
+          "line": 151,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "s1.spawn(10)"
+        },
+        {
+          "line": 161,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "assert len(dummy.spawn(10)) == 10"
+        },
+        {
+          "line": 169,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "new_ss = seq.spawn(5)"
+        },
+        {
+          "line": 173,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "new_bgs = rng.bit_generator.spawn(5)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/random/tests/test_extending.py",
+      "findings": [
+        {
+          "line": 80,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.check_call([\"meson\", \"setup\","
+        },
+        {
+          "line": 87,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.check_call([\"meson\", \"setup\","
+        },
+        {
+          "line": 91,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.check_call([\"meson\", \"compile\", \"-vv\"], cwd=target_dir)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/random/tests/test_generator_mt19937.py",
+      "findings": [
+        {
+          "line": 2802,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "rg.bit_generator.seed_seq.spawn(10)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/linalg/tests/test_linalg.py",
+      "findings": [
+        {
+          "line": 2068,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.check_call([sys.executable, \"-c\", code])"
+        },
+        {
+          "line": 2073,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.check_call([sys.executable, \"-c\", code])"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/f2py/tests/test_f2py2e.py",
+      "findings": [
+        {
+          "line": 597,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "rout = subprocess.run(cmd_run, capture_output=True, encoding='UTF-8')"
+        },
+        {
+          "line": 785,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "rout = subprocess.run(cmd_run, capture_output=True, encoding='UTF-8')"
+        },
+        {
+          "line": 807,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "rout = subprocess.run(cmd_run, capture_output=True, encoding='UTF-8')"
+        },
+        {
+          "line": 832,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "rout = subprocess.run(cmd_run, capture_output=True, encoding='UTF-8')"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/f2py/tests/util.py",
+      "findings": [
+        {
+          "line": 50,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "runmeson = subprocess.run("
+        },
+        {
+          "line": 56,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "except subprocess.CalledProcessError:"
+        },
+        {
+          "line": 246,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "p = subprocess.Popen(cmd,"
+        },
+        {
+          "line": 247,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "stdout=subprocess.PIPE,"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/numpy/f2py/_backends/_meson.py",
+      "findings": [
+        {
+          "line": 185,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.run(command, cwd=cwd, check=True)"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/moviepy/video/fx/all/__init__.py",
+      "findings": [
+        {
+          "line": 17,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec(\"from ..%s import %s\" % (name, name))"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/moviepy/audio/fx/all/__init__.py",
+      "findings": [
+        {
+          "line": 16,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec(\"from ..%s import %s\" % (name, name))"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/imageio/plugins/dicom.py",
+      "findings": [
+        {
+          "line": 81,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.check_call([fname, \"--version\"])"
+        },
+        {
+          "line": 91,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.check_call([fname, \"--version\"])"
+        },
+        {
+          "line": 175,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "subprocess.check_call(cmd + [fname1, fname2])"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/imageio/plugins/_tifffile.py",
+      "findings": [
+        {
+          "line": 10037,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "out = subprocess.check_output([jhove, filename, \"-m\", \"TIFF-hul\"])"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/curl_cffi/requests/session.py",
+      "findings": [
+        {
+          "line": 730,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "gevent.get_hub().threadpool.spawn(c.perform).get()  # type: ignore"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/anyio/abc/_subprocesses.py",
+      "findings": [
+        {
+          "line": 11,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "\"\"\"An asynchronous version of :class:`subprocess.Popen`.\"\"\""
+        },
+        {
+          "line": 29,
+          "type": "Command Execution / RCE Risk",
+          "snippet": ".. seealso:: :meth:`subprocess.Popen.terminate`"
+        },
+        {
+          "line": 40,
+          "type": "Command Execution / RCE Risk",
+          "snippet": ".. seealso:: :meth:`subprocess.Popen.kill`"
+        },
+        {
+          "line": 46,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "Send a signal to the subprocess."
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/anyio/_backends/_asyncio.py",
+      "findings": [
+        {
+          "line": 1072,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "_process: asyncio.subprocess.Process"
+        }
+      ]
+    },
+    {
+      "file": "botdiscord/ptkngu/.local/lib/python3.14/site-packages/anyio/_core/_subprocesses.py",
       "findings": [
         {
           "line": 44,
           "type": "Command Execution / RCE Risk",
-          "snippet": "manager.spawn(b);"
+          "snippet": ".. seealso:: :func:`subprocess.run`"
+        },
+        {
+          "line": 49,
+          "type": "Command Execution / RCE Risk",
+          "snippet": ":param stdin: one of :data:`subprocess.PIPE`, :data:`subprocess.DEVNULL`,"
+        },
+        {
+          "line": 51,
+          "type": "Command Execution / RCE Risk",
+          "snippet": ":param stdout: one of :data:`subprocess.PIPE`, :data:`subprocess.DEVNULL`,"
+        },
+        {
+          "line": 53,
+          "type": "Command Execution / RCE Risk",
+          "snippet": ":param stderr: one of :data:`subprocess.PIPE`, :data:`subprocess.DEVNULL`,"
         }
       ]
     },
     {
-      "file": "dev/netherbox-enchants/src/main/java/netherbox/enchants/listener/SwordEffects.java",
+      "file": "backend/src/admin/vpsMonitor.js",
       "findings": [
         {
-          "line": 186,
+          "line": 3,
           "type": "Command Execution / RCE Risk",
-          "snippet": "Skeleton sk = victim.getWorld().spawn(victim.getLocation(), Skeleton.class);"
+          "snippet": "import { exec, execSync } from 'child_process';"
+        },
+        {
+          "line": 6,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "const execAsync = util.promisify(exec);"
+        },
+        {
+          "line": 280,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "exec('pm2 jlist', { encoding: 'utf-8', timeout: 4000, stdio: ['pipe', 'pipe', 'ignore'] }, (err, std"
+        },
+        {
+          "line": 327,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "const { stdout, stderr } = await execAsync(cmd, { timeout: 10000 });"
+        }
+      ]
+    },
+    {
+      "file": "backend/src/discord/discordManager.js",
+      "findings": [
+        {
+          "line": 3,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "import { spawn } from 'child_process';"
+        },
+        {
+          "line": 579,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "const scoutProc = spawn(pyCmd, [PROXY_SCOUT_SCRIPT, PROXY_POOL_FILE], {"
+        },
+        {
+          "line": 806,
+          "type": "Command Execution / RCE Risk",
+          "snippet": "const pyProcess = spawn(pyCmd, pyArgs, { shell: false });"
         }
       ]
     }
   ],
-  "total_source_files": 119
+  "total_source_files": 6442
 }
