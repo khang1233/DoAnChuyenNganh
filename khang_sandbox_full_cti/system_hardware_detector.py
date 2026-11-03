@@ -316,7 +316,44 @@ def get_adaptive_system_profile() -> Dict[str, Any]:
     installed_models = ollama.get("models", [])
 
     # Xác định cấp bậc phần cứng và danh mục mô hình tương ứng
-    if is_gpu and vram >= 12.0:
+    if is_gpu and vram >= 20.0:
+        hw["tier_id"] = "ULTRA_FLAGSHIP"
+        hw["tier_title"] = f"Cấu hình Đồ họa Đỉnh Cao ({vram}GB VRAM • {ram_gb}GB RAM)"
+        hw["tier_desc"] = "Băng thông cực lớn hỗ trợ vận hành các mô hình Frontier 32B cho tư duy chuỗi CoT chuyên sâu tối đa."
+        recommended_tier = "32B (Mô Hình Biên Giới Frontier)"
+        tier1_candidates = [
+            {
+                "id": "deepseek-r1:32b",
+                "name": "DeepSeek R1 (32B Frontier Reasoning)",
+                "badge": "MẠNH NHẤT - KHUYẾN NGHỊ MẶC ĐỊNH",
+                "desc": "Mô hình suy luận chuỗi tư duy CoT đỉnh cao, phân tích đa tầng lỗ hổng zero-day và kiểm chứng an toàn.",
+                "recommended": True,
+                "intelligence": 89,
+                "speed_tps": 14,
+                "vram_gb": 20.2
+            },
+            {
+                "id": "qwen2.5:32b",
+                "name": "Qwen 2.5 (32B DeepSec Frontier)",
+                "badge": "CHUYÊN SÂU AN NINH MẠNG",
+                "desc": "Khả năng phân tích ngữ nghĩa mã nguồn toàn dự án, trích xuất chính xác 100% điểm nhạy cảm phức tạp.",
+                "recommended": False,
+                "intelligence": 86,
+                "speed_tps": 16,
+                "vram_gb": 19.5
+            },
+            {
+                "id": "qwen2.5:14b",
+                "name": "Qwen 2.5 (14B Security Reasoning)",
+                "badge": "TỐC ĐỘ CAO CHO 24GB",
+                "desc": "Phiên bản 14B chạy siêu tốc trên card 24GB VRAM với độ trễ phản hồi cực thấp.",
+                "recommended": False,
+                "intelligence": 78,
+                "speed_tps": 38,
+                "vram_gb": 11.2
+            }
+        ]
+    elif is_gpu and vram >= 11.0:
         hw["tier_id"] = "HIGH_END"
         hw["tier_title"] = f"Cấu hình Đồ họa Cực Mạnh ({vram}GB VRAM • {ram_gb}GB RAM)"
         hw["tier_desc"] = "Khả năng chạy mượt mà các mô hình 14B đến 32B cho suy luận chuyên sâu tối đa."
