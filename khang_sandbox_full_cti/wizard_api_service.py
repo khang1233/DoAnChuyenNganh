@@ -409,13 +409,24 @@ def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3) -> Di
     }
 
 
-def wizard_synthesize_skill(target: str, scope_id: str, article_id: str) -> Dict[str, Any]:
+def wizard_synthesize_skill(target: str, scope_id: str, article_id: str, scan_interval_sec: Optional[int] = None) -> Dict[str, Any]:
     """Bước 3: Tổng hợp và đóng gói Kỹ Năng Tác Tử Động."""
     target_path = Path(target)
     skill_name = synthesize_and_deploy_skill(target_path, scope_id, article_id)
     skill_dir = target_path / "defense_skills" / skill_name
     try:
         profile = resolve_scope_profile(scope_id)
+        existing_cfg = {}
+        cfg_file_path = target_path / ".cti_defense.json"
+        if cfg_file_path.exists():
+            try:
+                existing_cfg = json.loads(cfg_file_path.read_text(encoding="utf-8"))
+            except Exception:
+                pass
+        if scan_interval_sec is not None and int(scan_interval_sec) >= 10:
+            scan_sec = int(scan_interval_sec)
+        else:
+            scan_sec = existing_cfg.get("scan_interval_sec", profile.get("cadence_sec", 21600))
         cfg_meta = {
             "project_name": target_path.name,
             "project_path": str(target_path.resolve()),
@@ -423,10 +434,11 @@ def wizard_synthesize_skill(target: str, scope_id: str, article_id: str) -> Dict
             "scope_name": profile["name"],
             "skill_name": skill_name,
             "article_id": article_id,
+            "scan_interval_sec": int(scan_sec),
             "configured_at": datetime.now().isoformat(),
             "status": "PROTECTED"
         }
-        (target_path / ".cti_defense.json").write_text(json.dumps(cfg_meta, indent=2, ensure_ascii=False), encoding="utf-8")
+        cfg_file_path.write_text(json.dumps(cfg_meta, indent=2, ensure_ascii=False), encoding="utf-8")
     except Exception as e:
         pass
     

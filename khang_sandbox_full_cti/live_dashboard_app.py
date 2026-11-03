@@ -2658,8 +2658,8 @@ HTML_PAGE = r"""<!DOCTYPE html>
       if (btnEl) btnEl.classList.add('active');
     }
 
-    let serverRemainingSec = 120;
-    let serverScanInterval = 120;
+    let serverRemainingSec = 21600;
+    let serverScanInterval = 21600;
     let isServerScanning = false;
     let isServerQueueRunning = false;
     let lastCompletedArticleCount = -1;
@@ -2671,7 +2671,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
         const d = await res.json();
 
         serverRemainingSec = d.remaining_scan_sec;
-        serverScanInterval = d.scan_interval_sec || 120;
+        serverScanInterval = d.scan_interval_sec || 21600;
         isServerScanning = d.is_scanning;
         isServerQueueRunning = d.is_processing_queue;
 
@@ -2739,6 +2739,8 @@ HTML_PAGE = r"""<!DOCTYPE html>
     async function onScanDelayChange(newVal) {
       const sec = parseInt(newVal, 10);
       serverScanInterval = sec;
+      const wzCadence = document.getElementById('wzCadenceSelect');
+      if (wzCadence && wzCadence.value !== String(sec)) wzCadence.value = String(sec);
       try {
         await fetch('/api/system/daemon-config', {
           method: 'POST',
@@ -5126,6 +5128,13 @@ const elArt = document.getElementById('lblMasterArticlesCount');
               wzScopeId = data.config.scope_id;
               if (typeof switchDefenseScope === 'function') switchDefenseScope(data.config.scope_id);
             }
+            if (data.config.scan_interval_sec) {
+              serverScanInterval = data.config.scan_interval_sec;
+              const delaySelect = document.getElementById('scanDelayInput');
+              if (delaySelect) delaySelect.value = String(data.config.scan_interval_sec);
+              const wzCadence = document.getElementById('wzCadenceSelect');
+              if (wzCadence) wzCadence.value = String(data.config.scan_interval_sec);
+            }
             const autoScanControls = document.getElementById('autoScanStripControls');
             const autoScanMsg = document.getElementById('autoScanPendingMsg');
             if (autoScanControls) autoScanControls.style.display = 'flex';
@@ -5290,6 +5299,11 @@ let wzIsProjectConfigured = false;
         syncScopeSelectorUI();
       } else if (stepNum === 4) {
         renderAdaptiveCadence(wzScopeId);
+      } else if (stepNum === 5) {
+        const wzCadence = document.getElementById('wzCadenceSelect');
+        if (wzCadence && wzCadence.value) {
+          onWizardCadenceChange(wzCadence.value);
+        }
       } else if (stepNum === 6) {
         const hCount = document.getElementById("step6HistoryCount");
         const navH = document.getElementById("navHistoryCount");
@@ -5417,10 +5431,17 @@ let wzIsProjectConfigured = false;
         btn.textContent = "[ ĐANG ĐÓNG GÓI KỸ NĂNG TÁC TỬ... ]";
       }
       try {
+        const wzCadence = document.getElementById("wzCadenceSelect");
+        const chosenCadence = wzCadence ? parseInt(wzCadence.value, 10) : (serverScanInterval || 21600);
         const res = await fetch("/api/wizard/synthesize", {
           method: "POST",
           headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({ target: wzTarget, scope_id: wzScopeId, article_id: wzBestArticleId })
+          body: JSON.stringify({
+            target: wzTarget,
+            scope_id: wzScopeId,
+            article_id: wzBestArticleId,
+            scan_interval_sec: chosenCadence
+          })
         });
         const d = await res.json();
         if (d.status === "success") {
@@ -5837,7 +5858,7 @@ let wzIsProjectConfigured = false;
         if (isAll) {
           adviceBox.innerHTML = `
             Tác tử AI nhận diện: Bạn đang kích hoạt chế độ <b style="color:#7e22ce;">TOÀN DIỆN: TẤT CẢ CÁC PHÂN HỆ</b> (Web + Mạng + Máy Chủ + Phần Cứng).
-            <br/>&rarr; Tần suất khuyến nghị đồng bộ: <b style="color:#1e40af;">Mỗi 2 phút (120s)</b> nhằm cập nhật liên tục mọi bề mặt tấn công.
+            <br/>&rarr; Tần suất khuyến nghị đồng bộ: <b style="color:#1e40af;">Mỗi 6 giờ (21,600s)</b> nhằm kiểm soát toàn diện mọi bề mặt tấn công.
           `;
         } else if (isMulti) {
           adviceBox.innerHTML = `
@@ -5853,16 +5874,21 @@ let wzIsProjectConfigured = false;
       }
 
       if (sel && rec && rec.options) {
+        const defSec = rec.default_interval_sec || 21600;
         sel.innerHTML = "";
         rec.options.forEach(opt => {
           const optEl = document.createElement("option");
-          optEl.value = opt.sec;
+          optEl.value = String(opt.sec);
           optEl.textContent = opt.label;
-          if (opt.is_default || opt.sec === rec.default_interval_sec) {
+          if (opt.sec === defSec || opt.is_default) {
             optEl.selected = true;
           }
           sel.appendChild(optEl);
         });
+        sel.value = String(defSec);
+        const selMain = document.getElementById('scanDelayInput');
+        if (selMain) selMain.value = String(defSec);
+        onWizardCadenceChange(String(defSec));
       }
 
       // Đặt mặc định số năm cào báo quá khứ theo thể loại
@@ -5889,7 +5915,9 @@ let wzIsProjectConfigured = false;
       const sec = parseInt(val, 10);
       serverScanInterval = sec;
       const selMain = document.getElementById('scanDelayInput');
-      if (selMain) selMain.value = val;
+      if (selMain && selMain.value !== String(sec)) selMain.value = String(sec);
+      const wzSel = document.getElementById('wzCadenceSelect');
+      if (wzSel && wzSel.value !== String(sec)) wzSel.value = String(sec);
       try {
         await fetch('/api/system/daemon-config', {
           method: 'POST',
@@ -7605,6 +7633,7 @@ class WizardSynthReq(BaseModel):
     target: str = ""
     scope_id: str = "SCOPE_WEB"
     article_id: str = ""
+    scan_interval_sec: Optional[int] = None
 
 class WizardActReq(BaseModel):
     target: str = ""
@@ -7626,7 +7655,15 @@ def api_wizard_crawl_scope(req: WizardCrawlReq):
 @app.post("/api/wizard/synthesize")
 def api_wizard_synthesize(req: WizardSynthReq):
     try:
-        return wizard_synthesize_skill(target=req.target, scope_id=req.scope_id, article_id=req.article_id)
+        res = wizard_synthesize_skill(
+            target=req.target,
+            scope_id=req.scope_id,
+            article_id=req.article_id,
+            scan_interval_sec=req.scan_interval_sec
+        )
+        if req.scan_interval_sec and req.scan_interval_sec >= 10:
+            server_daemon.update_config(interval_sec=int(req.scan_interval_sec))
+        return res
     except Exception as e:
         import traceback
         traceback.print_exc()
@@ -7822,7 +7859,17 @@ class ServerAutonomousDaemon:
     def __init__(self):
         self.lock = threading.Lock()
         self.auto_scan_enabled: bool = True
-        self.scan_interval_sec: int = 120
+        saved_interval = 21600
+        if ACTIVE_TARGET_PROJECT:
+            try:
+                cfg_p = Path(ACTIVE_TARGET_PROJECT) / ".cti_defense.json"
+                if cfg_p.exists():
+                    c_data = json.loads(cfg_p.read_text(encoding="utf-8"))
+                    if "scan_interval_sec" in c_data and int(c_data["scan_interval_sec"]) >= 10:
+                        saved_interval = int(c_data["scan_interval_sec"])
+            except Exception:
+                pass
+        self.scan_interval_sec: int = saved_interval
         self.last_scan_time: float = time.time()
         self.next_scan_time: float = self.last_scan_time + self.scan_interval_sec
         self.is_scanning: bool = False
@@ -8035,6 +8082,7 @@ def api_get_project_context(target: str = Query("")):
                 "scope_id": scope_id,
                 "scope_name": scope_name,
                 "skill_name": found_skill,
+                "scan_interval_sec": server_daemon.scan_interval_sec or 21600,
                 "configured_at": datetime.now().isoformat(),
                 "status": "PROTECTED"
             }
@@ -8048,6 +8096,17 @@ def api_get_project_context(target: str = Query("")):
             cfg_data = json.loads(cfg_file.read_text(encoding="utf-8"))
         except Exception:
             pass
+
+    if is_configured and cfg_data:
+        saved_sec = cfg_data.get("scan_interval_sec")
+        if saved_sec and int(saved_sec) >= 10:
+            server_daemon.update_config(interval_sec=int(saved_sec))
+        else:
+            cfg_data["scan_interval_sec"] = server_daemon.scan_interval_sec
+            try:
+                cfg_file.write_text(json.dumps(cfg_data, indent=2, ensure_ascii=False), encoding="utf-8")
+            except Exception:
+                pass
             
     return {
         "target_path": str(p),
@@ -8139,6 +8198,22 @@ def api_update_daemon_config(req: DaemonConfigRequest):
         interval_sec=req.scan_interval_sec,
         auto_queue=req.auto_queue_enabled,
     )
+    global ACTIVE_TARGET_PROJECT
+    target_to_update = ACTIVE_TARGET_PROJECT
+    if target_to_update:
+        try:
+            cfg_p = Path(target_to_update) / ".cti_defense.json"
+            if cfg_p.exists():
+                c_data = json.loads(cfg_p.read_text(encoding="utf-8"))
+                if req.scan_interval_sec is not None:
+                    c_data["scan_interval_sec"] = int(req.scan_interval_sec)
+                if req.auto_scan_enabled is not None:
+                    c_data["auto_scan_enabled"] = bool(req.auto_scan_enabled)
+                if req.auto_queue_enabled is not None:
+                    c_data["auto_queue_enabled"] = bool(req.auto_queue_enabled)
+                cfg_p.write_text(json.dumps(c_data, indent=2, ensure_ascii=False), encoding="utf-8")
+        except Exception:
+            pass
     return server_daemon.get_status()
 
 
