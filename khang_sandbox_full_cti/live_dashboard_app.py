@@ -6126,7 +6126,7 @@ let wzIsProjectConfigured = false;
             <span style="font-size:11px; color:#64748b;">${art.ioc_count || 3} chỉ số đe dọa bóc tách</span>
           </div>
           <div id="wzArtRules_${idx}" style="display:none; font-size:11.5px; color:#15803d; font-family:monospace; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:4px; padding:4px 8px; margin-top:6px;">
-            [+] Đã sinh luật: ${art.rules_summary || 'Tập luật phòng thủ WAF/Firewall'}
+            [+] Tích hợp Kỹ Năng Tác Tử: ${art.skills_summary || art.rules_summary || 'Kỹ năng phòng thủ tác tử'}
           </div>
         </div>
       `;
@@ -6214,7 +6214,7 @@ let wzIsProjectConfigured = false;
                 badgeEl.style.background = "#dbeafe";
                 badgeEl.style.color = "#1d4ed8";
                 badgeEl.style.border = "1px solid #93c5fd";
-                badgeEl.textContent = "AI ĐANG ĐỌC & BÓC TÁCH IOC...";
+                badgeEl.textContent = "AI ĐANG ĐỐI SOÁT AST & TRÍCH XUẤT IOC...";
               }
               if (progressStatus) {
                 progressStatus.textContent = `Đang xử lý bài báo ${currentIdx + 1} / ${total}: "${(art.title || '').slice(0, 40)}..."`;
@@ -6249,7 +6249,7 @@ let wzIsProjectConfigured = false;
                 resLine.style.marginBottom = "3px";
                 resLine.style.color = "#4ade80";
                 const cveStr = (art.cves && art.cves.length) ? `CVE: ${art.cves.join(', ')}` : "Mối đe dọa Web";
-                resLine.textContent = `    -> Đã bóc tách ${art.ioc_count} IoCs (${cveStr}) -> Tạo luật: ${art.rules_summary}`;
+                resLine.textContent = `    -> Đã bóc tách ${art.ioc_count} IoCs (${cveStr}) -> Tích hợp Kỹ Năng: ${art.skills_summary || art.rules_summary}`;
                 if (term) {
                   term.appendChild(resLine);
                   term.scrollTop = term.scrollHeight;
@@ -6260,7 +6260,7 @@ let wzIsProjectConfigured = false;
 
                 currentIdx++;
                 processNextArticle();
-              }, 450);
+              }, 1800);
 
             } else {
               // 3. HOÀN TẤT XỬ LÝ TOÀN BỘ BÀI BÁO

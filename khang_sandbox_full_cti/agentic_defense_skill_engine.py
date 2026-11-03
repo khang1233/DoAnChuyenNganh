@@ -24,8 +24,8 @@ TARGET_SCOPES = {
         "name": "Toàn Diện Đa Tầng (Enterprise Full-Stack)",
         "persona": "CISO / SOC Lead / Ban Quản Trị Bảo Mật Doanh Nghiệp",
         "focus": "Bảo vệ toàn diện 4 tầng: Web, Mạng biên, Máy trạm và Hạ tầng sâu",
-        "scan_interval_sec": 120,
-        "cadence_label": "Quét định kỳ: 2 phút / lần",
+        "scan_interval_sec": 21600,
+        "cadence_label": "Quét định kỳ: 6 giờ / lần (Chuẩn Toàn Diện Đa Tầng)",
         "feed_sources": ["CISA US Gov", "TheHackerNews", "Kaspersky Securelist", "SentinelOne Labs", "Check Point Research", "The DFIR Report"],
         "primary_outputs": ["WAF ModSecurity", "Suricata DPI", "Windows Firewall", "Wazuh SIEM", "AppLocker & YARA", "UEFI Firmware Integrity"],
     },
@@ -34,8 +34,8 @@ TARGET_SCOPES = {
         "name": "Scope A: Web & API Layer (Người A)",
         "persona": "Đội ngũ Web / API DevSecOps / E-Commerce Admin",
         "focus": "Chuyên biệt OWASP Top 10, SQLi, RCE, Path Traversal, Deserialization, SSRF, API abuse",
-        "scan_interval_sec": 900,
-        "cadence_label": "Quét nhanh: 15 phút / lần (Bắt PoC Exploit tức thì)",
+        "scan_interval_sec": 21600,
+        "cadence_label": "Quét định kỳ: 6 giờ / lần (Chuẩn Web & API Layer)",
         "feed_sources": ["TheHackerNews", "CISA US Gov (Web KEV)"],
         "primary_outputs": ["WAF ModSecurity v3 Virtual Patching", "Nginx Route Lockdown", "Input Validation Regex", "Prepared Statement SOP"],
     },
@@ -386,6 +386,7 @@ def build_agentic_defense_skill_package(
     scope_id: str = "SCOPE_ALL",
     trust_audit: Optional[Dict[str, Any]] = None,
     xai_audit: Optional[Dict[str, Any]] = None,
+    scan_cadence: Optional[str] = None,
 ) -> str:
     """
     Đóng gói tri thức phòng thủ thành một bộ Agentic Defense Skill hoàn chỉnh (chuẩn SKILL.md),
@@ -437,6 +438,8 @@ def build_agentic_defense_skill_package(
             scope_id=scope_id,
         )
 
+    cadence_str = scan_cadence or scope_meta.get("cadence_label", "Quét định kỳ: 6 giờ / lần")
+
     # Xây dựng văn bản SKILL.md hoàn chỉnh
     lines = [
         "---",
@@ -446,7 +449,7 @@ def build_agentic_defense_skill_package(
         f'author: "Autonomous CTI Agent (OpenClaw Defense Orchestrator)"',
         f'target_scope: "{scope_meta["name"]}"',
         f'target_persona: "{scope_meta["persona"]}"',
-        f'scan_cadence: "{scope_meta["cadence_label"]}"',
+        f'scan_cadence: "{cadence_str}"',
         f'trust_score: {trust_score_val} / 100',
         f'trust_authority: "{auth_badge}"',
         f'verified_cve: {json.dumps(cves[:6])}',
@@ -468,7 +471,7 @@ def build_agentic_defense_skill_package(
         "",
         f"- **Nhóm đối tượng áp dụng:** `{scope_meta['persona']}`",
         f"- **Trọng tâm bảo vệ:** {scope_meta['focus']}",
-        f"- **Chu kỳ quét cập nhật:** `{scope_meta['cadence_label']}`",
+        f"- **Chu kỳ quét cập nhật:** `{cadence_str}`",
         f"- **Độ tin cậy được thẩm định:** `{trust_score_val} / 100` (Xác thực đồng thuận đa nguồn, triệt tiêu 100% ảo giác)",
         "",
         "## PHẦN 2: ĐẶC TẢ PHÁT HIỆN ĐA TẦNG (DETECTION SPECIFICATION)",

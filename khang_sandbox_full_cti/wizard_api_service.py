@@ -294,10 +294,11 @@ def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3) -> Di
         # Đếm số bài báo và tổng hợp bài báo thuộc Scope trong mốc thời gian
         kw_clauses = " OR ".join(["content LIKE ?" for _ in profile["keywords"][:6]])
         params = [f"%{kw}%" for kw in profile["keywords"][:6]]
+        limit_count = 100 if history_years == 1 else (250 if history_years == 3 else 500)
         matched_rows = conn.execute(
             f"SELECT article_id, title, source_name, published_date, sort_ts, content "
             f"FROM articles_archive WHERE sort_ts >= ? AND ({kw_clauses}) "
-            f"ORDER BY sort_ts DESC LIMIT 60",
+            f"ORDER BY sort_ts DESC LIMIT {limit_count}",
             [min_date] + params
         ).fetchall()
         matched_arts = [dict(r) for r in matched_rows]
@@ -315,13 +316,13 @@ def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3) -> Di
             is_critical = len(r_cves) > 0 or any(k in (r["title"] + " " + c_text).lower() for k in ["rce", "remote code", "zero-day", "injection", "root"])
             risk_tag = "CRITICAL" if is_critical else "HIGH"
             
-            rules_generated = []
+            skills_generated = []
             if len(r_cves) > 0:
-                rules_generated.append(f"WAF Rule: Block {r_cves[0]}")
+                skills_generated.append(f"Kỹ năng phòng thủ {r_cves[0]} & Script Probe")
             if len(r_ips) > 0:
-                rules_generated.append(f"Netsh Drop IP: {r_ips[0]}")
-            if not rules_generated:
-                rules_generated.append("WAF Regex: Filter Payload RCE")
+                skills_generated.append(f"Lá chắn Netsh chặn IP C2 {r_ips[0]}")
+            if not skills_generated:
+                skills_generated.append("Kỹ năng tác tử: Refactor Whitelist & RCE Shield")
                 
             enriched_articles.append({
                 "article_id": r["article_id"],
@@ -334,7 +335,8 @@ def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3) -> Di
                 "sample_domains": list(dict.fromkeys(r_domains))[:2],
                 "excerpt": c_text[:140].strip() + "...",
                 "risk_level": risk_tag,
-                "rules_summary": ", ".join(rules_generated),
+                "skills_summary": ", ".join(skills_generated),
+                "rules_summary": ", ".join(skills_generated),
                 "is_direct_target": (r["article_id"] == best_art_id)
             })
 
