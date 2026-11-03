@@ -43,6 +43,7 @@ desktop.ini
 .idea/
 *.swp
 *.swo
+~$*
 .git_submodule_backup/
 **/.git_submodule_backup/
 

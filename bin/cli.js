@@ -120,9 +120,28 @@ function printStatus() {
   });
 }
 
+function ensureDependencies(pyCmd) {
+  try {
+    execSync(`${pyCmd} -c "import fastapi, uvicorn, requests, docx"`, { stdio: 'ignore' });
+  } catch (e) {
+    console.log('[*] Dang kiem tra va tu dong cai dat cac thu vien Python can thiet...');
+    const reqPath = path.join(ROOT_DIR, 'requirements.txt');
+    if (fs.existsSync(reqPath)) {
+      try {
+        execSync(`${pyCmd} -m pip install -r "${reqPath}"`, { stdio: 'inherit' });
+        console.log('[OK] Da cai dat day du cac thu vien Python.');
+      } catch (err) {
+        console.error('[CANH BAO] Khong the tu dong cai dat thu vien Python:', err.message);
+      }
+    }
+  }
+}
+
 function startSystem() {
   const pyCmd = findPythonCommand();
   const targetDir = path.resolve(process.cwd());
+
+  ensureDependencies(pyCmd);
 
   // Kiem tra neu dang chay san roi
   checkServerReady(PORT, (alreadyRunning) => {

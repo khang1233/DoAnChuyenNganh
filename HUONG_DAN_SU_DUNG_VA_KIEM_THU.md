@@ -5,76 +5,82 @@
 
 ## 1. GIỚI THIỆU TỔNG QUAN
 
-Hệ thống **Autonomous CTI Agentic Defense** là giải pháp an ninh mạng tự hành thế hệ mới dành cho lập trình viên và kỹ sư DevSecOps. Hệ thống giải quyết bài toán cốt lõi: **Biến các thông tin an ninh mạng thô từ báo cáo quốc tế (CTI) thành các hành động phòng thủ thực thi tức thời trên mã nguồn dự án**.
+Hệ thống Autonomous CTI Agentic Defense là giải pháp an ninh mạng tự hành thế hệ mới dành cho lập trình viên và kỹ sư DevSecOps. Hệ thống giải quyết bài toán cốt lõi: Biến các thông tin an ninh mạng thô từ báo cáo quốc tế (CTI) thành các hành động phòng thủ thực thi tức thời trên mã nguồn dự án.
 
-Toàn bộ hệ thống được gom trọn vẹn vào **DUY NHẤT 1 TRANG WEB QUẢN TRỊ TRUNG TÂM**:
-**http://127.0.0.1:8765**
+Toàn bộ hệ thống được gom trọn vẹn vào DUY NHẤT 1 TRANG WEB QUẢN TRỊ TRUNG TÂM:
+http://127.0.0.1:8765
 
 Người dùng và tester không cần phải mở nhiều trang web hay nhớ nhiều cổng mạng phức tạp. Mọi hoạt động từ quét mã nguồn, cào bài báo CTI, sinh gói kỹ năng tác tử, trò chuyện với AI Agent đến việc kích hoạt và kiểm thử lá chắn WAF đều được tích hợp đầy đủ ngay trong 1 giao diện web duy nhất này.
 
 ### 1.1. Các Thành Phần Chính Được Tích Hợp
-- **Bộ Cào và Lọc Tình Báo Tự Động (CTI Multi-Source Engine)**: Tự động thu thập dữ liệu an ninh mạng từ các nguồn uy tín thế giới (TheHackerNews, CISA US-CERT, Check Point Research, BleepingComputer, The DFIR Report).
-- **Bộ Quét Mã Nguồn Chuyên Sâu (Codebase Inspector)**: Đọc cây AST, phân tích phiên bản Runtime môi trường (Python 3.14, Node.js 20+, PHP 8.2), định vị các điểm nóng nhạy cảm (Sensitive Sinks: exec, eval, system).
-- **Tác Tử AI So Khớp & Đóng Gói Kỹ Năng (Threat Matcher & Agentic Skill Synthesizer)**: Đối chiếu ngữ cảnh dự án với kho tri thức, kích hoạt cảnh báo đỏ khi phát hiện lỗi trùng phiên bản, và tự động sinh gói kỹ năng phòng thủ đa nền tảng (SKILL.md, rules, scripts).
-- **Bảng Điều Khiển & Kiểm Thử WAF Tích Hợp (Embedded WAF Console)**: Đã tích hợp sẵn màn hình console và các nút bắn gói tin thử nghiệm trực tiếp trên giao diện web để xác minh khả năng chặn đứng payload độc hại (mã 403 Forbidden). Cổng mạng 8766 chỉ là cổng socket proxy chạy ngầm bên dưới của WAF, hệ thống tự động quản lý ngầm mà người dùng không cần phải mở hay quản lý riêng.
-- **Tự Động Vá Mã Nguồn & Tái Kiểm Thử (Auto-Remediation & Verification)**: Tự động chuẩn hóa mã nguồn, triệt tiêu lỗ hổng (True Positive = 0) và đảm bảo không gây gián đoạn nghiệp vụ (False Positive = 0.0%).
+- Bộ Cào và Lọc Tình Báo Tự Động (CTI Multi-Source Engine): Tự động thu thập dữ liệu an ninh mạng từ các nguồn uy tín thế giới (TheHackerNews, CISA US-CERT, Check Point Research, BleepingComputer, The DFIR Report).
+- Bộ Quét Mã Nguồn Chuyên Sâu (Codebase Inspector): Đọc cây AST, phân tích phiên bản Runtime môi trường (Python 3.14, Node.js 20+, PHP 8.2), định vị các điểm nóng nhạy cảm (Sensitive Sinks: exec, eval, system).
+- Tác Tử AI So Khớp & Đóng Gói Kỹ Năng (Threat Matcher & Agentic Skill Synthesizer): Đối chiếu ngữ cảnh dự án với kho tri thức, kích hoạt cảnh báo đỏ khi phát hiện lỗi trùng phiên bản, và tự động sinh gói kỹ năng phòng thủ đa nền tảng (SKILL.md, rules, scripts).
+- Bảng Điều Khiển & Kiểm Thử WAF Tích Hợp (Embedded WAF Console): Đã tích hợp sẵn màn hình console và các nút bắn gói tin thử nghiệm trực tiếp trên giao diện web để xác minh khả năng chặn đứng payload độc hại (mã 403 Forbidden). Cổng mạng 8766 chỉ là cổng socket proxy chạy ngầm bên dưới của WAF, hệ thống tự động quản lý ngầm mà người dùng không cần phải mở hay quản lý riêng.
+- Tự Động Vá Mã Nguồn & Tái Kiểm Thử (Auto-Remediation & Verification): Tự động chuẩn hóa mã nguồn, triệt tiêu lỗ hổng (True Positive = 0) và đảm bảo không gây gián đoạn nghiệp vụ (False Positive = 0.0%).
 
 ### 1.2. Địa Chỉ Truy Cập Duy Nhất Của Hệ Thống
-- **Địa chỉ Web Quản Trị Trung Tâm**: http://127.0.0.1:8765
-*(Khởi động tự động bằng lệnh dòng lệnh `cti` tại bất kỳ thư mục dự án nào)*
+- Địa chỉ Web Quản Trị Trung Tâm: http://127.0.0.1:8765
+(Khởi động tự động bằng lệnh dòng lệnh cti tại bất kỳ thư mục dự án nào)
 
 ---
 
-## 2. YÊU CẦU MÔI TRƯỜNG VÀ CÀI ĐẶT
+## 2. HƯỚNG DẪN CÀI ĐẶT 1 DÒNG LỆNH DUY NHẤT (QUICK INSTALL)
 
-### 2.1. Yêu Cầu Phần Cứng & Phần Mềm
-- **Hệ điều hành**: Windows 10 / Windows 11 (hỗ trợ cả Linux và macOS).
-- **Python**: Phiên bản 3.10 trở lên (khuyến nghị Python 3.10 đến 3.14).
-  *Lưu ý quan trọng*: Khi cài đặt Python, bắt buộc phải tích chọn vào ô "Add Python to PATH".
-- **Node.js**: Phiên bản 16 trở lên (dùng để liên kết lệnh dòng lệnh cti).
-- **RAM**: Tối thiểu 4 GB (khuyến nghị 8 GB trở lên).
+Hệ thống hỗ trợ cài đặt siêu tốc bằng 1 dòng lệnh duy nhất (tương tự như 9router hoặc các công cụ AI CLI hiện đại):
 
-### 2.2. Các Bước Cài Đặt Ban Đầu (Chỉ thực hiện 1 lần duy nhất)
-
-#### Bước 1: Mở cửa sổ dòng lệnh CMD
-Nhấn phím Windows + R, gõ cmd, rồi chuyển vào thư mục chứa đồ án:
+### Cách 1: Cài đặt toàn cục qua NPM (Khuyến nghị chuẩn quốc tế)
+Mở CMD hoặc PowerShell tại bất kỳ đâu trên máy tính và chạy duy nhất 1 dòng lệnh:
 ```bash
-cd /d D:\mkhang\DoAnChuyenNganh
+npm install -g github:khang1233/DoAnChuyenNganh
+```
+Sau khi cài đặt xong, hệ thống đã được đăng ký toàn cục. Bạn chỉ cần mở CMD tại bất kỳ thư mục dự án nào và gõ:
+```bash
+cti
+```
+(Hệ thống sẽ tự động khởi động server và mở Web Dashboard duy nhất).
+
+### Cách 2: Cài đặt 1 dòng lệnh bằng PowerShell (Dành cho Windows)
+Mở PowerShell và dán duy nhất 1 dòng lệnh sau:
+```powershell
+irm https://raw.githubusercontent.com/khang1233/DoAnChuyenNganh/main/install.ps1 | iex
+```
+Lệnh này sẽ tự động tải mã nguồn, cài đặt các thư viện cần thiết và đăng ký lệnh cti vào hệ thống. Sau đó, bạn chỉ cần gõ:
+```bash
+cti
 ```
 
-#### Bước 2: Cài đặt các gói thư viện Python cần thiết
-Chạy lệnh sau để cài đặt toàn bộ phụ thuộc:
-```bash
-pip install -r requirements.txt
-```
-
-#### Bước 3: Đăng ký lệnh CLI toàn cục trên máy tính
-Chạy lệnh liên kết:
+### Cách 3: Nếu bạn đã tải sẵn thư mục đồ án về máy
+Chỉ cần mở CMD trong thư mục đồ án và chạy duy nhất 1 lệnh:
 ```bash
 npm link
 ```
-Sau khi chạy xong lệnh này, lệnh cti và cti-defense đã được cài đặt vào hệ thống toàn cục của Windows. Bạn có thể mở CMD ở bất kỳ thư mục nào trên máy tính và gõ cti để sử dụng.
+Sau đó gõ:
+```bash
+cti
+```
+(Hệ thống tự động phát hiện và cài đặt các thư viện Python nếu máy bạn chưa có).
 
 ---
 
 ## 3. HƯỚNG DẪN KHỞI ĐỘNG VÀ VẬN HÀNH
 
-Hệ thống hỗ trợ 2 phương thức vận hành linh hoạt:
+Sau khi cài đặt, bạn có thể vận hành hệ thống cực kỳ đơn giản:
 
 ### Cách 1: Sử Dụng Lệnh Dòng Lệnh CLI (Khuyến nghị)
-Bạn chỉ cần mở CMD ngay tại **thư mục dự án bạn muốn bảo vệ** (ví dụ: target_projects\My_Website hoặc bất kỳ dự án web nào trên máy tính của bạn):
+Bạn chỉ cần mở CMD ngay tại thư mục dự án bạn muốn bảo vệ (ví dụ: target_projects\My_Website hoặc bất kỳ dự án web nào trên máy tính của bạn):
 ```bash
 cti
 ```
-*(Hoặc có thể gõ cti-defense)*
+(Hoặc có thể gõ cti-defense)
 
-**Hệ thống sẽ tự động**:
+Hệ thống sẽ tự động:
 1. Nhận diện đường dẫn thư mục hiện tại của bạn.
-2. Khởi động Web Dashboard duy nhất và các tiến trình nền.
-3. In ra thông tin trạng thái và địa chỉ truy cập duy nhất.
+2. Kiểm tra và tự động cài đặt thư viện Python nếu máy thiếu.
+3. Khởi động Web Dashboard duy nhất và các tiến trình nền.
 4. Tự động mở trình duyệt Web tại http://127.0.0.1:8765.
 
-**Cách tắt hệ thống**:
+Cách tắt hệ thống:
 - Nhấn tổ hợp phím Ctrl + C tại cửa sổ CMD đang chạy; hoặc:
 - Mở một CMD mới và gõ:
 ```bash
@@ -82,74 +88,74 @@ cti stop
 ```
 
 ### Cách 2: Sử Dụng File Batch 1-Click
-- **Bật hệ thống**: Click đúp chuột vào file 1_BAT_HE_THONG.bat ở thư mục gốc. Hệ thống tự kiểm tra môi trường, bật server và mở trình duyệt.
-- **Tắt hệ thống**: Click đúp chuột vào file 2_TAT_HE_THONG.bat. Hệ thống sẽ giải phóng toàn bộ tiến trình, giải phóng bộ nhớ RAM, GPU và đóng các cổng mạng ngay lập tức.
+- Bật hệ thống: Click đúp chuột vào file 1_BAT_HE_THONG.bat ở thư mục gốc. Hệ thống tự kiểm tra môi trường, bật server và mở trình duyệt.
+- Tắt hệ thống: Click đúp chuột vào file 2_TAT_HE_THONG.bat. Hệ thống sẽ giải phóng toàn bộ tiến trình, giải phóng bộ nhớ RAM, GPU và đóng các cổng mạng ngay lập tức.
 
 ---
 
 ## 4. KỊCH BẢN KIỂM THỬ DÀNH CHO TESTER (STEP-BY-STEP TRÊN 1 WEB DUY NHẤT)
 
-Dưới đây là 5 kịch bản kiểm thử mẫu để bạn bè / tester kiểm tra toàn diện chức năng của hệ thống ngay trên giao diện Web duy nhất `http://127.0.0.1:8765`:
+Dưới đây là 5 kịch bản kiểm thử mẫu để bạn bè / tester kiểm tra toàn diện chức năng của hệ thống ngay trên giao diện Web duy nhất http://127.0.0.1:8765:
 
 ### KỊCH BẢN 1: QUY TRÌNH PHÒNG THỦ TỰ HÀNH 5 BƯỚC (WIZARD FLOW)
-**Mục tiêu**: Kiểm tra tính năng phân tích mã nguồn lần đầu, trích xuất lỗ hổng và sinh bộ kỹ năng phòng thủ.
+Mục tiêu: Kiểm tra tính năng phân tích mã nguồn lần đầu, trích xuất lỗ hổng và sinh bộ kỹ năng phòng thủ.
 
-- **Bước 1**: Mở trình duyệt tại http://127.0.0.1:8765. Giao diện tự động mở mục 5 Bước Tự Hành (Wizard) và khóa vào thư mục dự án mục tiêu.
-- **Bước 2**: Nhấn nút [ BẮT ĐẦU QUÉT DỰ ÁN ].
-  *Quan sát*: Terminal hiển thị tiến trình Tác tử AI đọc cây cú pháp AST, nhận diện ngôn ngữ, framework và các Sensitive Sinks (exec, eval, system).
-- **Bước 3**: Xem kết quả phân tích tại Bước 2:
-  *Kiểm tra*: Hệ thống hiển thị Ngôn ngữ, Framework, Phiên bản Runtime (ví dụ: Python 3.14, PHP 8.2), danh sách các dòng code nhạy cảm và Phân hệ bảo vệ (Scope A: Web & API Layer).
-- **Bước 4**: Nhấn nút chuyển sang Bước 3 (Cào báo CTI). Chọn mốc thời gian (1 năm, 3 năm hoặc 5 năm). Nhấn [ BẮT ĐẦU CÀO & ĐỐI CHIẾU ].
-  *Quan sát*: Live Stream nhật ký tác tử AI phân tích, đối chiếu chéo; nếu phát hiện bài báo khớp đúng phiên bản runtime của dự án, hệ thống sẽ kích hoạt dòng cảnh báo đỏ khẩn cấp và hiển thị các chỉ số IOC (IP C2, CVE, Domain).
-- **Bước 5**: Nhấn nút chuyển sang Bước 4 (Sinh Bộ Kỹ Năng).
-  *Quan sát*: Hệ thống tự động sinh gói kỹ năng agentic-defense-master-web-suite trực tiếp vào thư mục dự án và đồng bộ tới 15 nền tảng AI Agent (Claude, Cursor, Gemini, Copilot...).
-- **Bước 6**: Chuyển sang Bước 5 (Kiểm thử & Vá mã nguồn):
+- Bước 1: Mở trình duyệt tại http://127.0.0.1:8765. Giao diện tự động mở mục 5 Bước Tự Hành (Wizard) và khóa vào thư mục dự án mục tiêu.
+- Bước 2: Nhấn nút [ BẮT ĐẦU QUÉT DỰ ÁN ].
+  Quan sát: Terminal hiển thị tiến trình Tác tử AI đọc cây cú pháp AST, nhận diện ngôn ngữ, framework và các Sensitive Sinks (exec, eval, system).
+- Bước 3: Xem kết quả phân tích tại Bước 2:
+  Kiểm tra: Hệ thống hiển thị Ngôn ngữ, Framework, Phiên bản Runtime (ví dụ: Python 3.14, PHP 8.2), danh sách các dòng code nhạy cảm và Phân hệ bảo vệ (Scope A: Web & API Layer).
+- Bước 4: Nhấn nút chuyển sang Bước 3 (Cào báo CTI). Chọn mốc thời gian (1 năm, 3 năm hoặc 5 năm). Nhấn [ BẮT ĐẦU CÀO & ĐỐI CHIẾU ].
+  Quan sát: Live Stream nhật ký tác tử AI phân tích, đối chiếu chéo; nếu phát hiện bài báo khớp đúng phiên bản runtime của dự án, hệ thống sẽ kích hoạt dòng cảnh báo đỏ khẩn cấp và hiển thị các chỉ số IOC (IP C2, CVE, Domain).
+- Bước 5: Nhấn nút chuyển sang Bước 4 (Sinh Bộ Kỹ Năng).
+  Quan sát: Hệ thống tự động sinh gói kỹ năng agentic-defense-master-web-suite trực tiếp vào thư mục dự án và đồng bộ tới 15 nền tảng AI Agent (Claude, Cursor, Gemini, Copilot...).
+- Bước 6: Chuyển sang Bước 5 (Kiểm thử & Vá mã nguồn):
   1. Bấm nút kiểm thử [ Chạy Thử Probe Kiểm Tra Lỗ Hổng ]: Terminal trả về kết quả True Positive (xác nhận endpoint có lỗi RCE).
   2. Bấm nút [ Kích Hoạt Lá Chắn WAF & Firewall ]: Bật lá chắn mạng tức thời.
   3. Bấm nút [ Tự Động Vá Mã Nguồn ]: Hệ thống tự sửa code PHP/JS sang cơ chế Whitelist an toàn và tái kiểm thử xác nhận True Positive = 0.
 
 ### KỊCH BẢN 2: KIỂM THỬ LƯU TRỮ VÀ NHẬN DIỆN DỰ ÁN ĐÃ BẢO VỆ
-**Mục tiêu**: Kiểm tra khả năng tự động ghi nhớ trạng thái dự án thông qua tệp .cti_defense.json.
+Mục tiêu: Kiểm tra khả năng tự động ghi nhớ trạng thái dự án thông qua tệp .cti_defense.json.
 
-- **Bước 1**: Sau khi hoàn thành Kịch bản 1, tắt hệ thống bằng cti stop hoặc 2_TAT_HE_THONG.bat.
-- **Bước 2**: Mở CMD tại chính thư mục dự án đó và gõ cti.
-- **Bước 3**: Quan sát giao diện Web khi mở lên:
+- Bước 1: Sau khi hoàn thành Kịch bản 1, tắt hệ thống bằng cti stop hoặc 2_TAT_HE_THONG.bat.
+- Bước 2: Mở CMD tại chính thư mục dự án đó và gõ cti.
+- Bước 3: Quan sát giao diện Web khi mở lên:
   - Hệ thống nhận diện tệp .cti_defense.json.
   - Hiển thị banner màu xanh lá: [DỰ ÁN ĐÃ BẢO VỆ] kèm tên dự án, phân hệ Scope, tên kỹ năng tác tử và thời gian cấu hình.
   - Tự động chuyển thẳng vào Kho Kỹ Năng Tác Tử (Agentic Skills) hoặc Bảng Điểm IOC, không bắt quét lại từ đầu.
-- **Bước 4**: Thử nghiệm nút [ Quét Lại Dự Án ] trên banner để kiểm tra tính năng Reset và cấu hình lại.
+- Bước 4: Thử nghiệm nút [ Quét Lại Dự Án ] trên banner để kiểm tra tính năng Reset và cấu hình lại.
 
 ### KỊCH BẢN 3: KIỂM THỬ TÍNH ĐỘC LẬP KHI CHUYỂN DỰ ÁN MỚI
-**Mục tiêu**: Kiểm tra hệ thống có xử lý độc lập giữa các dự án khác nhau trên cùng một máy hay không.
+Mục tiêu: Kiểm tra hệ thống có xử lý độc lập giữa các dự án khác nhau trên cùng một máy hay không.
 
-- **Bước 1**: Tạo một thư mục rỗng mới hoặc mở một thư mục dự án khác (ví dụ: target_projects\demo_vulnerable_php_app).
-- **Bước 2**: Mở CMD tại thư mục đó và gõ cti.
-- **Bước 3**: Quan sát giao diện Web:
+- Bước 1: Tạo một thư mục rỗng mới hoặc mở một thư mục dự án khác (ví dụ: target_projects\demo_vulnerable_php_app).
+- Bước 2: Mở CMD tại thư mục đó và gõ cti.
+- Bước 3: Quan sát giao diện Web:
   - Hệ thống phát hiện thư mục này chưa có cấu hình bảo vệ.
   - Tự động mở mục Wizard Bước 1 và khóa đúng vào đường dẫn của thư mục mới này.
   - Người dùng có thể tiến hành quét và sinh bộ kỹ năng độc lập cho riêng dự án mới mà không ảnh hưởng tới dự án cũ.
 
 ### KỊCH BẢN 4: KIỂM THỬ LÁ CHẮN WAF TRỰC TIẾP TRÊN GIAO DIỆN WEB
-**Mục tiêu**: Xác minh WAF chặn đứng payload tấn công mà không cần mở trang web khác.
+Mục tiêu: Xác minh WAF chặn đứng payload tấn công mà không cần mở trang web khác.
 
-- **Bước 1**: Ngay trên giao diện Web http://127.0.0.1:8765, nhấp vào tab **3. Kho Kỹ Năng Tác Tử (Agentic Skills)** trên thanh điều hướng đầu trang.
-- **Bước 2**: Cuộn xuống mục **CONSOLE THỬ NGHIỆM TẤN CÔNG WAF THỰC TẾ**, bạn sẽ thấy các nút bấm kiểm thử được tích hợp sẵn:
-  - `[ Thử Nghiệm Tấn Công RCE ]` -> Gửi gói tin giả lập Remote Code Execution.
-  - `[ Thử Nghiệm Tấn Công SQLi ]` -> Gửi gói tin giả lập SQL Injection.
-  - `[ Thử Nghiệm Path Traversal ]` -> Gửi gói tin giả lập đọc trộm file hệ thống.
-  - `[ Thử Nghiệm Gói Tin Sạch (Clean Traffic) ]` -> Gửi gói tin người dùng thông thường.
-- **Bước 3**: Quan sát màn hình Console hiển thị kết quả kiểm thử ngay lập tức:
-  - Với các gói tin tấn công: Máy chủ WAF phản hồi **CHẶN ĐỨNG (403 FORBIDDEN - DROP PAYLOAD)** kèm mã quy tắc ModSecurity vi phạm và thời gian xử lý (< 2ms).
-  - Với gói tin sạch: Phản hồi **THÔNG QUA (200 OK - CLEAN TRAFFIC)** đảm bảo tính năng nghiệp vụ của ứng dụng hoạt động thông suốt.
+- Bước 1: Ngay trên giao diện Web http://127.0.0.1:8765, nhấp vào tab 3. Kho Kỹ Năng Tác Tử (Agentic Skills) trên thanh điều hướng đầu trang.
+- Bước 2: Cuộn xuống mục CONSOLE THỬ NGHIỆM TẤN CÔNG WAF THỰC TẾ, bạn sẽ thấy các nút bấm kiểm thử được tích hợp sẵn:
+  - [ Thử Nghiệm Tấn Công RCE ] -> Gửi gói tin giả lập Remote Code Execution.
+  - [ Thử Nghiệm Tấn Công SQLi ] -> Gửi gói tin giả lập SQL Injection.
+  - [ Thử Nghiệm Path Traversal ] -> Gửi gói tin giả lập đọc trộm file hệ thống.
+  - [ Thử Nghiệm Gói Tin Sạch (Clean Traffic) ] -> Gửi gói tin người dùng thông thường.
+- Bước 3: Quan sát màn hình Console hiển thị kết quả kiểm thử ngay lập tức:
+  - Với các gói tin tấn công: Máy chủ WAF phản hồi CHẶN ĐỨNG (403 FORBIDDEN - DROP PAYLOAD) kèm mã quy tắc ModSecurity vi phạm và thời gian xử lý (< 2ms).
+  - Với gói tin sạch: Phản hồi THÔNG QUA (200 OK - CLEAN TRAFFIC) đảm bảo tính năng nghiệp vụ của ứng dụng hoạt động thông suốt.
 
 ### KỊCH BẢN 5: KIỂM THỬ TRỢ LÝ TRÒ CHUYỆN AI AGENT
-**Mục tiêu**: Kiểm tra khả năng tra cứu chỉ số an ninh mạng bằng ngôn ngữ tự nhiên ngay trong giao diện Web.
+Mục tiêu: Kiểm tra khả năng tra cứu chỉ số an ninh mạng bằng ngôn ngữ tự nhiên ngay trong giao diện Web.
 
-- **Bước 1**: Nhấp vào tab **Chat AI Agent** trên thanh điều hướng đầu trang.
-- **Bước 2**: Bấm các nút câu hỏi mẫu có sẵn hoặc nhập nội dung tùy ý:
+- Bước 1: Nhấp vào tab Chat AI Agent trên thanh điều hướng đầu trang.
+- Bước 2: Bấm các nút câu hỏi mẫu có sẵn hoặc nhập nội dung tùy ý:
   - "Kiểm tra mức độ nguy hiểm của IP 43.134.165.205"
   - "Liệt kê các lỗ hổng CVE nguy hiểm nhất trong kho bài báo"
-- **Bước 3**: Quan sát phản hồi của AI Agent:
+- Bước 3: Quan sát phản hồi của AI Agent:
   - Phản hồi bằng tiếng Việt chuẩn mực, có căn cứ trích dẫn rõ ràng từ 5 nguồn dữ liệu tình báo CTI (OTX, AbuseIPDB, Shodan, Abuse.ch, GreyNoise).
 
 ---
