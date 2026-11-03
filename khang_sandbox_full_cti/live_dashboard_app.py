@@ -1509,121 +1509,30 @@ HTML_PAGE = r"""<!DOCTYPE html>
       <!-- ============================================================== -->
       <!-- BƯỚC 5: CÀO BÁO & TỰ ĐỘNG NÂNG CẤP KỸ NĂNG TÁC TỬ SỐNG (LIVING SKILL) -->
       <!-- ============================================================== -->
-      <div id="wizardCard5" class="WizardCard" style="display:none;">
-        <h3 style="font-size:16px; margin-bottom:8px; color:#0f172a;">Bước 5: Cào Báo Tình Báo CTI &amp; Tự Động Nâng Cấp Kỹ Năng Tác Tử Sống (Living Dynamic Skill)</h3>
-        <p style="color:#64748b; font-size:13px; margin-bottom:14px;">
-          Tác tử CTI tự động cào bài báo, đối chiếu cây AST mã nguồn, trích xuất IoCs/CVEs và tự động tích lũy, nâng cấp gói kỹ năng phòng thủ theo thời gian thực (không cần thao tác thủ công):
-        </p>
-
-        <div style="text-align:center; margin-bottom:16px;">
-          <button type="button" id="btnRunCrawl" class="CleanBtn btn-primary" style="padding:12px 36px; font-size:15px; font-weight:700; background:#2563eb; color:#ffffff; border:none; border-radius:6px; cursor:pointer; box-shadow:0 4px 14px rgba(37,99,235,0.3);" onclick="wizardExecuteCrawl()">
-            [ BẮT ĐẦU CÀO BÁO &amp; TÍCH LŨY KỸ NĂNG LIVE ]
-          </button>
-        </div>
-
-        <!-- Live Streaming Agent Terminal -->
-        <div id="wzAgentLogTerminal" style="display:none; background:#0f172a; color:#38bdf8; font-family:monospace; font-size:12px; padding:14px; border-radius:6px; max-height:160px; overflow-y:auto; margin-bottom:16px; border:1px solid #1e293b; line-height:1.6;">
-        </div>
-
-        <!-- KHUNG HÀNG ĐỢI TÌNH BÁO CTI & TIẾN TRÌNH AI XỬ LÝ (CHUẨN LIVE SERVER) -->
-        <div id="wzScannedArticlesSection" style="display:none; margin-bottom:18px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:16px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
-            <div style="font-size:13.5px; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:8px;">
-              <span>HÀNG ĐỢI TÌNH BÁO CTI DỰ ÁN</span>
-              <span id="wzArticlesCountHeader" style="font-size:12px; background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:4px; font-weight:700;">0 bài</span>
+      <!-- BƯỚC 5: LIVE CTI STREAMING & AST CORRELATION WORKSPACE         -->
+      <!-- ============================================================== -->
+      <div id="wizardCard5" class="WizardCard" style="display:none; padding:18px 22px; background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; margin-bottom:18px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+          <div>
+            <div style="font-size:15.5px; font-weight:700; color:#1e40af; display:flex; align-items:center; gap:8px;">
+              <span>Bước 5: Cào Báo Tình Báo CTI &amp; Tự Động Nâng Cấp Kỹ Năng Tác Tử Sống</span>
+              <span style="font-size:11.5px; background:#dcfce7; color:#15803d; border:1px solid #86efac; padding:2px 8px; border-radius:4px; font-weight:700;">GIAO DIỆN LIVE SERVER NGUYÊN BẢN</span>
             </div>
-            <div id="wzProgressStatusText" style="font-size:12px; font-weight:700; color:#2563eb;">
-              Đang chuẩn bị...
+            <div style="font-size:13px; color:#3b82f6; margin-top:4px; line-height:1.5;">
+              Hệ thống kích hoạt không gian Live Server nguyên bản: Danh sách bài báo CTI bên trái, trình đọc văn bản highlight nguyên bản bên phải và quản lý kho tri thức SQLite bên dưới.
             </div>
           </div>
-
-          <!-- Thanh tiến độ tổng quan -->
-          <div style="background:#e2e8f0; border-radius:4px; height:8px; width:100%; overflow:hidden; margin-bottom:12px;">
-            <div id="wzProgressBar" style="width:0%; height:100%; background:linear-gradient(90deg, #2563eb, #16a34a); transition:width 0.3s ease;"></div>
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <button type="button" class="CleanBtn" style="padding:9px 18px; font-size:13px; font-weight:600; background:#ffffff; color:#475569; border:1px solid #cbd5e1; border-radius:6px; cursor:pointer;" onclick="wizardGotoStep(4)">
+              ← Quay Lại Bước 4
+            </button>
+            <button type="button" class="CleanBtn btn-primary" id="btnLiveStartScan" style="padding:9px 22px; font-size:13.5px; font-weight:700; background:#2563eb; color:#ffffff; border:none; border-radius:6px; cursor:pointer; box-shadow:0 2px 8px rgba(37,99,235,0.25);" onclick="startLiveServerCrawlStep5()">
+              [ BẮT ĐẦU CÀO BÁO &amp; CHẠY AI LIVE ]
+            </button>
+            <button type="button" class="CleanBtn" id="btnStep5To6" style="padding:9px 22px; font-size:13.5px; font-weight:700; background:#16a34a; color:#ffffff; border:none; border-radius:6px; cursor:pointer; box-shadow:0 2px 8px rgba(22,163,74,0.25);" onclick="wizardGotoStep(6)">
+              [ TIẾP TỤC: VÁ MÃ NGUỒN &amp; KIỂM THỬ THỰC CHIẾN (BƯỚC 6) → ]
+            </button>
           </div>
-
-          <!-- Thanh phân loại trạng thái: ĐANG XỬ LÝ, CHỜ XỬ LÝ, ĐÃ XỬ LÝ -->
-          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px; padding:10px 14px; background:#ffffff; border:1px solid #e2e8f0; border-radius:6px;">
-            <div style="display:flex; gap:16px; font-size:12.5px; font-weight:600; align-items:center;">
-              <span style="color:#16a34a;">Đã xử lý: <b id="wzStatCompletedCount">0</b></span>
-              <span style="color:#2563eb;">Đang xử lý: <b id="wzStatProcessingCount">0</b></span>
-              <span style="color:#64748b;">Chờ xử lý: <b id="wzStatPendingCount">0</b></span>
-            </div>
-            <div style="display:flex; gap:6px;" id="wzQueueFilterButtons">
-              <button type="button" class="CleanBtn wzFilterBtn active" onclick="filterWzQueue('ALL', this)" style="font-size:11.5px; padding:4px 10px; background:#2563eb; color:#fff; border-radius:4px; border:1px solid #1d4ed8; font-weight:600;">Tất Cả (<span id="wzFilterAllCount">0</span>)</button>
-              <button type="button" class="CleanBtn wzFilterBtn" onclick="filterWzQueue('PROCESSING', this)" style="font-size:11.5px; padding:4px 10px; background:#f1f5f9; color:#1e293b; border-radius:4px; border:1px solid #cbd5e1; font-weight:600;">Đang Xử Lý (<span id="wzFilterProcCount">0</span>)</button>
-              <button type="button" class="CleanBtn wzFilterBtn" onclick="filterWzQueue('PENDING', this)" style="font-size:11.5px; padding:4px 10px; background:#f1f5f9; color:#1e293b; border-radius:4px; border:1px solid #cbd5e1; font-weight:600;">Chờ Xử Lý (<span id="wzFilterPendCount">0</span>)</button>
-              <button type="button" class="CleanBtn wzFilterBtn" onclick="filterWzQueue('COMPLETED', this)" style="font-size:11.5px; padding:4px 10px; background:#f1f5f9; color:#1e293b; border-radius:4px; border:1px solid #cbd5e1; font-weight:600;">Đã Xử Lý (<span id="wzFilterDoneCount">0</span>)</button>
-            </div>
-          </div>
-
-          <!-- Danh sách thẻ bài báo trực quan có phân loại trạng thái -->
-          <div id="wzArticlesQueueList" style="display:flex; flex-direction:column; gap:10px; max-height:420px; overflow-y:auto; padding-right:4px;">
-          </div>
-        </div>
-
-        <!-- Dynamic Living Skill Evolution Card -->
-        <div id="wzLivingSkillCard" style="display:none; margin-bottom:20px; background:#ffffff; border:2px solid #22c55e; border-radius:8px; padding:18px; box-shadow:0 4px 16px rgba(34,197,94,0.12);">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#22c55e; box-shadow:0 0 8px #22c55e;"></span>
-              <span style="font-size:11.5px; font-weight:800; color:#15803d; letter-spacing:0.5px;">KỸ NĂNG TÁC TỬ ĐỘNG (LIVING CTI SKILL) — NÂNG CẤP LIVE LIÊN TỤC</span>
-            </div>
-            <div style="font-size:12px; font-weight:700; background:#dcfce7; color:#15803d; padding:4px 12px; border-radius:4px; border:1px solid #86efac;">
-              PHIÊN BẢN SỐNG: <span id="wzLivingSkillVersion" style="font-family:monospace;">v2.5.4 (Tích Lũy)</span>
-            </div>
-          </div>
-
-          <!-- 4 Khối thông số kỹ năng tích lũy thực tế -->
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:14px;">
-            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px 14px;">
-              <div style="font-size:11px; color:#64748b; font-weight:600; text-transform:uppercase;">Tổng Bài Báo Tích Lũy</div>
-              <div id="wzCardArticlesCount" style="font-size:16px; font-weight:800; color:#0f172a; margin-top:2px;">-</div>
-              <div style="font-size:11px; color:#15803d; margin-top:2px;">Học và đồng bộ vào tri thức</div>
-            </div>
-
-            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px 14px;">
-              <div style="font-size:11px; color:#64748b; font-weight:600; text-transform:uppercase;">IoC &amp; CVE Mã Hóa</div>
-              <div id="wzCardIocCount" style="font-size:16px; font-weight:800; color:#b91c1c; margin-top:2px;">-</div>
-              <div style="font-size:11px; color:#64748b; margin-top:2px;">Bảo vệ đa tầng mã nguồn</div>
-            </div>
-
-            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px 14px;">
-              <div style="font-size:11px; color:#64748b; font-weight:600; text-transform:uppercase;">Lá Chắn Đa Lớp</div>
-              <div id="wzCardRulesInfo" style="font-size:15px; font-weight:800; color:#2563eb; margin-top:2px;">WAF + Suricata + Netsh</div>
-              <div style="font-size:11px; color:#64748b; margin-top:2px;">Chặn đứng tấn công L7 &amp; C2</div>
-            </div>
-
-            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px 14px;">
-              <div style="font-size:11px; color:#64748b; font-weight:600; text-transform:uppercase;">Thẩm Định xAI Dual-Loop</div>
-              <div id="wzCardTrustScore" style="font-size:16px; font-weight:800; color:#15803d; margin-top:2px;">95.0%</div>
-              <div style="font-size:11px; color:#15803d; margin-top:2px;">Tọa độ ký tự nguyên văn 100% TP</div>
-            </div>
-          </div>
-
-          <!-- Bài báo đe dọa trực tiếp đối với mã nguồn -->
-          <div style="padding:12px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:6px; margin-bottom:12px;">
-            <div style="font-size:12px; font-weight:700; color:#166534; margin-bottom:4px;">
-              MỐI ĐE DỌA CTI TRỰC TIẾP TỚI MÃ NGUỒN CỦA DỰ ÁN:
-            </div>
-            <b id="wzBestTitle" style="color:#b91c1c; font-size:13.5px; display:block; margin-bottom:4px;">-</b>
-            <div id="wzBestCves" style="font-family:monospace; color:#2563eb; font-size:12px; margin-bottom:6px;">-</div>
-            <p id="wzExcerpt" style="font-size:12px; color:#475569; line-height:1.5; font-style:italic; margin-bottom:4px;">-</p>
-          </div>
-
-          <div style="font-size:12px; color:#166534; line-height:1.5;">
-            - Gói kỹ năng: <b id="wzLivingSkillName" style="font-family:monospace; color:#0f172a;">-</b><br />
-            - Đã tự động phân phối tới các Agent: <code>.cursor/rules/</code>, <code>.gemini/skills/</code>, <code>defense_skills/</code> và lưu vào <code>.cti_defense.json</code>.
-          </div>
-        </div>
-
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-          <button type="button" class="CleanBtn" style="padding:10px 18px; border:1px solid #cbd5e1; background:#ffffff; color:#334155; border-radius:6px; cursor:pointer;" onclick="wizardGotoStep(4)">
-            &larr; Quay Lại Bước 4
-          </button>
-          <button type="button" id="btnNextStep5To6" class="CleanBtn btn-primary" style="padding:12px 32px; font-weight:700; background:#94a3b8; color:#ffffff; border:none; border-radius:6px; cursor:not-allowed;" onclick="wizardGotoStep(6)" disabled>
-            [ TIẾP TỤC: VÁ MÃ NGUỒN &amp; KIỂM THỬ THỰC CHIẾN (BƯỚC 6) &rarr; ]
-          </button>
         </div>
       </div>
 
@@ -5331,6 +5240,16 @@ let wzIsProjectConfigured = false;
         if (wzCadence && wzCadence.value) {
           onWizardCadenceChange(wzCadence.value);
         }
+        // Hien thi truc tiep khong gian Live Server nguyen ban (Nguon bao highlight + Lich su da hoc)
+        const feedSec = document.getElementById('sec-feed');
+        if (feedSec) feedSec.style.display = 'block';
+        const histSec = document.getElementById('sec-history');
+        if (histSec) histSec.style.display = 'block';
+        const defSec = document.getElementById('sec-defense');
+        if (defSec) defSec.style.display = 'block';
+
+        // Tu dong kich hoat cao bao va hien thi truc tiep tren giao dien Live Server
+        startLiveServerCrawlStep5();
       } else if (stepNum === 6) {
         const hCount = document.getElementById("step6HistoryCount");
         const navH = document.getElementById("navHistoryCount");
@@ -6197,6 +6116,87 @@ let wzIsProjectConfigured = false;
           </div>
         </div>
       `;
+    }
+
+    async function startLiveServerCrawlStep5() {
+      const btn = document.getElementById("btnLiveStartScan");
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = "[ ĐANG QUÉT CTI & NẠP HÀNG ĐỢI LIVE... ]";
+      }
+      updateLiveTicker(`[Bước 5] Đang kết nối kho tình báo an ninh mạng theo phân hệ [${wzScopeId}]...`);
+
+      const rads = document.getElementsByName("wzHistory");
+      let historyVal = 3;
+      for (const r of rads) { if (r.checked) historyVal = parseInt(r.value); }
+
+      try {
+        const res = await fetch("/api/wizard/crawl-scope", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({ target: wzTarget, scope_id: wzScopeId, history_years: historyVal })
+        });
+        const d = await res.json();
+        if (d.status === "success") {
+          wzBestArticleId = d.best_article_id;
+
+          if (d.scope_articles && d.scope_articles.length > 0) {
+            articles = d.scope_articles.map((art, idx) => ({
+              article_id: art.article_id,
+              source: art.source_name || "CTI Feed",
+              source_name: art.source_name || "CTI Feed",
+              title: art.title,
+              url: art.url || "",
+              published_at: art.published_date || "2026",
+              sort_ts: art.sort_ts || art.published_date || "2026",
+              content: art.content || art.excerpt || "",
+              status: idx === 0 ? "processing" : "pending",
+              ioc_counts: {
+                cves: (art.cves || []).length,
+                ips: (art.sample_ips || []).length,
+                domains: (art.sample_domains || []).length,
+                sha256: 0,
+                total: art.ioc_count || 3,
+                sample_cves: art.cves || [],
+                sample_ips: art.sample_ips || [],
+                sample_domains: art.sample_domains || []
+              },
+              skills_summary: art.skills_summary,
+              rules_summary: art.rules_summary
+            }));
+            allHistoryArticles = articles.slice();
+          }
+
+          renderNewsGrid();
+          renderHistoryManager();
+
+          if (articles.length > 0) {
+            selectCard(0, false);
+          }
+
+          // Cuon muot den khong gian Split Workspace (Nguon Bao & Van Ban Goc Highlight)
+          const feedEl = document.getElementById("sec-feed");
+          if (feedEl) {
+            feedEl.style.display = "block";
+            feedEl.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+
+          updateLiveTicker(`[Bước 5] Đã nạp thành công ${articles.length} bài báo phân hệ [${d.scope_name}] vào hàng đợi Live. Bắt đầu đối soát AST...`);
+
+          autoQueueEnabled = true;
+          if (!isQueueWorkerRunning && articles.length > 0) {
+            executeSingleArticleQueue(0);
+          }
+        }
+      } catch (e) {
+        console.error("Lỗi cào báo Step 5:", e);
+        updateLiveTicker(`Lỗi nạp bài báo Step 5: ${e}`);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = "[ QUÉT LẠI & TIẾP TỤC HÀNG ĐỢI ]";
+        }
+      }
     }
 
     async function wizardExecuteCrawl() {

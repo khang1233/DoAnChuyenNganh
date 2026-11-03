@@ -296,7 +296,7 @@ def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3) -> Di
         params = [f"%{kw}%" for kw in profile["keywords"][:6]]
         limit_count = 100 if history_years == 1 else (250 if history_years == 3 else 500)
         matched_rows = conn.execute(
-            f"SELECT article_id, title, source_name, published_date, sort_ts, content "
+            f"SELECT article_id, title, source_name, url, published_date, sort_ts, content "
             f"FROM articles_archive WHERE sort_ts >= ? AND ({kw_clauses}) "
             f"ORDER BY sort_ts DESC LIMIT {limit_count}",
             [min_date] + params
@@ -328,11 +328,13 @@ def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3) -> Di
                 "article_id": r["article_id"],
                 "title": r["title"],
                 "source_name": r["source_name"] or "OSINT CTI",
+                "url": r["url"] or "",
                 "published_date": r["published_date"] or r["sort_ts"] or "2026",
                 "cves": r_cves[:3],
                 "ioc_count": max(total_iocs_item, 3),
                 "sample_ips": list(dict.fromkeys(r_ips))[:2],
                 "sample_domains": list(dict.fromkeys(r_domains))[:2],
+                "content": c_text,
                 "excerpt": c_text[:140].strip() + "...",
                 "risk_level": risk_tag,
                 "skills_summary": ", ".join(skills_generated),
