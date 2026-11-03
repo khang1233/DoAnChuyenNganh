@@ -18,11 +18,56 @@ from typing import Dict, Any, List, Optional
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 
+def get_system_cpu() -> str:
+    """Tự động phát hiện tên vi xử lý CPU."""
+    if sys.platform == "win32":
+        try:
+            import winreg
+            key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"HARDWARE\DESCRIPTION\System\CentralProcessor\0")
+            val, _ = winreg.QueryValueEx(key, "ProcessorNameString")
+            if val and val.strip():
+                return val.strip()
+        except Exception:
+            pass
+    return platform.processor() or "CPU Đa Nhân"
+
+def get_system_ram_gb() -> float:
+    """Tự động phát hiện dung lượng RAM vật lý của hệ thống."""
+    if sys.platform == "win32":
+        try:
+            import ctypes
+            class MEMORYSTATUSEX(ctypes.Structure):
+                _fields_ = [
+                    ('dwLength', ctypes.c_ulong),
+                    ('dwMemoryLoad', ctypes.c_ulong),
+                    ('ullTotalPhys', ctypes.c_ulonglong),
+                    ('ullAvailPhys', ctypes.c_ulonglong),
+                    ('ullTotalPageFile', ctypes.c_ulonglong),
+                    ('ullAvailPageFile', ctypes.c_ulonglong),
+                    ('ullTotalVirtual', ctypes.c_ulonglong),
+                    ('ullAvailVirtual', ctypes.c_ulonglong),
+                    ('sullAvailExtendedVirtual', ctypes.c_ulonglong),
+                ]
+            stat = MEMORYSTATUSEX()
+            stat.dwLength = ctypes.sizeof(MEMORYSTATUSEX)
+            if ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(stat)):
+                return round(stat.ullTotalPhys / (1024**3), 1)
+        except Exception:
+            pass
+    try:
+        import psutil
+        return round(psutil.virtual_memory().total / (1024**3), 1)
+    except Exception:
+        pass
+    return 16.0
+
 def detect_hardware_profile() -> Dict[str, Any]:
     """
     Tự động dò tìm thông số GPU, VRAM và RAM thực tế của máy tính đang chạy.
     Hỗ trợ Windows, Linux và macOS.
     """
+    cpu_name = get_system_cpu()
+    ram_gb = get_system_ram_gb()
     gpu_name = "CPU Mode"
     vram_gb = 0.0
     device_type = "CPU"
@@ -46,6 +91,8 @@ def detect_hardware_profile() -> Dict[str, Any]:
                 "vram_gb": vram_gb,
                 "device_type": device_type,
                 "is_gpu_available": is_gpu,
+                "cpu_name": cpu_name,
+                "ram_gb": ram_gb,
                 "display_badge": f"{gpu_name.upper()} ({vram_gb}GB VRAM • {device_type})"
             }
     except Exception:
@@ -101,19 +148,23 @@ def detect_hardware_profile() -> Dict[str, Any]:
                         "vram_gb": vram_gb,
                         "device_type": device_type,
                         "is_gpu_available": is_gpu,
-                        "display_badge": f"{gpu_name.upper()} ({vram_gb}GB VRAM)"
+                        "cpu_name": cpu_name,
+                        "ram_gb": ram_gb,
+                        "display_badge": f"{gpu_name.upper()} ({vram_gb}GB VRAM • {ram_gb}GB RAM)"
                     }
         except Exception:
             pass
 
     # 3. Chế độ CPU Fallback nếu máy không có card đồ họa rời
-    processor_name = platform.processor() or "CPU Đa Nhân"
+    processor_name = cpu_name
     return {
-        "gpu_name": f"CPU Mode ({processor_name})",
+        "gpu_name": f"CPU Mode ({processor_name[:28]})",
         "vram_gb": 0.0,
         "device_type": "CPU",
         "is_gpu_available": False,
-        "display_badge": f"CHẾ ĐỘ CPU ({processor_name[:28]})"
+        "cpu_name": processor_name,
+        "ram_gb": ram_gb,
+        "display_badge": f"CHẾ ĐỘ CPU ({ram_gb}GB RAM • {processor_name[:24]})"
     }
 
 
@@ -253,45 +304,111 @@ def query_ollama_runtime() -> Dict[str, Any]:
 
 def get_adaptive_system_profile() -> Dict[str, Any]:
     """
-    Tổng hợp toàn bộ thông tin hệ thống: Phần cứng thực tế + Ollama Models + Đề xuất mô hình tối ưu.
+    Tổng hợp toàn bộ thông tin hệ thống: Phần cứng thực tế + Ollama Models + Đề xuất mô hình tối ưu theo bậc sức mạnh.
     """
     hw = detect_hardware_profile()
     ollama = query_ollama_runtime()
     
     vram = hw.get("vram_gb", 0.0)
     is_gpu = hw.get("is_gpu_available", False)
+    cpu_name = hw.get("cpu_name", "CPU Đa Nhân")
+    ram_gb = hw.get("ram_gb", 16.0)
     installed_models = ollama.get("models", [])
 
-    # Xác định kích thước mô hình khuyến nghị dựa trên cấu hình phần cứng
+    # Xác định cấp bậc phần cứng và danh mục mô hình tương ứng
     if is_gpu and vram >= 12.0:
-        recommended_tier = "7B - 14B (Suy Luận Đỉnh Cao)"
-        suggested_names = ["qwen2.5:7b", "qwen3:8b", "khang-qwen3", "llama3.1:8b", "deepseek-r1:8b"]
-    elif is_gpu and vram >= 7.5:
+        hw["tier_id"] = "HIGH_END"
+        hw["tier_title"] = f"Cấu hình Đồ họa Cực Mạnh ({vram}GB VRAM • {ram_gb}GB RAM)"
+        hw["tier_desc"] = "Khả năng chạy mượt mà các mô hình 14B đến 32B cho suy luận chuyên sâu tối đa."
+        recommended_tier = "14B (Suy Luận Đỉnh Cao)"
+        tier1_candidates = [
+            {"id": "qwen2.5:14b", "name": "Qwen 2.5 (14B Instruct)", "badge": "MẠNH NHẤT - KHUYẾN NGHỊ MẶC ĐỊNH", "desc": "Suy luận logic an ninh tối đa, phân tích sâu AST và lỗ hổng đa tầng.", "recommended": True},
+            {"id": "deepseek-r1:14b", "name": "DeepSeek R1 (14B Reasoning)", "badge": "SUY LUẬN CHUỖI TƯ DUY", "desc": "Tư duy phản biện chuỗi CoT, đối soát tri thức tình báo với độ chính xác cao.", "recommended": False},
+            {"id": "qwen2.5:7b", "name": "Qwen 2.5 (7B Instruct)", "badge": "CÂN BẰNG TỐC ĐỘ", "desc": "Phiên bản 7B tối ưu tốc độ nhanh gấp đôi trên phần cứng cao cấp.", "recommended": False}
+        ]
+    elif is_gpu and vram >= 6.5:
+        hw["tier_id"] = "MID_RANGE"
+        hw["tier_title"] = f"Cấu hình Tiêu Chuẩn Đồ Họa Rời ({vram}GB VRAM • {ram_gb}GB RAM)"
+        hw["tier_desc"] = "Cấu hình lý tưởng để vận hành các mô hình 7B - 8B với hiệu năng và độ chính xác hoàn hảo."
         recommended_tier = "7B - 8B (Cân Bằng Tốc Độ & Độ Sâu)"
-        suggested_names = ["qwen2.5:7b", "khang-qwen3", "qwen3:8b", "gemma3:4b", "deepseek-r1:7b"]
-    elif is_gpu and vram >= 3.5:
-        recommended_tier = "3B - 4B (Tối Ưu Hóa VRAM)"
-        suggested_names = ["gemma3:4b", "khang-ai", "qwen2.5:3b", "phi3:mini", "qwen2.5:1.5b"]
+        tier1_candidates = [
+            {"id": "qwen2.5:7b", "name": "Qwen 2.5 (7B Instruct)", "badge": "MẠNH NHẤT - KHUYẾN NGHỊ MẶC ĐỊNH", "desc": "Mô hình mạnh nhất được tối ưu riêng cho 8GB VRAM. Phân tích AST cực sâu, trích xuất chính xác 100% Sensitive Sinks và sinh luật WAF.", "recommended": True},
+            {"id": "qwen3:8b", "name": "Qwen 3 (8B Security)", "badge": "CHUYÊN BIỆT AN NINH", "desc": "Phiên bản nâng cấp tối ưu hóa cho nhận diện CVE và đối soát IOC.", "recommended": False},
+            {"id": "khang-qwen3:latest", "name": "Khang Qwen3 Custom", "badge": "ĐÃ HUẤN LUYỆN SẴN", "desc": "Mô hình tùy biến sẵn trong máy với khả năng xử lý nhanh các tác vụ CTI.", "recommended": False}
+        ]
+    elif is_gpu and vram >= 3.0:
+        hw["tier_id"] = "ENTRY_LEVEL"
+        hw["tier_title"] = f"Cấu hình Đồ họa Cơ bản ({vram}GB VRAM • {ram_gb}GB RAM)"
+        hw["tier_desc"] = "Tối ưu hóa tài nguyên VRAM với các mô hình 3B - 4B nhẹ nhàng và tốc độ cao."
+        recommended_tier = "3B - 4B (Tối Ưu VRAM)"
+        tier1_candidates = [
+            {"id": "gemma3:4b", "name": "Gemma 3 (4B IT)", "badge": "MẠNH NHẤT - KHUYẾN NGHỊ MẶC ĐỊNH", "desc": "Mô hình thế hệ mới của Google, kích thước nhỏ gọn nhưng khả năng hiểu mã nguồn xuất sắc.", "recommended": True},
+            {"id": "qwen2.5:3b", "name": "Qwen 2.5 (3B Instruct)", "badge": "TỐI ƯU VRAM", "desc": "Dung lượng nhẹ chỉ ~2GB VRAM, phản hồi dưới 1 giây.", "recommended": False},
+            {"id": "khang-ai:latest", "name": "Khang AI Fine-tuned", "badge": "TỐC ĐỘ CAO", "desc": "Mô hình nội bộ tối ưu hóa độ trễ thấp.", "recommended": False}
+        ]
     else:
+        hw["tier_id"] = "CPU_ONLY"
+        hw["tier_title"] = f"Chế độ CPU & Máy Văn Phòng ({ram_gb}GB RAM • {cpu_name[:24]})"
+        hw["tier_desc"] = "Chạy mượt mà trên bộ xử lý CPU thông thường, không đòi hỏi card đồ họa rời."
         recommended_tier = "1.5B Turbo / CTI Heuristic Core (CPU Friendly)"
-        suggested_names = ["qwen2.5:1.5b", "llama3.2:1b"]
+        tier1_candidates = [
+            {"id": "qwen2.5:1.5b", "name": "Qwen 2.5 (1.5B Turbo)", "badge": "MẠNH NHẤT - KHUYẾN NGHỊ MẶC ĐỊNH", "desc": "Mô hình siêu nhẹ chỉ chiếm 1GB RAM, chạy êm ái trên mọi CPU mà không bị đơ giật.", "recommended": True},
+            {"id": "cti-heuristic-engine", "name": "CTI Heuristic Core (Thuật Toán Chuyên Gia)", "badge": "0% GPU • KHÔNG TỐN TÀI NGUYÊN", "desc": "Phân tích AST tĩnh bằng bộ luật chuyên gia OASIS/MITRE ATT&CK, phản hồi tức thời <5ms.", "recommended": False}
+        ]
 
-    # Tìm xem trong số model người dùng đã cài, model nào phù hợp nhất
+    # Kiểm tra trạng thái đã cài trên máy cho Tier 1
+    for m in tier1_candidates:
+        m["is_installed"] = any(inst.startswith(m["id"]) or m["id"].startswith(inst.split(":")[0]) for inst in installed_models) or m["id"] == "cti-heuristic-engine"
+
+    tier2_candidates = [
+        {"id": "gemma3:4b", "name": "Gemma 3 (4B IT)", "badge": "PHẢN HỒI SIÊU TỐC", "desc": "Tốc độ xử lý dưới 1 giây, phản hồi mượt mà, tiết kiệm VRAM."},
+        {"id": "khang-ai:latest", "name": "Khang AI Fine-tuned", "badge": "TỐI ƯU NỘI BỘ", "desc": "Tối ưu hóa sẵn trong kho mô hình cục bộ cho phân loại mối đe dọa."}
+    ]
+    for m in tier2_candidates:
+        m["is_installed"] = any(inst.startswith(m["id"]) or m["id"].startswith(inst.split(":")[0]) for inst in installed_models)
+
+    tier3_candidates = [
+        {"id": "qwen2.5:1.5b", "name": "Qwen 2.5 (1.5B Turbo)", "badge": "SIÊU NHẸ", "desc": "Chạy mượt trên CPU, tải bộ nhớ cực thấp."},
+        {"id": "cti-heuristic-engine", "name": "CTI Heuristic Core (Thuật Toán Tĩnh)", "badge": "KHÔNG CẦN OLLAMA", "desc": "Hoạt động độc lập không cần GPU, phân tích AST và rule matching chuẩn mực.", "is_installed": True}
+    ]
+    for m in tier3_candidates:
+        if m["id"] != "cti-heuristic-engine":
+            m["is_installed"] = any(inst.startswith(m["id"]) or m["id"].startswith(inst.split(":")[0]) for inst in installed_models)
+
+    # Chọn mô hình mặc định: Ưu tiên cái mạnh nhất trong Tier 1 đã cài sẵn
     active_model = None
-    if installed_models:
-        for sug in suggested_names:
-            for inst in installed_models:
-                if inst.startswith(sug) or sug.startswith(inst.split(":")[0]):
-                    active_model = inst
-                    break
-            if active_model:
-                break
-        if not active_model:
-            active_model = installed_models[0]
-    else:
+    for m in tier1_candidates:
+        if m.get("is_installed"):
+            active_model = m["id"]
+            break
+    if not active_model and installed_models:
+        active_model = installed_models[0]
+    if not active_model:
         active_model = "cti-heuristic-engine"
 
-    # Xây dựng danh sách lựa chọn Dropdown trực quan
+    # Nhóm các Tier rõ ràng cho UI
+    model_tiers = [
+        {
+            "tier_key": "STRONGEST",
+            "tier_title": "Cấp Độ 1: Mạnh Nhất Khả Thi (Tối Đa Sức Mạnh Máy Này)",
+            "tier_badge": "KHUYẾN NGHỊ MẶC ĐỊNH",
+            "models": tier1_candidates
+        },
+        {
+            "tier_key": "BALANCED",
+            "tier_title": "Cấp Độ 2: Cân Bằng & Tốc Độ Cao",
+            "tier_badge": "PHẢN HỒI SIÊU TỐC",
+            "models": tier2_candidates
+        },
+        {
+            "tier_key": "ECO_CPU",
+            "tier_title": "Cấp Độ 3: Tiết Kiệm Tài Nguyên & CPU Fallback",
+            "tier_badge": "CHẠY TRÊN MỌI MÁY",
+            "models": tier3_candidates
+        }
+    ]
+
+    # Xây dựng danh sách lựa chọn Dropdown
     options = []
     if installed_models:
         for m in installed_models:
@@ -311,7 +428,6 @@ def get_adaptive_system_profile() -> Dict[str, Any]:
                 "is_installed": True
             })
     
-    # Luôn có tùy chọn CTI Heuristic Core phòng hờ
     options.append({
         "value": "cti-heuristic-engine",
         "label": f"Chế độ CTI Heuristic Core (Phân tích tĩnh dự phòng • Không tải GPU)",
@@ -319,13 +435,77 @@ def get_adaptive_system_profile() -> Dict[str, Any]:
         "is_installed": True
     })
 
+    # Tần suất quét CTI thích ứng theo loại dự án (Project Type-Adaptive Intervals)
+    cadence_recommendations = {
+        "SCOPE_WEB": {
+            "scope_id": "SCOPE_WEB",
+            "scope_name": "Scope A: Web & API Layer",
+            "desc": "Dự án Web & Public API trực tiếp đối mặt Internet, rủi ro tấn công injection và zero-day cao.",
+            "default_interval_sec": 21600,
+            "default_label": "Mỗi 6 giờ (Mặc định chuẩn Web App)",
+            "default_history_years": 3,
+            "options": [
+                {"sec": 120, "label": "Mỗi 2 phút (Chế độ Demo / Kiểm thử nhanh)"},
+                {"sec": 300, "label": "Mỗi 5 phút (Kiểm thử tức thời)"},
+                {"sec": 900, "label": "Mỗi 15 phút (Quét PoC Exploit nóng)"},
+                {"sec": 3600, "label": "Mỗi 1 giờ (Giám sát liên tục)"},
+                {"sec": 21600, "label": "Mỗi 6 giờ (Khuyến nghị chuẩn cho Web App - Mặc định)", "is_default": True},
+                {"sec": 43200, "label": "Mỗi 12 giờ (Dành cho Microservices/API)"},
+                {"sec": 86400, "label": "Mỗi 24 giờ / 1 ngày"}
+            ]
+        },
+        "SCOPE_NETWORK": {
+            "scope_id": "SCOPE_NETWORK",
+            "scope_name": "Scope B: Network & Perimeter C2",
+            "desc": "Hạ tầng mạng, C2 server, Docker, VPN và Firewall.",
+            "default_interval_sec": 43200,
+            "default_label": "Mỗi 12 giờ (Mặc định chuẩn Mạng)",
+            "default_history_years": 3,
+            "options": [
+                {"sec": 300, "label": "Mỗi 5 phút (Demo)"},
+                {"sec": 3600, "label": "Mỗi 1 giờ"},
+                {"sec": 43200, "label": "Mỗi 12 giờ (Mặc định cho Network)", "is_default": True},
+                {"sec": 86400, "label": "Mỗi 24 giờ"}
+            ]
+        },
+        "SCOPE_ENDPOINT": {
+            "scope_id": "SCOPE_ENDPOINT",
+            "scope_name": "Scope C: Endpoint & Host Identity",
+            "desc": "Ứng dụng Desktop, công cụ nội bộ, Active Directory và máy trạm.",
+            "default_interval_sec": 259200,
+            "default_label": "Mỗi 3 ngày (72 giờ - Mặc định chuẩn Endpoint)",
+            "default_history_years": 5,
+            "options": [
+                {"sec": 300, "label": "Mỗi 5 phút (Demo)"},
+                {"sec": 86400, "label": "Mỗi 24 giờ"},
+                {"sec": 259200, "label": "Mỗi 3 ngày (Mặc định cho Endpoint)", "is_default": True},
+                {"sec": 604800, "label": "Mỗi 7 ngày"}
+            ]
+        },
+        "SCOPE_HARDWARE": {
+            "scope_id": "SCOPE_HARDWARE",
+            "scope_name": "Scope D: Hardware, Firmware & Base Layer",
+            "desc": "Hệ thống nhúng, vi điều khiển IoT, firmware, SCADA.",
+            "default_interval_sec": 604800,
+            "default_label": "Mỗi 7 ngày (1 tuần - Mặc định chuẩn Phần Cứng)",
+            "default_history_years": 5,
+            "options": [
+                {"sec": 300, "label": "Mỗi 5 phút (Demo)"},
+                {"sec": 86400, "label": "Mỗi 24 giờ"},
+                {"sec": 604800, "label": "Mỗi 7 ngày (Mặc định cho Phần Cứng/IoT)", "is_default": True}
+            ]
+        }
+    }
+
     return {
         "status": "success",
         "hardware": hw,
         "ollama": ollama,
         "recommended_tier": recommended_tier,
+        "model_tiers": model_tiers,
         "active_model": active_model,
-        "options": options
+        "options": options,
+        "cadence_recommendations": cadence_recommendations
     }
 
 if __name__ == "__main__":
