@@ -5682,9 +5682,17 @@ function wizardGotoStep(stepNum) {
         if (d.status === "success") {
           wzTarget = d.target_path;
           wzScopeId = d.scope_id;
-          document.getElementById("wzTargetName").textContent = d.target_name + " (" + d.target_path + ")";
-          document.getElementById("wzScopeBadge").textContent = d.scope_name;
-          document.getElementById("wzCadenceLabel").textContent = d.cadence_label;
+          const elTarget = document.getElementById("wzTargetName");
+          if (elTarget) elTarget.textContent = d.target_name + " (" + d.target_path + ")";
+          const elS1 = document.getElementById("step1TargetName");
+          if (elS1) elS1.textContent = d.target_name;
+          const elS1P = document.getElementById("step1TargetPath");
+          if (elS1P) elS1P.textContent = d.target_path;
+
+          const elScope = document.getElementById("wzScopeBadge");
+          if (elScope) elScope.textContent = d.scope_name;
+          const elCad = document.getElementById("wzCadenceLabel");
+          if (elCad) elCad.textContent = d.cadence_label;
           
           // Render languages chips
           const langBox = document.getElementById("wzLanguagesBadge");
