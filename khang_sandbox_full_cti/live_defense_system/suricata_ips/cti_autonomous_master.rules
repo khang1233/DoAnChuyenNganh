@@ -1,6 +1,6 @@
 # =============================================================================
 # SURICATA IDS/IPS MASTER DEEP PACKET INSPECTION (DPI) RULES
-# Tong hop: 181 C2 IPs, 180 C2 Domains, 1425 CVEs
+# Tong hop: 181 C2 IPs, 180 C2 Domains, 1427 CVEs
 # =============================================================================
 
 # [1] CHAN LUU LUONG HAI CHIEU TOI 181 IP C2:

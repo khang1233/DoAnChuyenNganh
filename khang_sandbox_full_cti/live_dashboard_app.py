@@ -155,9 +155,11 @@ init_project_registry_db()
 from lam_automation_crawler import (
     add_custom_article_from_url_or_text,
     crawl_all_sources_and_archive,
+    crawl_gap_catchup_archive,
     crawl_year_to_date_archive,
     delete_archived_article,
     get_archived_articles,
+    get_cti_gap_status,
     get_database_overview_stats,
     save_ai_analysis_run_to_db,
     save_enriched_iocs_to_db,
@@ -1147,6 +1149,11 @@ HTML_PAGE = r"""<!DOCTYPE html>
         </select>
         <span class="mono" style="font-size:12px; color:var(--primary); font-weight:600;" id="countdownText">21600s</span>
         <span class="mono" style="color:var(--primary); font-weight:600;" id="progressPercentText">100%</span>
+        <span style="color:var(--border-main);">&bull;</span>
+        <button type="button" id="btnCatchUpGap" class="CleanBtn" style="padding:2px 10px; font-size:12px; height:26px; background:#fef3c7; color:#92400e; border:1px solid #fcd34d; border-radius:4px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:5px;" onclick="triggerCatchUpCrawl()" title="Rà soát và cào bù toàn bộ bài báo mới được công bố trong khoảng thời gian tắt máy">
+          <span id="gapIndicatorDot" style="width:7px; height:7px; border-radius:50%; background:#d97706; display:inline-block;"></span>
+          <span id="gapCatchUpBtnText">Cào Bù Tình Báo (Khoảng Trống Tắt Máy)</span>
+        </button>
       </div>
       <div id="autoScanPendingMsg" style="display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:#64748b; font-style:italic;">
         <span>Chờ kích hoạt bảo vệ dự án...</span>
@@ -8627,6 +8634,20 @@ def api_update_daemon_config(req: DaemonConfigRequest):
     return server_daemon.get_status()
 
 
+
+@app.get("/api/system/gap-status")
+def api_get_gap_status():
+    """Kiểm tra khoảng trống thời gian tắt máy và mốc bài báo mới nhất."""
+    return get_cti_gap_status()
+
+@app.post("/api/system/catch-up-crawl")
+def api_catch_up_crawl(since_date: Optional[str] = Query(None)):
+    """Kích hoạt cào bù toàn bộ các bài báo an ninh mạng phát sinh trong lúc tắt máy."""
+    res = crawl_gap_catchup_archive(since_date=since_date)
+    # Kích hoạt tác tử AI phân tích ngay các bài mới trong hàng đợi
+    server_daemon.trigger_scan_now()
+    return res
+
 @app.post("/api/system/trigger-scan")
 def api_trigger_scan():
     server_daemon.trigger_scan_now()
@@ -8648,6 +8669,21 @@ def _start_247_daemon_on_boot() -> None:
         print(f"[STARTUP] Lỗi khởi động live orchestrator: {e}")
 
     server_daemon.start_worker()
+
+    # Tự động phát hiện khoảng trống thời gian tắt máy và cào bù ngầm khi khởi động
+    def _auto_gap_catchup_worker():
+        time.sleep(3)
+        try:
+            gap_info = get_cti_gap_status()
+            if gap_info.get("gap_hours", 0) >= 3.0:
+                print(f"[AUTO-CATCHUP] Phát hiện khoảng trống tắt máy: {gap_info.get('gap_description')} (từ {gap_info.get('suggested_since_date')}). Đang tự động cào bù...")
+                res = crawl_gap_catchup_archive()
+                print(f"[AUTO-CATCHUP] Hoàn tất cào bù ngầm: Đã nạp {res.get('newly_added_count', 0)} bài báo mới vào hàng đợi.")
+                server_daemon.trigger_scan_now()
+        except Exception as e:
+            print(f"[AUTO-CATCHUP] Lỗi cào bù tự động: {e}")
+
+    threading.Thread(target=_auto_gap_catchup_worker, daemon=True, name="AutoGapCatchupWorker").start()
 
 
 if __name__ == "__main__":

@@ -20,9 +20,9 @@ import html
 import re
 import sqlite3
 import xml.etree.ElementTree as ET
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from urllib.parse import urlparse
 
 import requests
@@ -786,6 +786,263 @@ def crawl_year_to_date_archive(
         "collected_in_batch": len(collected),
         "total_articles_in_db": total_in_db,
         "sources_breakdown": stats_breakdown,
+    }
+
+
+
+def get_cti_gap_status() -> Dict[str, Any]:
+    """
+    Tính năng 7 (Cào Bù): Xác định khoảng trống thời gian (Downtime Gap) khi hệ thống bị tắt máy.
+    Đối chiếu thời điểm bài báo mới nhất được ghi nhận trong CSDL với thời gian hiện tại.
+    """
+    _init_archive_db()
+    with sqlite3.connect(ARCHIVE_DB_PATH) as conn:
+        row = conn.execute("SELECT MAX(sort_ts), MAX(fetched_at_utc), COUNT(*) FROM articles_archive").fetchone()
+    
+    max_sort_ts = row[0] or "2026-01-01 00:00:00"
+    max_fetched_at = row[1] or "2026-01-01T00:00:00Z"
+    total_count = row[2] or 0
+
+    now_utc = datetime.now(timezone.utc)
+    try:
+        clean_ts = max_sort_ts.replace("T", " ").split(".")[0]
+        latest_dt = datetime.fromisoformat(clean_ts).replace(tzinfo=timezone.utc)
+    except Exception:
+        latest_dt = datetime(2026, 1, 1, tzinfo=timezone.utc)
+
+    diff = now_utc - latest_dt
+    gap_seconds = max(0.0, diff.total_seconds())
+    gap_hours = round(gap_seconds / 3600.0, 1)
+    gap_days = round(gap_hours / 24.0, 1)
+
+    # Lùi lại 1 ngày đệm (Buffer Day) để bảo đảm tuyệt đối không sót các bài đăng cận giờ tắt máy
+    buffer_dt = latest_dt - timedelta(days=1)
+    suggested_since_date = buffer_dt.strftime("%Y-%m-%d")
+
+    if gap_hours < 1.0:
+        gap_desc = f"{int(gap_seconds // 60)} phút"
+    elif gap_hours < 24.0:
+        gap_desc = f"{int(gap_hours)} giờ {int((gap_hours % 1) * 60)} phút"
+    else:
+        gap_desc = f"{int(gap_days)} ngày {int(gap_hours % 24)} giờ"
+
+    needs_catchup = gap_hours >= 1.0
+
+    return {
+        "status": "success",
+        "latest_article_ts": max_sort_ts,
+        "latest_fetched_at": max_fetched_at,
+        "current_time_utc": now_utc.strftime("%Y-%m-%d %H:%M:%SZ"),
+        "gap_seconds": int(gap_seconds),
+        "gap_hours": gap_hours,
+        "gap_days": gap_days,
+        "gap_description": gap_desc,
+        "needs_catchup": needs_catchup,
+        "suggested_since_date": suggested_since_date,
+        "total_articles": total_count,
+    }
+
+
+def crawl_gap_catchup_archive(since_date: Optional[str] = None, max_per_source: int = 50) -> Dict[str, Any]:
+    """
+    Quy trình Cào Bù Tình Báo (CTI Downtime Gap Recovery):
+    Tự động rà soát và thu thập toàn bộ các bài báo an ninh mạng được công bố trong khoảng
+    thời gian hệ thống bị tắt máy (từ mốc bài cuối cùng đến thời điểm hiện tại).
+    Tất cả bài cào bù được nạp vào CSDL với trạng thái 'pending' để AI Agent phân tích tuần tự.
+    """
+    _init_archive_db()
+    gap_info = get_cti_gap_status()
+    target_since = since_date or gap_info["suggested_since_date"]
+    
+    collected: List[Dict[str, Any]] = []
+    stats_breakdown = {
+        "TheHackerNews": 0,
+        "CISA US Gov": 0,
+        "Kaspersky Securelist": 0,
+        "Check Point Research": 0,
+        "SentinelOne Labs": 0,
+        "The DFIR Report": 0,
+    }
+    content_ns = "{http://purl.org/rss/1.0/modules/content/}encoded"
+    t_key = "$" + "t"
+
+    # 1. TheHackerNews (Blogger Feed API lọc từ target_since)
+    try:
+        start_idx = 1
+        while stats_breakdown["TheHackerNews"] < max_per_source:
+            feed_url = (
+                f"https://thehackernews.com/feeds/posts/default?alt=json"
+                f"&published-min={target_since}T00:00:00Z&max-results=50&start-index={start_idx}"
+            )
+            resp = requests.get(feed_url, headers=DEFAULT_HEADERS, timeout=12)
+            if resp.status_code != 200:
+                break
+            entries = resp.json().get("feed", {}).get("entry", [])
+            if not entries:
+                break
+            for item in entries:
+                title = item.get("title", {}).get(t_key, "").strip()
+                pub_date = item.get("published", {}).get(t_key, "").strip()
+                links = [l.get("href") for l in item.get("link", []) if l.get("rel") == "alternate"]
+                link = links[0] if links else "https://thehackernews.com"
+                raw_summary = item.get("summary", {}).get(t_key, "") or item.get("content", {}).get(t_key, "")
+                verbatim_body = _extract_verbatim_article_excerpt(raw_summary)
+
+                collected.append({
+                    "article_id": f"thn-{hashlib.md5(link.encode('utf-8')).hexdigest()[:8]}",
+                    "source": "TheHackerNews",
+                    "title": title,
+                    "url": link,
+                    "published_at": pub_date,
+                    "is_historical": False,
+                    "content": verbatim_body,
+                })
+                stats_breakdown["TheHackerNews"] += 1
+                if stats_breakdown["TheHackerNews"] >= max_per_source:
+                    break
+            
+            earliest_in_batch = entries[-1].get("published", {}).get(t_key, "")
+            if earliest_in_batch < target_since:
+                break
+            start_idx += len(entries)
+    except Exception as e:
+        print(f"[CATCH-UP CRAWLER] THN error: {e}")
+
+    # 2. CISA KEV Catalog
+    try:
+        cisa_resp = requests.get(
+            "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json",
+            headers=DEFAULT_HEADERS,
+            timeout=12,
+        )
+        if cisa_resp.status_code == 200:
+            vulns = cisa_resp.json().get("vulnerabilities", [])
+            vulns_gap = [v for v in vulns if (v.get("dateAdded") or "") >= target_since]
+            for v in vulns_gap[:max_per_source]:
+                cve_id = v.get("cveID", "")
+                vendor = v.get("vendorProject", "")
+                product = v.get("product", "")
+                vuln_name = v.get("vulnerabilityName", "")
+                date_added = v.get("dateAdded", "")
+                short_desc = v.get("shortDescription", "")
+                action = v.get("requiredAction", "")
+                notes = v.get("notes", "")
+                content = f"{cve_id} — {vendor} {product}: {vuln_name}\n\n{short_desc}\n\n{action}\n\n{notes}".strip()
+                collected.append({
+                    "article_id": f"cisa-{cve_id}",
+                    "source": "CISA US Gov",
+                    "title": f"[{cve_id}] {vendor} {product} — {vuln_name}",
+                    "url": f"https://nvd.nist.gov/vuln/detail/{cve_id}",
+                    "published_at": date_added,
+                    "is_historical": False,
+                    "content": content,
+                })
+                stats_breakdown["CISA US Gov"] += 1
+    except Exception as e:
+        print(f"[CATCH-UP CRAWLER] CISA error: {e}")
+
+    # 3. Kaspersky Securelist
+    try:
+        resp = requests.get("https://securelist.com/feed/", headers=DEFAULT_HEADERS, timeout=10)
+        if resp.status_code == 200:
+            root = ET.fromstring(resp.content)
+            for item in root.findall(".//item")[:max_per_source]:
+                title = (item.findtext("title") or "").strip()
+                link = (item.findtext("link") or "").strip()
+                pub_date = (item.findtext("pubDate") or "").strip()
+                sort_ts = _normalize_date_to_iso(pub_date)
+                if sort_ts >= target_since:
+                    raw_html = item.findtext(content_ns) or item.findtext("description") or ""
+                    verbatim_body = _extract_verbatim_article_excerpt(raw_html)
+                    collected.append({
+                        "article_id": f"securelist-{hashlib.md5(link.encode('utf-8')).hexdigest()[:8]}",
+                        "source": "Kaspersky Securelist",
+                        "title": title,
+                        "url": link,
+                        "published_at": pub_date,
+                        "is_historical": False,
+                        "content": verbatim_body,
+                    })
+                    stats_breakdown["Kaspersky Securelist"] += 1
+    except Exception as e:
+        print(f"[CATCH-UP CRAWLER] Securelist error: {e}")
+
+    # 4. Check Point Research
+    try:
+        resp = requests.get("https://research.checkpoint.com/feed/", headers=DEFAULT_HEADERS, timeout=10)
+        if resp.status_code == 200:
+            root = ET.fromstring(resp.content)
+            for item in root.findall(".//item")[:max_per_source]:
+                title = (item.findtext("title") or "").strip()
+                link = (item.findtext("link") or "").strip()
+                pub_date = (item.findtext("pubDate") or "").strip()
+                sort_ts = _normalize_date_to_iso(pub_date)
+                if sort_ts >= target_since:
+                    raw_html = item.findtext(content_ns) or item.findtext("description") or ""
+                    verbatim_body = _extract_verbatim_article_excerpt(raw_html)
+                    collected.append({
+                        "article_id": f"checkpoint-{hashlib.md5(link.encode('utf-8')).hexdigest()[:8]}",
+                        "source": "Check Point Research",
+                        "title": title,
+                        "url": link,
+                        "published_at": pub_date,
+                        "is_historical": False,
+                        "content": verbatim_body,
+                    })
+                    stats_breakdown["Check Point Research"] += 1
+    except Exception as e:
+        print(f"[CATCH-UP CRAWLER] CheckPoint error: {e}")
+
+    # Lọc bài mới chưa có trong SQLite
+    new_articles_added = 0
+    with sqlite3.connect(ARCHIVE_DB_PATH) as conn:
+        existing_ids = set(r[0] for r in conn.execute("SELECT article_id FROM articles_archive").fetchall())
+    
+    unique_to_save = []
+    for it in collected:
+        if it["article_id"] not in existing_ids:
+            unique_to_save.append(it)
+            existing_ids.add(it["article_id"])
+            new_articles_added += 1
+
+    if unique_to_save:
+        _save_articles_to_db(unique_to_save, purge_synthetic=False)
+
+    with sqlite3.connect(ARCHIVE_DB_PATH) as conn:
+        total_in_db = conn.execute("SELECT COUNT(*) FROM articles_archive").fetchone()[0]
+        try:
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS defense_evolution_changelog (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    timestamp TEXT,
+                    change_type TEXT,
+                    summary TEXT,
+                    source TEXT
+                )
+            """)
+            conn.execute("""
+                INSERT INTO defense_evolution_changelog (timestamp, change_type, summary, source)
+                VALUES (?, 'GAP_CATCHUP_INGESTION', ?, 'CRAWLER_GAP_RECOVERY')
+            """, (
+                datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                f"Đã cào bù thành công {new_articles_added} bài báo mới trong khoảng trống tắt máy ({gap_info['gap_description']}) từ mốc {target_since}."
+            ))
+            conn.commit()
+        except Exception:
+            pass
+
+    return {
+        "status": "success",
+        "gap_info": gap_info,
+        "since_date": target_since,
+        "collected_in_batch": len(collected),
+        "newly_added_count": new_articles_added,
+        "total_articles_in_db": total_in_db,
+        "sources_breakdown": stats_breakdown,
+        "new_articles_summary": [
+            {"article_id": a["article_id"], "title": a["title"], "source": a["source"], "published_at": a["published_at"]}
+            for a in unique_to_save[:10]
+        ]
     }
 
 
