@@ -2,6 +2,21 @@
 # Git Ignore for DoAnChuyenNganh
 # ==========================================
 
+# 0. Secrets & Credentials (Public Repository Safety)
+.env
+.env.*
+*.env
+*.key
+*.pem
+*.token
+*.p12
+*.pfx
+secrets.json
+credentials.json
+*_secret*
+*_credential*
+*_key.txt
+
 # 1. Virtual Environments
 .venv/
 venv/
@@ -51,8 +66,12 @@ desktop.ini
 khang_sandbox_full_cti/scratch/
 target_projects/
 **/*full_corpus.sqlite
+**/*backup*.sqlite
 khang_sandbox_full_cti/cti_multi_source_archive_full_corpus.sqlite
 *.log
+*.tmp
+*.bak
+*.orig
 
 # 7. Exceptions (Keep essential scripts)
 !*.bat

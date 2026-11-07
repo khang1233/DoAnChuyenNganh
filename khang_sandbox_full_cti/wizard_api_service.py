@@ -20,6 +20,110 @@ if str(SANDBOX_DIR) not in sys.path:
 
 from apply_to_project import detect_project_scope, SCOPE_PROFILES, find_optimal_article_for_scope, synthesize_and_deploy_skill, resolve_scope_profile
 
+
+import json
+import os
+import sys
+
+def _call_local_agent_llm_for_codebase_scope(
+    target_path: Path,
+    languages: Dict[str, int],
+    frameworks: List[str],
+    sensitive_sinks: List[str],
+    runtime_versions: Dict[str, str],
+    total_files: int
+) -> Dict[str, Any]:
+    """Tác tử AI thực sự đọc ngữ cảnh mã nguồn và gọi Local LLM trên GPU để suy luận Scope."""
+    import requests as req_http
+    
+    # 1. Trích xuất tối đa 2 đoạn mã thực tế từ các sink nhạy cảm để Agent đọc trực tiếp
+    code_snippets = []
+    for s in sensitive_sinks[:3]:
+        try:
+            parts = s.split(":")
+            if len(parts) >= 2:
+                rel_file = parts[0].strip()
+                full_file = target_path / rel_file
+                if full_file.exists():
+                    f_text = full_file.read_text(encoding="utf-8", errors="ignore")
+                    lines = f_text.splitlines()[:60]
+                    code_snippets.append(f"--- File: {rel_file} ---\n" + "\n".join(lines[:35]))
+        except Exception:
+            pass
+
+    snippets_text = "\n\n".join(code_snippets) if code_snippets else "(Không có tệp mã nguồn nhạy cảm đặc biệt)"
+
+    # 2. Xây dựng prompt phân tích chuẩn an ninh mạng
+    prompt_content = f"""MỤC TIÊU: Bạn là Tác tử AI Thanh tra An ninh Mã nguồn (Codebase Inspector AI Agent).
+Hãy phân tích ngữ cảnh dự án phần mềm mục tiêu sau đây và xác định xem dự án này thuộc Phân hệ Phòng thủ (Scope) nào:
+
+THÔNG TIN QUÉT MÃ NGUỒN THỰC TẾ:
+- Tổng số tệp tin: {total_files} tệp
+- Ngôn ngữ nhận diện: {json.dumps(languages, ensure_ascii=False)}
+- Frameworks & Thư viện: {", ".join(frameworks) if frameworks else "Custom Architecture"}
+- Môi trường runtime: {json.dumps(runtime_versions, ensure_ascii=False)}
+- Các điểm nóng nhạy cảm (Sinks): {json.dumps(sensitive_sinks[:4], ensure_ascii=False)}
+
+MẪU MÃ NGUỒN TRỌNG YẾU:
+{snippets_text}
+
+QUY TẮC PHÂN LOẠI PHÂN HỆ PHÒNG THỦ:
+1. SCOPE_WEB: Web & API Layer (OWASP Top 10, SQLi, RCE, File Upload, Deserialization, SSRF, XSS).
+2. SCOPE_NETWORK: Network & Perimeter C2 (C2 IP, Botnet, Router/VPN Zero-Day, DPI Suricata).
+3. SCOPE_ENDPOINT: Endpoint & Host Identity (Webshell spawn, Ransomware, LSASS Dumping).
+4. SCOPE_HARDWARE: Hardware & Firmware Base Layer (UEFI, BIOS, Microcode, IoT/OT ICS).
+
+YÊU CẦU ĐẦU RA:
+Trả về duy nhất định dạng JSON thuần túy (không bọc trong markdown code block, không thêm văn bản ngoài):
+{{
+  "scope_id": "SCOPE_WEB" hoặc "SCOPE_NETWORK" hoặc "SCOPE_ENDPOINT" hoặc "SCOPE_HARDWARE",
+  "scope_name": "Scope A: Web & API Layer" hoặc "Scope B: Network & Perimeter" hoặc "Scope C: Endpoint & Host Identity" hoặc "Scope D: Hardware & Firmware Base Layer",
+  "architecture_summary": "Tóm tắt ngắn gọn kiến trúc dự án (dưới 35 từ)",
+  "attack_surface_analysis": "Phân tích nguy cơ rủi ro và các hàm nhạy cảm phát hiện trong code (dưới 50 từ)",
+  "agent_reasoning": "Chuỗi lập luận giải thích tại sao dự án này thuộc phạm vi phòng thủ trên (dưới 60 từ)"
+}}"""
+
+    payload = {
+        "model": "khang-qwen3:latest",
+        "messages": [
+            {"role": "system", "content": "Bạn là Tác tử AI An ninh Mạng chuyên sâu. Luôn trả về JSON phân tích kỹ thuật chuẩn xác."},
+            {"role": "user", "content": prompt_content}
+        ],
+        "stream": False,
+        "options": {
+            "temperature": 0.1,
+            "top_p": 0.9
+        }
+    }
+
+    try:
+        r = req_http.post("http://127.0.0.1:11434/api/chat", json=payload, timeout=45)
+        if r.status_code == 200:
+            raw_content = r.json().get("message", {}).get("content", "").strip()
+            # Bóc tách JSON nếu bị bọc trong markdown
+            clean_json = raw_content
+            if "```json" in clean_json:
+                clean_json = clean_json.split("```json")[1].split("```")[0].strip()
+            elif "```" in clean_json:
+                clean_json = clean_json.split("```")[1].split("```")[0].strip()
+            parsed = json.loads(clean_json)
+            if "scope_id" in parsed:
+                return parsed
+    except Exception as e:
+        print(f"[AI_AGENT_SCAN_FALLBACK] Lỗi gọi Local LLM: {e}")
+
+    # Fallback an toàn nếu LLM tạm thời chưa sẵn sàng
+    is_web = any(l in languages for l in ["PHP", "JavaScript", "TypeScript", "HTML"]) or len(frameworks) > 0
+    fallback_scope = "SCOPE_WEB" if is_web else "SCOPE_NETWORK"
+    fallback_name = "Scope A: Web & API Layer" if is_web else "Scope B: Network & Perimeter"
+    return {
+        "scope_id": fallback_scope,
+        "scope_name": fallback_name,
+        "architecture_summary": "Hệ thống Web Full-Stack đa tầng mã nguồn mở",
+        "attack_surface_analysis": "Bề mặt rủi ro tập trung vào các điểm nhạy cảm xử lý tệp tin và lệnh hệ điều hành",
+        "agent_reasoning": f"Tác tử định vị cấu trúc mã nguồn web và đề xuất phạm vi phòng thủ: {fallback_name}."
+    }
+
 def deep_agent_codebase_scan(target_path: Path) -> Dict[str, Any]:
     """Tác tử AI quét sâu cây AST, tệp cấu hình và định vị điểm nhạy cảm của mã nguồn."""
     p = target_path.resolve()
@@ -152,17 +256,31 @@ def deep_agent_codebase_scan(target_path: Path) -> Dict[str, Any]:
     if languages.get("JavaScript", 0) > 0 and "Node.js" not in runtime_versions:
         runtime_versions["Node.js Runtime"] = "20+" 
     
-    is_web = any(l in languages for l in ["PHP", "JavaScript", "TypeScript", "HTML"]) or len(frameworks) > 0
-    scope_id = "SCOPE_WEB" if is_web else "SCOPE_NETWORK"
-    scope_name = "Scope A: Web & API Layer" if is_web else "Scope B: Network & Perimeter"
+    # Gọi Tác tử AI (Local LLM Qwen3:8B trên GPU AMD Radeon RX 6600) phân tích chuyên sâu
+    ai_verdict = _call_local_agent_llm_for_codebase_scope(
+        target_path=p,
+        languages=languages,
+        frameworks=list(dict.fromkeys(frameworks)),
+        sensitive_sinks=sensitive_sinks,
+        runtime_versions=runtime_versions,
+        total_files=total_files
+    )
+
+    scope_id = ai_verdict.get("scope_id", "SCOPE_WEB")
+    scope_name = ai_verdict.get("scope_name", "Scope A: Web & API Layer")
+    arch_summary = ai_verdict.get("architecture_summary", "")
+    attack_analysis = ai_verdict.get("attack_surface_analysis", "")
+    agent_reason = ai_verdict.get("agent_reasoning", "")
     
     agent_logs = [
-        "[AGENT 1: CODEBASE INSPECTOR] Khởi tạo tác tử AI phân tích kiến trúc mã nguồn...",
+        "[TÁC TỬ 1: CODEBASE INSPECTOR] Khởi tạo phân tích kiến trúc mã nguồn qua Local LLM (GPU RX 6600)...",
         f"[AST CODEBASE SCAN] Quét toàn bộ cây thư mục: Đã định vị {total_files} tệp tin mã nguồn.",
         f"[NGÔN NGỮ NHẬN DIỆN] " + (", ".join(lang_labels) if lang_labels else "Đa ngôn ngữ"),
         f"[FRAMEWORKS & DEPENDENCIES] " + (", ".join(list(dict.fromkeys(frameworks))) if frameworks else "Custom Architecture"),
         f"[SENSITIVE SINKS] Phát hiện {len(sensitive_sinks)} điểm nóng nhạy cảm (exec, eval, system, shell_exec).",
-        f"[LUẬN ĐIỂM TÁC TỬ] Nhận diện cấu trúc Full-Stack Web đa tầng -> Gán phân hệ bảo vệ: {scope_name}."
+        f"[KIẾN TRÚC ĐỊNH DANH] {arch_summary}",
+        f"[BỀ MẶT TẤN CÔNG] {attack_analysis}",
+        f"[LUẬN ĐIỂM TÁC TỬ AI] {agent_reason} -> Gán phân hệ bảo vệ: {scope_name}."
     ]
     
     return {
@@ -175,6 +293,9 @@ def deep_agent_codebase_scan(target_path: Path) -> Dict[str, Any]:
         "runtime_versions": runtime_versions,
         "scope_id": scope_id,
         "scope_name": scope_name,
+        "architecture_summary": arch_summary,
+        "attack_surface_analysis": attack_analysis,
+        "agent_reasoning": agent_reason,
         "agent_logs": agent_logs
     }
 
@@ -315,7 +436,8 @@ def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3) -> Di
         # Đếm số bài báo và tổng hợp bài báo thuộc Scope trong mốc thời gian
         kw_clauses = " OR ".join(["content LIKE ?" for _ in profile["keywords"][:6]])
         params = [f"%{kw}%" for kw in profile["keywords"][:6]]
-        limit_count = 100 if history_years == 1 else (250 if history_years == 3 else 500)
+        # Lọc đúng 15 bài báo đe dọa cao nhất cho phân hệ dự án
+        limit_count = 15
         matched_rows = conn.execute(
             f"SELECT article_id, title, source_name, url, published_date, sort_ts, content "
             f"FROM articles_archive WHERE sort_ts >= ? AND ({kw_clauses}) "

@@ -106,3 +106,16 @@ defense_skills/<skill-name>/
     ├── xai_audit_trail.json   # Vết giải trình toán học
     └── cti_verbatim_report.txt# Toàn văn báo cáo tình báo an ninh mạng
 ```
+
+
+---
+
+## 📚 TÀI LIỆU HƯỚNG DẪN & BÁO CÁO ĐỒ ÁN
+
+Toàn bộ tài liệu chi tiết của đồ án được tổ chức gọn gàng trong thư mục [docs/](docs/):
+- **Báo cáo tiến độ tuần (Mới nhất)**: [BAO_CAO_TIEN_DO_TUAN.md](BAO_CAO_TIEN_DO_TUAN.md)
+- **Hướng dẫn sử dụng và kiểm thử (Markdown)**: [docs/HUONG_DAN_SU_DUNG_VA_KIEM_THU.md](docs/HUONG_DAN_SU_DUNG_VA_KIEM_THU.md)
+- **Hướng dẫn sử dụng và kiểm thử (Word)**: [docs/HUONG_DAN_SU_DUNG_VA_KIEM_THU.docx](docs/HUONG_DAN_SU_DUNG_VA_KIEM_THU.docx)
+- **Tài liệu tổng hợp Đồ án Chuyên ngành CTI**: [docs/TAI_LIEU_TONG_HOP_DACN_CTI.docx](docs/TAI_LIEU_TONG_HOP_DACN_CTI.docx)
+- **Đề cương Đồ án Chuyên ngành**: [docs/DE_CUONG_DO_AN_CHUYEN_NGANH.docx](docs/DE_CUONG_DO_AN_CHUYEN_NGANH.docx)
+- **Hướng dẫn điều khiển Agent đồng bộ**: [docs/HUONG_DAN_DIEU_KHIEN_AGENT_DONG_BO.docx](docs/HUONG_DAN_DIEU_KHIEN_AGENT_DONG_BO.docx)

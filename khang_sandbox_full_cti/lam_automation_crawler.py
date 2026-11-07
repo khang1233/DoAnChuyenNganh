@@ -121,15 +121,17 @@ def _normalize_date_to_iso(raw_date: str) -> str:
     s = (raw_date or "").strip()
     if not s:
         return "1970-01-01 00:00:00"
+    from datetime import timedelta
+    vn_tz = timezone(timedelta(hours=7))
     try:
         dt = email.utils.parsedate_to_datetime(s)
-        return dt.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+        return dt.astimezone(vn_tz).strftime("%Y-%m-%d %H:%M:%S")
     except Exception:
         pass
     try:
         dt2 = datetime.fromisoformat(s.replace("Z", "+00:00"))
         if dt2.tzinfo is not None:
-            dt2 = dt2.astimezone(timezone.utc)
+            dt2 = dt2.astimezone(vn_tz)
         return dt2.strftime("%Y-%m-%d %H:%M:%S")
     except Exception:
         pass
@@ -1307,9 +1309,11 @@ def update_article_analysis_status(
     status: str = "completed",
     processing_time_sec: float = 0.0,
 ) -> None:
-    """Cập nhật trạng thái 'pending' | 'processing' | 'completed' và thời gian xử lý vào SQLite."""
+    """Cập nhật trạng thái 'pending' | 'processing' | 'completed' và thời gian xử lý chuẩn giờ Việt Nam (UTC+7) vào SQLite."""
     _init_archive_db()
-    now_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+    from datetime import timedelta
+    vn_tz = timezone(timedelta(hours=7))
+    now_str = datetime.now(vn_tz).strftime("%Y-%m-%d %H:%M:%S")
     with sqlite3.connect(ARCHIVE_DB_PATH) as conn:
         conn.execute(
             """

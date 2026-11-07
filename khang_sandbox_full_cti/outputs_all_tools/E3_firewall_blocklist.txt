@@ -1,4 +1,4 @@
-block drop quick from any to 162.35.99.94 # Score=100/100 (AlienVault OTX + Abuse.ch/VT + AbuseIPDB + Shodan + GreyNoise (5-Layer Fusion))
-block drop quick from any to lanhd6549tdhse.top # Score=92/100 (AlienVault OTX + Abuse.ch MalwareBazaar/OpenPhish + VT)
-block drop quick from any to additionalver.com # Score=89/100 (AlienVault OTX + Abuse.ch MalwareBazaar/OpenPhish + VT)
-block drop quick from any to deepveindrilling.com # Score=91/100 (AlienVault OTX + Abuse.ch MalwareBazaar/OpenPhish + VT)
+block drop quick from any to 47.239.250.102 # Score=90/100 (AlienVault OTX + Abuse.ch/VT + AbuseIPDB + Shodan + GreyNoise (5-Layer Fusion))
+block drop quick from any to 47.237.122.175 # Score=90/100 (AlienVault OTX + Abuse.ch/VT + AbuseIPDB + Shodan + GreyNoise (5-Layer Fusion))
+block drop quick from any to config.pinyin.sogou.com # Score=89/100 (AlienVault OTX + Abuse.ch MalwareBazaar/OpenPhish + VT)
+block drop quick from any to sogou-cdn.com # Score=89/100 (AlienVault OTX + Abuse.ch MalwareBazaar/OpenPhish + VT)

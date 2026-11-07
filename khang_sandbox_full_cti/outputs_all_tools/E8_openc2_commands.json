@@ -1,21 +1,21 @@
 {
   "protocol": "OASIS OpenC2 v1.0 (Open Command and Control) over OpenClaw Local Bridge",
-  "campaign": "Hackers Infect 953 Online Stores With Scanner-Evading JavaScript, Mostly on Magento",
-  "generated_at_utc": "2026-11-03T12:14:33Z",
-  "total_commands": 8,
+  "campaign": "China-Aligned Hackers Hijack Sogou Input Method DNS Requests to Deploy DarkVigil Backdoor",
+  "generated_at_utc": "2026-11-04T14:53:28Z",
+  "total_commands": 7,
   "openc2_messages": [
     {
       "header": {
         "version": "1.0",
         "msg_type": "request",
-        "request_id": "openc2-f133d4b8",
-        "created": "2026-11-03T12:14:33Z",
+        "request_id": "openc2-a1ea9f79",
+        "created": "2026-11-04T14:53:28Z",
         "sender": "OpenClaw-Local-CTI-Agent"
       },
       "command": {
         "action": "deny",
         "target": {
-          "ipv4_net": "162.35.99.94/32"
+          "ipv4_net": "47.239.250.102/32"
         },
         "actuator": {
           "network_firewall": {
@@ -26,7 +26,7 @@
         "args": {
           "direction": "both",
           "drop_method": "silent_drop",
-          "reputation_score": 100
+          "reputation_score": 90
         }
       }
     },
@@ -34,23 +34,25 @@
       "header": {
         "version": "1.0",
         "msg_type": "request",
-        "request_id": "openc2-bb6d5f51",
-        "created": "2026-11-03T12:14:33Z",
+        "request_id": "openc2-c6e03b0d",
+        "created": "2026-11-04T14:53:28Z",
         "sender": "OpenClaw-Local-CTI-Agent"
       },
       "command": {
-        "action": "contain",
+        "action": "deny",
         "target": {
-          "domain_name": "lanhd6549tdhse.top"
+          "ipv4_net": "47.237.122.175/32"
         },
         "actuator": {
-          "dns_sinkhole_and_ips": {
-            "sinkhole_ip": "0.0.0.0",
-            "inspect_tls_sni": true
+          "network_firewall": {
+            "host": "DESKTOP-88HC5JH",
+            "engine": "Windows Defender Advanced Firewall / Linux Netfilter"
           }
         },
         "args": {
-          "reputation_score": 92
+          "direction": "both",
+          "drop_method": "silent_drop",
+          "reputation_score": 90
         }
       }
     },
@@ -58,14 +60,14 @@
       "header": {
         "version": "1.0",
         "msg_type": "request",
-        "request_id": "openc2-86ee52b7",
-        "created": "2026-11-03T12:14:33Z",
+        "request_id": "openc2-89ddbfa1",
+        "created": "2026-11-04T14:53:28Z",
         "sender": "OpenClaw-Local-CTI-Agent"
       },
       "command": {
         "action": "contain",
         "target": {
-          "domain_name": "additionalver.com"
+          "domain_name": "config.pinyin.sogou.com"
         },
         "actuator": {
           "dns_sinkhole_and_ips": {
@@ -82,14 +84,14 @@
       "header": {
         "version": "1.0",
         "msg_type": "request",
-        "request_id": "openc2-e83395ed",
-        "created": "2026-11-03T12:14:33Z",
+        "request_id": "openc2-50051243",
+        "created": "2026-11-04T14:53:28Z",
         "sender": "OpenClaw-Local-CTI-Agent"
       },
       "command": {
         "action": "contain",
         "target": {
-          "domain_name": "deepveindrilling.com"
+          "domain_name": "sogou-cdn.com"
         },
         "actuator": {
           "dns_sinkhole_and_ips": {
@@ -98,7 +100,7 @@
           }
         },
         "args": {
-          "reputation_score": 91
+          "reputation_score": 89
         }
       }
     },
@@ -106,14 +108,14 @@
       "header": {
         "version": "1.0",
         "msg_type": "request",
-        "request_id": "openc2-cc97453f",
-        "created": "2026-11-03T12:14:33Z",
+        "request_id": "openc2-82c0b4e2",
+        "created": "2026-11-04T14:53:28Z",
         "sender": "OpenClaw-Local-CTI-Agent"
       },
       "command": {
         "action": "mitigate",
         "target": {
-          "vulnerability": "CVE-2026-48356"
+          "vulnerability": "CVE-2026-120422"
         },
         "actuator": {
           "waf_and_suricata_ips": {
@@ -135,14 +137,14 @@
       "header": {
         "version": "1.0",
         "msg_type": "request",
-        "request_id": "openc2-8e3509ee",
-        "created": "2026-11-03T12:14:33Z",
+        "request_id": "openc2-fe664fb0",
+        "created": "2026-11-04T14:53:28Z",
         "sender": "OpenClaw-Local-CTI-Agent"
       },
       "command": {
         "action": "mitigate",
         "target": {
-          "vulnerability": "CVE-2025-54236"
+          "vulnerability": "CVE-2026-51990"
         },
         "actuator": {
           "waf_and_suricata_ips": {
@@ -164,43 +166,14 @@
       "header": {
         "version": "1.0",
         "msg_type": "request",
-        "request_id": "openc2-b4e9adb6",
-        "created": "2026-11-03T12:14:33Z",
+        "request_id": "openc2-3c06b983",
+        "created": "2026-11-04T14:53:28Z",
         "sender": "OpenClaw-Local-CTI-Agent"
       },
       "command": {
         "action": "mitigate",
         "target": {
-          "vulnerability": "CVE-2026-109618"
-        },
-        "actuator": {
-          "waf_and_suricata_ips": {
-            "virtual_patching": true,
-            "mode": "prevention_block"
-          }
-        },
-        "args": {
-          "mitre_techniques": [
-            "T1190",
-            "T1071.001",
-            "T1059",
-            "T1110"
-          ]
-        }
-      }
-    },
-    {
-      "header": {
-        "version": "1.0",
-        "msg_type": "request",
-        "request_id": "openc2-64e1badb",
-        "created": "2026-11-03T12:14:33Z",
-        "sender": "OpenClaw-Local-CTI-Agent"
-      },
-      "command": {
-        "action": "mitigate",
-        "target": {
-          "vulnerability": "CVE-2026-109619"
+          "vulnerability": "CVE-2021-38003"
         },
         "actuator": {
           "waf_and_suricata_ips": {

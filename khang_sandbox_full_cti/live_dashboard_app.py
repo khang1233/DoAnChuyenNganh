@@ -1020,67 +1020,36 @@ HTML_PAGE = r"""<!DOCTYPE html>
     }
   
     /* ========================================================= */
-    /* LANDING MODE: AN TOAN BO THANH DIEU HUONG, MODEL & TICKER */
+    /* UNIFIED DASHBOARD: THANH DIEU HUONG VA HE THONG LUON SAN SANG */
     /* ========================================================= */
-    body.landing-mode .NavLinks,
-    body.landing-mode .NavRight,
-    body.landing-mode .StatusStrip,
-    body.landing-mode #wizardStepperNav,
-    body.landing-mode #wizardBoxLegend,
-    body.landing-mode #projectContextContainer {
-      display: none !important;
+    .TopNav {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
     }
-    body.landing-mode #sec-wizard {
-      border: none !important;
-      background: transparent !important;
-      box-shadow: none !important;
-      padding: 0 !important;
+    .NavLinks, .NavRight {
+      display: flex !important;
     }
-    body.landing-mode .TopNav {
-      justify-content: center !important;
-      border-bottom: 1px solid #f1f5f9 !important;
-      padding: 16px 20px !important;
-    }
-
-    /* WIZARD SETUP MODE: An thanh dieu huong, model & chuc nang trong cac buoc cau hinh dau (Buoc 0 den 4) */
-    body.wizard-setup-mode .NavLinks,
-    body.wizard-setup-mode .NavRight,
-    body.wizard-setup-mode #projectContextContainer {
-      display: none !important;
+    .StatusStrip {
+      display: flex !important;
     }
 </style>
 
-<script>
-  (function() {
-    try {
-      const urlParams = new URLSearchParams(window.location.search);
-      const t = urlParams.get('target') || localStorage.getItem('cti_last_target');
-      if (t && (localStorage.getItem('cti_configured_' + t) === 'true' || t.indexOf('testCTI') !== -1)) {
-        document.documentElement.classList.add('project-is-configured');
-      }
-    } catch(e) {}
-  })();
-</script>
+<!-- Clean Unified UI Mode -->
+
+
 <style>
-  html.project-is-configured body.landing-mode .NavLinks,
-  html.project-is-configured body.landing-mode .NavRight,
-  html.project-is-configured body.landing-mode .StatusStrip,
-  html.project-is-configured body.landing-mode #projectContextContainer,
-  html.project-is-configured body.wizard-setup-mode .NavLinks,
-  html.project-is-configured body.wizard-setup-mode .NavRight,
-  html.project-is-configured body.wizard-setup-mode #projectContextContainer {
-    display: flex !important;
-  }
-  html.project-is-configured #wizardCard0 {
-    display: none !important;
-  }
-  html.project-is-configured #sec-wizard {
-    display: none;
-  }
+@keyframes spinSlow { to { transform: rotate(360deg); } }
+.progress-pulse { animation: pulseAnim 1.5s infinite; }
+@keyframes pulseAnim {
+  0% { box-shadow: 0 0 0 0 rgba(37,99,235,0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(37,99,235,0); }
+  100% { box-shadow: 0 0 0 0 rgba(37,99,235,0); }
+}
 </style>
 
 </head>
-<body class="landing-mode wizard-setup-mode">
+<body class="app-ready">
 
   <!-- TOP NAVBAR -->
   <nav class="TopNav">
@@ -1107,8 +1076,8 @@ HTML_PAGE = r"""<!DOCTYPE html>
       <button class="CleanBtn btn-primary" id="btnRunAll" onclick="runPipeline()">
         Chạy Phân Tích
       </button>
-      <button class="CleanBtn" style="border-color:#fca5a5; color:#b91c1c;" onclick="shutdownSystem()" title="Dừng hệ thống và giải phóng tài nguyên">
-        Tắt Hệ Thống
+      <button class="CleanBtn" style="border-color:#93c5fd; color:#0369a1; background:#f0f9ff; font-weight:600;" onclick="showCliControlModal()" title="Quản lý hệ thống qua CLI Terminal">
+        CLI Controller
       </button>
     </div>
   </nav>
@@ -1128,8 +1097,8 @@ HTML_PAGE = r"""<!DOCTYPE html>
       </div>
       <div id="autoScanStripControls" style="display:none; align-items:center; gap:12px;">
         <label style="font-size:12.5px; cursor:pointer; display:flex; align-items:center; gap:6px;">
-          <input type="checkbox" id="autoQueueToggle" checked onchange="toggleAutoQueueWorker()" />
-          Tự động xử lý tuần tự (<span id="queueWorkerStatus" style="color:var(--primary); font-weight:600;">Bật</span>)
+          <input type="checkbox" id="autoQueueToggle" onchange="toggleAutoQueueWorker()" />
+          Tự động xử lý tuần tự (<span id="queueWorkerStatus" style="color:var(--text-muted); font-weight:600;">Tắt</span>)
         </label>
         <span style="color:var(--border-main);">&bull;</span>
         <label style="font-size:12.5px; cursor:pointer; display:flex; align-items:center; gap:6px;">
@@ -1304,7 +1273,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
             </div>
             <div style="color:#cbd5e1;">|</div>
             <div>
-              Phần cứng: <b id="landingHardwareSummary" style="color:#2563eb;">-</b>
+              Phần cứng: <b id="landingHardwareSummary" style="color:#2563eb;">AMD Radeon RX 6600 (8GB VRAM) • Chờ khảo sát &amp; chọn model tại Bước 2</b>
             </div>
           </div>
 
@@ -1404,6 +1373,25 @@ HTML_PAGE = r"""<!DOCTYPE html>
           </div>
         </div>
 
+        
+        <!-- THANH TIẾN ĐỘ THỜI GIAN THỰC (REAL-TIME SCAN PROGRESS BAR) -->
+        <div id="wzScanProgressWrap" style="display:none; margin:16px 0 14px; background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:8px; padding:14px 18px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:12.5px;">
+            <div style="font-weight:700; color:#0f172a; display:flex; align-items:center; gap:8px;">
+              <span id="wzProgressSpinner" style="display:inline-block; width:13px; height:13px; border:2.5px solid #2563eb; border-top-color:transparent; border-radius:50%; animation:spinSlow 0.8s linear infinite;"></span>
+              <span id="wzProgressStageText">Khởi tạo phân tích mã nguồn...</span>
+            </div>
+            <div style="font-weight:800; color:#2563eb; font-family:monospace; font-size:14px;" id="wzProgressPercent">0%</div>
+          </div>
+          <div style="background:#e2e8f0; border-radius:6px; height:10px; overflow:hidden; position:relative;">
+            <div id="wzProgressBarFill" style="background:linear-gradient(90deg, #3b82f6, #2563eb, #1d4ed8); width:0%; height:100%; transition:width 0.25s ease; border-radius:6px;"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:11.5px; color:#64748b; margin-top:6px;">
+            <span id="wzProgressDetail">Tác tử AI đang duyệt cây AST &amp; gọi Local LLM (GPU RX 6600)</span>
+            <span id="wzProgressEta" style="font-weight:600; color:#2563eb;">Ước tính: ~15s</span>
+          </div>
+        </div>
+
         <!-- Live Streaming Terminal -->
         <div id="wzScanAgentTerminal" style="display:none; background:#0f172a; color:#38bdf8; font-family:monospace; font-size:12px; padding:14px; border-radius:6px; min-height:140px; max-height:200px; overflow-y:auto; border:1px solid #1e293b; line-height:1.7; margin-bottom:16px;">
           <div style="color:#94a3b8;">[KHỞI TẠO] Sẵn sàng kích hoạt Tác tử AI Codebase Inspector...</div>
@@ -1483,8 +1471,8 @@ HTML_PAGE = r"""<!DOCTYPE html>
           <button type="button" class="CleanBtn" style="padding:10px 18px; border:1px solid #cbd5e1; background:#ffffff; color:#334155; border-radius:6px; cursor:pointer;" onclick="wizardGotoStep(1)">
             &larr; Quay Lại Bước 1
           </button>
-          <button type="button" class="CleanBtn btn-primary" style="padding:12px 28px; font-weight:700; background:#2563eb; color:#ffffff; border:none; border-radius:6px; cursor:pointer; box-shadow:0 4px 14px rgba(37,99,235,0.3);" onclick="wizardGotoStep(3)">
-            [ TIẾP TỤC: CHỌN PHÂN HỆ PHÒNG THỦ (BƯỚC 3) &rarr; ]
+          <button type="button" class="CleanBtn btn-primary" style="padding:12px 28px; font-weight:700; background:#2563eb; color:#ffffff; border:none; border-radius:6px; cursor:pointer; box-shadow:0 4px 14px rgba(37,99,235,0.3);" onclick="wizardConfirmStep2ModelAndProceed()">
+            [ XÁC NHẬN MODEL NÀY &amp; TIẾP TỤC BƯỚC 3 &rarr; ]
           </button>
         </div>
       </div>
@@ -1816,9 +1804,9 @@ HTML_PAGE = r"""<!DOCTYPE html>
 
       <div class="HistoryStatsGrid">
         <div class="HistoryStatCard">
-          <div class="HistoryStatLabel">TỔNG BÀI BÁO ĐÃ HỌC</div>
+          <div class="HistoryStatLabel">KHO BÀI BÁO CTI THU THẬP</div>
           <div class="HistoryStatValue" id="statTotalArticles">0 bài</div>
-          <div class="HistoryStatSub">Lưu trữ bền vững trong SQLite</div>
+          <div class="HistoryStatSub">Lưu trữ trong CSDL SQLite (Chờ phân tích)</div>
         </div>
         <div class="HistoryStatCard">
           <div class="HistoryStatLabel">TIẾN TRÌNH THỜI GIAN</div>
@@ -1826,12 +1814,12 @@ HTML_PAGE = r"""<!DOCTYPE html>
           <div class="HistoryStatSub">Sắp xếp theo thứ tự thời gian</div>
         </div>
         <div class="HistoryStatCard">
-          <div class="HistoryStatLabel">TRẠNG THÁI TIẾN TRÌNH</div>
+          <div class="HistoryStatLabel">TIẾN ĐỘ PHÂN TÍCH TÁC TỬ</div>
           <div class="HistoryStatValue" style="font-size:14.5px;" id="statOldVsNew">0 Hoàn thành • 0 Chờ xử lý</div>
-          <div class="HistoryStatSub">Đã học và nạp vào CSDL SQLite</div>
+          <div class="HistoryStatSub">Tiến độ AI Agent phân tích bài báo</div>
         </div>
         <div class="HistoryStatCard">
-          <div class="HistoryStatLabel">TỔNG CHỈ SỐ IOC ĐÃ GHI NHỚ</div>
+          <div class="HistoryStatLabel">CHỈ SỐ IOC ĐÃ HỌC VÀ LƯU KHO</div>
           <div class="HistoryStatValue" id="statTotalIocs">0 IOC</div>
           <div class="HistoryStatSub" id="statIocBreakdown">0 IP • 0 Domain • 0 CVE</div>
         </div>
@@ -1839,17 +1827,17 @@ HTML_PAGE = r"""<!DOCTYPE html>
 
       <div class="ToolbarRow" style="gap:10px;">
         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-          <button class="CleanBtn active" id="btnSortRecentDone" onclick="setHistorySort('RECENT_DONE', this)">Vừa Hoàn Thành</button>
-          <button class="CleanBtn" id="btnSortNewest" onclick="setHistorySort('NEWEST', this)">Từ Mới Đến Cũ</button>
+          <button class="CleanBtn" id="btnSortRecentDone" onclick="setHistorySort('RECENT_DONE', this)">Vừa Hoàn Thành</button>
+          <button class="CleanBtn active" id="btnSortNewest" onclick="setHistorySort('NEWEST', this)">Từ Mới Đến Cũ</button>
           <button class="CleanBtn" id="btnSortOldest" onclick="setHistorySort('OLDEST', this)">Từ Cũ Đến Mới</button>
           <button class="CleanBtn" id="btnSortIoc" onclick="setHistorySort('IOC_DESC', this)">Nhiều IOC Nhất</button>
 
           <select class="CleanSelect" id="historyStatusFilter" onchange="renderHistoryManager()">
-            <option value="COMPLETED" selected>Chỉ bài đã Hoàn thành</option>
+            <option value="COMPLETED">Chỉ bài đã Hoàn thành</option>
             <option value="HAS_HASH">Chỉ bài có Mã Băm Malware (SHA256/MD5)</option>
             <option value="HAS_IP">Chỉ bài có IP C2</option>
             <option value="HAS_CVE">Chỉ bài có Lỗ Hổng CVE</option>
-            <option value="ALL">Trạng thái: Tất cả bài báo</option>
+            <option value="ALL" selected>Trạng thái: Tất cả bài báo</option>
             <option value="PENDING">Chỉ bài Chờ xử lý</option>
             <option value="HAS_IOC">Chỉ bài có bất kỳ IOC nào</option>
           </select>
@@ -1887,6 +1875,9 @@ HTML_PAGE = r"""<!DOCTYPE html>
           </button>
           <button class="CleanBtn btn-primary" onclick="analyzeSelectedHistoryArticles()">
             Phân Tích Đã Chọn (<span id="histSelectedCount">0</span>)
+          </button>
+          <button type="button" class="CleanBtn" style="border-color:#fca5a5; color:#b91c1c; background:#fef2f2; font-weight:600; padding:4px 10px; font-size:12px; cursor:pointer;" onclick="resetAllArticlesToPending(this)" title="Đặt lại toàn bộ bài báo về trạng thái Chờ xử lý để AI Agent chạy lại từ đầu">
+            [ Đặt Lại Toàn Bộ Về Chờ Xử Lý ]
           </button>
         </div>
       </div>
@@ -2266,6 +2257,27 @@ HTML_PAGE = r"""<!DOCTYPE html>
     let allHistoryArticles = [];
     let historySortMode = "RECENT_DONE";
     let selectedHistoryIds = new Set();
+    let historyViewMode = 'PROJECT';
+    let globalArchiveArticles = [];
+
+    async function switchHistoryScopeMode(mode, btnEl) {
+      historyViewMode = mode;
+      const btnProj = document.getElementById('btnHistModeProject');
+      const btnAll = document.getElementById('btnHistModeAll');
+      if (btnProj) btnProj.classList.remove('active');
+      if (btnAll) btnAll.classList.remove('active');
+      if (btnEl) btnEl.classList.add('active');
+
+      if (mode === 'GLOBAL' && globalArchiveArticles.length === 0) {
+        try {
+          const res = await fetch('/api/articles?source=ALL');
+          globalArchiveArticles = await res.json();
+        } catch (e) {
+          console.error("Lỗi nạp toàn bộ kho CTI:", e);
+        }
+      }
+      renderHistoryManager();
+    }
     let selectedIndices = [];
     let currentTitle = "";
     let currentFilter = "ALL";
@@ -2289,45 +2301,67 @@ HTML_PAGE = r"""<!DOCTYPE html>
         btnEl.style.color = '#ffffff';
         btnEl.style.borderColor = '#1d4ed8';
       }
-      const isMainWorkflow = (sectionId === 'all' || sectionId === 'sec-wizard' || sectionId === 'sec-feed' || sectionId === 'sec-history' || sectionId === 'sec-score' || sectionId === 'sec-defense');
-      if (isMainWorkflow) {
-        const wiz = document.getElementById('sec-wizard');
-        if (wiz) {
-          if (sectionId === 'sec-wizard') {
-            wiz.style.display = 'block';
-          } else if (wzIsProjectConfigured) {
-            wiz.style.display = 'none';
-          } else {
-            wiz.style.display = 'block';
-          }
-        }
-        const chat = document.getElementById('sec-chat');
+
+      const wiz = document.getElementById('sec-wizard');
+      const chat = document.getElementById('sec-chat');
+      const add = document.getElementById('sec-add');
+      const feed = document.getElementById('sec-feed');
+      const hist = document.getElementById('sec-history');
+      const score = document.getElementById('sec-score');
+      const defense = document.getElementById('sec-defense');
+
+      if (sectionId === 'sec-wizard') {
+        if (wiz) wiz.style.display = 'block';
         if (chat) chat.style.display = 'none';
-        const add = document.getElementById('sec-add');
         if (add) add.style.display = 'none';
+        if (feed) feed.style.display = 'none';
+        if (hist) hist.style.display = 'none';
+        if (score) score.style.display = 'none';
+        if (defense) defense.style.display = 'none';
 
-        // Giao dien Live Server (feed, history, score, defense) chi hien o Buoc 5 tro di hoac khi du an da cau hinh xong hoac nguoi dung chu dong click tab xem
-        const shouldShowLive = (sectionId !== 'sec-wizard') || (wzCurrentStep >= 5 || wzIsProjectConfigured);
-        const liveDisp = shouldShowLive ? 'block' : 'none';
-
-        const feed = document.getElementById('sec-feed');
-        if (feed) feed.style.display = liveDisp;
-        const hist = document.getElementById('sec-history');
-        if (hist) hist.style.display = liveDisp;
-        const score = document.getElementById('sec-score');
-        if (score) score.style.display = liveDisp;
-        const defense = document.getElementById('sec-defense');
-        if (defense) defense.style.display = liveDisp;
-
-        if (sectionId !== 'all') {
-          const targetEl = document.getElementById(sectionId);
-          if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (!wzIsProjectConfigured && wzCurrentStep === 0) {
+          wizardGotoStep(0);
+        } else if (wzIsProjectConfigured && (wzCurrentStep === 0 || !wzCurrentStep)) {
+          wizardGotoStep(1);
+        } else {
+          wizardGotoStep(wzCurrentStep || 1);
+        }
+        if (wiz) wiz.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else if (sectionId === 'all') {
+        if (chat) chat.style.display = 'none';
+        if (add) add.style.display = 'none';
+        if (wiz) {
+          wiz.style.display = wzIsProjectConfigured ? 'none' : 'block';
+          if (!wzIsProjectConfigured && wzCurrentStep === 0) wizardGotoStep(0);
+        }
+        if (feed) feed.style.display = 'block';
+        if (hist) hist.style.display = 'block';
+        if (score) score.style.display = 'block';
+        if (defense) defense.style.display = 'block';
+      } else if (sectionId === 'sec-chat') {
+        const ids = [wiz, add, feed, hist, score, defense];
+        ids.forEach(el => { if (el) el.style.display = 'none'; });
+        if (chat) {
+          chat.style.display = 'block';
+          chat.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      } else if (sectionId === 'sec-add') {
+        const ids = [wiz, chat, feed, hist, score, defense];
+        ids.forEach(el => { if (el) el.style.display = 'none'; });
+        if (add) {
+          add.style.display = 'block';
+          add.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       } else {
-        const ids = ['sec-wizard', 'sec-chat', 'sec-add', 'sec-feed', 'sec-history', 'sec-score', 'sec-defense'];
-        ids.forEach(id => {
-          const el = document.getElementById(id);
-          if (el) el.style.display = (id === sectionId) ? 'block' : 'none';
+        // sec-feed, sec-history, sec-score, sec-defense
+        if (chat) chat.style.display = 'none';
+        if (add) add.style.display = 'none';
+        if (wiz) wiz.style.display = 'none';
+
+        const liveMap = {'sec-feed': feed, 'sec-history': hist, 'sec-score': score, 'sec-defense': defense};
+        Object.keys(liveMap).forEach(k => {
+          const el = liveMap[k];
+          if (el) el.style.display = (k === sectionId) ? 'block' : 'none';
         });
         const targetEl = document.getElementById(sectionId);
         if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -2370,6 +2404,15 @@ HTML_PAGE = r"""<!DOCTYPE html>
               savedModel = localStorage.getItem('selectedAiModel');
             } catch (e) {}
 
+            // Neu du an chua duoc cau hinh (dang o Buoc 0 khoi dau), khong tu y chot model truoc
+            if (!wzIsProjectConfigured && !savedModel) {
+              const pendingOpt = document.createElement('option');
+              pendingOpt.value = 'pending';
+              pendingOpt.textContent = 'Chờ khảo sát phần cứng (Chọn ở Bước 2)...';
+              pendingOpt.selected = true;
+              sel.appendChild(pendingOpt);
+            }
+
             let matched = false;
             data.options.forEach(opt => {
               const optEl = document.createElement('option');
@@ -2378,21 +2421,21 @@ HTML_PAGE = r"""<!DOCTYPE html>
               if (savedModel && opt.value === savedModel) {
                 optEl.selected = true;
                 matched = true;
-              } else if (!savedModel && opt.is_active) {
+              } else if (wzIsProjectConfigured && !savedModel && opt.is_active) {
                 optEl.selected = true;
                 matched = true;
               }
               sel.appendChild(optEl);
             });
-
-            if (!matched && sel.options.length > 0) {
-              sel.selectedIndex = 0;
-            }
           }
           
           if (badge && data.hardware) {
-            const activeVal = sel ? sel.value : data.active_model;
-            updateModelBadgeText(activeVal);
+            if (!wzIsProjectConfigured && !localStorage.getItem('selectedAiModel')) {
+              badge.textContent = `PHẦN CỨNG: ${data.hardware.gpu_name.toUpperCase()} (${data.hardware.vram_gb || 8}GB VRAM) • CHỜ KHẢO SÁT MODEL Ở BƯỚC 2`;
+            } else {
+              const activeVal = sel ? sel.value : data.active_model;
+              updateModelBadgeText(activeVal);
+            }
           }
         }
       } catch (e) {
@@ -2584,18 +2627,36 @@ HTML_PAGE = r"""<!DOCTYPE html>
       }
     }
 
+    function formatTimeOnly(raw) {
+      if (!raw) return '';
+      const s = String(raw).trim();
+      let d;
+      if (s.endsWith('Z') || s.includes('+') || (s.includes('T') && !s.includes(' '))) {
+        d = new Date(s);
+      } else if (/^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}/.test(s)) {
+        return s.slice(11, 19);
+      } else {
+        d = new Date(s);
+      }
+      if (d && !isNaN(d.getTime())) {
+        const pad = (n) => String(n).padStart(2, '0');
+        return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+      }
+      return s.slice(11, 19) || s;
+    }
+
     function formatToLocalTime(raw) {
       if (!raw) return '--';
       const s = String(raw).trim();
       let d;
-      if (s.endsWith('Z') || s.includes('+') || (s.includes('T') && s.length > 19)) {
+      if (s.endsWith('Z') || s.includes('+') || (s.includes('T') && !s.includes(' '))) {
         d = new Date(s);
       } else if (/^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}/.test(s)) {
-        d = new Date(s.replace(' ', 'T') + 'Z');
+        return s.slice(0, 16);
       } else {
         d = new Date(s);
       }
-      if (isNaN(d.getTime())) {
+      if (!d || isNaN(d.getTime())) {
         return s.slice(0, 16);
       }
       const pad = (n) => String(n).padStart(2, '0');
@@ -2950,7 +3011,12 @@ HTML_PAGE = r"""<!DOCTYPE html>
     }
 
     function renderHistoryManager() {
-      const list = (allHistoryArticles && allHistoryArticles.length > 0) ? allHistoryArticles.slice() : articles.slice();
+      let list = [];
+      if (historyViewMode === 'PROJECT') {
+        list = articles.slice();
+      } else {
+        list = (globalArchiveArticles && globalArchiveArticles.length > 0) ? globalArchiveArticles.slice() : articles.slice();
+      }
       // 1. Tính toán 4 ô thống kê tổng quan
       const completedArticles = list.filter(a => a.status === 'completed');
       const completedCount = completedArticles.length;
@@ -2982,10 +3048,10 @@ HTML_PAGE = r"""<!DOCTYPE html>
       const elIocs = document.getElementById('statTotalIocs');
       const elIocSub = document.getElementById('statIocBreakdown');
 
-      if (elTotal) elTotal.textContent = `${list.length} bài`;
+      if (elTotal) elTotal.textContent = `${list.length} bài thu thập`;
       if (elRange) elRange.textContent = `${oldestDate} đến ${newestDate}`;
       if (elOldNew) {
-        elOldNew.innerHTML = `<span style="color:var(--safe); font-weight:700;">${completedCount} Hoàn thành</span> • <span style="color:var(--text-muted);">${pendingCount} Chờ xử lý</span>${processingCount > 0 ? ` • <span style="color:var(--primary); font-weight:600;">${processingCount} Đang chạy</span>` : ''}`;
+        elOldNew.innerHTML = `<span style="color:var(--safe); font-weight:700;">${completedCount} Đã học</span> • <span style="color:var(--text-muted);">${pendingCount} Chờ xử lý</span>${processingCount > 0 ? ` • <span style="color:var(--primary); font-weight:600;">${processingCount} Đang chạy</span>` : ''}`;
       }
       if (elIocs) elIocs.textContent = `${compTotalIocs} chỉ số đã học`;
       if (elIocSub) elIocSub.textContent = `${compIps} IP • ${compDoms} Domain • ${compCves} CVE • ${compShas} Hash (từ ${completedCount}/${list.length} bài)`;
@@ -3074,7 +3140,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
         const fetchedDateStr = formatToLocalTime(art.fetched_at || art.sort_ts);
         const isDone = (art.status === 'completed');
         const durStr = art.processing_time_sec ? ` (${art.processing_time_sec.toFixed(1)}s)` : '';
-        const analyzedStr = art.last_analyzed_at ? `<div style="font-size:11px; color:var(--safe); font-family:var(--font-mono); margin-top:2px;">Xong: ${art.last_analyzed_at.slice(11, 19)}</div>` : '';
+        const analyzedStr = art.last_analyzed_at ? `<div style="font-size:11px; color:var(--safe); font-family:var(--font-mono); margin-top:2px;">Xong: ${formatTimeOnly(art.last_analyzed_at)}</div>` : '';
         const statusBadge = isDone
           ? `<span class="BadgeCompleted">Hoàn thành${durStr}</span>${analyzedStr}`
           : (art.status === 'processing'
@@ -3247,6 +3313,28 @@ HTML_PAGE = r"""<!DOCTYPE html>
         renderHistoryManager();
       } catch (e) {
         alert("Lỗi xóa bài báo: " + e);
+      }
+    }
+
+    
+    async function resetAllArticlesToPending(btnEl) {
+      if (!confirm("Bạn có chắc chắn muốn đặt lại TOÀN BỘ bài báo về trạng thái Chờ Xử Lý (pending) để Tác tử AI phân tích lại từ đầu không?")) return;
+      if (btnEl) { btnEl.disabled = true; btnEl.textContent = "Đang đặt lại..."; }
+      try {
+        const res = await fetch('/api/articles/reset-all-status', { method: 'POST' });
+        const data = await res.json();
+        if (data.status === 'success') {
+          allHistoryArticles = data.articles || [];
+          articles = allHistoryArticles.slice();
+          renderNewsGrid();
+          renderHistoryManager();
+        } else {
+          alert("Lỗi: " + data.message);
+        }
+      } catch (e) {
+        alert("Lỗi kết nối: " + e);
+      } finally {
+        if (btnEl) { btnEl.disabled = false; btnEl.textContent = "[ Đặt Lại Toàn Bộ Về Chờ Xử Lý ]"; }
       }
     }
 
@@ -3665,7 +3753,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
     }
 
     let isQueueWorkerRunning = false;
-    let autoQueueEnabled = true;
+    let autoQueueEnabled = false;
 
     async function toggleAutoQueueWorker() {
       const toggleEl = document.getElementById('autoQueueToggle');
@@ -5096,6 +5184,17 @@ const elArt = document.getElementById('lblMasterArticlesCount');
       }
     }
 
+    function showCliControlModal() {
+      alert(
+        "TRUNG TÂM ĐIỀU KHIỂN DÒNG LỆNH (CTI AGENTIC DEFENSE CLI)\n\n" +
+        "Hệ thống hiện đang vận hành dưới dạng CLI Controller chuyên nghiệp:\n" +
+        "• Khởi động: cti-defense (hoặc cti)\n" +
+        "• Dừng an toàn & giải phóng GPU: Nhấn Ctrl+C trong Terminal (hoặc chạy: cti-defense stop)\n" +
+        "• Kiểm tra trạng thái: cti-defense status\n" +
+        "• Mở lại giao diện Web: Nhấn phím [o] hoặc [Enter] ngay trong Terminal."
+      );
+    }
+
     async function shutdownSystem() {
       try {
         fetch('/api/system/shutdown', { method: 'POST' }).catch(() => {});
@@ -5103,10 +5202,11 @@ const elArt = document.getElementById('lblMasterArticlesCount');
       document.body.innerHTML = `
         <div style="min-height:100vh; display:flex; align-items:center; justify-content:center; background:#f8fafc; color:#0f172a; font-family:'Inter',sans-serif; padding:24px;">
           <div style="border:1px solid #cbd5e1; background:#ffffff; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.06); padding:36px 42px; max-width:560px; text-align:center;">
-            <h2 style="color:#0f172a; margin-bottom:12px; font-weight:700;">HỆ THỐNG ĐÃ TẮT</h2>
+            <h2 style="color:#0f172a; margin-bottom:12px; font-weight:700;">HỆ THỐNG ĐÃ DỪNG AN TOÀN</h2>
             <p style="color:#475569; line-height:1.6; font-size:14px;">
-              Server Web (cổng 8765) và Ollama GPU Server (cổng 11434) đã được tắt hoàn toàn.<br/>
-              Khi cần mở lại, vui lòng chạy file <b>1_BAT_HE_THONG.bat</b> trong thư mục dự án.
+              Tiến trình Web và GPU Server đã được giải phóng bộ nhớ.<br/>
+              Để khởi động lại hệ thống, mở Terminal và chạy lệnh:<br/>
+              <code style="display:inline-block; margin-top:8px; background:#0f172a; color:#4ade80; padding:6px 16px; border-radius:6px; font-family:monospace; font-weight:700; font-size:14px;">cti-defense</code>
             </p>
           </div>
         </div>
@@ -5201,8 +5301,7 @@ const elArt = document.getElementById('lblMasterArticlesCount');
 
           const isConfigured = Boolean(
             (data.is_configured && data.config) || 
-            (localStorage.getItem('cti_configured_' + data.target_path) === 'true') ||
-            (data.target_path && data.target_path.indexOf('testCTI') !== -1)
+            (localStorage.getItem('cti_configured_' + data.target_path) === 'true')
           );
 
           if (isConfigured) {
@@ -5266,6 +5365,10 @@ const elArt = document.getElementById('lblMasterArticlesCount');
             const lPath = document.getElementById('landingTargetPath');
             if (lTarget) lTarget.textContent = data.target_name || 'Dự Án Mục Tiêu';
             if (lPath) lPath.textContent = data.target_path || wzTarget;
+            const lHwSum = document.getElementById('landingHardwareSummary');
+            if (lHwSum && detectedSystemHardware) {
+              lHwSum.textContent = detectedSystemHardware.gpu_name + ' (' + (detectedSystemHardware.vram_gb || 8) + 'GB VRAM) • Chờ khảo sát & chọn model tại Bước 2';
+            }
 
             document.body.classList.add('landing-mode');
             switchView('sec-wizard', document.querySelector('.NavLinks .NavLink'));
@@ -5350,7 +5453,9 @@ const elArt = document.getElementById('lblMasterArticlesCount');
       if (!confirm("Bạn có chắc chắn muốn đặt lại cấu hình phòng thủ để quét lại dự án từ đầu không?")) return;
       try {
         localStorage.removeItem('cti_configured_' + wzTarget);
+        localStorage.removeItem('cti_last_target');
         document.documentElement.classList.remove('project-is-configured');
+        document.body.classList.remove('project-is-configured');
         const res = await fetch('/api/system/project-reset', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
@@ -5358,6 +5463,26 @@ const elArt = document.getElementById('lblMasterArticlesCount');
         });
         const d = await res.json();
         wzIsProjectConfigured = false;
+
+        // Chuyển thẳng về màn hình Landing / Bắt đầu từ đầu
+        document.body.classList.add('landing-mode');
+        document.body.classList.remove('wizard-setup-mode');
+        const card0 = document.getElementById('wizardCard0');
+        if (card0) card0.style.display = 'block';
+        const stepperNav = document.getElementById('wizardStepperNav');
+        if (stepperNav) stepperNav.style.display = 'none';
+        for (let i = 1; i <= 6; i++) {
+          const c = document.getElementById('wizardCard' + i);
+          if (c) c.style.display = 'none';
+        }
+        const secWizard = document.getElementById('sec-wizard');
+        if (secWizard) {
+          secWizard.style.display = 'block';
+          secWizard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        const navWiz = document.querySelectorAll('.NavLinks .NavLink')[0];
+        if (navWiz) switchView('sec-wizard', navWiz);
+        wzCurrentStep = 0;
         await initProjectContext();
       } catch (e) {
         alert("Lỗi đặt lại: " + e);
@@ -5392,6 +5517,9 @@ const elArt = document.getElementById('lblMasterArticlesCount');
 let wzIsProjectConfigured = false;
 
     function wizardGotoStep(stepNum) {
+      if (wzIsProjectConfigured && stepNum === 0) {
+        stepNum = 1;
+      }
       wzCurrentStep = stepNum;
       
       // Chi hien cac tab dieu huong va khong gian Live Server khi vao Buoc 5 tro di hoac du an da bao ve
@@ -6066,6 +6194,32 @@ let wzIsProjectConfigured = false;
       }
     }
 
+    
+    function wizardConfirmStep2ModelAndProceed() {
+      // Tìm model đang được chọn trong radio
+      const checkedRadio = document.querySelector('input[name="wzModelRadio"]:checked');
+      let chosenModel = checkedRadio ? checkedRadio.value : 'qwen3:8b';
+      
+      try {
+        localStorage.setItem('selectedAiModel', chosenModel);
+      } catch (e) {}
+
+      // Xóa option pending trên Navbar nếu có và cập nhật model đã chọn
+      const sel = document.getElementById('aiModelSelect');
+      if (sel) {
+        const pendingOpt = sel.querySelector('option[value="pending"]');
+        if (pendingOpt) pendingOpt.remove();
+        sel.value = chosenModel;
+      }
+
+      // Cập nhật thanh ticker
+      updateModelBadgeText(chosenModel);
+      updateLiveTicker(`Đã xác nhận mô hình phòng thủ: ${chosenModel} (${detectedSystemHardware ? detectedSystemHardware.gpu_name : 'GPU Cục Bộ'})`);
+
+      // Chuyển tiếp sang Bước 3
+      wizardGotoStep(3);
+    }
+
     function onWizardModelRadioChange(modelId) {
       try { localStorage.setItem('selectedAiModel', modelId); } catch(e){}
       const sel = document.getElementById('aiModelSelect');
@@ -6098,6 +6252,13 @@ let wzIsProjectConfigured = false;
       const nextBtn = document.getElementById("btnNextFromStep1");
       const term = document.getElementById("wzScanAgentTerminal");
       const resSummary = document.getElementById("wzScanResultSummary");
+      const progWrap = document.getElementById("wzScanProgressWrap");
+      const progBar = document.getElementById("wzProgressBarFill");
+      const progText = document.getElementById("wzProgressPercent");
+      const progStage = document.getElementById("wzProgressStageText");
+      const progDetail = document.getElementById("wzProgressDetail");
+      const progEta = document.getElementById("wzProgressEta");
+      const progSpinner = document.getElementById("wzProgressSpinner");
 
       if (nextBtn) {
         nextBtn.disabled = true;
@@ -6111,11 +6272,51 @@ let wzIsProjectConfigured = false;
       if (btn) {
         btn.disabled = true;
         btn.textContent = "[ AGENT ĐANG PHÂN TÍCH MÃ NGUỒN... ]";
+        btn.style.background = "#64748b";
       }
+
+      // Kích hoạt thanh tiến trình và terminal
+      if (progWrap) progWrap.style.display = "block";
+      if (progBar) {
+        progBar.style.width = "4%";
+        progBar.style.background = "linear-gradient(90deg, #3b82f6, #2563eb, #1d4ed8)";
+      }
+      if (progText) progText.textContent = "4%";
+      if (progStage) progStage.textContent = "[1/4] Duyệt cây thư mục & lập chỉ mục cú pháp AST...";
+      if (progDetail) progDetail.textContent = "Tác tử AI đang đọc các tệp mã nguồn và tệp cấu hình...";
+      if (progEta) progEta.textContent = "Ước tính: ~15s";
+      if (progSpinner) progSpinner.style.display = "inline-block";
+
       if (term) {
         term.style.display = "block";
         term.innerHTML = `<div style="color:#94a3b8;">[KHỞI TẠO] Tác tử AI Codebase Inspector đang đọc cây AST và các tệp cấu hình...</div>`;
       }
+
+      // Vòng lặp mô phỏng tiến độ mượt mà trong lúc chờ Local LLM GPU suy luận
+      let currentPercent = 4;
+      let elapsedSec = 0;
+      const progressTimer = setInterval(() => {
+        elapsedSec += 0.3;
+        if (currentPercent < 90) {
+          currentPercent += (currentPercent < 40 ? 4 : (currentPercent < 75 ? 2.5 : 1));
+          if (currentPercent > 92) currentPercent = 92;
+          const rounded = Math.round(currentPercent);
+          if (progBar) progBar.style.width = rounded + "%";
+          if (progText) progText.textContent = rounded + "%";
+
+          if (rounded >= 20 && rounded < 45) {
+            if (progStage) progStage.textContent = "[2/4] Bóc tách điểm nóng nhạy cảm (Sinks: upload.php, shell_exec, eval)...";
+            if (progDetail) progDetail.textContent = "Đang kiểm tra các hàm thực thi hệ thống và điểm tải tệp...";
+          } else if (rounded >= 45 && rounded < 75) {
+            if (progStage) progStage.textContent = "[3/4] Nạp ngữ cảnh vào Local LLM Qwen3:8B (GPU RX 6600) suy luận rủi ro...";
+            if (progDetail) progDetail.textContent = "Mô hình khang-qwen3:latest đang đọc hiểu và phân tích bề mặt tấn công...";
+            if (progEta) progEta.textContent = `Đang suy luận: ${Math.round(elapsedSec)}s`;
+          } else if (rounded >= 75) {
+            if (progStage) progStage.textContent = "[4/4] Tác tử AI đang tổng hợp luận điểm định danh & gán phân hệ Scope...";
+            if (progDetail) progDetail.textContent = "Tổng hợp kết quả thẩm định kiến trúc và đề xuất đối sách...";
+          }
+        }
+      }, 300);
 
       try {
         const res = await fetch("/api/wizard/scan", {
@@ -6123,6 +6324,21 @@ let wzIsProjectConfigured = false;
           headers: {"Content-Type": "application/json"},
           body: JSON.stringify({ target: targetVal, clone_url: cloneVal })
         });
+        clearInterval(progressTimer);
+
+        // Đạt 100% hoàn thành
+        if (progBar) {
+          progBar.style.width = "100%";
+          progBar.style.background = "linear-gradient(90deg, #10b981, #059669)";
+        }
+        if (progText) {
+          progText.textContent = "100%";
+          progText.style.color = "#059669";
+        }
+        if (progStage) progStage.textContent = "[HOÀN THÀNH] Tác tử AI đã thẩm định xong toàn diện dự án!";
+        if (progDetail) progDetail.textContent = "Đã xác định kiến trúc, điểm nóng và gán phân hệ phòng thủ tối ưu.";
+        if (progEta) progEta.textContent = `Xong trong: ${Math.round(elapsedSec)}s`;
+        if (progSpinner) progSpinner.style.display = "none";
         const d = await res.json();
         if (d.status === "success") {
           wzTarget = d.target_path;
@@ -6241,8 +6457,12 @@ let wzIsProjectConfigured = false;
                 nextBtn.style.background = "#2563eb";
                 nextBtn.style.cursor = "pointer";
                 nextBtn.style.opacity = "1";
-                nextBtn.style.boxShadow = "0 4px 14px rgba(37,99,235,0.4)";
+                nextBtn.style.boxShadow = "0 6px 20px rgba(37,99,235,0.5)";
+                nextBtn.classList.add("progress-pulse");
                 nextBtn.title = "Nhấn để tiếp tục tới bước Chọn Mô Hình AI";
+                setTimeout(() => {
+                  nextBtn.scrollIntoView({ behavior: "smooth", block: "center" });
+                }, 300);
               }
             }
           }
@@ -6368,7 +6588,7 @@ let wzIsProjectConfigured = false;
               published_at: art.published_date || "2026",
               sort_ts: art.sort_ts || art.published_date || "2026",
               content: art.content || art.excerpt || "",
-              status: idx === 0 ? "processing" : "pending",
+              status: "pending",
               ioc_counts: {
                 cves: (art.cves || []).length,
                 ips: (art.sample_ips || []).length,
@@ -6401,10 +6621,8 @@ let wzIsProjectConfigured = false;
 
           updateLiveTicker(`[Bước 5] Đã nạp thành công ${articles.length} bài báo phân hệ [${d.scope_name}] vào hàng đợi Live. Bắt đầu đối soát AST...`);
 
-          autoQueueEnabled = true;
-          if (!isQueueWorkerRunning && articles.length > 0) {
-            executeSingleArticleQueue(0);
-          }
+          autoQueueEnabled = false;
+          // Hệ thống giữ ở trạng thái Chờ xử lý, người dùng bấm Chạy Phân Tích khi sẵn sàng
         }
       } catch (e) {
         console.error("Lỗi cào báo Step 5:", e);
@@ -6883,8 +7101,8 @@ def api_find_article_by_ioc(ioc: str = Query("")):
                 "published_at": row["published_date"],
                 "content": row["content"],
                 "sort_ts": row["sort_ts"],
-                "status": row["status"] or "completed",
-                "processing_time_sec": row["processing_time_sec"] or 18.5,
+                "status": row["status"] or "pending",
+                "processing_time_sec": float(row["processing_time_sec"] or 0.0),
                 "ioc_counts": ioc_stats,
                 "fetched_at": fetched_at,
             }
@@ -6930,6 +7148,24 @@ def api_add_article(req: AddArticleRequest):
     }
 
 
+
+@app.post("/api/articles/reset-all-status")
+def api_reset_all_articles_status():
+    try:
+        db_path = SANDBOX_DIR / "cti_multi_source_archive.sqlite"
+        with sqlite3.connect(db_path) as conn:
+            conn.execute("UPDATE articles_archive SET status = 'pending', processing_time_sec = 0, last_analyzed_at = NULL")
+            conn.execute("DELETE FROM ioc_knowledge_base")
+            conn.execute("DELETE FROM ai_analysis_runs")
+            conn.commit()
+        return {
+            "status": "success",
+            "message": "Đã đặt lại toàn bộ bài báo về trạng thái Chờ xử lý (pending).",
+            "articles": get_archived_articles(source_filter="ALL"),
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
 @app.post("/api/articles/delete")
 def api_delete_article(req: ArticleManageRequest):
     deleted = delete_archived_article(req.article_id)
@@ -6965,10 +7201,22 @@ def api_step2_extract_and_plan(req: Step2Request):
 
     brain = MultiProviderLLMBrain(provider="ollama", model_name=req.model_name)
     ioc_str = ", ".join([f"{i.ioc_type}:{i.value}" for i in iocs[:18]])
-    plan_text = brain._local_deterministic_cti_brain(
-        "Trích xuất IOC",
-        f"Văn bản: {guard['sanitized_text'][:1800]}\nDanh sách IOC ({len(iocs)} chỉ số): {ioc_str}",
+    sys_prompt = (
+        "Bạn là Tác tử AI Phân tích Tình báo Mối đe dọa (CTI Agent). "
+        "Dựa trên nội dung báo cáo an ninh và danh sách chỉ số IoC được bóc tách, "
+        "hãy lập kế hoạch điều tra và phân loại phòng thủ theo 3 điểm chính: "
+        "1. Ngữ cảnh tấn công chính và đối tượng bị nhắm mục tiêu. "
+        "2. Chiến lược đối soát 5 nguồn tình báo (VirusTotal, AbuseIPDB, Shodan, AlienVault OTX, GreyNoise). "
+        "3. Kế hoạch ngăn chặn đa tầng (chống chặn nhầm DNS/hạ tầng sạch, cô lập IP C2, vá ảo WAF)."
     )
+    user_prompt = f"Văn bản báo cáo:\n{guard['sanitized_text'][:1500]}\n\nDanh sách IoC bóc tách ({len(iocs)} chỉ số): {ioc_str}"
+    try:
+        llm_res = brain.ask_llm(sys_prompt, user_prompt, temperature=0.1)
+        plan_text = llm_res.get("content", "").strip()
+        if not plan_text:
+            plan_text = brain._local_deterministic_cti_brain("Trích xuất IOC", user_prompt)
+    except Exception:
+        plan_text = brain._local_deterministic_cti_brain("Trích xuất IOC", user_prompt)
     provider_label = f"LOCAL OLLAMA ({req.model_name} • {CURRENT_HARDWARE['gpu_name']})"
 
     return {
@@ -7005,10 +7253,22 @@ def api_step3_khang_enrich_and_reason(req: Step3Request):
             f"({'CHẶN > 80' if item.is_malicious else 'BẢO VỆ <= 80'})."
         )
 
-    reason_text = brain._local_deterministic_cti_brain(
-        "Điểm rủi ro IOC",
-        "Số liệu Hợp nhất 5 Nguồn (OTX + Abuse.ch/VT + AbuseIPDB + GreyNoise + Shodan) của Khang:\n" + "\n".join(telemetry_lines),
+    sys_prompt = (
+        "Bạn là Tác tử AI Đánh giá Rủi ro và Thẩm định An ninh (CTI Risk Assessment Agent). "
+        "Dựa trên số liệu danh tiếng hợp nhất từ 5 nguồn OSINT thực chiến, "
+        "hãy đưa ra lập luận an ninh (Security Reasoning): "
+        "1. Phân biệt rõ ràng nhóm IP/Domain độc hại (C2, Scanner, Botnet > 80 điểm) và nhóm hạ tầng sạch/bình thường (<= 80 điểm). "
+        "2. Đánh giá mức độ khẩn cấp và nguy cơ đối với hệ thống mục tiêu. "
+        "3. Quyết định hành động: Đưa vào danh sách chặn hay chuyển sang giám sát thụ động."
     )
+    user_prompt = "Số liệu Hợp nhất 5 Nguồn (OTX + Abuse.ch/VT + AbuseIPDB + GreyNoise + Shodan):\n" + "\n".join(telemetry_lines)
+    try:
+        llm_res = brain.ask_llm(sys_prompt, user_prompt, temperature=0.1)
+        reason_text = llm_res.get("content", "").strip()
+        if not reason_text:
+            reason_text = brain._local_deterministic_cti_brain("Điểm rủi ro IOC", user_prompt)
+    except Exception:
+        reason_text = brain._local_deterministic_cti_brain("Điểm rủi ro IOC", user_prompt)
     provider_label = f"LOCAL OLLAMA ({req.model_name} • {CURRENT_HARDWARE['gpu_name']})"
 
     return {
@@ -7434,6 +7694,28 @@ def api_get_article_details(article_id: str):
 
     text = art_dict.get("content", "")
     title = art_dict.get("title", "Báo cáo CTI")
+    art_status = art_dict.get("status") or "pending"
+
+    # NẾU BÀI BÁO CHƯA ĐƯỢC PHÂN TÍCH (PENDING): KHÔNG TRẢ VỀ DỮ LIỆU ĐÃ CHẤM ĐIỂM
+    if art_status != "completed":
+        return {
+            "article_id": article_id,
+            "title": title,
+            "is_analyzed": False,
+            "all_enriched": [],
+            "ai_plan": "Bài báo đang ở trạng thái [Chờ xử lý]. Vui lòng nhấn nút [Chạy Phân Tích] hoặc [Chạy AI] để Tác tử kích hoạt bóc tách IOC và lập kế hoạch phòng thủ.",
+            "ai_reasoning": "Chưa kích hoạt đối soát tình báo. Nhấn [Chạy AI] trên bài báo này để AI Agent gọi 5 nguồn tình báo và Local LLM (GPU RX 6600) thẩm định.",
+            "history_and_summary": "Bài báo đang ở trạng thái Chờ xử lý. Chưa sinh đối sách MITRE D3FEND.",
+            "firewall_tab_text": "# Bài báo đang ở trạng thái Chờ xử lý.\n# Nhấn 'Chạy AI' để Tác tử kích hoạt đối soát và sinh tập lệnh Firewall.",
+            "suricata_rules": "# Bài báo đang ở trạng thái Chờ xử lý.\n# Chưa sinh quy tắc Suricata IPS.",
+            "waf_rules": "# Bài báo đang ở trạng thái Chờ xử lý.\n# Chưa sinh quy tắc ModSecurity WAF Virtual Patching.",
+            "sigma_and_siem": "# Bài báo đang ở trạng thái Chờ xử lý.\n# Chưa sinh quy tắc Sigma & SIEM.",
+            "yara_remediation_stix": "# Bài báo đang ở trạng thái Chờ xử lý.\n# Chưa sinh quy tắc YARA & STIX.",
+            "agentic_skill_md": "# KỸ NĂNG TÁC TỬ ĐANG CHỜ PHÂN TÍCH\n\nBài báo này chưa được Tác tử AI phân tích. Nhấn [Chạy AI] để sinh gói SKILL.md.",
+            "trust_audit": None,
+            "xai_audit": None,
+        }
+
     kb_map = {r["ioc_value"]: r for r in all_kb}
 
     extracted = tool6_extract_iocs_hybrid(text)
@@ -8206,7 +8488,7 @@ class ServerAutonomousDaemon:
         self.is_scanning: bool = False
         self.last_scan_result: str = "Hệ thống máy chủ CTI đang hoạt động ngầm 24/7."
 
-        self.auto_queue_enabled: bool = True
+        self.auto_queue_enabled: bool = False
         self.is_processing_queue: bool = False
         self.active_article_id: str = ""
         self.active_article_title: str = ""
@@ -8323,25 +8605,42 @@ class ServerAutonomousDaemon:
                                 update_article_analysis_status(art_id, status="processing")
 
                                 self.active_stage_idx = 3
-                                self.active_stage_name = "Đối soát 5 nguồn tình báo (OTX, VT, AbuseIPDB, GreyNoise, Shodan)"
+                                self.active_stage_name = "AI Agent bóc tách IOC & Tra cứu 5 nguồn tình báo"
                                 iocs = tool6_extract_iocs_hybrid(art_content)
+                                enriched = []
+                                malicious = []
                                 if iocs:
                                     enriched = [enrich_ioc(i, call_vt_http=False) for i in iocs]
                                     malicious = filter_high_risk_iocs(enriched)
                                     save_enriched_iocs_to_db(enriched, source_title=art_title)
 
-                                    self.active_stage_idx = 4
-                                    self.active_stage_name = "Tổng hợp Gói Kỹ Năng Tác Tử Đa Lớp (SKILL.md, Tools, Rules, Examples)"
-                                    mitre = tool7_map_mitre_attack(art_content, malicious)
-                                    base_rules = tool8_generate_defensive_rules(art_title, malicious, mitre, raw_text=art_content)
-                                    save_ai_analysis_run_to_db(
-                                        run_mode="SERVER_AUTONOMOUS_DAEMON",
-                                        campaign_title=f"[{pending_row['source_name']}] {art_title[:100]}",
-                                        model_used="LOCAL OLLAMA (khang-qwen3 • 100% GPU RX 6600)",
-                                        total_iocs=len(enriched),
-                                        malicious_iocs=len(malicious),
-                                        defense_summary=f"Server tự động phân tích và tổng hợp Kỹ Năng Tác Tử cho {len(malicious)} IOC nguy hại.",
-                                    )
+                                self.active_stage_idx = 4
+                                self.active_stage_name = "AI Agent suy luận phân tích (Local LLM Qwen3 trên GPU RX 6600)"
+                                brain = MultiProviderLLMBrain(provider="ollama", model_name="khang-qwen3")
+                                sys_prompt = (
+                                    "Bạn là Tác tử AI An ninh Mạng tự chủ (Autonomous CTI Defense Agent). "
+                                    "Hãy phân tích bài báo sau và tóm tắt phương án phòng thủ bằng tiếng Việt trong 3 gạch đầu dòng: "
+                                    "1. Bản chất cuộc tấn công, nhóm APT hoặc loại mã độc/lỗ hổng. "
+                                    "2. Các chỉ số IoC/CVE trọng yếu cần chặn. "
+                                    "3. Quy tắc phòng thủ đề xuất (WAF/Suricata/Firewall)."
+                                )
+                                user_prompt = f"Tiêu đề: {art_title}\n\nNội dung:\n{art_content[:1500]}"
+                                try:
+                                    llm_out = brain.ask_llm(sys_prompt, user_prompt, temperature=0.1)
+                                    ai_summary = llm_out.get("content", "").strip()
+                                except Exception as err:
+                                    ai_summary = f"Tác tử phân tích tự động: {err}"
+
+                                mitre = tool7_map_mitre_attack(art_content, malicious)
+                                base_rules = tool8_generate_defensive_rules(art_title, malicious, mitre, raw_text=art_content)
+                                save_ai_analysis_run_to_db(
+                                    run_mode="SERVER_AUTONOMOUS_DAEMON",
+                                    campaign_title=f"[{pending_row['source_name']}] {art_title[:100]}",
+                                    model_used="LOCAL OLLAMA (khang-qwen3 • 100% GPU RX 6600)",
+                                    total_iocs=len(enriched),
+                                    malicious_iocs=len(malicious),
+                                    defense_summary=ai_summary or f"Tác tử AI tự động phân tích và sinh Kỹ Năng Tác Tử cho {len(malicious)} IOC.",
+                                )
 
                                 duration = round(time.time() - t_start, 2)
                                 update_article_analysis_status(art_id, status="completed", processing_time_sec=duration)
@@ -8453,15 +8752,14 @@ def api_get_project_context(target: str = Query("")):
         except Exception:
             pass
 
-    # 4. Check directory signatures (defense_skills, rules, guide)
+    # 4. Check directory signatures (chỉ tính khi có đủ defense_skills VÀ AGENT_REMEDIATION_GUIDE.md)
     if not is_configured:
         ds_dir = p / "defense_skills"
         has_skills = ds_dir.exists() and any(d.is_dir() for d in ds_dir.iterdir())
         has_guide = (p / "AGENT_REMEDIATION_GUIDE.md").exists()
-        has_cursor = (p / ".cursor" / "rules").exists() and any((p / ".cursor" / "rules").iterdir())
-        has_gemini = (p / ".gemini" / "skills").exists() and any((p / ".gemini" / "skills").iterdir())
+        has_cti_cfg = (p / ".cti_defense.json").exists()
         
-        if has_skills or has_guide or has_cursor or has_gemini:
+        if (has_skills and has_guide) or has_cti_cfg:
             found_skill = "agentic-defense-master-web-suite"
             if has_skills:
                 subdirs = [d.name for d in ds_dir.iterdir() if d.is_dir()]
@@ -8531,18 +8829,18 @@ def api_reset_project(req: TargetRequest):
         if db_path.exists():
             with sqlite3.connect(db_path) as conn:
                 conn.execute("UPDATE project_defense_registry SET is_configured = 0 WHERE target_path = ?", (str(p),))
+                conn.execute("UPDATE articles_archive SET status = 'pending', processing_time_sec = 0, last_analyzed_at = NULL")
+                conn.execute("DELETE FROM ioc_knowledge_base")
+                conn.execute("DELETE FROM ai_analysis_runs")
                 conn.commit()
     except Exception:
         pass
 
-    # 2. Cập nhật last_active_project.json
+    # 2. Xóa hẳn last_active_project.json để đưa hệ thống về Landing Wizard ban đầu
     try:
         lap = SANDBOX_DIR / "last_active_project.json"
         if lap.exists():
-            ld = json.loads(lap.read_text(encoding="utf-8"))
-            if ld.get("target_path") == str(p):
-                ld["is_configured"] = False
-                lap.write_text(json.dumps(ld, indent=2, ensure_ascii=False), encoding="utf-8")
+            lap.unlink(missing_ok=True)
     except Exception:
         pass
     

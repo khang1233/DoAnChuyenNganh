@@ -1,28 +1,26 @@
-title: Web Exploit Attempt - Hackers Infect 953 Online Stores With Scanner-Evading JavaScript,
-id: 9b4a2c10-8e3f-4d2a-b7c1-121412000001
+title: Web Exploit Attempt - China-Aligned Hackers Hijack Sogou Input Method DNS Requests to D
+id: 9b4a2c10-8e3f-4d2a-b7c1-145319000001
 status: production
 description: >
-  Detects potential exploitation attempts targeting CVE-2026-48356, CVE-2025-54236, CVE-2026-109618.
+  Detects potential exploitation attempts targeting CVE-2026-120422, CVE-2026-51990, CVE-2021-38003.
   Monitors web server and reverse proxy logs for unauthorized traversal, exploit parameters, or CVE strings.
 author: Autonomous CTI AI Agent (Phuc Core & Khang Security)
-date: 2026/11/03
+date: 2026/11/04
 tags:
   - attack.t1190
   - attack.initial_access
-  - cve.cve.2026.48356
-  - cve.cve.2025.54236
-  - cve.cve.2026.109618
-  - cve.cve.2026.109619
+  - cve.cve.2026.120422
+  - cve.cve.2026.51990
+  - cve.cve.2021.38003
 logsource:
   category: webserver
   product: apache_nginx_iis_webapps
 detection:
   selection_cve_uri:
     cs-uri-stem|contains:
-      - 'CVE-2026-48356'
-      - 'CVE-2025-54236'
-      - 'CVE-2026-109618'
-      - 'CVE-2026-109619'
+      - 'CVE-2026-120422'
+      - 'CVE-2026-51990'
+      - 'CVE-2021-38003'
       - '/api/'
       - '/rest/'
       - '/admin/'
@@ -47,14 +45,14 @@ falsepositives:
   - Legitimate security vulnerability scanning or authorized testing
 level: critical
 ---
-title: Post-Exploitation Child Process Creation - Hackers Infect 953 Online Stores With Scanner-Evading JavaSc
-id: 9b4a2c10-8e3f-4d2a-b7c1-121412000002
+title: Post-Exploitation Child Process Creation - China-Aligned Hackers Hijack Sogou Input Method DNS Requests
+id: 9b4a2c10-8e3f-4d2a-b7c1-145319000002
 status: production
 description: >
   Detects interactive command shells or system enumeration tools spawned by application servers
-  (Java/Tomcat/Atlassian/IIS/Nginx) following successful exploitation of CVE-2026-48356, CVE-2025-54236, CVE-2026-109618.
+  (Java/Tomcat/Atlassian/IIS/Nginx) following successful exploitation of CVE-2026-120422, CVE-2026-51990, CVE-2021-38003.
 author: Autonomous CTI AI Agent (Phuc Core & Khang Security)
-date: 2026/11/03
+date: 2026/11/04
 tags:
   - attack.t1190
   - attack.t1059.001
@@ -93,13 +91,13 @@ falsepositives:
   - Rare legitimate administrative deployment tasks
 level: critical
 ---
-title: Network Traffic to Verified C2 - Hackers Infect 953 Online Stores With Scanner-Evading JavaScript,
-id: 9b4a2c10-8e3f-4d2a-b7c1-121412000003
+title: Network Traffic to Verified C2 - China-Aligned Hackers Hijack Sogou Input Method DNS Requests to D
+id: 9b4a2c10-8e3f-4d2a-b7c1-145319000003
 status: production
 description: >
   Detects outbound network communication to verified malicious C2 servers and botnet infrastructure.
 author: Autonomous CTI AI Agent (Phuc Core & Khang Security)
-date: 2026/11/03
+date: 2026/11/04
 tags:
   - attack.t1190
   - attack.t1071.001
@@ -111,12 +109,12 @@ logsource:
 detection:
   selection_c2_ip:
     DestinationIp:
-      - '162.35.99.94'
+      - '47.239.250.102'
+      - '47.237.122.175'
   selection_c2_domain:
     QueryName|contains:
-      - 'lanhd6549tdhse.top'
-      - 'additionalver.com'
-      - 'deepveindrilling.com'
+      - 'config.pinyin.sogou.com'
+      - 'sogou-cdn.com'
   condition: selection_c2_ip or selection_c2_domain
 falsepositives:
   - Legitimate connections already filtered out by Khang's Enrichment Gatekeeper (Score <= 80)

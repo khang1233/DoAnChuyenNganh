@@ -1,28 +1,26 @@
-title: Web Exploit Attempt - Hackers Infect 953 Online Stores With Scanner-Evading JavaScript,
-id: 9b4a2c10-8e3f-4d2a-b7c1-121412000001
+title: Web Exploit Attempt - China-Aligned Hackers Hijack Sogou Input Method DNS Requests to D
+id: 9b4a2c10-8e3f-4d2a-b7c1-145319000001
 status: production
 description: >
-  Detects potential exploitation attempts targeting CVE-2026-48356, CVE-2025-54236, CVE-2026-109618.
+  Detects potential exploitation attempts targeting CVE-2026-120422, CVE-2026-51990, CVE-2021-38003.
   Monitors web server and reverse proxy logs for unauthorized traversal, exploit parameters, or CVE strings.
 author: Autonomous CTI AI Agent (Phuc Core & Khang Security)
-date: 2026/11/03
+date: 2026/11/04
 tags:
   - attack.t1190
   - attack.initial_access
-  - cve.cve.2026.48356
-  - cve.cve.2025.54236
-  - cve.cve.2026.109618
-  - cve.cve.2026.109619
+  - cve.cve.2026.120422
+  - cve.cve.2026.51990
+  - cve.cve.2021.38003
 logsource:
   category: webserver
   product: apache_nginx_iis_webapps
 detection:
   selection_cve_uri:
     cs-uri-stem|contains:
-      - 'CVE-2026-48356'
-      - 'CVE-2025-54236'
-      - 'CVE-2026-109618'
-      - 'CVE-2026-109619'
+      - 'CVE-2026-120422'
+      - 'CVE-2026-51990'
+      - 'CVE-2021-38003'
       - '/api/'
       - '/rest/'
       - '/admin/'
@@ -47,14 +45,14 @@ falsepositives:
   - Legitimate security vulnerability scanning or authorized testing
 level: critical
 ---
-title: Post-Exploitation Child Process Creation - Hackers Infect 953 Online Stores With Scanner-Evading JavaSc
-id: 9b4a2c10-8e3f-4d2a-b7c1-121412000002
+title: Post-Exploitation Child Process Creation - China-Aligned Hackers Hijack Sogou Input Method DNS Requests
+id: 9b4a2c10-8e3f-4d2a-b7c1-145319000002
 status: production
 description: >
   Detects interactive command shells or system enumeration tools spawned by application servers
-  (Java/Tomcat/Atlassian/IIS/Nginx) following successful exploitation of CVE-2026-48356, CVE-2025-54236, CVE-2026-109618.
+  (Java/Tomcat/Atlassian/IIS/Nginx) following successful exploitation of CVE-2026-120422, CVE-2026-51990, CVE-2021-38003.
 author: Autonomous CTI AI Agent (Phuc Core & Khang Security)
-date: 2026/11/03
+date: 2026/11/04
 tags:
   - attack.t1190
   - attack.t1059.001
@@ -93,13 +91,13 @@ falsepositives:
   - Rare legitimate administrative deployment tasks
 level: critical
 ---
-title: Network Traffic to Verified C2 - Hackers Infect 953 Online Stores With Scanner-Evading JavaScript,
-id: 9b4a2c10-8e3f-4d2a-b7c1-121412000003
+title: Network Traffic to Verified C2 - China-Aligned Hackers Hijack Sogou Input Method DNS Requests to D
+id: 9b4a2c10-8e3f-4d2a-b7c1-145319000003
 status: production
 description: >
   Detects outbound network communication to verified malicious C2 servers and botnet infrastructure.
 author: Autonomous CTI AI Agent (Phuc Core & Khang Security)
-date: 2026/11/03
+date: 2026/11/04
 tags:
   - attack.t1190
   - attack.t1071.001
@@ -111,12 +109,12 @@ logsource:
 detection:
   selection_c2_ip:
     DestinationIp:
-      - '162.35.99.94'
+      - '47.239.250.102'
+      - '47.237.122.175'
   selection_c2_domain:
     QueryName|contains:
-      - 'lanhd6549tdhse.top'
-      - 'additionalver.com'
-      - 'deepveindrilling.com'
+      - 'config.pinyin.sogou.com'
+      - 'sogou-cdn.com'
   condition: selection_c2_ip or selection_c2_domain
 falsepositives:
   - Legitimate connections already filtered out by Khang's Enrichment Gatekeeper (Score <= 80)
@@ -129,8 +127,8 @@ level: critical
   <!-- [QUY TẮC 1A] Phát hiện hành vi khai thác lỗ hổng Web/API trên máy chủ ứng dụng -->
   <rule id="100910" level="14">
     <if_group>web|apache|nginx|iis</if_group>
-    <match>CVE\-2026\-48356|CVE\-2025\-54236|CVE\-2026\-109618|CVE\-2026\-109619|\.\./|\.\.%2e|%2e%2e|/rest/|/xwork/|WEB-INF|META-INF</match>
-    <description>[OPENCLAW CTI] Phát hiện dấu vết khai thác lỗ hổng CVE-2026-48356, CVE-2025-54236, CVE-2026-109618 trên Web Server</description>
+    <match>CVE\-2026\-120422|CVE\-2026\-51990|CVE\-2021\-38003|\.\./|\.\.%2e|%2e%2e|/rest/|/xwork/|WEB-INF|META-INF</match>
+    <description>[OPENCLAW CTI] Phát hiện dấu vết khai thác lỗ hổng CVE-2026-120422, CVE-2026-51990, CVE-2021-38003 trên Web Server</description>
     <mitre>
       <id>T1190</id>
     </mitre>
@@ -139,7 +137,7 @@ level: critical
   <rule id="100911" level="15">
     <if_group>sysmon_event1</if_group>
     <match>java\.exe.*(cmd|powershell|whoami|net\.exe)|tomcat.*(cmd|sh|bash)|w3wp\.exe.*(cmd|powershell)|nginx.*(bash|sh)</match>
-    <description>[OPENCLAW CTI] Cảnh báo RCE: Máy chủ ứng dụng sinh tiến trình dòng lệnh trái phép sau khai thác CVE-2026-48356, CVE-2025-54236, CVE-2026-109618</description>
+    <description>[OPENCLAW CTI] Cảnh báo RCE: Máy chủ ứng dụng sinh tiến trình dòng lệnh trái phép sau khai thác CVE-2026-120422, CVE-2026-51990, CVE-2021-38003</description>
     <mitre>
       <id>T1190</id>
       <id>T1059</id>
@@ -148,8 +146,8 @@ level: critical
   <!-- [QUY TẮC 1C] Phát hiện kết nối ra máy chủ C2 / Scanner độc hại -->
   <rule id="100912" level="14">
     <if_group>sysmon_event3|firewall|ids</if_group>
-    <match>162\.35\.99\.94</match>
-    <description>[OPENCLAW CTI] Phát hiện kết nối mạng tới C2 độc hại (Hackers Infect 953 Online Stores With Scanner-Evad)</description>
+    <match>47\.239\.250\.102|47\.237\.122\.175</match>
+    <description>[OPENCLAW CTI] Phát hiện kết nối mạng tới C2 độc hại (China-Aligned Hackers Hijack Sogou Input Method DN)</description>
     <mitre>
       <id>T1071.001</id>
     </mitre>
@@ -166,10 +164,10 @@ level: critical
 </group>
 
 # =============================================================================
-# CÂU TRUY VẤN SPLUNK SPL #1: TRUY TÌM DẤU VẾT KHAI THÁC CVE-2026-48356, CVE-2025-54236, CVE-2026-109618 TRÊN WEB/API LOG:
+# CÂU TRUY VẤN SPLUNK SPL #1: TRUY TÌM DẤU VẾT KHAI THÁC CVE-2026-120422, CVE-2026-51990, CVE-2021-38003 TRÊN WEB/API LOG:
 # =============================================================================
 index=web OR index=proxy OR sourcetype="access_combined" OR sourcetype="iis" OR sourcetype="nginx:plus:access"
-(uri_path="*CVE-2026-48356*" OR uri_query="*CVE-2026-48356*" OR uri="*../*" OR uri="*%2e%2e*" OR uri="*/rest/*" OR uri="*/xwork/*") status IN (200, 302, 500)
+(uri_path="*CVE-2026-120422*" OR uri_query="*CVE-2026-120422*" OR uri="*../*" OR uri="*%2e%2e*" OR uri="*/rest/*" OR uri="*/xwork/*") status IN (200, 302, 500)
 | stats count min(_time) as first_attempt max(_time) as last_attempt values(c_ip) as attacker_ips values(uri) as attacked_endpoints by host, status
 | where count >= 1
 
@@ -185,6 +183,6 @@ index=main (sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" Eve
 # =============================================================================
 # CÂU TRUY VẤN SPLUNK SPL #2: TRUY TÌM KẾT NỐI TỚI C2 VÀ HASH MÃ ĐỘC:
 # =============================================================================
-index=main (sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="firewall") (dest_ip="162.35.99.94" OR query="lanhd6549tdhse.top" OR query="additionalver.com" OR query="deepveindrilling.com")
+index=main (sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="firewall") (dest_ip="47.239.250.102" OR dest_ip="47.237.122.175" OR query="config.pinyin.sogou.com" OR query="sogou-cdn.com")
 | stats count min(_time) as first_seen max(_time) as last_seen values(process_name) as processes by src_ip, dest_ip, user
 | where count >= 1

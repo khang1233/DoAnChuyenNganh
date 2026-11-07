@@ -1,14 +1,14 @@
 # =============================================================================
 # KỊCH BẢN KHẮC PHỤC SỰ CỐ, DIỆT MÃ ĐỘC & HARDENING HỆ THỐNG TỰ ĐỘNG
-# Chiến dịch: Hackers Infect 953 Online Stores With Scanner-Evading JavaScript, Most
-# Lỗ hổng liên quan: CVE-2026-48356, CVE-2025-54236, CVE-2026-109618, CVE-2026-109619
+# Chiến dịch: China-Aligned Hackers Hijack Sogou Input Method DNS Requests to Deploy
+# Lỗ hổng liên quan: CVE-2026-120422, CVE-2026-51990, CVE-2021-38003
 # Chức năng: Quét mã băm diệt tiến trình mã độc, cô lập file vào vùng cách ly,
 # ngắt kết nối socket tới C2, khóa DNS Sinkhole và rà soát bản vá hệ thống.
 # =============================================================================
 
 # --- [1] WINDOWS POWERSHELL ACTIVE REMEDIATION & MALWARE CLEANUP (.ps1) ---
-$MaliciousIPs = @("162.35.99.94")
-$MaliciousDomains = @("lanhd6549tdhse.top", "additionalver.com", "deepveindrilling.com")
+$MaliciousIPs = @("47.239.250.102", "47.237.122.175")
+$MaliciousDomains = @("config.pinyin.sogou.com", "sogou-cdn.com")
 $MaliciousHashes = @()
 
 # Bước 0: Rà quét tiến trình bộ nhớ, tính hash SHA256 và tiêu diệt ngay tiến trình mã độc:
@@ -70,7 +70,7 @@ Get-HotFix | Sort-Object InstalledOn -Descending | Select-Object -First 5
 # for h in none; do
 #     find /tmp /var/tmp /dev/shm -type f -exec sha256sum {} + 2>/dev/null | grep "$h" | awk '{print $2}' | xargs -r rm -f
 # done
-# for ip in 162.35.99.94; do
+# for ip in 47.239.250.102 47.237.122.175; do
 #     ss -tupn | grep "$ip" && echo "[ALERT] Active C2 socket to $ip"
 #     iptables -I OUTPUT -d "$ip" -j DROP
 #     iptables -I INPUT -s "$ip" -j DROP

@@ -228,9 +228,7 @@ def interactive_menu():
             print("  [OK] WAF Reverse Proxy L7 : http://127.0.0.1:8766")
             print("  [OK] AI Agent Engine      : Dang san sang nhan dien ma nguon va hoc CTI")
             print()
-            print("  * Ghi chu: Ban co the dong cua so nay bat ky luc nao, he thong van tiep tuc")
-            print("    chay ngam. Khi can tat: Nhap dup vao file '2_TAT_HE_THONG.bat',")
-            print("    hoac bam nut 'Tat He Thong' truc tiep tren Web Dashboard.")
+            print("  * Ghi chu: Quan ly he thong qua CLI 'cti-defense' (hoac dung: 'cti-defense stop').")
         else:
             print("  - He thong hien dang tam tat.")
         print()
