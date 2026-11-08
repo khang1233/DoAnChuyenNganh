@@ -3,8 +3,8 @@
 - **Tên đề tài**: Tự động hóa quy trình CTI và sinh quy tắc phòng thủ ứng dụng AI Agent
 - **Giảng viên hướng dẫn**: Thầy Đinh Phương Nam
 - **Nhóm sinh viên thực hiện**:
-  - Trần Minh Khang - MSSV: 2387700027 - Lớp: 23DATA1 - Nhóm trưởng
-  - Nguyễn Phi Phúc - MSSV: 2387701131 - Lớp: 23DATA1 - Thành viên
+  - Nguyễn Phi Phúc - MSSV: 2387701131 - Lớp: 23DATA1 - Nhóm trưởng
+  - Trần Minh Khang - MSSV: 2387700027 - Lớp: 23DATA1 - Thành viên
   - Nguyễn Nhật Lâm - MSSV: 2387700036 - Lớp: 23DATA1 - Thành viên
 - **Ngành**: An toàn thông tin
 - **Chuyên ngành**: An toàn thông tin
