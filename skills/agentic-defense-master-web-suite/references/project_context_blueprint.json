@@ -20,7 +20,6 @@
     "frontend/src/components/AppHeader.jsx",
     "frontend/src/components/AppSidebar.jsx",
     "frontend/src/components/MinecraftBotViews.jsx",
-    "DoAnChuyenNganh/docker_security_tool/app_web.py",
     "DoAnChuyenNganh/khang_sandbox_full_cti/live_dashboard_app.py",
     "DoAnChuyenNganh/skills/agentic-defense-cve-2026-109618-php2shell-exploit-attempt/scripts/apply_virtual_patch.py",
     "botdiscord/ptkngu/bot.py",
@@ -150,7 +149,6 @@
       ]
     },
     {
-      "file": "DoAnChuyenNganh/docker_security_tool/app_web.py",
       "findings": [
         {
           "line": 43,
@@ -160,7 +158,6 @@
       ]
     },
     {
-      "file": "DoAnChuyenNganh/docker_security_tool/demo.py",
       "findings": [
         {
           "line": 16,
@@ -175,7 +172,6 @@
       ]
     },
     {
-      "file": "DoAnChuyenNganh/docker_security_tool/docker_security_scanner.py",
       "findings": [
         {
           "line": 672,

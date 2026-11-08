@@ -517,13 +517,6 @@ Duy trì chu kỳ quét 15 phút / lần để tự động nạp các mã CVE m
 Hệ thống phát hiện các hàm thực thi hệ thống hoặc truy vấn cần được bảo vệ theo chuẩn CTI:
 - **Tệp:** `DoAnChuyenNganh/ai-devsecops-agent/sync.py`
   - Dòng 9 [Command Execution / RCE Risk]: `result = subprocess.run(cmd, shell=True, text=True, capture_output=True)`
-- **Tệp:** `DoAnChuyenNganh/docker_security_tool/app_web.py`
-  - Dòng 43 [Command Execution / RCE Risk]: `res = subprocess.run(["docker", "inspect", target_type], capture_output=True, text=True, timeout=3)`
-- **Tệp:** `DoAnChuyenNganh/docker_security_tool/demo.py`
-  - Dòng 16 [Command Execution / RCE Risk]: `os.system("cls" if os.name == "nt" else "clear")`
-  - Dòng 19 [Command Execution / RCE Risk]: `return subprocess.run([sys.executable, SCANNER_SCRIPT] + args, cwd=TOOL_DIR)`
-- **Tệp:** `DoAnChuyenNganh/docker_security_tool/docker_security_scanner.py`
-  - Dòng 672 [Command Execution / RCE Risk]: `res = subprocess.run(["docker", "inspect", args.target], capture_output=True, text=True)`
 - **Tệp:** `DoAnChuyenNganh/khang_sandbox_full_cti/agentic_defense_skill_engine.py`
   - Dòng 555 [Command Execution / RCE Risk]: `"   - **Đối với RCE / Command Injection:** Cấm gọi trực tiếp `exec()`, `system()`, `Runtime.getRunti`
 - **Tệp:** `DoAnChuyenNganh/khang_sandbox_full_cti/check_completed.py`

@@ -61,8 +61,7 @@ DoAnChuyenNganh/
 │   ├── openclaw_firewall_bridge.py   # Windows Defender Firewall (netsh) controller
 │   └── cti_multi_source_archive.sqlite # SQLite database (7,450 articles, 9,444 IOCs)
 │
-├── ai-devsecops-agent/               # Deep DevSecOps Agent module
-└── docker_security_tool/             # Docker container vulnerability scanner
+└── ai-devsecops-agent/               # Deep DevSecOps Agent module
 ```
 
 ---

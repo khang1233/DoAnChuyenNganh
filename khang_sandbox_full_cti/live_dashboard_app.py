@@ -5972,7 +5972,7 @@ let wzIsProjectConfigured = false;
         inpTarget.value = "./target_projects/demo_vulnerable_php_app";
         inpClone.value = "";
       } else if (type === 'docker') {
-        inpTarget.value = "./docker_security_tool/demo";
+        inpTarget.value = "./target_projects/My_Website";
         inpClone.value = "";
       }
     }
