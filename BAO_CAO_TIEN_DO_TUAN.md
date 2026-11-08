@@ -1,70 +1,94 @@
-# BÁO CÁO TIẾN ĐỘ THỰC HIỆN ĐỒ ÁN CHUYÊN NGÀNH
+# BÁO CÁO TIẾN ĐỘ THỰC HIỆN ĐỒ ÁN CHUYÊN NGÀNH THEO TỪNG TUẦN
 
 - **Tên đề tài**: Tự động hóa quy trình CTI và sinh quy tắc phòng thủ ứng dụng AI Agent
 - **Giảng viên hướng dẫn**: Thầy Đinh Phương Nam
 - **Nhóm sinh viên thực hiện**:
-  - Trần Minh Khang - MSSV: 2387700027 - Lớp: 23DATH1 - Nhóm trưởng
-  - Nguyễn Phi Phúc - MSSV: 2387701131 - Lớp: 23DATH1 - Thành viên
-  - Nguyễn Nhật Lâm - MSSV: 2387700036 - Lớp: 23DATH1 - Thành viên
+  - Trần Minh Khang - MSSV: 2387700027 - Lớp: 23DATA1 - Nhóm trưởng
+  - Nguyễn Phi Phúc - MSSV: 2387701131 - Lớp: 23DATA1 - Thành viên
+  - Nguyễn Nhật Lâm - MSSV: 2387700036 - Lớp: 23DATA1 - Thành viên
 - **Ngành**: An toàn thông tin
+- **Chuyên ngành**: An toàn thông tin
 
 ---
 
-## 1. TỔNG HỢP TIẾN ĐỘ CÁC TUẦN (THEO PHIẾU THEO DÕI)
+## TUẦN 1: TỪ 12/10/2026 ĐẾN 18/10/2026
 
-| Tuần | Thời gian | Nội dung công việc thực hiện | Trạng thái |
-| :--- | :--- | :--- | :--- |
-| **Tuần 1** | 12/10/2026 đến 18/10/2026 | Chuẩn bị môi trường, tìm hiểu lý thuyết, thiết lập kho lưu trữ mã nguồn GitHub, phân chia công việc trong nhóm, khảo sát công nghệ và nguồn dữ liệu an ninh mạng đầu vào. | Hoàn thành |
-| **Tuần 2** | 19/10/2026 đến 25/10/2026 | Dựng khung hệ thống, khảo sát và chọn lọc các nguồn tin tức tình báo an ninh uy tín, bước đầu triển khai kiến trúc ứng dụng. | Hoàn thành |
-| **Tuần 3** | 26/10/2026 đến 01/11/2026 | Xây dựng hoàn chỉnh phân hệ thu thập dữ liệu tự động từ các nguồn tình báo mở OSINT, chuẩn bị các công cụ bóc tách chỉ số nguy hại IOC. | Hoàn thành |
-| **Tuần 4** | 02/11/2026 đến 08/11/2026 | Nâng cấp quy trình 6 bước tự hành cho Tác tử AI, tích hợp bộ cào báo trực quan đa nguồn tại Bước 5, khắc phục triệt để hiện tượng dính dữ liệu cũ, đóng gói Kỹ năng Tác tử phòng thủ đa tầng và dọn dẹp bảo mật mã nguồn. | Hoàn thành |
+### 1. Nội dung công việc thực hiện
+- Khởi tạo môi trường lập trình và tìm hiểu cơ sở lý thuyết về an ninh mạng cùng mô hình tác tử trí tuệ nhân tạo.
+- Thiết lập kho lưu trữ mã nguồn GitHub cho dự án và phân chia vai trò cho các thành viên trong nhóm.
+- Khảo sát các công nghệ lõi cần sử dụng và nguồn dữ liệu an ninh mạng đầu vào.
+
+### 2. Kết quả đạt được
+- Tạo thành công cấu trúc dự án chuẩn trên GitHub và thống nhất quy trình làm việc nhóm.
+- Xác định mục tiêu trọng tâm: Tự động hóa quy trình phân tích mối đe dọa và sinh đối sách phòng thủ cho ứng dụng web.
 
 ---
 
-## 2. CHI TIẾT KẾT QUẢ THỰC HIỆN TUẦN 4 (ĐÃ LÀM TỚI GÌ)
+## TUẦN 2: TỪ 19/10/2026 ĐẾN 25/10/2026
 
-Trong tuần 4, nhóm tập trung nâng cấp hệ thống theo hướng trực quan hóa hoạt động của Tác tử AI và hoàn thiện cơ chế xử lý dữ liệu sạch cho từng dự án:
+### 1. Nội dung công việc thực hiện
+- Dựng khung kiến trúc nền tảng cho hệ thống phòng thủ.
+- Tìm kiếm, đánh giá và chọn lọc các nguồn tin tức tình báo an ninh mạng uy tín trên thế giới.
+- Bước đầu triển khai các mô-đun kết nối dữ liệu thử nghiệm.
 
-- **Nâng cấp quy trình 6 bước tự hành khép kín (Wizard)**:
-  - Bước 1: Quét sâu cây cú pháp trừu tượng AST mã nguồn dự án mục tiêu và nhận diện điểm nóng nhạy cảm như upload tệp tin, thực thi lệnh hệ thống.
-  - Bước 2: Tự động đo lường cấu hình phần cứng phần cứng GPU AMD Radeon RX 6600, 8GB VRAM và đề xuất mô hình AI cục bộ phù hợp như Qwen3 8B.
-  - Bước 3: Gán phân hệ phòng thủ chính xác cho dự án như Web và API.
-  - Bước 4: Thiết lập chu kỳ quét giám sát tự động.
-  - Bước 5: Kích hoạt Tác tử cào báo tình báo chuyên biệt theo phân hệ và nạp dữ liệu trực quan.
-  - Bước 6: Đóng gói bản vá ảo WAF, sinh bộ kỹ năng phòng thủ và kiểm thử thực chiến.
+### 2. Kết quả đạt được
+- Lựa chọn 6 nguồn tin tức tình báo an ninh mạng mở chính thống gồm The Hacker News, CISA KEV Catalog, Bleeping Computer, Check Point Research, Kaspersky Securelist và The DFIR Report.
+- Thiết lập cơ sở dữ liệu SQLite cục bộ để lưu trữ và quản lý tập trung các bài viết an ninh mạng.
 
-- **Xây dựng Trung tâm điều khiển cào báo trực quan tại Bước 5**:
-  - Tích hợp bảng giám sát kết nối thời gian thực cho 6 nguồn tin an ninh mạng quốc tế gồm The Hacker News, CISA KEV Catalog, Bleeping Computer, Check Point Research, Kaspersky Securelist và The DFIR Report.
-  - Thêm đèn chỉ thị trạng thái kết nối chuyển đổi trực tiếp: Chờ kết nối, Đang kết nối TLS tải dữ liệu và Hoàn tất.
-  - Hiển thị thanh phần trăm tiến trình chuyển động mượt mà từ 0% đến 100% kèm nhãn từng bước xử lý.
-  - Thêm bảng dòng lệnh Terminal hiển thị nhật ký bóc tách tin tức trực tiếp.
-  - Cơ chế nạp từng bài báo vào hàng đợi: Lọc đúng 15 bài báo nguy cơ cao nhất khớp với công nghệ của dự án và nạp tuần tự từng bài kèm độ trễ để người dùng quan sát rõ ràng quá trình làm việc của Tác tử.
+---
 
-- **Khắc phục triệt để lỗi dính dữ liệu cũ và phân tách vùng làm việc**:
-  - Khi bắt đầu dự án mới hoặc bấm quét lại, hàng đợi bài báo được làm sạch về 0 bài, không còn hiện tượng hiển thị sẵn dữ liệu từ các lần chạy trước.
-  - Tách bạch rõ ràng giữa hai chế độ xem: Bài báo thuộc dự án hiện tại và Toàn bộ kho tri thức lịch sử hệ thống lưu trong cơ sở dữ liệu SQLite.
+## TUẦN 3: TỪ 26/10/2026 ĐẾN 01/11/2026
 
-- **Đóng gói Kỹ năng Tác tử phòng thủ đa tầng (Agentic Defense Skills)**:
-  - Tự động sinh trọn bộ quy tắc phòng thủ phối hợp gồm ModSecurity WAF cổng 8766, luật mạng Suricata IPS, giám sát hành vi Sigma, luật quét mã độc YARA và chính sách tường lửa OpenC2.
-  - Tệp hướng dẫn SKILL.md đi kèm mã nguồn mẫu trước và sau khi vá lỗi, kèm script kiểm chứng lỗ hổng cho các AI Coding Agent nạp tự động.
+### 1. Nội dung công việc thực hiện
+- Xây dựng hoàn chỉnh phân hệ thu thập dữ liệu tự động từ các nguồn tin tình báo mở OSINT.
+- Chuẩn bị các bộ công cụ bóc tách chỉ số nhận diện xâm nhập nguy hại IOC.
+- Bắt đầu xây dựng cơ chế làm giàu dữ liệu và chấm điểm mối đe dọa.
 
-- **Dọn dẹp mã nguồn và thắt chặt an toàn kho lưu trữ**:
-  - Quy hoạch toàn bộ tài liệu hướng dẫn và đề cương vào thư mục `docs/`.
-  - Loại bỏ các tệp rác, các bản sao lưu trùng lặp và các script kiểm tra tạm thời.
+### 2. Kết quả đạt được
+- Thu thập và lưu trữ thành công kho tri thức ban đầu hơn 200 bài báo tình báo an ninh mạng.
+- Tích hợp biểu thức chính quy để trích xuất tự động địa chỉ IP tấn công, tên miền độc hại, mã định danh lỗ hổng CVE và mã băm mã độc SHA256.
+
+---
+
+## TUẦN 4: TỪ 02/11/2026 ĐẾN 08/11/2026 (TUẦN HIỆN TẠI)
+
+### 1. Chi tiết các công việc và nâng cấp mới hoàn thành
+- **Quy trình 6 bước tự hành cho Tác tử AI**:
+  - Bước 1: Quét sâu cây cú pháp trừu tượng AST mã nguồn dự án mục tiêu để tìm các điểm nóng nhạy cảm như hàm thực thi lệnh hệ thống, hàm tải tệp tin.
+  - Bước 2: Tự động kiểm tra phần cứng máy tính và chọn mô hình ngôn ngữ lớn cục bộ Qwen3 8B chạy trên card đồ họa AMD Radeon RX 6600.
+  - Bước 3: Định danh kiến trúc và gán phân hệ phòng thủ chính xác cho dự án như phân hệ Web và API.
+  - Bước 4: Thiết lập chu kỳ tự động giám sát và quét mối đe dọa định kỳ.
+  - Bước 5: Kích hoạt Tác tử cào dữ liệu chuyên sâu theo phân hệ đã chọn.
+  - Bước 6: Đóng gói bản vá ảo WAF, sinh kỹ năng phòng thủ và kiểm thử thực chiến.
+
+- **Trung tâm cào báo trực quan tại Bước 5**:
+  - Giao diện hiển thị trực quan trạng thái kết nối của 6 nguồn tin an ninh quốc tế với đèn tín hiệu chuyển đổi từ Chờ kết nối sang Đang kết nối rồi đến Hoàn tất.
+  - Thanh tiến trình phần trăm chuyển động mượt mà từ 0% đến 100% kèm nhãn trạng thái của từng giai đoạn.
+  - Bảng điều khiển dòng lệnh Terminal hiển thị nhật ký thu thập dữ liệu thời gian thực.
+  - Cơ chế nạp từng bài báo vào hàng đợi: Lọc đúng 15 bài báo nguy cơ cao nhất sát với công nghệ dự án và nạp lần lượt kèm độ trễ để người dùng quan sát rõ ràng quá trình Tác tử làm việc.
+
+- **Sửa triệt để lỗi dính dữ liệu cũ và phân tách vùng làm việc**:
+  - Khi bắt đầu kiểm tra một dự án mới hoặc nhấn nút quét lại, hàng đợi bài báo được đặt lại sạch sẽ về 0 bài, không còn bị nạp tràn lan hàng trăm bài báo cũ từ trước.
+  - Tách bạch hai chế độ xem: Chế độ chỉ xem bài báo thuộc dự án hiện tại và Chế độ xem toàn bộ kho tri thức lịch sử hệ thống lưu trong cơ sở dữ liệu SQLite.
+
+- **Đóng gói Kỹ năng Tác tử phòng thủ đa tầng**:
+  - Tự động sinh trọn bộ quy tắc phòng thủ phối hợp gồm tường lửa ứng dụng ModSecurity WAF cổng 8766, hệ thống ngăn chặn xâm nhập Suricata IPS, luật giám sát hành vi Sigma, luật rà quét mã độc YARA và chính sách chặn mạng OpenC2.
+  - Đóng gói tệp hướng dẫn chuẩn SKILL.md cùng mã nguồn mẫu trước và sau khi sửa lỗi cho các công cụ lập trình AI tự động đọc và thực thi.
+
+- **Dọn dẹp mã nguồn và bảo mật kho lưu trữ**:
+  - Di chuyển toàn bộ các tài liệu Word vào thư mục riêng `docs/`, xóa bỏ các bản sao lưu trùng lặp.
   - Cập nhật tệp `.gitignore` chặn tuyệt đối mọi tệp chứa biến môi trường, khóa bí mật, chứng chỉ số trước khi mở công khai kho lưu trữ.
 
----
-
-## 3. CÁC ĐIỂM NGHẼN VÀ KHÓ KHĂN ĐANG GẶP PHẢI (STUCK Ở ĐÂU)
-
-- **Giới hạn bộ nhớ đồ họa 8GB VRAM khi chạy mô hình cục bộ**: Khi gặp các bài báo phân tích chiến dịch APT có độ dài văn bản quá lớn, việc nạp toàn bộ nội dung thô vào mô hình ngôn ngữ lớn Qwen3 8B làm tăng thời gian suy luận. Giải pháp nhóm đang áp dụng là xây dựng bộ lọc đoạn văn chứa thực thể IOC trước khi chuyển vào mô hình.
-- **Giới hạn số lượt gọi API từ các dịch vụ thẩm định an ninh bên ngoài**: Các dịch vụ đối soát như VirusTotal và AbuseIPDB áp dụng hạn ngạch số lần truy vấn miễn phí theo phút, gây chậm tiến độ khi đối soát hàng loạt chỉ số mới. Nhóm đã bổ sung cơ chế lưu bộ nhớ đệm cục bộ vào SQLite để tái sử dụng kết quả các chỉ số đã kiểm tra trước đó.
-- **Quyền hạn can thiệp tường lửa hệ điều hành**: Việc tự động thêm quy tắc chặn IP thông qua lệnh Netsh trên Windows đòi hỏi quyền quản trị viên cao cấp, cần hoàn thiện giao diện nhắc cấp quyền mượt mà hơn cho người dùng cuối.
+### 2. Các điểm nghẽn và khó khăn đang gặp phải (Stuck ở đâu)
+- **Giới hạn bộ nhớ đồ họa 8GB VRAM**: Khi gặp bài báo tình báo có nội dung văn bản quá dài, việc nạp toàn bộ vào mô hình ngôn ngữ lớn cục bộ làm thời gian suy luận bị chậm. Hướng giải quyết là xây dựng bộ lọc đoạn văn chứa mã nhận diện nguy hại trước khi đưa vào mô hình.
+- **Giới hạn số lượt gọi API từ các dịch vụ bên ngoài**: Các dịch vụ kiểm tra như VirusTotal và AbuseIPDB giới hạn số lượt truy vấn miễn phí trong một phút. Hướng giải quyết là nhóm đã xây dựng cơ chế lưu bộ nhớ đệm kết quả vào cơ sở dữ liệu SQLite để không phải gọi lại các chỉ số đã kiểm tra.
+- **Quyền hạn can thiệp tường lửa hệ điều hành**: Việc tự động thêm luật chặn IP qua lệnh Netsh trên Windows cần quyền quản trị viên cao cấp, nhóm đang hoàn thiện giao diện thông báo mượt mà hơn cho người dùng.
 
 ---
 
-## 4. HƯỚNG ĐI TIẾP THEO TRONG TUẦN 5 (TỪ 09/11 ĐẾN 15/11/2026)
+## TUẦN 5: TỪ 09/11/2026 ĐẾN 15/11/2026 (KẾ HOẠCH TIẾP THEO)
 
-- **Hoàn thiện kịch bản kiểm thử đối kháng tự động**: Triển khai kịch bản Tác tử tự động gửi payload tấn công thử nghiệm vào ứng dụng mẫu (thực thi mã từ xa RCE, tải tệp độc hại), kích hoạt lá chắn ModSecurity WAF và tường lửa để chặn đứng, sau đó vá mã nguồn và tái kiểm thử xác nhận an toàn 100%.
-- **Đo lường định lượng và tối ưu hiệu năng**: Đo thời gian phản hồi trung bình từ lúc phát hiện tin CTI đến lúc sinh xong quy tắc phòng thủ, giảm độ trễ xử lý của mô hình AI xuống dưới 10 giây mỗi đợt quét.
-- **Viết báo cáo tổng kết và chuẩn bị thuyết trình demo**: Hoàn thiện tài liệu thuyết minh chi tiết của đồ án theo mẫu khoa và biên soạn slide trình chiếu demo trực tiếp toàn bộ luồng hoạt động cho giảng viên hướng dẫn.
+### 1. Nhiệm vụ trọng tâm cần triển khai
+- **Kiểm thử đối kháng tự động**: Xây dựng kịch bản cho Tác tử tự động gửi mã tấn công thử nghiệm vào dự án mẫu, kích hoạt tường lửa ModSecurity WAF và Suricata IPS để chặn đứng, sau đó áp dụng mã vá lỗi và tái kiểm thử xác nhận an toàn.
+- **Đo lường hiệu năng và tối ưu hóa**: Đo thời gian phản hồi từ lúc cào tin tức đến lúc kích hoạt phòng thủ thành công, tối ưu tốc độ xử lý của mô hình AI xuống dưới 10 giây mỗi đợt quét.
+- **Hoàn thiện tài liệu báo cáo và chuẩn bị slide**: Viết hoàn chỉnh tài liệu báo cáo đồ án theo đúng mẫu khoa và thiết kế slide trình chiếu để chuẩn bị báo cáo demo trực tiếp với giảng viên hướng dẫn.
