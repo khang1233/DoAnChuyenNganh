@@ -12,7 +12,7 @@ const path = require('path');
 const fs = require('fs');
 
 const ROOT_DIR = path.resolve(__dirname, '..');
-const SANDBOX_DIR = path.join(ROOT_DIR, 'khang_sandbox_full_cti');
+const SANDBOX_DIR = path.join(ROOT_DIR, 'cti_core');
 const APP_FILE = path.join(SANDBOX_DIR, 'live_dashboard_app.py');
 const SYSTEM_CTL_FILE = path.join(SANDBOX_DIR, 'system_ctl.py');
 const PORT = 8765;

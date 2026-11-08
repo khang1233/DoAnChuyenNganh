@@ -25,8 +25,8 @@ This repository is an **Autonomous Cyber Threat Intelligence (CTI) & Agentic Def
 | **Start Entire System** | `1_BAT_HE_THONG.bat` | Starts SOC Dashboard (8765) and WAF Gateway (8766). |
 | **Stop Entire System** | Press `[T]` in `1_BAT_HE_THONG.bat` or click `[Tat He Thong]` in UI | Gracefully terminates all background Python servers. |
 | **Protect Any Project** | `python apply_to_project.py --target <path>` | Auto-detects tech stack and installs Agentic Skill into `<path>`. |
-| **Package New Skill** | `python khang_sandbox_full_cti/skill_bundle_packager.py` | Generates a complete GitHub Agent Skill folder bundle. |
-| **Enrich Corpus** | `python khang_sandbox_full_cti/enrich_all_corpus.py 500` | Multi-threaded full-text crawl and IOC learning pipeline. |
+| **Package New Skill** | `python cti_core/skill_bundle_packager.py` | Generates a complete GitHub Agent Skill folder bundle. |
+| **Enrich Corpus** | `python cti_core/enrich_all_corpus.py 500` | Multi-threaded full-text crawl and IOC learning pipeline. |
 | **Test WAF Gateway** | `curl -i -X POST http://localhost:8766/api/login -d "cmd=id"` | Verifies 403 Forbidden virtual patch blocking. |
 
 ---
@@ -51,7 +51,7 @@ DoAnChuyenNganh/
 │       ├── references/               # Ground truth CTI reports, STIX 2.1, xAI audit trail
 │       └── examples/                 # Vulnerable vs. hardened code fixtures
 │
-├── khang_sandbox_full_cti/           # Core Backend Engine
+├── cti_core/                         # Core Backend Engine
 │   ├── live_dashboard_app.py         # FastAPI SOC Dashboard Server (Port 8765)
 │   ├── live_defense_orchestrator.py  # Defense engine orchestrator & WAF Proxy (Port 8766)
 │   ├── agentic_defense_skill_engine.py # Trust Score calculation & xAI attribution engine

@@ -11,7 +11,7 @@ echo.
 cd /d "%~dp0"
 
 :: 1. Goi trinh dieu khien python dung sach se he thong
-python khang_sandbox_full_cti\system_ctl.py stop
+python cti_core\system_ctl.py stop
 if errorlevel 1 goto fallback_kill
 goto end
 

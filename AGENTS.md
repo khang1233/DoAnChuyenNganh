@@ -62,6 +62,6 @@ All skills in `skills/` must strictly conform to this structure:
 ## 4. Environment & Execution Guidelines
 
 - **Python**: Version 3.10+ required.
-- **SQLite Database**: Located at `khang_sandbox_full_cti/cti_multi_source_archive.sqlite` (contains full-text articles and learned IOCs).
+- **SQLite Database**: Located at `cti_core/cti_multi_source_archive.sqlite` (contains full-text articles and learned IOCs).
 - **FastAPI Backend**: Run `cti-defense` CLI (or `cti`) to launch on port `8765` (Dashboard) and port `8766` (WAF Proxy).
 - **Firewall Integration**: Any Windows Firewall modification via `openclaw_firewall_bridge.py` requires elevated permissions and must support instant rollback via `rollback_firewall.bat`.

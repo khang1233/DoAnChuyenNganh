@@ -1,54 +1,55 @@
-# ==========================================
-# Git Ignore for DoAnChuyenNganh
-# ==========================================
-
-# 0. Secrets & Credentials (Public Repository Safety)
-.env
-.env.*
-*.env
-*.key
-*.pem
-*.token
-*.p12
-*.pfx
-secrets.json
-credentials.json
-*_secret*
-*_credential*
-*_key.txt
-
-# 1. Virtual Environments
-.venv/
-venv/
-env/
-ENV/
-ai-devsecops-agent/.venv/
-
-# 2. Python Bytecode & Cache
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
+
+# C extensions
 *.so
-.pytest_cache/
-.coverage
-htmlcov/
 
-# 3. Model Weights & Massive Datasets
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Node dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ollama Models & Binary blobs
 ollama_models/
-*.gguf
 *.bin
-*.pt
-*.safetensors
-
-# 4. Binaries & Executables (>100MB exceeds GitHub limits)
+*.gguf
 *.exe
 *.msi
 *.dll
 *.sys
-khang_sandbox_full_cti/suricata_setup.msi
-khang_sandbox_full_cti/suricata_windivert.msi
-khang_sandbox_full_cti/live_defense_system/suricata_bin/
-khang_sandbox_full_cti/live_defense_system/suricata_windivert_bin/
+cti_core/suricata_setup.msi
+cti_core/suricata_windivert.msi
+cti_core/live_defense_system/suricata_bin/
+cti_core/live_defense_system/suricata_windivert_bin/
 
 # 5. OS & IDE Metadata
 .DS_Store
@@ -63,11 +64,11 @@ desktop.ini
 **/.git_submodule_backup/
 
 # 6. Temporary scratch & test artifacts
-khang_sandbox_full_cti/scratch/
+cti_core/scratch/
 target_projects/
 **/*full_corpus.sqlite
 **/*backup*.sqlite
-khang_sandbox_full_cti/cti_multi_source_archive_full_corpus.sqlite
+cti_core/cti_multi_source_archive_full_corpus.sqlite
 *.log
 *.tmp
 *.bak
@@ -78,6 +79,6 @@ khang_sandbox_full_cti/cti_multi_source_archive_full_corpus.sqlite
 !*.sh
 !*.md
 !*.json
-!khang_sandbox_full_cti/cti_multi_source_archive.sqlite
-!khang_sandbox_full_cti/cti_local_firewall_rules.sqlite
+!cti_core/cti_multi_source_archive.sqlite
+!cti_core/cti_local_firewall_rules.sqlite
 !*.html

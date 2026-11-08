@@ -9,7 +9,7 @@ if errorlevel 1 goto no_python
 
 :: 2. Chuyen vao thu muc goc va chay bo dieu khien he thong
 cd /d "%~dp0"
-python khang_sandbox_full_cti\system_ctl.py %*
+python cti_core\system_ctl.py %*
 exit /b %errorlevel%
 
 :no_python

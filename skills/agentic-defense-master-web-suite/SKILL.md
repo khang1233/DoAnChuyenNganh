@@ -517,9 +517,9 @@ Duy trì chu kỳ quét 15 phút / lần để tự động nạp các mã CVE m
 Hệ thống phát hiện các hàm thực thi hệ thống hoặc truy vấn cần được bảo vệ theo chuẩn CTI:
 - **Tệp:** `DoAnChuyenNganh/ai-devsecops-agent/sync.py`
   - Dòng 9 [Command Execution / RCE Risk]: `result = subprocess.run(cmd, shell=True, text=True, capture_output=True)`
-- **Tệp:** `DoAnChuyenNganh/khang_sandbox_full_cti/agentic_defense_skill_engine.py`
+- **Tệp:** `DoAnChuyenNganh/cti_core/agentic_defense_skill_engine.py`
   - Dòng 555 [Command Execution / RCE Risk]: `"   - **Đối với RCE / Command Injection:** Cấm gọi trực tiếp `exec()`, `system()`, `Runtime.getRunti`
-- **Tệp:** `DoAnChuyenNganh/khang_sandbox_full_cti/check_completed.py`
+- **Tệp:** `DoAnChuyenNganh/cti_core/check_completed.py`
   - Dòng 6 [Possible Raw SQL Concatenation]: `rows = conn.execute("SELECT article_id, source_name, title, sort_ts, processing_time_sec, last_analy`
 
 ### 3. Chỉ Dẫn Hành Động Cụ Thể Cho AI Coding Agent:

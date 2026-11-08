@@ -113,7 +113,7 @@ defense_skills/<skill-name>/
 ## 📚 TÀI LIỆU HƯỚNG DẪN & BÁO CÁO ĐỒ ÁN
 
 Toàn bộ tài liệu chi tiết của đồ án được tổ chức gọn gàng trong thư mục [docs/](docs/):
-- **Báo cáo tiến độ tuần (Mới nhất)**: [BAO_CAO_TIEN_DO_TUAN.md](BAO_CAO_TIEN_DO_TUAN.md)
+- **Báo cáo tiến độ tuần (Mới nhất)**: [docs/BAO_CAO_TIEN_DO_TUAN.md](docs/BAO_CAO_TIEN_DO_TUAN.md)
 - **Hướng dẫn sử dụng và kiểm thử (Markdown)**: [docs/HUONG_DAN_SU_DUNG_VA_KIEM_THU.md](docs/HUONG_DAN_SU_DUNG_VA_KIEM_THU.md)
 - **Hướng dẫn sử dụng và kiểm thử (Word)**: [docs/HUONG_DAN_SU_DUNG_VA_KIEM_THU.docx](docs/HUONG_DAN_SU_DUNG_VA_KIEM_THU.docx)
 - **Tài liệu tổng hợp Đồ án Chuyên ngành CTI**: [docs/TAI_LIEU_TONG_HOP_DACN_CTI.docx](docs/TAI_LIEU_TONG_HOP_DACN_CTI.docx)

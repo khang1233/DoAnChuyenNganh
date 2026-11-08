@@ -8,10 +8,10 @@ from datetime import datetime, timezone
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List, Tuple, Dict, Any
 
-sys.path.append('khang_sandbox_full_cti')
+sys.path.append('cti_core')
 from phuc_core_ai_agent import tool6_extract_iocs_hybrid
 
-DB_PATH = 'khang_sandbox_full_cti/cti_multi_source_archive.sqlite'
+DB_PATH = 'cti_core/cti_multi_source_archive.sqlite'
 
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',

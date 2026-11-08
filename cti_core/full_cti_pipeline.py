@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ================================================================================
-BẢN FULL DỰ ÁN 8 TOOLS (100% DỮ LIỆU THẬT TỪ INTERNET) DÀNH RIÊNG CHO KHANG
-Đường dẫn: D:\\mkhang\\DoAnChuyenNganh\\khang_sandbox_full_cti\\full_cti_pipeline.py
-LƯU Ý: File này nằm NGOÀI thư mục Git của nhóm để Khang thoải mái chạy toàn bộ 8 Tools
-       với dữ liệu trực tuyến thật 100% mà không ảnh hưởng tới GitHub của nhóm!
+PIPELINE TỔNG HỢP 8 CÔNG CỤ CTI VÀ PHÒNG THỦ TỰ ĐỘNG (DỮ LIỆU THỰC TẾ)
+Đường dẫn: cti_core/full_cti_pipeline.py
+Mục đích: Tích hợp toàn trình thu thập, trích xuất, làm giàu, ánh xạ MITRE
+         và sinh quy tắc phòng thủ đa tầng (Sigma, YARA, Firewall, STIX 2.1).
 ================================================================================
 """
 

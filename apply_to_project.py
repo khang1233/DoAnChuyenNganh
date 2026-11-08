@@ -24,7 +24,7 @@ from pathlib import Path
 from datetime import datetime
 
 ROOT_DIR = Path(__file__).resolve().parent
-SANDBOX_DIR = ROOT_DIR / "khang_sandbox_full_cti"
+SANDBOX_DIR = ROOT_DIR / "cti_core"
 DB_PATH = SANDBOX_DIR / "cti_multi_source_archive.sqlite"
 SKILLS_DIR = ROOT_DIR / "skills"
 

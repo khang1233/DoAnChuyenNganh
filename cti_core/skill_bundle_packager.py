@@ -15,7 +15,7 @@ from agentic_defense_skill_engine import (
 from phuc_core_ai_agent import tool6_extract_iocs_hybrid
 from multi_lang_remediation_suite import write_all_language_fixtures, generate_multi_lang_markdown_sop
 
-SANDBOX_DIR = Path("khang_sandbox_full_cti")
+SANDBOX_DIR = Path("cti_core")
 DB_PATH = SANDBOX_DIR / "cti_multi_source_archive.sqlite"
 SKILLS_OUTPUT_DIR = Path("skills")
 

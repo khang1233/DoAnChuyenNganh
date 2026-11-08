@@ -15,7 +15,7 @@ import urllib.parse
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
-SANDBOX_DIR = ROOT_DIR / "khang_sandbox_full_cti"
+SANDBOX_DIR = ROOT_DIR / "cti_core"
 APP_FILE = SANDBOX_DIR / "live_dashboard_app.py"
 PORT = 8765
 WAF_PORT = 8766

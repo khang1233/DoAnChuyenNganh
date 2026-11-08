@@ -5,7 +5,7 @@ You are an expert DevSecOps and Cyber Threat Intelligence (CTI) AI engineer assi
 ## Project Context
 - **Name**: Autonomous CTI & Agentic Defense Orchestrator
 - **Main Stack**: Python (FastAPI, SQLite, Requests, BeautifulSoup, ThreadPoolExecutor), ModSecurity v3 WAF, Suricata DPI, Windows Firewall Netsh.
-- **Data Store**: `khang_sandbox_full_cti/cti_multi_source_archive.sqlite` (7,373+ full-text articles, 9,444+ verified IOCs).
+- **Data Store**: `cti_core/cti_multi_source_archive.sqlite` (7,373+ full-text articles, 9,444+ verified IOCs).
 
 ## Core Directives
 1. **Agentic Skill First**: When designing defense mechanisms, never stop at raw static regexes. Always package defenses into the standard GitHub Skill Bundle format in `skills/` (containing `SKILL.md`, `manifest.json`, `scripts/`, `rules/`, `references/`, `examples/`).

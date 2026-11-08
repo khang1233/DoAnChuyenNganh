@@ -20,7 +20,7 @@
     "frontend/src/components/AppHeader.jsx",
     "frontend/src/components/AppSidebar.jsx",
     "frontend/src/components/MinecraftBotViews.jsx",
-    "DoAnChuyenNganh/khang_sandbox_full_cti/live_dashboard_app.py",
+    "DoAnChuyenNganh/cti_core/live_dashboard_app.py",
     "DoAnChuyenNganh/skills/agentic-defense-cve-2026-109618-php2shell-exploit-attempt/scripts/apply_virtual_patch.py",
     "botdiscord/ptkngu/bot.py",
     "botdiscord/token_manager_tool/modules/server_checker.py",
@@ -181,7 +181,7 @@
       ]
     },
     {
-      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/agentic_defense_skill_engine.py",
+      "file": "DoAnChuyenNganh/cti_core/agentic_defense_skill_engine.py",
       "findings": [
         {
           "line": 555,
@@ -191,7 +191,7 @@
       ]
     },
     {
-      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/check_completed.py",
+      "file": "DoAnChuyenNganh/cti_core/check_completed.py",
       "findings": [
         {
           "line": 6,
@@ -201,7 +201,7 @@
       ]
     },
     {
-      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/check_daily_stats.py",
+      "file": "DoAnChuyenNganh/cti_core/check_daily_stats.py",
       "findings": [
         {
           "line": 8,
@@ -211,7 +211,7 @@
       ]
     },
     {
-      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/check_malware.py",
+      "file": "DoAnChuyenNganh/cti_core/check_malware.py",
       "findings": [
         {
           "line": 9,
@@ -226,7 +226,7 @@
       ]
     },
     {
-      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/check_security_tools.py",
+      "file": "DoAnChuyenNganh/cti_core/check_security_tools.py",
       "findings": [
         {
           "line": 37,
@@ -236,7 +236,7 @@
       ]
     },
     {
-      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/check_stuck.py",
+      "file": "DoAnChuyenNganh/cti_core/check_stuck.py",
       "findings": [
         {
           "line": 6,
@@ -251,7 +251,7 @@
       ]
     },
     {
-      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/ingest_3_year_data.py",
+      "file": "DoAnChuyenNganh/cti_core/ingest_3_year_data.py",
       "findings": [
         {
           "line": 255,
@@ -261,7 +261,7 @@
       ]
     },
     {
-      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/ingest_and_triage_full_3year_corpus.py",
+      "file": "DoAnChuyenNganh/cti_core/ingest_and_triage_full_3year_corpus.py",
       "findings": [
         {
           "line": 169,
@@ -286,7 +286,7 @@
       ]
     },
     {
-      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/lam_automation_crawler.py",
+      "file": "DoAnChuyenNganh/cti_core/lam_automation_crawler.py",
       "findings": [
         {
           "line": 780,
@@ -311,7 +311,7 @@
       ]
     },
     {
-      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/live_dashboard_app.py",
+      "file": "DoAnChuyenNganh/cti_core/live_dashboard_app.py",
       "findings": [
         {
           "line": 2757,
@@ -336,7 +336,7 @@
       ]
     },
     {
-      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/live_defense_orchestrator.py",
+      "file": "DoAnChuyenNganh/cti_core/live_defense_orchestrator.py",
       "findings": [
         {
           "line": 67,
@@ -361,7 +361,7 @@
       ]
     },
     {
-      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/openclaw_firewall_bridge.py",
+      "file": "DoAnChuyenNganh/cti_core/openclaw_firewall_bridge.py",
       "findings": [
         {
           "line": 933,
@@ -386,7 +386,7 @@
       ]
     },
     {
-      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/phuc_core_ai_agent.py",
+      "file": "DoAnChuyenNganh/cti_core/phuc_core_ai_agent.py",
       "findings": [
         {
           "line": 160,
@@ -406,7 +406,7 @@
       ]
     },
     {
-      "file": "DoAnChuyenNganh/khang_sandbox_full_cti/reset_stuck.py",
+      "file": "DoAnChuyenNganh/cti_core/reset_stuck.py",
       "findings": [
         {
           "line": 6,
