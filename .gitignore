@@ -64,6 +64,7 @@ desktop.ini
 **/.git_submodule_backup/
 
 # 6. Temporary scratch & test artifacts
+skills/agentic-defense-*
 cti_core/scratch/
 target_projects/
 **/*full_corpus.sqlite
