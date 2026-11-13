@@ -19,10 +19,9 @@ Giải quyết triệt để 2 vấn đề lớn:
    - Sourcegraph Cody: .cody/prompts/cody-instructions.md
    - Universal ReAct / Standard: defense_skills/ & manifest.json
 
-2. Quét và trích xuất Ngữ Cảnh Dự Án Thực Tế (Project Context-Aware Grounding):
-   - Tự động đọc cấu trúc thư mục, entrypoint, frameworks, và các điểm nhạy cảm
-     (Sensitive Sinks: execAsync, db.query, subprocess...) để chỉ dẫn chính xác
-     cho bất kỳ AI Agent nào mở dự án ra đều biết cụ thể file nào cần sửa.
+2. Quét và trích xuất Ngữ Cảnh Hạ Tầng Dự Án (Infrastructure & Telemetry Context Grounding):
+   - Tự động nhận diện frameworks, môi trường chạy và điểm triển khai
+     để đóng gói Agentic Skill (`SKILL.md`, `manifest.json`, `scripts/`, `references/`) phù hợp cho bất kỳ AI Agent nào mở dự án.
 """
 
 import os
@@ -136,7 +135,7 @@ def generate_context_blueprint_markdown(context: Dict[str, Any]) -> str:
         "",
         "> [!IMPORTANT]",
         f"> **Tác tử AI (Claude, Cursor, Codex, Antigravity, Devin, Aider, Continue)**: Dự án `{pname}` đã được hệ thống CTI thẩm định ngữ cảnh.",
-        "> Tuyệt đối không suy luận chung chung! Bạn phải đọc ngữ cảnh thực tế của dự án dưới đây để thực hiện refactor:",
+        "> Tuyệt đối không suy luận chung chung! Bạn phải đọc ngữ cảnh thực tế của dự án dưới đây để triển khai Gói Kỹ Năng CTI:",
         "",
         f"- **Tên dự án:** `{pname}`",
         f"- **Frameworks nhận diện:** `{fws}`",
@@ -149,24 +148,17 @@ def generate_context_blueprint_markdown(context: Dict[str, Any]) -> str:
 
     lines.extend([
         "",
-        "### 2. Các Điểm Nóng Bảo Mật Thực Tế Cần Rà Soát (Detected Sensitive Sinks):",
-        "Hệ thống phát hiện các hàm thực thi hệ thống hoặc truy vấn cần được bảo vệ theo chuẩn CTI:"
-    ])
-
-    if sinks:
-        for item in sinks[:6]:
-            lines.append(f"- **Tệp:** `{item['file']}`")
-            for f in item["findings"]:
-                lines.append(f"  - Dòng {f['line']} [{f['type']}]: `{f['snippet']}`")
-    else:
-        lines.append("- Chưa phát hiện sink nguy hiểm trực tiếp. Cần rà soát các điểm nhận input từ request người dùng.")
-
-    lines.extend([
+        "### 2. Cấu Trúc Gói Kỹ Năng Phòng Thủ CTI (Agentic Skill Package):",
+        "Hệ thống CTI đóng gói tri thức mối đe dọa thành cấu trúc Skill chuẩn gồm:",
+        "- **`SKILL.md`**: Hướng dẫn SOP và mô tả kỹ thuật chiến dịch tấn công cho AI Agent đọc hiểu.",
+        "- **`manifest.json`**: Siêu dữ liệu công cụ, chỉ số IOC và ánh xạ thư mục chuẩn Agent Loader.",
+        "- **`scripts/verify_threat.py`**: Script thực thi rà quét log, payload và chỉ số mạng theo IOC đã xác minh.",
+        "- **`references/`**: Chứa `c2_ip_indicators.txt`, `cti_verbatim_report.txt` và `xai_audit_trail.json`.",
         "",
-        "### 3. Chỉ Dẫn Hành Động Cụ Thể Cho AI Coding Agent:",
-        "1. Mở trực tiếp các tệp tin trong danh sách Điểm Nóng phía trên.",
-        "2. Thay thế việc ghép chuỗi câu lệnh trong các hàm `execAsync` / `exec` bằng mảng tham số cố định `execFile` hoặc Whitelist.",
-        "3. Đảm bảo toàn bộ câu lệnh truy vấn dữ liệu được chuẩn hóa bằng Prepared Statements.",
+        "### 3. Chỉ Dẫn Hành Động Cụ Thể Cho AI Agent:",
+        "1. Đọc tài liệu kỹ năng và bằng chứng trích dẫn xAI nguyên văn trong `SKILL.md` và `references/`.",
+        "2. Thực thi `scripts/verify_threat.py` để kiểm tra log, tệp tin và lưu lượng đối chiếu với IOC độc hại.",
+        "3. Đảm bảo chỉ số sạch công cộng (như `8.8.8.8`, `1.1.1.1`) được bảo vệ qua Whitelist fail-closed (0% False Positive).",
         ""
     ])
     return "\n".join(lines)

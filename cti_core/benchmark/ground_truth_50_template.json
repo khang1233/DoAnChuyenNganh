@@ -1,0 +1,902 @@
+[
+  {
+    "index": 1,
+    "article_id": "thn-aa6560399965",
+    "title": "GoBruteforcer Botnet Targets Crypto Project Databases by Exploiting Weak Credentials",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-01-12",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 2,
+    "article_id": "thn-40afd2505d67",
+    "title": "Researchers Null-Route Over 550 Kimwolf and Aisuru Botnet Command Servers",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-01-14",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 3,
+    "article_id": "thn-88fd4729371c",
+    "title": "CrashFix Chrome Extension Delivers ModeloRAT Using ClickFix-Style Browser Crash Lures",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-01-19",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 4,
+    "article_id": "thn-71c64490b0d7",
+    "title": "Malicious VS Code AI Extensions with 1.5 Million Installs Steal Developer Source Code",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-01-26",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 5,
+    "article_id": "securelist-9024165e",
+    "title": "HoneyMyte updates CoolClient and deploys multiple stealers in recent campaigns",
+    "source_name": "Kaspersky Securelist",
+    "published_date": "2026-01-27",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 6,
+    "article_id": "thn-f35a3fc043b7",
+    "title": "Researchers Find 175,000 Publicly Exposed Ollama AI Servers Across 130 Countries",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-01-29",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 7,
+    "article_id": "thn-cb58df5d37b7",
+    "title": "Researchers Uncover Chrome Extensions Abusing Affiliate Links and Stealing ChatGPT Access",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-01-30",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 8,
+    "article_id": "thn-bb2f0be4112c",
+    "title": "Researchers Find 341 Malicious ClawHub Skills Stealing Data from OpenClaw Users",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-02-02",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 9,
+    "article_id": "thn-6313e0cdee3f",
+    "title": "Notepad++ Hosting Breach Attributed to China-Linked Lotus Blossom Hacking Group",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-02-03",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 10,
+    "article_id": "thn-db7ed05f2920",
+    "title": "APT28 Uses Microsoft Office CVE-2026-21509 in Espionage-Focused Malware Attacks",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-02-03",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 11,
+    "article_id": "securelist-7e721564",
+    "title": "Stan Ghouls targeting Russia and Uzbekistan with NetSupport RAT",
+    "source_name": "Kaspersky Securelist",
+    "published_date": "2026-02-05",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 12,
+    "article_id": "thn-bf975c96f290",
+    "title": "SolarWinds Web Help Desk Exploited for RCE in Multi-Stage Attacks on Exposed Servers",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-02-09",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 13,
+    "article_id": "securelist-bbd64eab",
+    "title": "The game is over: when “free” comes at too high a price. What we know about RenEngine",
+    "source_name": "Kaspersky Securelist",
+    "published_date": "2026-02-11",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 14,
+    "article_id": "securelist-8afa4d60",
+    "title": "Divide and conquer: how the new Keenadu backdoor exposed links between major Android botnets",
+    "source_name": "Kaspersky Securelist",
+    "published_date": "2026-02-17",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 15,
+    "article_id": "thn-4af5852bc769",
+    "title": "Notepad++ Fixes Hijacked Update Mechanism Used to Deliver Targeted Malware",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-02-18",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 16,
+    "article_id": "securelist-c5c061a6",
+    "title": "Arkanix Stealer: a C++ & Python infostealer",
+    "source_name": "Kaspersky Securelist",
+    "published_date": "2026-02-19",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 17,
+    "article_id": "thn-d407ebda9a82",
+    "title": "PromptSpy Android Malware Abuses Gemini AI to Automate Recent-Apps Persistence",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-02-19",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 18,
+    "article_id": "thn-ca5df16b90a9",
+    "title": "ClawJacked Flaw Lets Malicious Sites Hijack Local OpenClaw AI Agents via WebSocket",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-02-28",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 19,
+    "article_id": "thn-7a97c98a1216",
+    "title": "APT28 Tied to CVE-2026-21513 MSHTML 0-Day Exploited Before Feb 2026 Patch Tuesday",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-03-02",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 20,
+    "article_id": "thn-6d76f840e5db",
+    "title": "Coruna iOS Exploit Kit Uses 23 Exploits Across Five Chains Targeting iOS 13–17.2.1",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-03-04",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 21,
+    "article_id": "sec-fc5e100ff1e0",
+    "title": "BeatBanker: A dual‑mode Android Trojan",
+    "source_name": "Kaspersky Securelist",
+    "published_date": "2026-03-10",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 22,
+    "article_id": "thn-797cc9c2d119",
+    "title": "Investigating a New Click-Fix Variant",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-03-13",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 23,
+    "article_id": "sec-66e48fcc34ea",
+    "title": "Free real estate: GoPix, the banking Trojan living off your memory",
+    "source_name": "Kaspersky Securelist",
+    "published_date": "2026-03-16",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 24,
+    "article_id": "thn-f9ce4af82763",
+    "title": "AI Flaws in Amazon Bedrock, LangSmith, and SGLang Enable Data Exfiltration and RCE",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-03-17",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 25,
+    "article_id": "thn-cd94f39112d2",
+    "title": "CISA Warns of Zimbra, SharePoint Flaw Exploits; Cisco Zero-Day Hit in Ransomware Attacks",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-03-19",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 26,
+    "article_id": "thn-f5d8ece44e74",
+    "title": "DarkSword iOS Exploit Kit Uses 6 Flaws, 3 Zero-Days for Full Device Takeover",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-03-19",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 27,
+    "article_id": "thn-74a026e325e0",
+    "title": "TeamPCP Hacks Checkmarx GitHub Actions Using Stolen CI Credentials",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-03-24",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 28,
+    "article_id": "thn-e2adc66b0ab3",
+    "title": "Device Code Phishing Hits 340+ Microsoft 365 Orgs Across Five Countries via OAuth Abuse",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-03-25",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 29,
+    "article_id": "sec-501ae2358020",
+    "title": "An AI gateway designed to steal your data",
+    "source_name": "Kaspersky Securelist",
+    "published_date": "2026-03-26",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 30,
+    "article_id": "thn-3b09dd874e84",
+    "title": "CERT-UA Impersonation Campaign Spread AGEWHEEZE Malware to 1 Million Emails",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-04-01",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 31,
+    "article_id": "thn-1010bd32f8f0",
+    "title": "APT28 Deploys PRISMEX Malware in Campaign Targeting Ukraine and NATO Allies",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-04-08",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 32,
+    "article_id": "securelist-f1475328",
+    "title": "The long road to your crypto: ClipBanker and its marathon infection chain",
+    "source_name": "Kaspersky Securelist",
+    "published_date": "2026-04-09",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 33,
+    "article_id": "thn-e1485d8c5a18",
+    "title": "CPUID Breach Distributes STX RAT via Trojanized CPU-Z and HWMonitor Downloads",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-04-12",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 34,
+    "article_id": "sec-7df3676bbea9",
+    "title": "JanelaRAT: a financial threat targeting users in Latin America",
+    "source_name": "Kaspersky Securelist",
+    "published_date": "2026-04-13",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 35,
+    "article_id": "securelist-d281ec59",
+    "title": "FakeWallet crypto stealer spreading through iOS apps in the App Store",
+    "source_name": "Kaspersky Securelist",
+    "published_date": "2026-04-20",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 36,
+    "article_id": "thn-9afa9ad61dd4",
+    "title": "Google Patches Antigravity IDE Flaw Enabling Prompt Injection Code Execution",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-04-21",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 37,
+    "article_id": "dfir-689ef7f4",
+    "title": "Bissa Scanner Exposed: AI-Assisted Mass Exploitation and Credential Harvesting",
+    "source_name": "The DFIR Report",
+    "published_date": "2026-04-22",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 38,
+    "article_id": "thn-56404cecf750",
+    "title": "Malicious KICS Docker Images and VS Code Extensions Hit Checkmarx Supply Chain",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-04-22",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 39,
+    "article_id": "thn-c6c6339dccbd",
+    "title": "LMDeploy CVE-2026-33626 Flaw Exploited Within 13 Hours of Disclosure",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-04-24",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 40,
+    "article_id": "thn-57a84dfe10da",
+    "title": "Mirai-Based xlabs_v1 Botnet Exploits ADB to Hijack IoT Devices for DDoS Attacks",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-05-06",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 41,
+    "article_id": "thn-ecb3982310df",
+    "title": "MuddyWater Uses Microsoft Teams to Steal Credentials in False Flag Ransomware Attack",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-05-06",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 42,
+    "article_id": "thn-cb24025d9fcf",
+    "title": "cPanel, WHM Release Fixes for Three New Vulnerabilities — Patch Now",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-05-09",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 43,
+    "article_id": "dfir-576dbdf3",
+    "title": "Flash Alert: EtherRat and TukTuk C2 End in The Gentleman Ransomware",
+    "source_name": "The DFIR Report",
+    "published_date": "2026-05-11",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 44,
+    "article_id": "thn-d5bf3a7d9f74",
+    "title": "cPanel CVE-2026-41940 Under Active Exploitation to Deploy Filemanager Backdoor",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-05-11",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 45,
+    "article_id": "thn-a64d643b4e48",
+    "title": "Mini Shai-Hulud Worm Compromises TanStack, Mistral AI, Guardrails AI & More Packages",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-05-12",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 46,
+    "article_id": "securelist-2b79f73e",
+    "title": "Kimsuky targets organizations with PebbleDash-based tools",
+    "source_name": "Kaspersky Securelist",
+    "published_date": "2026-05-14",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 47,
+    "article_id": "thn-447fec50ca10",
+    "title": "On-Prem Microsoft Exchange Server CVE-2026-42897 Exploited via Crafted Email",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-05-15",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 48,
+    "article_id": "thn-597ec3e36639",
+    "title": "Four Malicious npm Packages Deliver Infostealers and Phantom Bot DDoS Malware",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-05-18",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 49,
+    "article_id": "securelist-29b580f5",
+    "title": "Cloud Atlas activity in the second half of 2025 and early 2026: new tools and a new payload",
+    "source_name": "Kaspersky Securelist",
+    "published_date": "2026-05-22",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  },
+  {
+    "index": 50,
+    "article_id": "thn-183ac3ea8a40",
+    "title": "Megalodon GitHub Attack Targets 5,561 Repos with Malicious CI/CD Workflows",
+    "source_name": "TheHackerNews",
+    "published_date": "2026-05-22",
+    "annotation_status": "pending",
+    "ground_truth": {
+      "ips": [],
+      "domains": [],
+      "urls": [],
+      "md5": [],
+      "sha256": [],
+      "cves": [],
+      "attack_behaviors": []
+    },
+    "annotator_notes": ""
+  }
+]

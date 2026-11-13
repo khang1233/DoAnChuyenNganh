@@ -1,6 +1,6 @@
-# HỆ THỐNG TỰ ĐỘNG HÓA TÌNH BÁO AN NINH MẠNG (CTI) & ĐÓNG GÓI KỸ NĂNG TÁC TỬ (AGENTIC DEFENSE SKILLS)
+# HỆ THỐNG TỰ ĐỘNG HÓA TÌNH BÁO AN NINH MẠNG (CTI) & SINH QUY TẮC PHÒNG THỦ ỨNG DỤNG AI AGENT
 
-Hệ thống tự động phân tích mã nguồn dự án mục tiêu, đối soát với kho tri thức tình báo an ninh mạng (CTI), thẩm định độ tin cậy toán học **Trust Score** (>90đ, 0% False Positive) và đóng gói thành các **Bộ Kỹ Năng Tác Tử (Agentic Skill Package)** hỗ trợ chuẩn bản địa cho **15 nền tảng AI Coding Agent lớn nhất thế giới** (Claude Code, Cursor, Codex, Antigravity, Aider, Devin, Windsurf, Copilot...).
+Hệ thống tiếp nhận bản tin tình báo an ninh mạng (CTI), sử dụng **Local AI Agent (Ollama: Qwen 2.5 7B / Qwen 3 8B)** để trích xuất chính xác các chỉ số xâm nhập (IOC: IP, Domain, URL, MD5, SHA256, CVE) kèm bằng chứng trích dẫn nguyên văn (xAI Grounding), từ đó tự động đóng gói thành **Bộ Kỹ Năng Tác Tử (Agentic Defense Skill Package: `SKILL.md`, `manifest.json`, `scripts/verify_threat.py`, `references/`)**.
 
 ---
 
@@ -113,9 +113,61 @@ defense_skills/<skill-name>/
 ## 📚 TÀI LIỆU HƯỚNG DẪN & BÁO CÁO ĐỒ ÁN
 
 Toàn bộ tài liệu chi tiết của đồ án được tổ chức gọn gàng trong thư mục [docs/](docs/):
-- **Báo cáo tiến độ tuần (Mới nhất)**: [docs/BAO_CAO_TIEN_DO_TUAN.md](docs/BAO_CAO_TIEN_DO_TUAN.md)
-- **Hướng dẫn sử dụng và kiểm thử (Markdown)**: [docs/HUONG_DAN_SU_DUNG_VA_KIEM_THU.md](docs/HUONG_DAN_SU_DUNG_VA_KIEM_THU.md)
+- **Báo cáo thực nghiệm 50 bài CTI (Word)**: [docs/BAO_CAO_THUC_NGHIEM_50_BAI_CTI.docx](docs/BAO_CAO_THUC_NGHIEM_50_BAI_CTI.docx)
+- **Báo cáo thực nghiệm 50 bài CTI (Markdown)**: [docs/BAO_CAO_THUC_NGHIEM_50_BAI_CTI.md](docs/BAO_CAO_THUC_NGHIEM_50_BAI_CTI.md)
+- **Báo cáo tiến độ Tuần 05 (Word)**: [docs/BAO_CAO_TIEN_DO_TUAN_05.docx](docs/BAO_CAO_TIEN_DO_TUAN_05.docx)
+- **Báo cáo tiến độ Tuần 05 (Markdown)**: [docs/BAO_CAO_TIEN_DO_TUAN_05.md](docs/BAO_CAO_TIEN_DO_TUAN_05.md)
+- **Báo cáo tiến độ tổng hợp các tuần**: [docs/BAO_CAO_TIEN_DO_TUAN.md](docs/BAO_CAO_TIEN_DO_TUAN.md)
 - **Hướng dẫn sử dụng và kiểm thử (Word)**: [docs/HUONG_DAN_SU_DUNG_VA_KIEM_THU.docx](docs/HUONG_DAN_SU_DUNG_VA_KIEM_THU.docx)
+- **Hướng dẫn sử dụng và kiểm thử (Markdown)**: [docs/HUONG_DAN_SU_DUNG_VA_KIEM_THU.md](docs/HUONG_DAN_SU_DUNG_VA_KIEM_THU.md)
 - **Tài liệu tổng hợp Đồ án Chuyên ngành CTI**: [docs/TAI_LIEU_TONG_HOP_DACN_CTI.docx](docs/TAI_LIEU_TONG_HOP_DACN_CTI.docx)
 - **Đề cương Đồ án Chuyên ngành**: [docs/DE_CUONG_DO_AN_CHUYEN_NGANH.docx](docs/DE_CUONG_DO_AN_CHUYEN_NGANH.docx)
-- **Hướng dẫn điều khiển Agent đồng bộ**: [docs/HUONG_DAN_DIEU_KHIEN_AGENT_DONG_BO.docx](docs/HUONG_DAN_DIEU_KHIEN_AGENT_DONG_BO.docx)
+
+---
+
+## KẾT QUẢ BENCHMARK ĐỊNH LƯỢNG TRÊN 50 BẢN TIN CTI ĐẦU NĂM 2026 (LOCAL LLM QWEN3:8B)
+
+Quy trình đánh giá thực nghiệm khách quan đối chiếu giữa **Local AI Agent (Ollama: qwen3:8b)** và tập đáp án gán tay **Ground Truth 50 bài** (cti_core/benchmark/ground_truth_50.json):
+
+### Bảng 1: Độ đúng khi trích xuất IOC (Agent vs Ground Truth gán tay)
+| Loại IOC | Số lượng GT | Agent trích | TP | FP | FN | Precision (%) | Recall (%) | F1-Score (%) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| IP | 67 | 66 | 64 | 2 | 3 | 96.97% | 95.52% | 96.24% |
+| DOMAIN | 218 | 163 | 163 | 0 | 55 | 100.00% | 74.77% | 85.56% |
+| URL | 119 | 115 | 106 | 9 | 13 | 92.17% | 89.08% | 90.60% |
+| MD5 | 287 | 286 | 286 | 0 | 1 | 100.00% | 99.65% | 99.83% |
+| SHA256 | 10 | 9 | 9 | 0 | 1 | 100.00% | 90.00% | 94.74% |
+| CVE | 67 | 67 | 67 | 0 | 0 | 100.00% | 100.00% | 100.00% |
+| **TỔNG HỢP (Micro)** | **768** | **706** | **695** | **11** | **73** | **98.44%** | **90.49%** | **94.30%** |
+
+- **xAI Grounding nguyên văn**: Đạt **100.0%** (706/706 chỉ báo có trích dẫn câu gốc).
+- **Tỷ lệ bài hoàn hảo**: 25/50 bài đạt 100% Precision và 100% Recall; 41/50 bài đạt 0 False Positives.
+
+### Bảng 2: Tỷ lệ gói Skill hợp lệ cấu trúc & cú pháp
+| Thành phần Skill | Cơ chế kiểm định | Tổng số gói | Hợp lệ cú pháp thô | Hợp lệ sau kiểm chuẩn | Tỷ lệ hợp lệ |
+| :--- | :--- | :---: | :---: | :---: | :---: |
+| SKILL.md | PyYAML Frontmatter + SOP | 50 | 47/50 (94.0%) | 50/50 | **100.00%** |
+| manifest.json | JSON Schema (AGENTS.md) | 50 | 43/50 (86.0%) | 50/50 | **100.00%** |
+| scripts/verify_threat.py | Python AST compile() | 50 | 37/50 (74.0%) | 50/50 | **100.00%** |
+| 
+eferences/c2_ip_indicators.txt | IPv4/Domain + Whitelist Check | 50 | 50/50 | 50/50 | **100.00%** |
+
+### Bảng 3: Tỷ lệ Skill thực thi bắt được mẫu thử
+| Kênh kiểm thử trong Skill | Cơ chế thực thi | Số bộ mẫu | Bắt trúng mẫu độc (TP) | Detection Rate (%) | Báo nhầm mẫu sạch (FP) |
+| :--- | :--- | :---: | :---: | :---: | :---: |
+| Log Telemetry Events | scripts/verify_threat.py (scan_artifact(log_event)) | 50 | 49/50 | **98.00%** | 0/50 (0%) |
+| Binary / Payload Buffer | scripts/verify_threat.py (scan_artifact(payload_bytes)) | 50 | 48/50 | **96.00%** | 0/50 (0%) |
+| Network C2 Indicators | 
+eferences/c2_ip_indicators.txt vs Clean DNS | 43 | 36/43 | **83.72%** | 0/43 (0%) |
+
+---
+
+## HƯỚNG DẪN TỰ CHẠY BENCHMARK 50 BẢN TIN CTI
+1. **Khởi chạy Web Workbench gán nhãn & so sánh trực quan** (cổng http://127.0.0.1:8780):
+   `ash
+   python cti_core/benchmark/labeler_server.py
+   `
+2. **Chạy đánh giá định lượng 3 bảng độc lập**:
+   `ash
+   python cti_core/benchmark/evaluate_50_articles.py --model qwen3:8b
+   `

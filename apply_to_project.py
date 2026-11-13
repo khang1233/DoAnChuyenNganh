@@ -346,26 +346,23 @@ def synthesize_and_deploy_skill(target_path: Path, scope_id: str, article_id: st
 - Danh sách chỉ số IP C2 độc hại đối soát: `./defense_skills/{bundle_path.name}/references/c2_ip_indicators.txt`.
 - Bằng chứng đối chiếu tri thức CTI nguyên bản: `./defense_skills/{bundle_path.name}/references/cti_verbatim_report.txt`.
 
-### BƯỚC 3: TỰ ĐỘNG SỬA TẬN GỐC MÃ NGUỒN (CODE REFACTORING)
-- Đọc file chỉ dẫn tư duy: `./defense_skills/{bundle_path.name}/SKILL.md`.
-- Đối chiếu mã nguồn của dự án với các file mẫu chuẩn trong `./defense_skills/{bundle_path.name}/examples/`:
-  - Đối với Node.js / Express: xem `vulnerable_sample.js` vs `patched_secure_sample.js`
-  - Đối với Python Backend: xem `vulnerable_sample.py` vs `patched_secure_sample.py`
-- Thực hiện sửa code trực tiếp:
-  1. Thêm Whitelist kiểm tra giá trị tham số hợp lệ.
-  2. Bổ sung Parameterized Queries và Input Sanitization.
-  3. Loại bỏ mọi hàm gọi thực thi hệ điều hành tùy tiện (`exec()`, `os.system()`).
+### BƯỚC 3: KÍCH HOẠT & TRIỂN KHAI GÓI KỸ NĂNG TÁC TỬ (AGENTIC SKILL PACKAGE)
+- Đọc hồ sơ mô tả và bằng chứng xAI tại: `./defense_skills/{bundle_path.name}/SKILL.md`.
+- Nạp trọn bộ cấu trúc Skill theo chuẩn Agent Loader:
+  1. **`SKILL.md` & `manifest.json`**: Giao thức tư duy SOP và siêu dữ liệu công cụ cho AI Agent.
+  2. **`scripts/verify_threat.py`**: Kịch bản thực thi rà quét log, tệp tin và chỉ số mạng theo IOC đã xác minh.
+  3. **`references/`**: Danh sách chỉ số `c2_ip_indicators.txt` (đã qua bộ lọc Whitelist fail-closed, tuyệt đối không chặn DNS công cộng), bài gốc `cti_verbatim_report.txt` và `xai_audit_trail.json`.
 
-### BƯỚC 4: TÁI KIỂM THỬ XÁC MINH KHÔNG BÁO NHẦM (POST-FIX VERIFICATION)
-- Chạy lại script kiểm thử đa vector:
+### BƯỚC 4: TÁI KIỂM THỬ XÁC MINH PHÁT HIỆN & KHÔNG BÁO NHẦM
+- Chạy lại script kiểm thử trong gói Skill trên mẫu thử dương tính và âm tính:
   ```bash
   python ./defense_skills/{bundle_path.name}/scripts/verify_exploit.py http://localhost:8766
   ```
 - Kết quả bắt buộc:
-  - Tấn công bị vô hiệu hóa hoàn toàn (True Positive = 0).
-  - Không gây gián đoạn luồng dữ liệu nghiệp vụ thông thường (False Positive = 0.0%).
+  - Các thành phần trong gói Skill (`SKILL.md`, `manifest.json`, `scripts/`) hợp lệ 100% và bắt trúng mẫu thử chứa IOC độc hại.
+  - Không gây báo nhầm trên lưu lượng và tệp tin nghiệp vụ sạch (False Positive = 0.0%).
 - Tạo Git Commit với thông điệp:
-  `fix(security): auto-patch vulnerabilities based on CTI Skill {bundle_path.name}`
+  `feat(cti): deploy agentic skill package {bundle_path.name}`
 
 ### BƯỚC 5: TIẾN TRÌNH GIÁM SÁT ĐỊNH KỲ (CONTINUOUS SCAN CADENCE)
 - Thiết lập cron job hoặc chạy tiến trình nền theo đúng chu kỳ của Scope `{profile['name']}`:
@@ -453,7 +450,7 @@ def main():
     print(f"1. Gói kỹ năng tác tử: defense_skills/{skill_name}/")
     print(f"2. File hướng dẫn 5 bước hành động: {target_path / 'AGENT_REMEDIATION_GUIDE.md'}")
     print(f"3. Chu kỳ tự động cập nhật: {profile['cadence_label']}")
-    print("\nAI Agent trong dự án đích chỉ cần mở AGENT_REMEDIATION_GUIDE.md để tự động vá mã nguồn.")
+    print("\nAI Agent có thể đọc AGENT_REMEDIATION_GUIDE.md để nạp và thực thi Agentic Skill Package.")
 
     # Chế độ Daemon nếu người dùng yêu cầu
     if args.daemon:

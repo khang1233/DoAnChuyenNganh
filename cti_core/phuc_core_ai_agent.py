@@ -619,6 +619,8 @@ def tool8_generate_defensive_rules(
     now_date = datetime.now(timezone.utc).strftime("%Y/%m/%d")
     now_ts = datetime.now(timezone.utc).strftime("%H%M%S")
 
+    safe_title_yaml = re.sub(r'["\\\r\n]+', " ", report_title[:65]).strip()
+    safe_title_yara = re.sub(r'["\\\r\n]+', "'", report_title[:60]).strip()
     sigma_docs = []
 
     # 1. NẾU BÀI BÁO CHỨA LỖ HỔNG CVE (RCE, Auth Bypass, Path Traversal, Web Exploit):
@@ -640,7 +642,7 @@ def tool8_generate_defensive_rules(
         all_uri_lines = (cve_uri_lines + "\n" + "\n".join(specific_endpoints)).strip()
 
         rule_web = (
-            f"title: Web Exploit Attempt - {report_title[:65]}\n"
+            f'title: "Web Exploit Attempt - {safe_title_yaml}"\n'
             f"id: 9b4a2c10-8e3f-4d2a-b7c1-{now_ts}000001\n"
             f"status: production\n"
             f"description: >\n"
@@ -683,7 +685,7 @@ def tool8_generate_defensive_rules(
 
         # Rule phát hiện RCE: Máy chủ ứng dụng (Java/Tomcat/Atlassian/IIS) sinh tiến trình dòng lệnh
         rule_proc = (
-            f"title: Post-Exploitation Child Process Creation - {report_title[:60]}\n"
+            f'title: "Post-Exploitation Child Process Creation - {safe_title_yaml}"\n'
             f"id: 9b4a2c10-8e3f-4d2a-b7c1-{now_ts}000002\n"
             f"status: production\n"
             f"description: >\n"
@@ -748,7 +750,7 @@ def tool8_generate_defensive_rules(
         c2_cond_text = " or ".join(conditions)
 
         rule_c2 = (
-            f"title: Network Traffic to Verified C2 - {report_title[:65]}\n"
+            f'title: "Network Traffic to Verified C2 - {safe_title_yaml}"\n'
             f"id: 9b4a2c10-8e3f-4d2a-b7c1-{now_ts}000003\n"
             f"status: production\n"
             f"description: >\n"
@@ -773,7 +775,7 @@ def tool8_generate_defensive_rules(
     if not sigma_docs and mal_hashes:
         hash_lines = "\n".join([f"      - '{h}'" for h in mal_hashes[:10]])
         rule_hash = (
-            f"title: Execution of Verified Malicious Binary - {report_title[:65]}\n"
+            f'title: "Execution of Verified Malicious Binary - {safe_title_yaml}"\n'
             f"id: 9b4a2c10-8e3f-4d2a-b7c1-{now_ts}000004\n"
             f"status: production\n"
             f"description: Detects execution of malware samples identified by SHA256 hashes.\n"
@@ -810,7 +812,7 @@ def tool8_generate_defensive_rules(
         f"{{\n"
         f"    meta:\n"
         f'        author = "Autonomous CTI AI Agent (Phuc & Khang)"\n'
-        f'        description = "Detects verified indicators (Score > 80) from: {report_title[:60]}"\n'
+        f'        description = "Detects verified indicators (Score > 80) from: {safe_title_yara}"\n'
         f'        date = "{datetime.now(timezone.utc).strftime("%Y-%m-%d")}"\n'
         f"        gatekeeper_threshold = 80\n"
         f"    strings:\n"
