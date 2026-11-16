@@ -20,8 +20,8 @@ echo.
 echo [*] Dang cuong che giai phong tien trinh va cong mang...
 taskkill /F /IM "ollama.exe" /T >nul 2>&1
 taskkill /F /IM "ollama_llama_server.exe" /T >nul 2>&1
-powershell -NoProfile -Command "$procs = Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'live_dashboard_app' }; if ($procs) { $procs | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue } }"
-powershell -NoProfile -Command "$pids = (Get-NetTCPConnection -LocalPort 8765,8766,11434 -ErrorAction SilentlyContinue).OwningProcess; if ($pids) { Stop-Process -Id $pids -Force -ErrorAction SilentlyContinue }"
+powershell -NoProfile -Command "$procs = Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'live_dashboard_app|labeler_server' }; if ($procs) { $procs | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue } }"
+powershell -NoProfile -Command "$pids = (Get-NetTCPConnection -LocalPort 8765,8766,8780,11434 -ErrorAction SilentlyContinue).OwningProcess; if ($pids) { Stop-Process -Id $pids -Force -ErrorAction SilentlyContinue }"
 echo.
 echo ==============================================================================
 echo   [HOAN TAT] DA TAT SACH TOAN BO HE THONG!

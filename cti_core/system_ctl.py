@@ -2,6 +2,11 @@
 """
 TRUNG TÂM ĐIỀU KHIỂN HỆ THỐNG AN NINH MẠNG CTI AGENTIC DEFENSE
 Quản lý toàn bộ vòng đời khởi động, kiểm tra cổng mạng, mở trình duyệt và tắt hệ thống sạch sẽ.
+Bao gồm:
+- Web Dashboard Tổng (Cổng 8765)
+- WAF Reverse Proxy L7 (Cổng 8766)
+- Phân hệ So Sánh Đối Chiếu 50 Bài CTI Ground Truth (Cổng 8780)
+- Ollama GPU Server (Cổng 11434)
 """
 
 import os
@@ -17,8 +22,11 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).resolve().parents[1]
 SANDBOX_DIR = ROOT_DIR / "cti_core"
 APP_FILE = SANDBOX_DIR / "live_dashboard_app.py"
+BENCHMARK_FILE = SANDBOX_DIR / "benchmark" / "labeler_server.py"
+
 PORT = 8765
 WAF_PORT = 8766
+BENCHMARK_PORT = 8780
 OLLAMA_PORT = 11434
 
 def get_default_target_project() -> str:
@@ -56,11 +64,11 @@ def wait_for_server(port: int, max_retries: int = 24, delay: float = 0.5) -> boo
     return False
 
 def free_ports():
-    """Dừng các tiến trình đang chiếm cổng 8765 hoặc 8766."""
+    """Dừng các tiến trình đang chiếm cổng 8765, 8766 hoặc 8780."""
     if sys.platform == "win32":
         cmd = (
             'powershell -NoProfile -Command "'
-            'Get-NetTCPConnection -LocalPort 8765,8766 -ErrorAction SilentlyContinue | '
+            'Get-NetTCPConnection -LocalPort 8765,8766,8780 -ErrorAction SilentlyContinue | '
             'ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }"'
         )
         try:
@@ -105,7 +113,7 @@ def start_ollama_if_needed():
                 pass
 
 def start_system(target_dir: str = ""):
-    """Khởi động hệ thống CTI Dashboard và WAF Proxy chạy ngầm độc lập."""
+    """Khởi động toàn bộ hệ thống: Dashboard (8765), WAF (8766), và So Sánh 50 Bài (8780)."""
     if not target_dir:
         target_dir = get_default_target_project()
     print("=" * 78)
@@ -117,11 +125,11 @@ def start_system(target_dir: str = ""):
     free_ports()
 
     # 2. Bật Ollama GPU ngầm
-    print("[1/3] Kiem tra va khoi dong Ollama GPU Server...")
+    print("[1/4] Kiem tra va khoi dong Ollama GPU Server...")
     start_ollama_if_needed()
 
     # 3. Khởi động Web Server & WAF Proxy chạy ngầm hoàn toàn độc lập
-    print("[2/3] Khoi dong CTI Web Server (Cong 8765) va WAF Reverse Proxy (Cong 8766)...")
+    print("[2/4] Khoi dong CTI Web Server (Cong 8765) va WAF Reverse Proxy (Cong 8766)...")
     creationflags = 0x00000008 if sys.platform == "win32" else 0  # DETACHED_PROCESS
     env = os.environ.copy()
     env["PYTHONIOENCODING"] = "utf-8"
@@ -143,12 +151,32 @@ def start_system(target_dir: str = ""):
         print(f"[LOI] Khong the khoi dong Web Server: {e}")
         return False
 
-    # 4. Chờ server sẵn sàng
-    print("[3/3] Dang nap tri thuc CTI va kiem tra ket noi...")
-    ready = wait_for_server(PORT, max_retries=20, delay=0.5)
+    # 4. Khởi động Phân hệ So Sánh Đối Chiếu 50 Bài CTI (Benchmark Ground Truth)
+    print("[3/4] Khoi dong Phan he So Sanh Doi Chieu 50 Bai CTI (Cong 8780)...")
+    if BENCHMARK_FILE.exists():
+        try:
+            subprocess.Popen(
+                [sys.executable, str(BENCHMARK_FILE)],
+                cwd=str(BENCHMARK_FILE.parent),
+                env=env,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                creationflags=creationflags
+            )
+        except Exception as e:
+            print(f"[CANH BAO] Khong the khoi dong Benchmark Labeler Server: {e}")
 
-    if ready:
+    # 5. Chờ cả hai máy chủ sẵn sàng
+    print("[4/4] Dang nap tri thuc CTI va kiem tra ket noi mang...")
+    ready_main = wait_for_server(PORT, max_retries=20, delay=0.5)
+    ready_bm = wait_for_server(BENCHMARK_PORT, max_retries=15, delay=0.5)
+
+    if ready_main:
         print("[OK] He thong da san sang!")
+        print("  - Web Dashboard Tong     : http://127.0.0.1:8765")
+        if ready_bm:
+            print("  - Bang So Sanh 50 Bai    : http://127.0.0.1:8780")
+        print("  - WAF Reverse Proxy L7   : http://127.0.0.1:8766")
         time.sleep(0.5)
         url = f"http://127.0.0.1:8765/?target={urllib.parse.quote(target_dir)}" if target_dir else "http://127.0.0.1:8765"
         webbrowser.open(url)
@@ -175,12 +203,12 @@ def stop_system():
         except Exception:
             pass
 
-    # 2. Dừng Python Server
-    print("[2/3] Dung tien trinh Web Dashboard va WAF Proxy...")
+    # 2. Dừng Python Server (Cả Dashboard và Benchmark Labeler)
+    print("[2/3] Dung tien trinh Web Dashboard, WAF Proxy va Server So Sanh 50 Bai...")
     if sys.platform == "win32":
         cmd = (
             'powershell -NoProfile -Command "'
-            '$procs = Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match \'live_dashboard_app\' }; '
+            '$procs = Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match \'live_dashboard_app|labeler_server\' }; '
             'if ($procs) { $procs | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue } }"'
         )
         try:
@@ -189,12 +217,12 @@ def stop_system():
             pass
 
     # 3. Giải phóng các cổng
-    print("[3/3] Giai phong cac cong mang (8765, 8766, 11434)...")
+    print("[3/3] Giai phong cac cong mang (8765, 8766, 8780, 11434)...")
     free_ports()
     if sys.platform == "win32":
         cmd_port = (
             'powershell -NoProfile -Command "'
-            '$pids = (Get-NetTCPConnection -LocalPort 11434 -ErrorAction SilentlyContinue).OwningProcess; '
+            '$pids = (Get-NetTCPConnection -LocalPort 8765,8766,8780,11434 -ErrorAction SilentlyContinue).OwningProcess; '
             'if ($pids) { Stop-Process -Id $pids -Force -ErrorAction SilentlyContinue }"'
         )
         try:
@@ -206,6 +234,7 @@ def stop_system():
     print("=" * 78)
     print("  [HOAN TAT] DA TAT SACH TOAN BO HE THONG!")
     print("  - Toan bo bo nho GPU va RAM da duoc giai phong 100%.")
+    print("  - Cac cong mang 8765, 8766, 8780 va 11434 da dong hoan toan.")
     print("=" * 78)
     print()
     time.sleep(2)
@@ -215,6 +244,7 @@ def interactive_menu():
     while True:
         os.system("cls" if sys.platform == "win32" else "clear")
         is_running = is_port_listening(PORT)
+        is_benchmark_running = is_port_listening(BENCHMARK_PORT)
 
         print("=" * 78)
         if is_running:
@@ -224,9 +254,11 @@ def interactive_menu():
         print("=" * 78)
         print()
         if is_running:
-            print("  [OK] Web Dashboard        : http://127.0.0.1:8765")
-            print("  [OK] WAF Reverse Proxy L7 : http://127.0.0.1:8766")
-            print("  [OK] AI Agent Engine      : Dang san sang nhan dien ma nguon va hoc CTI")
+            print("  [OK] Web Dashboard Tong        : http://127.0.0.1:8765")
+            if is_benchmark_running:
+                print("  [OK] Bang So Sanh 50 Bai CTI   : http://127.0.0.1:8780")
+            print("  [OK] WAF Reverse Proxy L7      : http://127.0.0.1:8766")
+            print("  [OK] AI Agent Engine           : Dang san sang nhan dien ma nguon va hoc CTI")
             print()
             print("  * Ghi chu: Quan ly he thong qua CLI 'cti-defense' (hoac dung: 'cti-defense stop').")
         else:
@@ -235,12 +267,13 @@ def interactive_menu():
         print("=" * 78)
         print("  BANG DIEU KHIEN TRUC TIEP:")
         if is_running:
-            print("    [1] Mo lai Web Dashboard tren trinh duyet (Enter)")
-            print("    [2] TAT TOAN BO HE THONG va Giai phong RAM / GPU")
-            print("    [3] Khoi dong lai he thong")
+            print("    [1] Mo Web Dashboard Tong tren trinh duyet (http://127.0.0.1:8765)")
+            print("    [2] Mo Bang So Sanh 50 Bai CTI tren trinh duyet (http://127.0.0.1:8780)")
+            print("    [3] TAT TOAN BO HE THONG va Giai phong RAM / GPU")
+            print("    [4] Khoi dong lai toan bo he thong")
             print("    [0] Thoat cua so nay (He thong van tiep tuc chay ngam)")
         else:
-            print("    [1] BAT HE THONG va mo Web Dashboard (Enter)")
+            print("    [1] BAT TOAN BO HE THONG (Dashboard + So Sanh 50 Bai + AI) (Enter)")
             print("    [0] Thoat")
         print("=" * 78)
         print()
@@ -250,14 +283,25 @@ def interactive_menu():
         except (KeyboardInterrupt, EOFError):
             break
 
-        if not choice or choice in ("1", "m"):
+        if not choice:
             if is_running:
                 webbrowser.open('http://127.0.0.1:8765')
             else:
                 start_system()
-        elif choice in ("2", "t"):
+        elif choice in ("1", "m", "d"):
+            if is_running:
+                webbrowser.open('http://127.0.0.1:8765')
+            else:
+                start_system()
+        elif choice in ("2", "b", "s"):
+            if is_running:
+                webbrowser.open('http://127.0.0.1:8780')
+            else:
+                start_system()
+                webbrowser.open('http://127.0.0.1:8780')
+        elif choice in ("3", "t", "stop"):
             stop_system()
-        elif choice in ("3", "r"):
+        elif choice in ("4", "r", "restart"):
             stop_system()
             start_system()
         elif choice in ("0", "q", "exit"):
@@ -280,9 +324,15 @@ def main():
             stop_system()
             return
         elif cmd == "status":
-            alive = is_port_listening(PORT)
-            status_text = "ONLINE (http://127.0.0.1:8765)" if alive else "OFFLINE"
-            print(f"CTI Defense Status: {status_text}")
+            alive_main = is_port_listening(PORT)
+            alive_bm = is_port_listening(BENCHMARK_PORT)
+            if alive_main:
+                print("CTI Defense Status: ONLINE")
+                print("  - Web Dashboard Tong:  http://127.0.0.1:8765 (ONLINE)")
+                print(f"  - So Sanh 50 Bai CTI:  http://127.0.0.1:8780 ({'ONLINE' if alive_bm else 'OFFLINE'})")
+                print("  - WAF Proxy L7:        http://127.0.0.1:8766 (ONLINE)")
+            else:
+                print("CTI Defense Status: OFFLINE")
             return
         elif cmd == "restart":
             stop_system()

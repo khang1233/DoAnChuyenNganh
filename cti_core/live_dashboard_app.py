@@ -1067,12 +1067,16 @@ HTML_PAGE = r"""<!DOCTYPE html>
       <button class="NavLink" onclick="switchView('sec-defense', this)">3. Kho Kỹ Năng Tác Tử (Agentic Skills)</button>
       <button class="NavLink" onclick="switchView('sec-chat', this)">Chat AI Agent</button>
       <button class="NavLink" onclick="switchView('sec-add', this)">+ Thêm Báo Mới</button>
+      <a href="http://127.0.0.1:8780" target="_blank" class="NavLink" style="color:#059669; font-weight:700; text-decoration:none;" title="Mở phân hệ So Sánh Đối Chiếu 50 Bài CTI Ground Truth (Cổng 8780)">📊 So Sánh 50 Bài ↗</a>
     </div>
 
     <div class="NavRight">
       <select id="aiModelSelect" class="CleanSelect" onchange="onAiModelChange()">
         <option value="auto" selected>Đang dò tìm Model &amp; GPU cục bộ...</option>
       </select>
+      <a href="http://127.0.0.1:8780" target="_blank" class="CleanBtn" style="border-color:#10b981; color:#065f46; background:#ecfdf5; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:4px;" title="Mở phân hệ So Sánh Đối Chiếu 50 Bài CTI Ground Truth (Cổng 8780)">
+        📊 So Sánh 50 Bài (8780)
+      </a>
       <button class="CleanBtn btn-primary" id="btnRunAll" onclick="runPipeline()">
         Chạy Phân Tích
       </button>

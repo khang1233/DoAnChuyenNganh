@@ -1065,6 +1065,9 @@ HTML_UI = r"""<!DOCTYPE html>
     </div>
 
     <div class="NavRight">
+      <a href="http://127.0.0.1:8765" class="CleanBtn" style="border-color:#2563eb; color:#1d4ed8; background:#eff6ff; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:4px; padding:5px 12px; border-radius:6px; font-size:12px;" title="Quay lại Web Dashboard Tổng (Cổng 8765)">
+        &larr; Về Dashboard Tổng (8765)
+      </a>
       <span class="BadgeCompleted" id="progressPill" style="font-size:12.5px; padding:5px 12px;">0 / 50 đã gán</span>
       <span class="MetaPill" style="font-size:12px;">Model chuẩn: <b class="mono" id="defaultModelLabel">qwen3:8b</b></span>
     </div>

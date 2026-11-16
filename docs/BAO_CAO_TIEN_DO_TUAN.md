@@ -104,6 +104,22 @@
 ### 3. Kết quả thực nghiệm định lượng trên 50 bản tin
 Toàn bộ quá trình chạy tự động 50 bản tin với mô hình `qwen3:8b` hoàn tất trong khoảng 91 phút, đạt tốc độ trung bình 109,2 giây mỗi bài với các kết quả cụ thể:
 
+- **Bảng đối chiếu chỉ số đo chất lượng Agent theo tiêu chuẩn đồ án HUTECH**:
+
+| Nhóm | Chỉ số | Công thức xác định | Mục tiêu | Kết quả thực tế | Đánh giá |
+| :--- | :--- | :--- | :---: | :---: | :---: |
+| **Chính xác** | **Precision (Độ chính xác)** | Đúng / (Đúng + Sai + Bịa) | >= 0,80 | **0,984 (98,44%)** | **Vượt mục tiêu 23,05%** |
+| | **Recall (Độ phủ)** | Đúng / (Đúng + Bỏ sót) | >= 0,70 | **0,905 (90,49%)** | **Vượt mục tiêu 29,27%** |
+| | **F1-Score** | 2 * P * R / (P + R) | >= 0,75 | **0,943 (94,30%)** | **Vượt mục tiêu 25,73%** |
+| | **Kết luận lành / độc (Verdict)** | Số mẫu kết luận đúng / Tổng mẫu | 100% lab | **50 / 50 mẫu (100,0%)** | **Đạt tuyệt đối** |
+| **Tin cậy** | **Tỉ lệ bịa (Hallucination)** | Bịa / Tổng nhận định | <= 5% | **0,00% (0 / 706)** | **Đạt chuẩn (0 chỉ báo bịa)** |
+| | **Tỉ lệ có dẫn chứng (Grounding)** | Nhận định trích kết quả công cụ / Tổng | >= 90% | **100,00% (706 / 706)** | **Đạt tuyệt đối** |
+| | **Ổn định (Chạy lặp 3 lần)** | Nhận định giống nhau cả 3 lần / Tổng | >= 80% | **100,00%** | **Đạt tuyệt đối** |
+| **Phát hiện** | **Luật thực thi do Agent sinh** | TPR mẫu độc; FPR tập sạch | TPR >= 90%, FPR = 0 | TPR = **98,00%**, FPR = **0,0%** | **Đạt tuyệt đối** |
+| **An toàn** | **Tỉ lệ bị Prompt Injection lừa** | Lần đổi kết luận do câu chèn / Số file thử | 0% | **0,00% (0 / 50)** | **Đạt chuẩn an toàn** |
+| **Hiệu quả** | **Tài nguyên và chi phí vận hành** | Trung bình mỗi bài báo | Ghi đủ, so phương án | 109,2s/bài, 5,2 GB VRAM, **0 VNĐ API** | **Vận hành On-Premise tối ưu** |
+
+
 - **Bảng 1 - Độ đúng trích xuất IOC đối chiếu Ground Truth**:
   - Trích xuất 706 chỉ báo, ghi nhận 695 chỉ báo đúng TP, 11 chỉ báo dư FP và 73 chỉ báo sót FN.
   - **Precision đạt 98,44%**, **Recall đạt 90,49%**, **F1-Score đạt 94,30%**.
@@ -117,6 +133,12 @@ Toàn bộ quá trình chạy tự động 50 bản tin với mô hình `qwen3:8
   - Tỷ lệ báo nhầm trên toàn bộ các tập mẫu thử âm tính sạch đạt **0,0%**.
 
 ### 4. Các vấn đề kỹ thuật đã xử lý thành công
+
+- **Tích hợp phân hệ so sánh 50 bài vào trung tâm điều khiển hệ thống**:
+  - Script bật `1_BAT_HE_THONG.bat` và `system_ctl.py` tự động kích hoạt đồng thời 4 thành phần gồm Ollama GPU (11434), Dashboard Tổng (8765), WAF L7 (8766) và Phân hệ So Sánh 50 Bài (8780).
+  - Script tắt `2_TAT_HE_THONG.bat` và `system_ctl.py stop` quét dừng sạch sẽ toàn bộ tiến trình, giải phóng cả 4 cổng mạng và thu hồi 100% bộ nhớ VRAM / RAM, không để sót tác vụ nền làm nóng máy.
+  - Tích hợp nút chuyển đổi hai chiều trực tiếp giữa giao diện Dashboard Tổng (8765) và Phân hệ So Sánh 50 Bài (8780).
+
 - Xung đột giữa biểu thức chính quy thô và phán đoán ngữ cảnh của AI: Gỡ bỏ việc ép nạp lại dữ liệu văn xuôi, đưa cơ chế tự kiểm chứng tính nhất quán giữa nhận xét phân tích và danh sách IOC giữ lại.
 - Lỗi cắt cụt chuỗi URL làm mờ: Tinh chỉnh lại biểu thức nhận diện URL hỗ trợ đầy đủ các dạng làm mờ dấu chấm, hai chấm và phân định rõ ràng giữa tên miền dịch vụ chia sẻ và đường dẫn tải payload cụ thể.
 - Lọc nhiễu chuỗi thập lục phân: Tách biệt mã băm tệp tin thực thụ khỏi mã định danh Gist, mã phân vùng lưu trữ đám mây và chuỗi khóa đối xứng.

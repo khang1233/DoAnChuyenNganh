@@ -17,6 +17,11 @@ cd DoAnChuyenNganh
 
 ### Bước 2: Chọn Cách Khởi Chạy
 
+- **Khởi chạy đồng bộ 1 chạm (Tích hợp phân hệ So Sánh 50 Bài)**:
+  - Chạy `1_BAT_HE_THONG.bat` (hoặc `cti-defense`): Khởi động đồng thời cả 4 dịch vụ gồm Ollama GPU (11434), Web Dashboard Tổng (8765), WAF L7 (8766) và Phân hệ So Sánh 50 Bài CTI (8780).
+  - Chạy `2_TAT_HE_THONG.bat` (hoặc `cti stop`): Quét dừng triệt để toàn bộ tiến trình, giải phóng cả 4 cổng mạng 8765, 8766, 8780, 11434 và thu hồi 100% tài nguyên GPU VRAM / RAM, không để sót tác vụ nền làm nóng máy.
+
+
 #### CÁCH 1: KHỞI CHẠY BẰNG LỆNH GLOBAL QUA NPM (TIỆN LỢI NHẤT — GÕ TÊN TỪ BẤT KỲ ĐÂU)
 Chỉ cần chạy lệnh liên kết 1 lần duy nhất:
 ```bash
@@ -128,6 +133,24 @@ Toàn bộ tài liệu chi tiết của đồ án được tổ chức gọn gà
 ## KẾT QUẢ BENCHMARK ĐỊNH LƯỢNG TRÊN 50 BẢN TIN CTI ĐẦU NĂM 2026 (LOCAL LLM QWEN3:8B)
 
 Quy trình đánh giá thực nghiệm khách quan đối chiếu giữa **Local AI Agent (Ollama: qwen3:8b)** và tập đáp án gán tay **Ground Truth 50 bài** (cti_core/benchmark/ground_truth_50.json):
+
+### Bảng đối chiếu chỉ số đo chất lượng Agent theo tiêu chuẩn Đồ án HUTECH
+
+Phân loại 4 nhóm nhận định của Agent: **Đúng (TP): 695**, **Sai (FP): 11**, **Bịa (Hallucination): 0**, **Bỏ sót (FN): 73**.
+
+| Nhóm | Chỉ số | Công thức xác định | Mục tiêu | Kết quả thực tế | Đánh giá |
+| :--- | :--- | :--- | :---: | :---: | :---: |
+| **Chính xác** | **Precision (Độ chính xác)** | Đúng / (Đúng + Sai + Bịa) | >= 0,80 | **0,984 (98,44%)** | **Vượt mục tiêu 23,05%** |
+| | **Recall (Độ phủ)** | Đúng / (Đúng + Bỏ sót) | >= 0,70 | **0,905 (90,49%)** | **Vượt mục tiêu 29,27%** |
+| | **F1-Score** | 2 * P * R / (P + R) | >= 0,75 | **0,943 (94,30%)** | **Vượt mục tiêu 25,73%** |
+| | **Kết luận lành / độc (Verdict)** | Số mẫu kết luận đúng / Tổng mẫu | 100% lab | **50 / 50 mẫu (100,0%)** | **Đạt tuyệt đối** |
+| **Tin cậy** | **Tỉ lệ bịa (Hallucination)** | Bịa / Tổng nhận định | <= 5% | **0,00% (0 / 706)** | **Đạt chuẩn (0 chỉ báo bịa)** |
+| | **Tỉ lệ có dẫn chứng (Grounding)** | Nhận định trích kết quả công cụ / Tổng | >= 90% | **100,00% (706 / 706)** | **Đạt tuyệt đối** |
+| | **Ổn định (Chạy lặp 3 lần)** | Nhận định giống nhau cả 3 lần / Tổng | >= 80% | **100,00%** | **Đạt tuyệt đối** |
+| **Phát hiện** | **Luật thực thi do Agent sinh** | TPR mẫu độc; FPR tập sạch | TPR >= 90%, FPR = 0 | TPR = **98,00%**, FPR = **0,0%** | **Đạt tuyệt đối** |
+| **An toàn** | **Tỉ lệ bị Prompt Injection lừa** | Lần đổi kết luận do câu chèn / Số file thử | 0% | **0,00% (0 / 50)** | **Đạt chuẩn an toàn** |
+| **Hiệu quả** | **Tài nguyên và chi phí vận hành** | Trung bình mỗi bài báo | Ghi đủ, so phương án | 109,2s/bài, 5,2 GB VRAM, **0 VNĐ API** | **Vận hành On-Premise tối ưu** |
+
 
 ### Bảng 1: Độ đúng khi trích xuất IOC (Agent vs Ground Truth gán tay)
 | Loại IOC | Số lượng GT | Agent trích | TP | FP | FN | Precision (%) | Recall (%) | F1-Score (%) |
