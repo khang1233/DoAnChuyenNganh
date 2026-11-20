@@ -15,42 +15,41 @@ cd DoAnChuyenNganh
 
 ---
 
-### Bước 2: Chọn Cách Khởi Chạy
+### Bước 2: Khởi Chạy Hệ Thống
 
-- **Khởi chạy đồng bộ 1 chạm (Tích hợp phân hệ So Sánh 50 Bài)**:
-  - Chạy `1_BAT_HE_THONG.bat` (hoặc `cti-defense`): Khởi động đồng thời cả 4 dịch vụ gồm Ollama GPU (11434), Web Dashboard Tổng (8765), WAF L7 (8766) và Phân hệ So Sánh 50 Bài CTI (8780).
-  - Chạy `2_TAT_HE_THONG.bat` (hoặc `cti stop`): Quét dừng triệt để toàn bộ tiến trình, giải phóng cả 4 cổng mạng 8765, 8766, 8780, 11434 và thu hồi 100% tài nguyên GPU VRAM / RAM, không để sót tác vụ nền làm nóng máy.
-
-
-#### CÁCH 1: KHỞI CHẠY BẰNG LỆNH GLOBAL QUA NPM (TIỆN LỢI NHẤT — GÕ TÊN TỪ BẤT KỲ ĐÂU)
-Chỉ cần chạy lệnh liên kết 1 lần duy nhất:
+#### CÁCH 1: KHỞI CHẠY BẰNG LỆNH TOÀN CỤC (CLI)
+Cài đặt lệnh trực tiếp từ GitHub hoặc thư mục hiện tại:
 ```bash
-npm link
+npm install -g khang1233/DoAnChuyenNganh
 ```
-*(Hoặc cài đặt toàn cục: `npm install -g .`)*
+*(Hoặc tại thư mục dự án: `npm link` hoặc `pip install -e .`)*
 
-Từ lần sau trở đi, tại bất kỳ thư mục nào trên máy tính (Terminal, PowerShell, CMD), bạn chỉ cần gõ tên:
+Tại bất kỳ thư mục nào trên máy tính, gõ:
 ```bash
-cti-defense
+cti
 ```
-*(Hoặc viết tắt: `cti`)*
+*(Hoặc lệnh đầy đủ: `cti-defense`)*
 
-- Hệ thống sẽ **tự động khởi chạy** máy chủ CTI, WAF Proxy và **tự động mở trình duyệt** tại:
-  **`http://127.0.0.1:8765`** (vào ngay **Bước 1: Quét Dự Án**).
+- Hệ thống tự động khởi chạy máy chủ CTI, WAF Proxy và tự động mở trình duyệt tại:
+  **`http://127.0.0.1:8765`** (vào quy trình **5 Bước Tự Hành Wizard**).
 - Các lệnh điều khiển nhanh:
-  - `cti-defense` hoặc `cti` : Khởi động hệ thống và mở Dashboard.
-  - `cti stop` : Tắt toàn bộ hệ thống và giải phóng cổng mạng.
-  - `cti status` : Kiểm tra trạng thái hệ thống (Online / Offline).
+  - `cti` : Khởi động hệ thống và mở Dashboard.
+  - `cti scan` : Quét nhanh dự án hiện tại ngay từ terminal hoặc giao diện web.
+  - `cti stop` : Tắt toàn bộ hệ thống và thu hồi 100% tài nguyên GPU/cổng mạng.
+  - `cti status` : Kiểm tra trạng thái hoạt động của hệ thống.
 
 ---
 
-#### CÁCH 2: KHỞI CHẠY BẰNG FILE BATCH 1-CLICK (KHÔNG CẦN CÀI NPM)
-1. **Cài đặt thư viện (chỉ cần làm 1 lần đầu)**:
-   - Nhấp đúp vào file: `1_BAT_HE_THONG.bat (he thong tu dong kiem tra va cai dat neu thieu)` (hoặc gõ `pip install -r requirements.txt`).
-2. **Bật toàn bộ hệ thống**:
-   - Nhấp đúp vào file: `1_BAT_HE_THONG.bat`.
-   - Hệ thống sẽ tự động bật Live Server, WAF Proxy cổng 8766 và **tự động mở trình duyệt** tại:
-     **`http://127.0.0.1:8765`**
+#### CÁCH 2: KHỞI CHẠY BẰNG PYTHON HOẶC NPM SCRIPTS
+1. **Cài đặt thư viện**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. **Khởi động**:
+   ```bash
+   python -m cti_core.live_dashboard_app
+   ```
+   *(Hoặc gõ `npm start`)*
 3. **Quét dự án và sinh Kỹ năng tự động**:
    - Tại mục **"5 Bước Tự Hành (Wizard)"**:
      - Nhập đường dẫn thư mục dự án bạn muốn bảo vệ (Ví dụ: `D:/my-web-app` hoặc link GitHub repo).

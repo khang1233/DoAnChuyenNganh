@@ -75,8 +75,15 @@ cti_core/cti_multi_source_archive_full_corpus.sqlite
 *.bak
 *.orig
 
-# 7. Exceptions (Keep essential scripts)
-!*.bat
+# 7. Local convenience scripts & developer drafts (kept locally on disk, hidden from GitHub)
+1_BAT_HE_THONG.bat
+2_TAT_HE_THONG.bat
+CAI_DAT_LENH_CTI.bat
+daynha.txt
+install.ps1
+
+# 8. Exceptions (Keep essential scripts and rules)
+!cti_core/**/*.bat
 !*.sh
 !*.md
 !*.json

@@ -4,8 +4,8 @@
   "description": "He thong phong thu an ninh mang tu hanh tu tinh bao CTI va dong goi ky nang tac tu (Autonomous CTI Agentic Defense)",
   "main": "bin/cli.js",
   "bin": {
-    "cti-defense": "./bin/cli.js",
-    "cti": "./bin/cli.js"
+    "cti-defense": "bin/cli.js",
+    "cti": "bin/cli.js"
   },
   "files": [
     "bin",
@@ -21,10 +21,7 @@
     "apply_to_project.py",
     "requirements.txt",
     "README.md",
-    "AGENTS.md",
-    "CAI_DAT_LENH_CTI.bat",
-    "1_BAT_HE_THONG.bat",
-    "2_TAT_HE_THONG.bat"
+    "AGENTS.md"
   ],
   "scripts": {
     "start": "node ./bin/cli.js",
