@@ -7,8 +7,20 @@
     "cti-defense": "./bin/cli.js",
     "cti": "./bin/cli.js"
   },
+  "files": [
+    "bin",
+    "cti_core",
+    "apply_to_project.py",
+    "requirements.txt",
+    "README.md",
+    "AGENTS.md",
+    "CAI_DAT_LENH_CTI.bat",
+    "1_BAT_HE_THONG.bat",
+    "2_TAT_HE_THONG.bat"
+  ],
   "scripts": {
     "start": "node ./bin/cli.js",
+    "scan": "node ./bin/cli.js scan",
     "stop": "node ./bin/cli.js stop",
     "status": "node ./bin/cli.js status"
   },

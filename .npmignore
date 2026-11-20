@@ -2,3 +2,10 @@
 .github
 *.log
 cti_core/scratch/
+ollama_models/
+node_modules/
+target_projects/
+ai-devsecops-agent/
+*.docx
+__pycache__/
+*.pyc
