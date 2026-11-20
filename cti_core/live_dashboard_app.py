@@ -6296,29 +6296,48 @@ let wzIsProjectConfigured = false;
         term.innerHTML = `<div style="color:#94a3b8;">[KHỞI TẠO] Tác tử AI Codebase Inspector đang đọc cây AST và các tệp cấu hình...</div>`;
       }
 
-      // Vòng lặp mô phỏng tiến độ mượt mà trong lúc chờ Local LLM GPU suy luận
+      // Vòng lặp tiến độ thời gian thực liên tục trong lúc Local LLM GPU suy luận
       let currentPercent = 4;
       let elapsedSec = 0;
+      let logStage2 = false, logStage3 = false, logStage4 = false;
       const progressTimer = setInterval(() => {
         elapsedSec += 0.3;
-        if (currentPercent < 90) {
-          currentPercent += (currentPercent < 40 ? 4 : (currentPercent < 75 ? 2.5 : 1));
-          if (currentPercent > 92) currentPercent = 92;
+        const secInt = Math.round(elapsedSec);
+        if (currentPercent < 97) {
+          currentPercent += (currentPercent < 40 ? 3.5 : (currentPercent < 75 ? 1.8 : (currentPercent < 90 ? 0.8 : 0.2)));
+          if (currentPercent > 97) currentPercent = 97;
           const rounded = Math.round(currentPercent);
           if (progBar) progBar.style.width = rounded + "%";
           if (progText) progText.textContent = rounded + "%";
 
           if (rounded >= 20 && rounded < 45) {
-            if (progStage) progStage.textContent = "[2/4] Bóc tách điểm nóng nhạy cảm (Sinks: upload.php, shell_exec, eval)...";
+            if (progStage) progStage.textContent = "[2/4] Bóc tách điểm nóng nhạy cảm (Sinks: upload, shell_exec, eval)...";
             if (progDetail) progDetail.textContent = "Đang kiểm tra các hàm thực thi hệ thống và điểm tải tệp...";
+            if (!logStage2 && term) {
+              logStage2 = true;
+              term.innerHTML += `<div style="color:#38bdf8; margin-top:4px;">[AST SCAN] Đã duyệt cây thư mục, đang bóc tách các điểm nóng mã nguồn...</div>`;
+              term.scrollTop = term.scrollHeight;
+            }
           } else if (rounded >= 45 && rounded < 75) {
-            if (progStage) progStage.textContent = "[3/4] Nạp ngữ cảnh vào Local LLM Qwen3:8B (GPU RX 6600) suy luận rủi ro...";
-            if (progDetail) progDetail.textContent = "Mô hình khang-qwen3:latest đang đọc hiểu và phân tích bề mặt tấn công...";
-            if (progEta) progEta.textContent = `Đang suy luận: ${Math.round(elapsedSec)}s`;
+            if (progStage) progStage.textContent = "[3/4] Nạp ngữ cảnh vào Local LLM Qwen3:8B (GPU RX 6600)...";
+            if (progDetail) progDetail.textContent = "Mô hình qwen3:8b đang đọc hiểu cấu trúc mã nguồn và đánh giá rủi ro...";
+            if (!logStage3 && term) {
+              logStage3 = true;
+              term.innerHTML += `<div style="color:#fbbf24; margin-top:4px;">[GPU INFERENCE] Đang nạp ngữ cảnh vào mô hình qwen3:8b qua Ollama (chờ ~15s)...</div>`;
+              term.scrollTop = term.scrollHeight;
+            }
           } else if (rounded >= 75) {
             if (progStage) progStage.textContent = "[4/4] Tác tử AI đang tổng hợp luận điểm định danh & gán phân hệ Scope...";
-            if (progDetail) progDetail.textContent = "Tổng hợp kết quả thẩm định kiến trúc và đề xuất đối sách...";
+            if (progDetail) progDetail.textContent = "Tổng hợp kết quả thẩm định kiến trúc và đề xuất đối sách phòng thủ...";
+            if (!logStage4 && term) {
+              logStage4 = true;
+              term.innerHTML += `<div style="color:#a78bfa; margin-top:4px;">[SCOPE CLASSIFIER] Đang tổng hợp phân hệ phòng thủ tối ưu cho dự án...</div>`;
+              term.scrollTop = term.scrollHeight;
+            }
           }
+        }
+        if (progEta) {
+          progEta.textContent = `Đang xử lý GPU: ${secInt}s (khoảng ~15-20s)`;
         }
       }, 300);
 
