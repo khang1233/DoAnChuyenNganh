@@ -30,7 +30,13 @@ BENCHMARK_PORT = 8780
 OLLAMA_PORT = 11434
 
 def get_default_target_project() -> str:
-    """Xác định đường dẫn dự án đích mặc định hoặc đã được cấu hình gần nhất."""
+    """Xác định đường dẫn dự án đích mặc định hoặc thư mục hiện tại khi chạy lệnh cti."""
+    # 1. Ưu tiên thư mục hiện tại người dùng đang đứng (nếu đứng tại thư mục dự án bên ngoài)
+    cwd = Path.cwd().resolve()
+    if cwd != ROOT_DIR.resolve() and cwd != SANDBOX_DIR.resolve():
+        return str(cwd)
+
+    # 2. Kiểm tra cấu hình dự án hoạt động gần nhất
     last_cfg = SANDBOX_DIR / "last_active_project.json"
     if last_cfg.exists():
         try:
@@ -40,6 +46,8 @@ def get_default_target_project() -> str:
                 return str(Path(tp).resolve())
         except Exception:
             pass
+
+    # 3. Thư mục dự án kiểm thử mặc định
     cti_cand = Path("D:/mkhang/testCTI")
     if cti_cand.exists():
         return str(cti_cand.resolve())
@@ -47,8 +55,6 @@ def get_default_target_project() -> str:
     if sample_p.exists():
         return str(sample_p.resolve())
     return ""
-
-
 def is_port_listening(port: int, host: str = "127.0.0.1") -> bool:
     """Kiểm tra cực nhanh (0.01s) xem cổng có đang mở không."""
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -317,6 +323,21 @@ def main():
             target_dir = a.split("=", 1)[1]
             break
 
+    # Kiểm tra lệnh quét trực tiếp từ dòng lệnh: cti scan hoặc cti quet
+    if len(sys.argv) > 1 and sys.argv[1].lower() in ("scan", "quet", "protect"):
+        target = target_dir
+        for idx, a in enumerate(sys.argv):
+            if a in ("--target", "-t") and idx + 1 < len(sys.argv):
+                target = sys.argv[idx + 1]
+                break
+        print("=" * 78)
+        print("  CTI AGENTIC DEFENSE: TIEN HANH QUET VA BAO VE DU AN TRUC TIEP")
+        print(f"  [*] Thu muc du an: {target}")
+        print("=" * 78)
+        apply_script = ROOT_DIR / "apply_to_project.py"
+        subprocess.run([sys.executable, str(apply_script), "--target", str(target)], cwd=str(ROOT_DIR))
+        return
+
     # Kiểm tra cờ tham số dòng lệnh nếu gọi từ CLI
     if len(sys.argv) > 1 and sys.argv[1].lower() in ("stop", "status", "restart"):
         cmd = sys.argv[1].lower()
@@ -351,4 +372,8 @@ def main():
     interactive_menu()
 
 if __name__ == "__main__":
+    main()
+
+def cli_entrypoint():
+    """Entrypoint toàn cục khi cài đặt qua pip (pip install -e .)"""
     main()

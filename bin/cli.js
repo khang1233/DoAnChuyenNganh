@@ -363,10 +363,38 @@ function startSystem() {
   });
 }
 
+function scanCurrentProject() {
+  const pyCmd = findPythonCommand();
+  const targetDir = path.resolve(process.cwd());
+  const applyScript = path.join(ROOT_DIR, 'apply_to_project.py');
+  console.log('==============================================================================');
+  console.log('  CTI AGENTIC DEFENSE: DANG QUET VA BAO VE DU AN TRUC TIEP QUA TERMINAL');
+  console.log(`  [*] Thu muc du an muc tieu: ${targetDir}`);
+  console.log('==============================================================================');
+  ensureDependencies(pyCmd);
+  try {
+    const proc = spawn(pyCmd, [applyScript, '--target', targetDir], {
+      cwd: ROOT_DIR,
+      stdio: 'inherit',
+      env: { ...process.env, PYTHONIOENCODING: 'utf-8' }
+    });
+    proc.on('exit', (code) => {
+      console.log(`
+[*] Tien trinh quet hoan tat voi ma: ${code}`);
+      process.exit(code || 0);
+    });
+  } catch (e) {
+    console.error('[LOI] Qua trinh quet du an bi gian doan:', e.message);
+    process.exit(1);
+  }
+}
+
 // Router CLI
 const arg = (process.argv[2] || '').toLowerCase().trim();
 
-if (arg === 'stop' || arg === 'down' || arg === 'tat') {
+if (arg === 'scan' || arg === 'quet' || arg === 'protect') {
+  scanCurrentProject();
+} else if (arg === 'stop' || arg === 'down' || arg === 'tat') {
   stopSystem();
 } else if (arg === 'status' || arg === 'check') {
   printStatus();
@@ -375,10 +403,11 @@ if (arg === 'stop' || arg === 'down' || arg === 'tat') {
 Su dung: cti-defense [command] (hoac cti [command])
 
 Lenh:
-  cti-defense            Khoi dong toan bo he thong, giu terminal va tu dong mo trinh duyet
-  cti-defense stop       Tat toan bo tien trinh dang chay (cong 8765, 8766, 11434)
-  cti-defense status     Kiem tra he thong dang Online hay Offline
-  cti-defense --help     Hien thi huong dan su dung
+  cti                    Khoi dong he thong va mo Web Dashboard cho thu muc hien tai
+  cti scan               Quet va cai dat ngay bo ky nang phong thu vao thu muc hien tai (CLI)
+  cti stop               Tat toan bo tien trinh dang chay (cong 8765, 8766, 8780, 11434)
+  cti status             Kiem tra he thong dang Online hay Offline
+  cti --help             Hien thi huong dan su dung
 `);
 } else {
   startSystem();
