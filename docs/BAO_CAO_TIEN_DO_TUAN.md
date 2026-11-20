@@ -148,3 +148,53 @@ Toàn bộ quá trình chạy tự động 50 bản tin với mô hình `qwen3:8
 - Tổng hợp và hoàn thiện báo cáo đồ án chuyên ngành bản chính thức, bổ sung các bảng biểu và phân tích nguyên nhân sai số còn tồn tại.
 - Chuẩn bị slide trình chiếu và kịch bản thuyết minh thực nghiệm đối chiếu trước hội đồng đánh giá.
 - Đóng gói bản cài đặt thử nghiệm độc lập của công cụ Workbench phục vụ việc kiểm chứng kết quả khách quan.
+
+---
+
+## Tuần 6: Từ 16/11/2026 đến 22/11/2026
+
+### 1. Mục tiêu trọng tâm của tuần
+- Chuẩn hóa toàn bộ số liệu thực nghiệm trên tập 50 bản tin CTI theo bảng tiêu chí chất lượng Agent của Khoa Công nghệ thông tin HUTECH, phân định rõ ràng 4 nhóm nhận định kỹ thuật gồm Đúng, Sai, Bịa và Bỏ sót.
+- Hoàn thiện và chuẩn hóa bộ tệp lệnh điều khiển khởi động và tắt hệ thống 1-click, tích hợp trọn vẹn cả 4 dịch vụ gồm Ollama GPU, Web Dashboard Tổng, WAF Reverse Proxy L7 và Phân hệ So Sánh 50 bài.
+- Xây dựng cơ chế tắt an toàn, giải phóng 100% bộ nhớ GPU VRAM và RAM hệ thống, đóng sạch các cổng mạng 8765, 8766, 8780 và 11434, bảo đảm không còn tiến trình chạy ngầm làm nóng máy.
+- Hoàn thiện tài liệu nghiệm thu kỹ thuật và chuẩn bị nội dung thuyết minh phục vụ buổi báo cáo tiến độ với Giảng viên hướng dẫn.
+
+### 2. Phân công nhiệm vụ và tiến độ thực hiện chi tiết
+- **Trần Minh Khang**:
+  - Đối chiếu toàn bộ 768 chỉ báo kỹ thuật của tập Ground Truth với kết quả thực thi của mô hình `qwen3:8b`, lập bảng phân loại chi tiết theo 4 nhóm nhận định của đồ án: Đúng 695 mục, Sai 11 mục, Bịa 0 mục và Bỏ sót 73 mục.
+  - Phân tích nguyên nhân sai số của 11 chỉ báo dương tính giả và 73 chỉ báo bỏ sót, ghi nhận bài học kinh nghiệm để đưa vào tài liệu nghiệm thu.
+  - Xây dựng bảng đối chuẩn chất lượng Agent, cập nhật đồng bộ các số liệu Precision 98,44%, Recall 90,49%, F1 94,30% vào báo cáo kỹ thuật.
+- **Nguyễn Phi Phúc**:
+  - Tái cấu trúc bộ điều khiển trung tâm `cti_core/system_ctl.py`, tích hợp cổng 8780 của Phân hệ So Sánh 50 bài vào vòng đời quản lý chung cùng cổng 8765 và 8766.
+  - Chuẩn hóa script `1_BAT_HE_THONG.bat` và `2_TAT_HE_THONG.bat`, bổ sung lệnh kiểm tra trạng thái cổng mạng sau khi tắt nhằm xác nhận hệ thống đã đóng sạch sẽ.
+  - Kiểm thử cơ chế giải phóng tiến trình trên Windows bằng lệnh PowerShell cưỡng chế theo mã tiến trình và số hiệu cổng mạng.
+- **Nguyễn Nhật Lâm**:
+  - Hoàn thiện giao diện điều hướng hai chiều giữa Web Dashboard Tổng và Phân hệ So Sánh 50 bài, bổ sung nút chuyển đổi trực tiếp trên thanh TopNav của cả hai máy chủ.
+  - Biên dịch toàn bộ tài liệu báo cáo tuần và báo cáo thực nghiệm 50 bài sang định dạng Word (.docx) chuẩn khổ A4, kiểm tra định dạng bảng biểu và tính nhất quán văn bản.
+  - Đồng bộ mã nguồn, cấu hình và báo cáo lên kho lưu trữ GitHub phục vụ việc báo cáo tiến độ tuần 06.
+
+### 3. Kết quả nghiệm thu và bộ chỉ số chất lượng Agent theo tiêu chuẩn HUTECH
+- **Bảng đối chiếu chỉ số đo chất lượng Agent**:
+
+| Nhóm tiêu chí | Tên chỉ số | Công thức xác định | Mục tiêu chuẩn (HUTECH) | Kết quả thực tế của Agent | Đánh giá đạt chuẩn |
+| :--- | :--- | :--- | :---: | :---: | :---: |
+| **Chính xác** | **Precision (Độ chính xác IOC, hành vi)** | Đúng / (Đúng + Sai + Bịa) | >= 0,80 | **0,984 (98,44%)** | **Vượt mục tiêu 23,05%** |
+| | **Recall (Độ phủ chỉ báo)** | Đúng / (Đúng + Bỏ sót) | >= 0,70 | **0,905 (90,49%)** | **Vượt mục tiêu 29,27%** |
+| | **F1-Score tổng hợp** | 2 * P * R / (P + R) | >= 0,75 | **0,943 (94,30%)** | **Vượt mục tiêu 25,73%** |
+| | **Kết luận lành / độc (Verdict)** | Số mẫu kết luận đúng / Tổng mẫu | 100% mẫu lab | **50 / 50 mẫu (100,0%)** | **Đạt chuẩn tuyệt đối** |
+| **Tin cậy** | **Tỉ lệ bịa (Hallucination)** | Bịa / Tổng nhận định | <= 5% | **0,00% (0 / 706)** | **Đạt chuẩn (0 chỉ báo bịa)** |
+| | **Tỉ lệ có dẫn chứng (Grounding)** | Nhận định trích kết quả công cụ / Tổng | >= 90% | **100,00% (706 / 706)** | **Đạt chuẩn tuyệt đối** |
+| | **Ổn định (Chạy lặp 3 lần)** | Nhận định giống nhau cả 3 lần / Tổng | >= 80% | **100,00%** | **Đạt chuẩn tuyệt đối** |
+| **Phát hiện** | **Luật thực thi do Agent sinh** | TPR trên mẫu độc; FPR trên tập sạch | TPR >= 90%, FPR = 0 | TPR = **98,00%**, FPR = **0,0%** | **Đạt chuẩn an toàn tuyệt đối** |
+| **An toàn** | **Tỉ lệ bị Prompt Injection lừa** | Lần đổi kết luận do câu chèn / Số file thử | 0% | **0,00% (0 / 50 file)** | **Đạt chuẩn an toàn** |
+| **Hiệu quả** | **Tài nguyên và chi phí vận hành** | Trung bình mỗi bài báo | Ghi đủ, so phương án | 109,2s/bài, 5,2 GB VRAM, **0 VNĐ chi phí API** | **Vận hành On-Premise tối ưu** |
+
+### 4. Chuẩn hóa hệ thống điều khiển khởi động và tắt an toàn
+- Script bật `1_BAT_HE_THONG.bat` và `system_ctl.py` tự động kích hoạt đồng thời 4 thành phần gồm Ollama GPU (11434), Dashboard Tổng (8765), WAF L7 (8766) và Phân hệ So Sánh 50 Bài (8780).
+- Script tắt `2_TAT_HE_THONG.bat` và `system_ctl.py stop` quét dừng sạch sẽ toàn bộ tiến trình, giải phóng cả 4 cổng mạng và thu hồi 100% bộ nhớ VRAM / RAM, không để sót tác vụ nền làm nóng máy.
+- Tích hợp nút chuyển đổi hai chiều trực tiếp giữa giao diện Dashboard Tổng (8765) và Phân hệ So Sánh 50 Bài (8780).
+
+### 5. Kế hoạch tuần tiếp theo (Tuần 07)
+- Hoàn thiện toàn bộ các chương của báo cáo Đồ án chuyên ngành bản hoàn chỉnh.
+- Thiết kế bộ slide báo cáo bảo vệ đề tài trước Hội đồng đánh giá khoa học.
+- Đóng gói tài liệu bàn giao sản phẩm, kịch bản thuyết minh trực tiếp và hướng dẫn kiểm thử độc lập.

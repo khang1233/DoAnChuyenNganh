@@ -120,6 +120,8 @@ defense_skills/<skill-name>/
 Toàn bộ tài liệu chi tiết của đồ án được tổ chức gọn gàng trong thư mục [docs/](docs/):
 - **Báo cáo thực nghiệm 50 bài CTI (Word)**: [docs/BAO_CAO_THUC_NGHIEM_50_BAI_CTI.docx](docs/BAO_CAO_THUC_NGHIEM_50_BAI_CTI.docx)
 - **Báo cáo thực nghiệm 50 bài CTI (Markdown)**: [docs/BAO_CAO_THUC_NGHIEM_50_BAI_CTI.md](docs/BAO_CAO_THUC_NGHIEM_50_BAI_CTI.md)
+- **Báo cáo tiến độ Tuần 06 (Word)**: [docs/BAO_CAO_TIEN_DO_TUAN_06.docx](docs/BAO_CAO_TIEN_DO_TUAN_06.docx)
+- **Báo cáo tiến độ Tuần 06 (Markdown)**: [docs/BAO_CAO_TIEN_DO_TUAN_06.md](docs/BAO_CAO_TIEN_DO_TUAN_06.md)
 - **Báo cáo tiến độ Tuần 05 (Word)**: [docs/BAO_CAO_TIEN_DO_TUAN_05.docx](docs/BAO_CAO_TIEN_DO_TUAN_05.docx)
 - **Báo cáo tiến độ Tuần 05 (Markdown)**: [docs/BAO_CAO_TIEN_DO_TUAN_05.md](docs/BAO_CAO_TIEN_DO_TUAN_05.md)
 - **Báo cáo tiến độ tổng hợp các tuần**: [docs/BAO_CAO_TIEN_DO_TUAN.md](docs/BAO_CAO_TIEN_DO_TUAN.md)

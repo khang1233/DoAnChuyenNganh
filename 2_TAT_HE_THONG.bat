@@ -13,7 +13,7 @@ cd /d "%~dp0"
 :: 1. Goi trinh dieu khien python dung sach se he thong
 python cti_core\system_ctl.py stop
 if errorlevel 1 goto fallback_kill
-goto end
+goto verify
 
 :fallback_kill
 echo.
@@ -26,6 +26,11 @@ echo.
 echo ==============================================================================
 echo   [HOAN TAT] DA TAT SACH TOAN BO HE THONG!
 echo ==============================================================================
+
+:verify
+echo.
+python cti_core\system_ctl.py status
+echo.
 
 :end
 echo Nhap phim bat ky de dong cua so...
