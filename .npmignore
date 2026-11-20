@@ -9,3 +9,17 @@ ai-devsecops-agent/
 *.docx
 __pycache__/
 *.pyc
+
+# Binaries & large installers
+*.exe
+*.msi
+*.dll
+*.sys
+*.bin
+*.gguf
+cti_core/suricata_setup.msi
+cti_core/suricata_windivert.msi
+cti_core/winpcap.exe
+cti_core/cti_multi_source_archive_full_corpus.sqlite
+cti_core/live_defense_system/suricata_bin/
+cti_core/live_defense_system/suricata_windivert_bin/
