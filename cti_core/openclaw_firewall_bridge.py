@@ -25,17 +25,25 @@ Giải quyết 3 yêu cầu trọng tâm của Giảng viên hướng dẫn:
 
 from datetime import datetime, timezone
 import json
+import os
+from pathlib import Path
 import platform
 import re
 import sqlite3
 import subprocess
-from pathlib import Path
-from typing import Any, Dict, List
-import uuid
-
-from shared.schemas import EnrichedIOC, MitreTechnique
-
+import sys
 SANDBOX_DIR = Path(__file__).resolve().parent
+ROOT_PROJECT_DIR = Path(__file__).resolve().parents[1]
+REPO_ROOT = ROOT_PROJECT_DIR / "ai-devsecops-agent"
+
+for candidate_path in [str(SANDBOX_DIR), str(ROOT_PROJECT_DIR), str(REPO_ROOT)]:
+    if os.path.exists(candidate_path) and candidate_path not in sys.path:
+        sys.path.insert(0, candidate_path)
+
+try:
+    from shared.schemas import EnrichedIOC, MitreTechnique
+except ImportError:
+    from cti_core.shared.schemas import EnrichedIOC, MitreTechnique
 FIREWALL_DB_PATH = SANDBOX_DIR / "cti_local_firewall_rules.sqlite"
 RULE_PREFIX = "CTI_OPENCLAW_DEFENSE"
 

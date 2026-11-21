@@ -37,9 +37,13 @@ import uvicorn
 
 import os
 
-REPO_ROOT = Path(__file__).resolve().parents[1] / "ai-devsecops-agent"
 SANDBOX_DIR = Path(__file__).resolve().parent
 ROOT_PROJECT_DIR = Path(__file__).resolve().parents[1]
+REPO_ROOT = ROOT_PROJECT_DIR / "ai-devsecops-agent"
+
+for candidate_path in [str(SANDBOX_DIR), str(ROOT_PROJECT_DIR), str(REPO_ROOT)]:
+    if os.path.exists(candidate_path) and candidate_path not in sys.path:
+        sys.path.insert(0, candidate_path)
 
 ACTIVE_TARGET_PROJECT = os.environ.get("CTI_TARGET_PROJECT", "")
 for idx, arg in enumerate(sys.argv):
@@ -71,14 +75,18 @@ if not ACTIVE_TARGET_PROJECT:
             ACTIVE_TARGET_PROJECT = str(sample_p)
         else:
             ACTIVE_TARGET_PROJECT = str(Path.cwd())
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
-if str(SANDBOX_DIR) not in sys.path:
-    sys.path.insert(0, str(SANDBOX_DIR))
 
-from shared.schemas import EnrichedIOC, ExtractedIOC
-from src.security.enrichment_service import enrich_ioc, filter_high_risk_iocs
-from src.security.stix_converter import export_stix_package
+try:
+    from shared.schemas import EnrichedIOC, ExtractedIOC
+except ImportError:
+    from cti_core.shared.schemas import EnrichedIOC, ExtractedIOC
+
+try:
+    from src.security.enrichment_service import enrich_ioc, filter_high_risk_iocs
+    from src.security.stix_converter import export_stix_package
+except ImportError:
+    from cti_core.src.security.enrichment_service import enrich_ioc, filter_high_risk_iocs
+    from cti_core.src.security.stix_converter import export_stix_package
 
 def init_project_registry_db():
     db_path = SANDBOX_DIR / "cti_multi_source_archive.sqlite"

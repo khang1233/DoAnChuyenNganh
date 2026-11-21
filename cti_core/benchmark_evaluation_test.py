@@ -17,11 +17,21 @@ from pathlib import Path
 from typing import Dict, List, Any
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT_DIR))
-sys.path.insert(0, str(ROOT_DIR / "ai-devsecops-agent" / "src"))
+SANDBOX_DIR = Path(__file__).resolve().parent
 
-from security.enrichment_service import enrich_ioc, MALICIOUS_SCORE_THRESHOLD
-from shared.schemas import ExtractedIOC
+for candidate_path in [str(SANDBOX_DIR), str(ROOT_DIR), str(ROOT_DIR / "ai-devsecops-agent" / "src"), str(ROOT_DIR / "ai-devsecops-agent")]:
+    if os.path.exists(candidate_path) and candidate_path not in sys.path:
+        sys.path.insert(0, candidate_path)
+
+try:
+    from shared.schemas import ExtractedIOC
+except ImportError:
+    from cti_core.shared.schemas import ExtractedIOC
+
+try:
+    from src.security.enrichment_service import enrich_ioc, MALICIOUS_SCORE_THRESHOLD
+except ImportError:
+    from cti_core.src.security.enrichment_service import enrich_ioc, MALICIOUS_SCORE_THRESHOLD
 
 # TẬP DỮ LIỆU ĐỐI CHUẨN GROUND TRUTH (50 MẪU ĐỘC HẠI THẬT vs 50 MẪU AN TOÀN THẬT)
 BENCHMARK_GROUND_TRUTH_DATASET = [

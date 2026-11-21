@@ -27,21 +27,35 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import requests
 
-REPO_ROOT = Path(__file__).resolve().parents[1] / "ai-devsecops-agent"
 SANDBOX_DIR = Path(__file__).resolve().parent
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
-if str(SANDBOX_DIR) not in sys.path:
-    sys.path.insert(0, str(SANDBOX_DIR))
+ROOT_PROJECT_DIR = Path(__file__).resolve().parents[1]
+REPO_ROOT = ROOT_PROJECT_DIR / "ai-devsecops-agent"
 
-from shared.schemas import DefensiveRules, EnrichedIOC, ExtractedIOC, MitreTechnique
-from src.security.enrichment_service import (
-    MALICIOUS_SCORE_THRESHOLD,
-    enrich_ioc_list,
-    filter_high_risk_iocs,
-    refang_ioc,
-)
-from src.security.stix_converter import export_stix_package
+for candidate_path in [str(SANDBOX_DIR), str(ROOT_PROJECT_DIR), str(REPO_ROOT)]:
+    if os.path.exists(candidate_path) and candidate_path not in sys.path:
+        sys.path.insert(0, candidate_path)
+
+try:
+    from shared.schemas import DefensiveRules, EnrichedIOC, ExtractedIOC, MitreTechnique
+except ImportError:
+    from cti_core.shared.schemas import DefensiveRules, EnrichedIOC, ExtractedIOC, MitreTechnique
+
+try:
+    from src.security.enrichment_service import (
+        MALICIOUS_SCORE_THRESHOLD,
+        enrich_ioc_list,
+        filter_high_risk_iocs,
+        refang_ioc,
+    )
+    from src.security.stix_converter import export_stix_package
+except ImportError:
+    from cti_core.src.security.enrichment_service import (
+        MALICIOUS_SCORE_THRESHOLD,
+        enrich_ioc_list,
+        filter_high_risk_iocs,
+        refang_ioc,
+    )
+    from cti_core.src.security.stix_converter import export_stix_package
 from lam_automation_crawler import fetch_rss_feeds, scrape_article_text
 
 

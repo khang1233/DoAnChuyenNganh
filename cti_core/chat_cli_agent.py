@@ -12,15 +12,19 @@ import requests
 
 os.environ["OLLAMA_MODELS"] = r"D:\mkhang\DoAnChuyenNganh\ollama_models"
 
-REPO_ROOT = Path(__file__).resolve().parents[1] / "ai-devsecops-agent"
 SANDBOX_DIR = Path(__file__).resolve().parent
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
-if str(SANDBOX_DIR) not in sys.path:
-    sys.path.insert(0, str(SANDBOX_DIR))
+ROOT_PROJECT_DIR = Path(__file__).resolve().parents[1]
+REPO_ROOT = ROOT_PROJECT_DIR / "ai-devsecops-agent"
+
+for candidate_path in [str(SANDBOX_DIR), str(ROOT_PROJECT_DIR), str(REPO_ROOT)]:
+    if os.path.exists(candidate_path) and candidate_path not in sys.path:
+        sys.path.insert(0, candidate_path)
 
 import re
-from src.security.enrichment_service import enrich_ioc_list
+try:
+    from src.security.enrichment_service import enrich_ioc_list
+except ImportError:
+    from cti_core.src.security.enrichment_service import enrich_ioc_list
 from phuc_core_ai_agent import MultiProviderLLMBrain, tool6_extract_iocs_hybrid
 
 

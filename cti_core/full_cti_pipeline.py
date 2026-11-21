@@ -14,31 +14,61 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List
 
-REPO_ROOT = Path(__file__).resolve().parents[1] / "ai-devsecops-agent"
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
+SANDBOX_DIR = Path(__file__).resolve().parent
+ROOT_PROJECT_DIR = Path(__file__).resolve().parents[1]
+REPO_ROOT = ROOT_PROJECT_DIR / "ai-devsecops-agent"
 
-from shared.schemas import (
-    DefensiveRules,
-    EnrichedIOC,
-    ExtractedIOC,
-    MitreTechnique,
-    RawThreatData,
-    ThreatIntelReport,
-)
-from src.security.benchmark.apt_dataset_builder import (
-    fetch_live_cisa_kev_entries,
-    fetch_live_thehackernews_articles,
-)
-from src.security.enrichment_service import (
-    MALICIOUS_SCORE_THRESHOLD,
-    _get_live_abuseipdb_blacklist,
-    _get_live_malwarebazaar_hashes,
-    _get_live_openphish_domains,
-    enrich_ioc_list,
-    filter_high_risk_iocs,
-)
-from src.security.stix_converter import export_stix_package
+for candidate_path in [str(SANDBOX_DIR), str(ROOT_PROJECT_DIR), str(REPO_ROOT)]:
+    if os.path.exists(candidate_path) and candidate_path not in sys.path:
+        sys.path.insert(0, candidate_path)
+
+try:
+    from shared.schemas import (
+        DefensiveRules,
+        EnrichedIOC,
+        ExtractedIOC,
+        MitreTechnique,
+        RawThreatData,
+        ThreatIntelReport,
+    )
+except ImportError:
+    from cti_core.shared.schemas import (
+        DefensiveRules,
+        EnrichedIOC,
+        ExtractedIOC,
+        MitreTechnique,
+        RawThreatData,
+        ThreatIntelReport,
+    )
+
+try:
+    from src.security.benchmark.apt_dataset_builder import (
+        fetch_live_cisa_kev_entries,
+        fetch_live_thehackernews_articles,
+    )
+    from src.security.enrichment_service import (
+        MALICIOUS_SCORE_THRESHOLD,
+        _get_live_abuseipdb_blacklist,
+        _get_live_malwarebazaar_hashes,
+        _get_live_openphish_domains,
+        enrich_ioc_list,
+        filter_high_risk_iocs,
+    )
+    from src.security.stix_converter import export_stix_package
+except ImportError:
+    from cti_core.src.security.benchmark.apt_dataset_builder import (
+        fetch_live_cisa_kev_entries,
+        fetch_live_thehackernews_articles,
+    )
+    from cti_core.src.security.enrichment_service import (
+        MALICIOUS_SCORE_THRESHOLD,
+        _get_live_abuseipdb_blacklist,
+        _get_live_malwarebazaar_hashes,
+        _get_live_openphish_domains,
+        enrich_ioc_list,
+        filter_high_risk_iocs,
+    )
+    from cti_core.src.security.stix_converter import export_stix_package
 
 
 # ==============================================================================

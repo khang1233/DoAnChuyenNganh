@@ -1,6 +1,6 @@
 {
   "name": "cti-defense",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "He thong phong thu an ninh mang tu hanh tu tinh bao CTI va dong goi ky nang tac tu (Autonomous CTI Agentic Defense)",
   "main": "bin/cli.js",
   "bin": {
@@ -10,6 +10,8 @@
   "files": [
     "bin",
     "cti_core",
+    "shared",
+    "src",
     "!cti_core/**/*.exe",
     "!cti_core/**/*.msi",
     "!cti_core/**/*.dll",
