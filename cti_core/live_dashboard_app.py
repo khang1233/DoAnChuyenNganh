@@ -3187,9 +3187,18 @@ HTML_PAGE = r"""<!DOCTYPE html>
         if (c.cves > 0) summaryCounts.push(`<b>${c.cves}</b> CVE`);
         if (c.sha256 > 0) summaryCounts.push(`<b>${c.sha256}</b> Hash`);
 
-        const iocCellHtml = summaryCounts.length > 0
-          ? `<div style="font-size:11.5px; margin-bottom:4px; color:var(--primary);">${summaryCounts.join(' &bull; ')}</div><div>${chips.slice(0, 4).join('')}</div>`
-          : `<span style="color:var(--text-muted); font-size:12px;">Báo cáo ngữ cảnh chung</span>`;
+        let iocCellHtml = '';
+        if (isDone) {
+          iocCellHtml = summaryCounts.length > 0
+            ? `<div style="font-size:11.5px; margin-bottom:4px; color:#15803d; font-weight:700;">Đã xác thực OSINT: ${summaryCounts.join(' &bull; ')}</div><div>${chips.slice(0, 4).join('')}</div>`
+            : `<span style="color:var(--text-muted); font-size:12px;">Báo cáo ngữ cảnh chung</span>`;
+        } else if (art.status === 'processing') {
+          iocCellHtml = `<div style="font-size:12px; color:#1d4ed8; font-weight:600;">Đang bóc tách &amp; tra cứu 5 nguồn...</div>`;
+        } else {
+          iocCellHtml = summaryCounts.length > 0
+            ? `<div style="font-size:11px; margin-bottom:4px; color:#64748b;">Khảo sát từ khóa thô: ${summaryCounts.join(' &bull; ')}</div><div style="font-size:11px; color:#94a3b8; font-style:italic;">(Chờ AI Agent đối soát 5 nguồn)</div>`
+            : `<span style="color:var(--text-muted); font-size:12px;">Báo cáo ngữ cảnh chung</span>`;
+        }
 
         const safeTitle = (art.title || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         const charLen = (art.content || '').length.toLocaleString('vi-VN');
@@ -3457,13 +3466,19 @@ HTML_PAGE = r"""<!DOCTYPE html>
 
         const st = art.status || 'pending';
         let statusBadgeHtml = '';
+        let iocBadgeMeta = '';
+
         if (st === 'processing') {
           statusBadgeHtml = `<span class="BadgeProcessing">Đang xử lý...</span>`;
+          iocBadgeMeta = `<span style="font-size:11px; color:#1d4ed8; background:#dbeafe; border:1px solid #93c5fd; padding:1px 6px; border-radius:4px; font-weight:600;">Đang đối soát 5 nguồn...</span>`;
         } else if (st === 'completed') {
           const dur = art.processing_time_sec ? `${art.processing_time_sec.toFixed(1)}s` : 'Xong';
-          statusBadgeHtml = `<span class="BadgeCompleted">Đã xử lý (${dur})</span>`;
+          statusBadgeHtml = `<span class="BadgeCompleted">Đã thẩm định (${dur})</span>`;
+          iocBadgeMeta = `<span style="font-size:11px; color:#15803d; background:#dcfce7; border:1px solid #86efac; padding:1px 6px; border-radius:4px; font-weight:700;">Đã xác thực: ${iocBadge}</span>`;
         } else {
           statusBadgeHtml = `<span class="BadgePending">Chờ xử lý</span>`;
+          const rawNote = counts.cves > 0 ? `${counts.cves} CVE trong tiêu đề` : (badgeParts.length > 0 ? `Chứa ${badgeParts.join(', ')}` : 'Văn bản báo cáo');
+          iocBadgeMeta = `<span style="font-size:11px; color:#64748b; background:#f1f5f9; border:1px solid #e2e8f0; padding:1px 6px; border-radius:4px;" title="Chỉ là từ khóa thô phát hiện trong tiêu đề/nội dung bài báo, chưa qua AI thẩm định và tính điểm OSINT">Từ khóa văn bản: ${rawNote}</span>`;
         }
 
         const pubDateStr = formatToLocalTime(art.sort_ts || art.published_at);
@@ -3473,7 +3488,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
           <div class="FeedItem ${isSel}" id="ncard-${idx}" onclick="selectCard(${idx}, false)">
             <div class="FeedMeta">
               <span class="FeedSource">#${idx + 1} &bull; ${art.source}</span>
-              <span>${iocBadge}</span>
+              ${iocBadgeMeta}
             </div>
             <div class="FeedTitle">${art.title}</div>
             <div class="FeedFootMeta" style="flex-wrap: wrap; gap: 4px;">
@@ -5342,14 +5357,19 @@ const elArt = document.getElementById('lblMasterArticlesCount');
             if (lTier) lTier.textContent = (detectedSystemHardware.tier_title || 'CẤU HÌNH TIÊU CHUẨN').toUpperCase();
           }
 
+          const savedStep = parseInt(localStorage.getItem('cti_wizard_step') || '0', 10);
           const isConfigured = Boolean(
             (data.is_configured && data.config) || 
-            (localStorage.getItem('cti_configured_' + data.target_path) === 'true')
+            (localStorage.getItem('cti_configured_' + data.target_path) === 'true') ||
+            (localStorage.getItem('cti_dashboard_ready') === 'true') ||
+            savedStep >= 5
           );
 
           if (isConfigured) {
             wzIsProjectConfigured = true;
             localStorage.setItem('cti_configured_' + data.target_path, 'true');
+            localStorage.setItem('cti_dashboard_ready', 'true');
+            localStorage.setItem('cti_wizard_step', '5');
 
             // Xóa triệt để landing-mode và wizard-setup-mode
             document.body.classList.remove('wizard-setup-mode');
@@ -5413,13 +5433,23 @@ const elArt = document.getElementById('lblMasterArticlesCount');
               lHwSum.textContent = detectedSystemHardware.gpu_name + ' (' + (detectedSystemHardware.vram_gb || 8) + 'GB VRAM) • Chờ khảo sát & chọn model tại Bước 2';
             }
 
-            document.body.classList.add('landing-mode');
+            if (savedStep > 0 && savedStep < 5) {
+              document.body.classList.remove('landing-mode');
+              wizardGotoStep(savedStep);
+            } else {
+              document.body.classList.add('landing-mode');
+              switchView('sec-wizard', document.querySelector('.NavLinks .NavLink'));
+              wizardGotoStep(0);
+            }
+          }
+        } else {
+          const savedStep = parseInt(localStorage.getItem('cti_wizard_step') || '0', 10);
+          if (savedStep > 0 && savedStep < 5) {
+            wizardGotoStep(savedStep);
+          } else {
             switchView('sec-wizard', document.querySelector('.NavLinks .NavLink'));
             wizardGotoStep(0);
           }
-        } else {
-          switchView('sec-wizard', document.querySelector('.NavLinks .NavLink'));
-          wizardGotoStep(0);
         }
       } catch (e) {
         console.error('Loi khoi tao ngu canh du an:', e);
@@ -5564,6 +5594,14 @@ let wzIsProjectConfigured = false;
         stepNum = 1;
       }
       wzCurrentStep = stepNum;
+      try {
+        localStorage.setItem('cti_wizard_step', String(stepNum));
+        if (wzTarget) localStorage.setItem('cti_last_target', wzTarget);
+        if (stepNum >= 5) {
+          localStorage.setItem('cti_configured_' + wzTarget, 'true');
+          localStorage.setItem('cti_dashboard_ready', 'true');
+        }
+      } catch (e) {}
       
       // Chi hien cac tab dieu huong va khong gian Live Server khi vao Buoc 5 tro di hoac du an da bao ve
       const isLiveStage = (stepNum >= 5 || wzIsProjectConfigured);
@@ -6503,6 +6541,11 @@ let wzIsProjectConfigured = false;
                 btn.textContent = "[ QUÉT LẠI DỰ ÁN ]";
               }
               wzScanCompleted = true;
+              try {
+                localStorage.setItem('cti_wizard_step', '1');
+                localStorage.setItem('cti_last_target', d.target_path || wzTarget);
+                localStorage.setItem('cti_scope_id', d.scope_id || wzScopeId);
+              } catch (e) {}
 
               // Hiển thị khung kết quả & Điểm mấu chốt
               if (resSummary) resSummary.style.display = "block";
@@ -6681,12 +6724,32 @@ let wzIsProjectConfigured = false;
             feedEl.scrollIntoView({ behavior: "smooth", block: "start" });
           }
 
-          updateLiveTicker(`[Bước 5] Đã nạp thành công ${articles.length} bài báo phân hệ [${d.scope_name}]. Bấm 'Chạy Phân Tích' hoặc '▶ Chạy Tự Động Hàng Đợi' để AI Agent bắt đầu!`);
+          updateLiveTicker(`[Bước 5] Đã nạp thành công ${articles.length} bài báo phân hệ [${d.scope_name}]. AI Agent đang tự động xử lý tuần tự toàn bộ hàng đợi...`);
 
           const autoStrip = document.getElementById("autoScanStripControls");
           if (autoStrip) autoStrip.style.display = "flex";
 
-          autoQueueEnabled = false;
+          try {
+            localStorage.setItem('cti_configured_' + wzTarget, 'true');
+            localStorage.setItem('cti_dashboard_ready', 'true');
+            localStorage.setItem('cti_wizard_step', '5');
+            localStorage.setItem('cti_last_target', wzTarget);
+          } catch (e) {}
+
+          // Tự động kích hoạt AI Agent chạy ngay lập tức khi bấm Bắt Đầu Cào Báo & Chạy AI Live
+          autoQueueEnabled = true;
+          const toggleEl = document.getElementById('autoQueueToggle');
+          if (toggleEl) toggleEl.checked = true;
+          const qStatus = document.getElementById('queueWorkerStatus');
+          if (qStatus) {
+            qStatus.textContent = "Bật (Đang xử lý)";
+            qStatus.style.color = "#16a34a";
+          }
+
+          // Bắt đầu xử lý bài đầu tiên trong hàng đợi sau 500ms
+          setTimeout(() => {
+            executeSingleArticleQueue(0);
+          }, 500);
         }
       } catch (e) {
         console.error("Lỗi cào báo Step 5:", e);
@@ -8319,11 +8382,36 @@ class WizardActReq(BaseModel):
 
 @app.post("/api/wizard/scan")
 def api_wizard_scan(req: WizardScanReq):
+    global ACTIVE_TARGET_PROJECT
+    if req.target:
+        try:
+            ACTIVE_TARGET_PROJECT = str(Path(req.target).resolve())
+            lap = SANDBOX_DIR / "last_active_project.json"
+            lap.write_text(json.dumps({
+                "target_path": ACTIVE_TARGET_PROJECT,
+                "target_name": Path(ACTIVE_TARGET_PROJECT).name,
+                "is_configured": False
+            }, ensure_ascii=False, indent=2), encoding="utf-8")
+        except Exception:
+            pass
     return wizard_scan_project(target=req.target, clone_url=req.clone_url)
 
 @app.post("/api/wizard/crawl-scope")
 def api_wizard_crawl_scope(req: WizardCrawlReq):
     try:
+        global ACTIVE_TARGET_PROJECT
+        if req.target:
+            try:
+                ACTIVE_TARGET_PROJECT = str(Path(req.target).resolve())
+                lap = SANDBOX_DIR / "last_active_project.json"
+                lap.write_text(json.dumps({
+                    "target_path": ACTIVE_TARGET_PROJECT,
+                    "target_name": Path(ACTIVE_TARGET_PROJECT).name,
+                    "scope_id": req.scope_id,
+                    "is_configured": True
+                }, ensure_ascii=False, indent=2), encoding="utf-8")
+            except Exception:
+                pass
         return wizard_crawl_scope(target=req.target, scope_id=req.scope_id, history_years=req.history_years)
     except Exception as e:
         import traceback
