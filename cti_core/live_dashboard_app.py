@@ -1888,6 +1888,9 @@ HTML_PAGE = r"""<!DOCTYPE html>
           <button class="CleanBtn btn-primary" onclick="analyzeSelectedHistoryArticles()">
             Phân Tích Đã Chọn (<span id="histSelectedCount">0</span>)
           </button>
+          <button type="button" class="CleanBtn" style="border-color:#16a34a; color:#ffffff; background:#16a34a; font-weight:700;" onclick="startAutoQueueFromButton(this)" title="Kích hoạt AI Agent tự động phân tích lần lượt từng bài báo trong hàng đợi">
+            ▶ Chạy Tự Động Hàng Đợi
+          </button>
           <button type="button" class="CleanBtn" style="border-color:#fca5a5; color:#b91c1c; background:#fef2f2; font-weight:600; padding:4px 10px; font-size:12px; cursor:pointer;" onclick="resetAllArticlesToPending(this)" title="Đặt lại toàn bộ bài báo về trạng thái Chờ xử lý để AI Agent chạy lại từ đầu">
             [ Đặt Lại Toàn Bộ Về Chờ Xử Lý ]
           </button>
@@ -3276,11 +3279,29 @@ HTML_PAGE = r"""<!DOCTYPE html>
       }
     }
 
+    function startAutoQueueFromButton(btn) {
+      autoQueueEnabled = true;
+      const toggleEl = document.getElementById('autoQueueToggle');
+      if (toggleEl) toggleEl.checked = true;
+      const qStatus = document.getElementById('queueWorkerStatus');
+      if (qStatus) {
+        qStatus.textContent = "Bật (Đang xử lý)";
+        qStatus.style.color = "#16a34a";
+      }
+      const autoStrip = document.getElementById("autoScanStripControls");
+      if (autoStrip) autoStrip.style.display = "flex";
+      updateLiveTicker("Đã kích hoạt AI Agent tự động xử lý tuần tự toàn bộ hàng đợi bài báo...");
+      triggerNextInQueue();
+    }
+
     function analyzeSelectedHistoryArticles() {
       const list = (allHistoryArticles && allHistoryArticles.length > 0) ? allHistoryArticles : articles;
       const chosen = list.filter(a => selectedHistoryIds.has(a.article_id));
       if (chosen.length === 0) {
-        alert("Vui lòng tích chọn ít nhất 1 bài báo trong bảng Lịch Sử để chạy phân tích!");
+        const ok = confirm("Bạn chưa tích chọn bài báo nào. Bạn có muốn kích hoạt AI Agent tự động phân tích tuần tự toàn bộ hàng đợi không?");
+        if (ok) {
+          startAutoQueueFromButton();
+        }
         return;
       }
       currentTitle = `[Gộp ${chosen.length} Bài Từ Lịch Sử] ` + chosen.map(a => a.source).join(', ');
@@ -4892,6 +4913,16 @@ const elArt = document.getElementById('lblMasterArticlesCount');
       if (selectedIndices.length > 1) {
         await executeMergedArticlesPipeline();
       } else {
+        autoQueueEnabled = true;
+        const toggleEl = document.getElementById('autoQueueToggle');
+        if (toggleEl) toggleEl.checked = true;
+        const qStatus = document.getElementById('queueWorkerStatus');
+        if (qStatus) {
+          qStatus.textContent = "Bật (Đang xử lý)";
+          qStatus.style.color = "#16a34a";
+        }
+        const autoStrip = document.getElementById("autoScanStripControls");
+        if (autoStrip) autoStrip.style.display = "flex";
         await executeSingleArticleQueue(selectedIndices[0] || 0);
       }
     }
@@ -6650,10 +6681,12 @@ let wzIsProjectConfigured = false;
             feedEl.scrollIntoView({ behavior: "smooth", block: "start" });
           }
 
-          updateLiveTicker(`[Bước 5] Đã nạp thành công ${articles.length} bài báo phân hệ [${d.scope_name}] vào hàng đợi Live. Bắt đầu đối soát AST...`);
+          updateLiveTicker(`[Bước 5] Đã nạp thành công ${articles.length} bài báo phân hệ [${d.scope_name}]. Bấm 'Chạy Phân Tích' hoặc '▶ Chạy Tự Động Hàng Đợi' để AI Agent bắt đầu!`);
+
+          const autoStrip = document.getElementById("autoScanStripControls");
+          if (autoStrip) autoStrip.style.display = "flex";
 
           autoQueueEnabled = false;
-          // Hệ thống giữ ở trạng thái Chờ xử lý, người dùng bấm Chạy Phân Tích khi sẵn sàng
         }
       } catch (e) {
         console.error("Lỗi cào báo Step 5:", e);
@@ -6796,7 +6829,8 @@ let wzIsProjectConfigured = false;
                 term.scrollTop = term.scrollHeight;
               }
 
-              // Thời gian AI xử lý từng bài (1.8s)
+              // Thời gian AI xử lý từng bài (adaptive delay tùy quy mô hàng đợi)
+              const stepDelay = total > 50 ? 200 : (total > 20 ? 400 : 1200);
               setTimeout(() => {
                 if (cardEl) {
                   cardEl.setAttribute("data-status", "completed");

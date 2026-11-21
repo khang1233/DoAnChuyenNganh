@@ -390,6 +390,99 @@ def wizard_scan_project(target: str = "", clone_url: str = "") -> Dict[str, Any]
         "keywords": profile["keywords"][:6]
     }
 
+def compute_scope_relevance(scope_id: str, title: str, content: str) -> int:
+    """Tính toán điểm tương quan chuyên sâu của bài báo CTI với Phân hệ Phòng thủ (Scope)."""
+    t = (title or "").lower()
+    c = (content or "").lower()
+    score = 0
+
+    if scope_id == "SCOPE_WEB":
+        primary_techs = [
+            "php", "laravel", "magento", "wordpress", "apache", "nginx",
+            "sql", "mysql", "postgres", "sqlite", "injection", "sqli",
+            "rce", "xss", "ssrf", "web shell", "webshell", "file upload",
+            "deserialization", "struts", "roller", "fastapi", "django", "flask",
+            "express", "nodejs", "node.js", "javascript"
+        ]
+        for tech in primary_techs:
+            if tech in t:
+                score += 35
+        if any(w in t for w in ["web", "api", "http", "server", "flaw", "bypass", "vulnerability"]):
+            score += 15
+        if any(w in t for w in ["remote code execution", "remote code", "cvss 10", "cvss 9", "zero-day", "unauthenticated"]):
+            score += 25
+        if "cve-" in t:
+            score += 15
+        for tech in primary_techs:
+            if tech in c:
+                score += 2
+        non_web = [
+            "ransomware", "consulting", "banker", "trojan", "stealer",
+            "espionage", "firmware", "uefi", "bios", "infostealer"
+        ]
+        has_web_title = any(w in t for w in [
+            "web", "php", "sql", "apache", "nginx", "laravel", "wordpress",
+            "magento", "xss", "ssrf", "injection", "rce", "upload", "deserialization", "shell"
+        ])
+        if not has_web_title and any(p in t for p in non_web):
+            score -= 60
+
+    elif scope_id == "SCOPE_NETWORK":
+        net_techs = [
+            "botnet", "mirai", "c2", "command and control", "ddos", "firewall",
+            "router", "vpn", "fortinet", "ivanti", "pfsense", "cisco", "dns",
+            "proxy", "traffic", "network", "suricata", "snort", "packet"
+        ]
+        for tech in net_techs:
+            if tech in t:
+                score += 35
+        if any(w in t for w in ["zero-day", "unauthenticated", "rce", "exploit", "bypass"]):
+            score += 25
+        if "cve-" in t:
+            score += 15
+        for tech in net_techs:
+            if tech in c:
+                score += 2
+
+    elif scope_id == "SCOPE_ENDPOINT":
+        host_techs = [
+            "ransomware", "webshell", "credential dumping", "mimikatz", "sysmon",
+            "privilege escalation", "active directory", "edr", "lsass", "defender",
+            "stealer", "trojan", "malware", "persistence", "registry", "powershell"
+        ]
+        for tech in host_techs:
+            if tech in t:
+                score += 35
+        if any(w in t for w in ["privilege", "persistence", "execution", "bypass", "stealer"]):
+            score += 20
+        if "cve-" in t:
+            score += 15
+        for tech in host_techs:
+            if tech in c:
+                score += 2
+
+    elif scope_id == "SCOPE_HARDWARE":
+        hw_techs = [
+            "firmware", "uefi", "bios", "microcode", "bmc", "ics", "scada",
+            "plc", "hardware", "chipset", "embedded", "iot"
+        ]
+        for tech in hw_techs:
+            if tech in t:
+                score += 35
+        if "cve-" in t:
+            score += 15
+        for tech in hw_techs:
+            if tech in c:
+                score += 2
+    else:
+        score = 50
+        if any(w in t for w in ["rce", "remote code", "zero-day", "cvss 10", "critical"]):
+            score += 30
+        if "cve-" in t:
+            score += 20
+
+    return score
+
 def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3) -> Dict[str, Any]:
     """Bước 2: Cào bài báo và lọc tri thức CTI theo đúng mục đích của Scope đã chọn."""
     profile = resolve_scope_profile(scope_id)
@@ -433,22 +526,30 @@ def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3) -> Di
         art = conn.execute("SELECT * FROM articles_archive WHERE article_id = ?", (best_art_id,)).fetchone()
         art_dict = dict(art) if art else {}
 
-        # Đếm số bài báo và tổng hợp bài báo thuộc Scope trong mốc thời gian
-        kw_clauses = " OR ".join(["content LIKE ?" for _ in profile["keywords"][:6]])
-        params = [f"%{kw}%" for kw in profile["keywords"][:6]]
-        # Lọc đúng 15 bài báo đe dọa cao nhất cho phân hệ dự án
-        limit_count = 15
-        matched_rows = conn.execute(
-            f"SELECT article_id, title, source_name, url, published_date, sort_ts, content "
-            f"FROM articles_archive WHERE sort_ts >= ? AND ({kw_clauses}) "
-            f"ORDER BY sort_ts DESC LIMIT {limit_count}",
-            [min_date] + params
+        # Lấy toàn bộ bài báo trong mốc thời gian lọc (sort_ts >= min_date)
+        all_candidate_rows = conn.execute(
+            "SELECT article_id, title, source_name, url, published_date, sort_ts, content "
+            "FROM articles_archive WHERE sort_ts >= ? ORDER BY sort_ts DESC",
+            (min_date,)
         ).fetchall()
-        matched_arts = [dict(r) for r in matched_rows]
+
+        # Đánh giá điểm tương quan kỹ thuật của từng bài báo với Scope đã chọn
+        scored_candidates = []
+        for r in all_candidate_rows:
+            relevance = compute_scope_relevance(scope_id, r["title"], r["content"])
+            if relevance >= 20 or r["article_id"] == best_art_id:
+                scored_candidates.append((relevance, dict(r)))
+
+        # Sắp xếp theo điểm tương quan cao nhất và ngày đăng mới nhất
+        scored_candidates.sort(key=lambda x: (x[0], x[1].get("sort_ts") or ""), reverse=True)
+        
+        matched_count = len(scored_candidates)
+        # Giới hạn bài báo hiển thị để giao diện mượt mà (tối đa 120 bài)
+        matched_arts = [item[1] for item in scored_candidates[:120]]
 
         # Bóc tách chi tiết từng bài báo để AI xử lý tuần tự trực tiếp trên giao diện
         enriched_articles = []
-        for r in matched_rows:
+        for r in matched_arts:
             c_text = r["content"] or ""
             r_cves = re.findall(r"\bCVE-\d{4}-\d{4,7}\b", r["title"] + " " + c_text)
             r_cves = list(dict.fromkeys(r_cves))
@@ -491,7 +592,8 @@ def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3) -> Di
             best_item = enriched_articles.pop(best_idx)
             enriched_articles.insert(0, best_item)
 
-    matched_count = len(matched_arts) if matched_arts else 1
+    if not matched_count:
+        matched_count = len(matched_arts) if matched_arts else 1
 
     from lam_automation_crawler import _count_real_iocs
     raw_iocs = _count_real_iocs(art_dict.get("content", ""))
@@ -503,16 +605,16 @@ def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3) -> Di
 
     # Đếm IOC liên quan trong Scope
     with sqlite3.connect(DB_PATH) as conn:
-        titles = [a["title"] for a in matched_arts[:15]]
+        titles = [a["title"] for a in matched_arts[:30]]
         total_scope_iocs = 0
         if titles:
-            t_clauses = " OR ".join(["source_title LIKE ?" for _ in titles[:8]])
-            t_params = [f"%{t[:28]}%" for t in titles[:8]]
+            t_clauses = " OR ".join(["source_title LIKE ?" for _ in titles[:15]])
+            t_params = [f"%{t[:28]}%" for t in titles[:15]]
             total_scope_iocs = conn.execute(
                 f"SELECT count(*) FROM ioc_knowledge_base WHERE {t_clauses}", t_params
             ).fetchone()[0]
         if total_scope_iocs == 0:
-            total_scope_iocs = raw_iocs["total"]
+            total_scope_iocs = raw_iocs["total"] * min(matched_count, 15)
 
     techs_str = ", ".join(techs) if techs else "Web & API Ecosystem"
     
