@@ -136,7 +136,7 @@ function printStatus() {
 
 function ensureDependencies(pyCmd) {
   try {
-    execSync(`${pyCmd} -c "import fastapi, uvicorn, requests, docx"`, { stdio: 'ignore' });
+    execSync(`${pyCmd} -c "import fastapi, uvicorn, requests, pydantic"`, { stdio: 'ignore' });
   } catch (e) {
     console.log('[*] Dang kiem tra va tu dong cai dat cac thu vien Python can thiet...');
     const reqPath = path.join(ROOT_DIR, 'requirements.txt');
