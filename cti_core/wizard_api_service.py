@@ -5,7 +5,7 @@ import sqlite3
 import re
 import subprocess
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 SANDBOX_DIR = Path(__file__).resolve().parent

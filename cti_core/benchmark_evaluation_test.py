@@ -11,10 +11,11 @@ Mục đích phục vụ Báo cáo & Hội đồng phản biện:
   3. Đo lường hiệu năng thời gian (Mean Time to Respond - MTTR): So sánh chuyên viên SOC thủ công vs AI Agent Pipeline.
 """
 
+import os
 import sys
 import time
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 SANDBOX_DIR = Path(__file__).resolve().parent
