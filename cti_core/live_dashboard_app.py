@@ -680,6 +680,86 @@ HTML_PAGE = r"""<!DOCTYPE html>
       50% { transform: scale(1.25); opacity: 0.65; }
     }
 
+    /* ======================================================================== */
+    /* AGENT LIVE STATUS LED INDICATOR STYLES                                  */
+    /* ======================================================================== */
+    .AgentLedPill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 4px 11px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 700;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      transition: all 0.3s ease;
+      cursor: default;
+      user-select: none;
+    }
+    .AgentLedPill.state-ready {
+      background: #f0fdf4;
+      border-color: #86efac;
+      color: #15803d;
+    }
+    .AgentLedPill.state-processing {
+      background: #f0f9ff;
+      border-color: #7dd3fc;
+      color: #0369a1;
+    }
+    .AgentLedPill.state-offline {
+      background: #fef2f2;
+      border-color: #fca5a5;
+      color: #b91c1c;
+    }
+
+    .AgentLedDot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      flex-shrink: 0;
+      transition: all 0.3s ease;
+    }
+    .AgentLedDot.state-ready {
+      background: #10b981;
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25), 0 0 8px #10b981;
+      animation: ledPulseGreen 2s infinite ease-in-out;
+    }
+    .AgentLedDot.state-processing {
+      background: #0284c7;
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.35), 0 0 12px #38bdf8;
+      animation: ledPulseBlue 0.8s infinite ease-in-out;
+    }
+    .AgentLedDot.state-offline {
+      background: #ef4444;
+      box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25);
+    }
+
+    @keyframes ledPulseGreen {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3), 0 0 6px #10b981;
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.3);
+        box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.15), 0 0 14px #34d399;
+        opacity: 0.85;
+      }
+    }
+
+    @keyframes ledPulseBlue {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.4), 0 0 8px #38bdf8;
+      }
+      50% {
+        transform: scale(1.35);
+        box-shadow: 0 0 0 6px rgba(2, 132, 199, 0.2), 0 0 18px #0284c7;
+      }
+    }
+
     .ReaderColumn {
       background: #ffffff;
       border: 1px solid var(--border-main);
@@ -1078,7 +1158,11 @@ HTML_PAGE = r"""<!DOCTYPE html>
       <a href="http://127.0.0.1:8780" target="_blank" class="NavLink" style="color:#059669; font-weight:700; text-decoration:none;" title="Mở phân hệ So Sánh Đối Chiếu 50 Bài CTI Ground Truth (Cổng 8780)">📊 So Sánh 50 Bài ↗</a>
     </div>
 
-    <div class="NavRight">
+    <div class="NavRight" style="display:flex; align-items:center; gap:8px;">
+      <div id="navAgentLedPill" class="AgentLedPill state-ready" title="Đèn trạng thái Tác tử AI (Local LLM / GPU)">
+        <span class="AgentLedDot state-ready" id="navAgentLedDot"></span>
+        <span id="navAgentLedText">AGENT: ONLINE</span>
+      </div>
       <select id="aiModelSelect" class="CleanSelect" onchange="onAiModelChange()">
         <option value="auto" selected>Đang dò tìm Model &amp; GPU cục bộ...</option>
       </select>
@@ -1101,7 +1185,8 @@ HTML_PAGE = r"""<!DOCTYPE html>
 
     <!-- THANH TRẠNG THÁI -->
     <div class="StatusStrip">
-      <div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span class="AgentLedDot state-ready" id="stripAgentLedDot" title="Đèn trạng thái Tác tử AI"></span>
         <b style="color:var(--primary);" id="localModelBadge">TỰ ĐỘNG NHẬN DIỆN PHẦN CỨNG...</b>
         <span style="margin:0 8px;">&bull;</span>
         <span id="statusText">Sẵn sàng phân tích.</span>
@@ -1239,11 +1324,11 @@ HTML_PAGE = r"""<!DOCTYPE html>
       <!-- Stepper Nav Bar (6 Bước mạch lạc) -->
       <div id="wizardStepperNav" style="display:flex; justify-content:space-between; align-items:center; margin:16px 0 24px 0; background:#f8fafc; padding:12px 18px; border-radius:8px; border:1px solid #e2e8f0; flex-wrap:wrap; gap:8px;">
         <div id="stepBadge1" class="WizardStepBadge active" style="font-weight:700; padding:6px 12px; border-radius:20px; font-size:11.5px; background:#2563eb; color:#ffffff;">
-          1. Quét AST & Điểm Nóng
+          1. Chọn Model AI &amp; Phần Cứng
         </div>
         <span style="color:#94a3b8; font-weight:bold;">&rarr;</span>
         <div id="stepBadge2" class="WizardStepBadge" style="font-weight:600; padding:6px 12px; border-radius:20px; font-size:11.5px; background:#e2e8f0; color:#475569;">
-          2. Chọn Model AI
+          2. Quét AST &amp; Điểm Nóng
         </div>
         <span style="color:#94a3b8; font-weight:bold;">&rarr;</span>
         <div id="stepBadge3" class="WizardStepBadge" style="font-weight:600; padding:6px 12px; border-radius:20px; font-size:11.5px; background:#e2e8f0; color:#475569;">
@@ -1255,11 +1340,11 @@ HTML_PAGE = r"""<!DOCTYPE html>
         </div>
         <span style="color:#94a3b8; font-weight:bold;">&rarr;</span>
         <div id="stepBadge5" class="WizardStepBadge" style="font-weight:600; padding:6px 12px; border-radius:20px; font-size:11.5px; background:#e2e8f0; color:#475569;">
-          5. Cào Báo & Sinh Kỹ Năng
+          5. Cào Báo &amp; Sinh Kỹ Năng
         </div>
         <span style="color:#94a3b8; font-weight:bold;">&rarr;</span>
         <div id="stepBadge6" class="WizardStepBadge" style="font-weight:600; padding:6px 12px; border-radius:20px; font-size:11.5px; background:#e2e8f0; color:#475569;">
-          6. Vá & Kiểm Thử
+          6. Vá &amp; Kiểm Thử
         </div>
       </div>
 
@@ -1285,7 +1370,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
             </div>
             <div style="color:#cbd5e1;">|</div>
             <div>
-              Phần cứng: <b id="landingHardwareSummary" style="color:#2563eb;">AMD Radeon RX 6600 (8GB VRAM) • Chờ khảo sát &amp; chọn model tại Bước 2</b>
+              Phần cứng: <b id="landingHardwareSummary" style="color:#2563eb;">AMD Radeon RX 6600 (8GB VRAM) &bull; Sẵn sàng tại Bước 1 (Chọn Model &amp; Khảo Sát)</b>
             </div>
           </div>
 
@@ -1308,25 +1393,79 @@ HTML_PAGE = r"""<!DOCTYPE html>
               outline: none;
             " onmouseover="this.style.transform='scale(1.06)'; this.style.boxShadow='0 18px 40px rgba(37,99,235,0.45)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 12px 32px rgba(37,99,235,0.35)';">
               <span style="font-size:13px; font-weight:700; letter-spacing:1px; opacity:0.9; text-transform:uppercase;">BẮT ĐẦU</span>
-              <span style="font-size:21px; font-weight:900; letter-spacing:1.5px; margin-top:2px; text-transform:uppercase;">QUÉT DỰ ÁN</span>
-              <span style="font-size:11px; opacity:0.8; margin-top:4px;">(Click để phân tích AST)</span>
+              <span style="font-size:20px; font-weight:900; letter-spacing:1.2px; margin-top:2px; text-transform:uppercase;">CHỌN MODEL &amp; BẢO VỆ</span>
+              <span style="font-size:11px; opacity:0.8; margin-top:4px;">(Click để khảo sát &amp; bắt đầu)</span>
             </button>
           </div>
 
           <p style="font-size:12.5px; color:#64748b; margin:0; line-height:1.6;">
-            Nhấn vào nút tròn để Tác tử AI đọc cây cú pháp AST, định vị điểm nhạy cảm và bắt đầu quy trình phòng thủ tự hành 6 bước.
+            Nhấn vào nút tròn để khảo sát phần cứng máy tính, chọn mô hình AI tối ưu và khởi động quy trình bảo vệ dự án 6 bước.
           </p>
         </div>
       </div>
 
       <!-- ============================================================== -->
-      <!-- BƯỚC 1: QUÉT SÂU AST & ĐỊNH DANH DỰ ÁN                         -->
+      <!-- BƯỚC 1: CHỌN MÔ HÌNH AI THÍCH ỨNG CẤU HÌNH PHẦN CỨNG          -->
       <!-- ============================================================== -->
-      <div id="wizardCard1" class="WizardCard" style="display:block;">
-        <h3 style="font-size:16px; margin-bottom:8px; color:#0f172a;">Bước 1: Quét Sâu Cây AST Mã Nguồn &amp; Định Danh Kiến Trúc Dự Án</h3>
+      <div id="wizardCard1" class="WizardCard" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
+          <h3 style="font-size:16px; margin:0; color:#0f172a;">Bước 1: Chọn Mô Hình AI Thích Ứng Cấu Hình Phần Cứng (Hardware-Aware Model Selection)</h3>
+          <div class="AgentLedPill state-ready" id="step1AgentLedPill">
+            <span class="AgentLedDot state-ready"></span>
+            <span style="font-size:11.5px; font-weight:700; color:#15803d;">ĐÈN TÁC TỬ: SỐNG &amp; SẴN SÀNG</span>
+          </div>
+        </div>
         <p style="color:#64748b; font-size:13px; margin-bottom:16px;">
-          Tác tử AI Codebase Inspector sẽ duyệt cây thư mục, đọc cú pháp AST để nhận diện ngôn ngữ, framework, phiên bản môi trường và bóc tách các điểm nóng nhạy cảm.
+          Hệ thống tự động phát hiện năng lực CPU, GPU, VRAM và <b>chọn sẵn mô hình mạnh nhất</b> mà máy tính của bạn có thể vận hành trơn tru. Bạn có thể giữ nguyên mặc định hoặc nhấp chọn mô hình khác tùy ý:
         </p>
+
+        <!-- Thẻ thông số phần cứng -->
+        <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:14px 18px; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div style="font-size:12.5px; color:#334155; line-height:1.7;">
+            <div><b>Card Đồ Họa (GPU):</b> <span id="wzGpuText" style="color:#0f172a; font-weight:600;">AMD Radeon RX 6600 (8.0GB VRAM)</span></div>
+            <div><b>Bộ Vi Xử Lý (CPU):</b> <span id="wzCpuText" style="color:#0f172a; font-weight:600;">13th Gen Intel Core i5-13400F</span> &bull; <b>RAM:</b> <span id="wzRamText" style="color:#0f172a; font-weight:600;">15.8 GB</span></div>
+          </div>
+          <div id="wzHardwareSummaryTag" style="font-size:12px; font-weight:700; color:#15803d; background:#dcfce7; border:1px solid #86efac; padding:4px 12px; border-radius:6px;">
+            CẤU HÌNH ĐỒ HỌA TIÊU CHUẨN
+          </div>
+        </div>
+
+        <!-- Dynamic Container for Model Tiers -->
+        <div id="wzModelTiersContainer" style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
+          <!-- Populated dynamically by renderHardwareModelSelector() -->
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <button type="button" class="CleanBtn" style="padding:10px 18px; border:1px solid #cbd5e1; background:#ffffff; color:#334155; border-radius:6px; cursor:pointer;" onclick="wizardGotoStep(0)">
+            &larr; Quay Lại Bắt Đầu
+          </button>
+          <button type="button" class="CleanBtn btn-primary" style="padding:12px 28px; font-weight:700; background:#2563eb; color:#ffffff; border:none; border-radius:6px; cursor:pointer; box-shadow:0 4px 14px rgba(37,99,235,0.3);" onclick="wizardConfirmStep1ModelAndProceed()">
+            [ XÁC NHẬN MODEL NÀY &amp; TIẾP TỤC BƯỚC 2: QUÉT MÃ NGUỒN &rarr; ]
+          </button>
+        </div>
+      </div>
+
+      <!-- ============================================================== -->
+      <!-- BƯỚC 2: QUÉT SÂU AST & ĐỊNH DANH DỰ ÁN (SỬ DỤNG MODEL BƯỚC 1)  -->
+      <!-- ============================================================== -->
+      <div id="wizardCard2" class="WizardCard" style="display:none;">
+        <h3 style="font-size:16px; margin-bottom:8px; color:#0f172a;">Bước 2: Quét Sâu Cây AST Mã Nguồn &amp; Định Danh Kiến Trúc Dự Án</h3>
+        <p style="color:#64748b; font-size:13px; margin-bottom:14px;">
+          Tác tử AI Codebase Inspector sẽ sử dụng mô hình AI đã chọn ở Bước 1 để duyệt cây thư mục, đọc cú pháp AST để nhận diện ngôn ngữ, framework, phiên bản môi trường và bóc tách các điểm nóng nhạy cảm.
+        </p>
+
+        <!-- Thẻ hiển thị Model AI đang được sử dụng để quét mã nguồn -->
+        <div style="background:#eff6ff; border:1.5px solid #bfdbfe; border-radius:8px; padding:10px 16px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:#1e40af;">
+            <span class="AgentLedDot state-ready" id="step2AgentLedDot"></span>
+            <span>Mô hình AI thực thi: <b id="step2ActiveModelName" style="color:#1d4ed8;">khang-qwen3:latest</b></span>
+            <span style="color:#93c5fd;">&bull;</span>
+            <span id="step2ActiveHwInfo" style="color:#475569; font-size:12px;">AMD Radeon RX 6600 (8GB VRAM)</span>
+          </div>
+          <button type="button" class="CleanBtn" style="font-size:11.5px; padding:3px 10px; background:#ffffff; color:#2563eb; border:1px solid #bfdbfe; border-radius:4px; font-weight:600; cursor:pointer;" onclick="wizardGotoStep(1)">
+            &larr; Đổi Model ở Bước 1
+          </button>
+        </div>
 
         <!-- Thẻ dự án hiện tại -->
         <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:16px; margin-bottom:16px;">
@@ -1377,7 +1516,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
 
         <!-- Nút Bắt đầu quét -->
         <div style="text-align:center; margin:18px 0 16px;">
-          <button type="button" id="btnRunStep1" class="CleanBtn btn-primary" style="padding:14px 44px; font-size:16px; font-weight:700; background:#2563eb; color:#ffffff; border:none; border-radius:6px; cursor:pointer; box-shadow:0 6px 16px rgba(37,99,235,0.25); transition:all 0.2s;" onclick="wizardExecuteStep1()">
+          <button type="button" id="btnRunStep1" class="CleanBtn btn-primary" style="padding:14px 44px; font-size:16px; font-weight:700; background:#2563eb; color:#ffffff; border:none; border-radius:6px; cursor:pointer; box-shadow:0 6px 16px rgba(37,99,235,0.25); transition:all 0.2s;" onclick="wizardExecuteStep2Scan()">
             [ BẮT ĐẦU QUÉT DỰ ÁN ]
           </button>
           <div style="margin-top:8px; font-size:12.5px; color:#64748b;">
@@ -1385,7 +1524,6 @@ HTML_PAGE = r"""<!DOCTYPE html>
           </div>
         </div>
 
-        
         <!-- THANH TIẾN ĐỘ THỜI GIAN THỰC (REAL-TIME SCAN PROGRESS BAR) -->
         <div id="wzScanProgressWrap" style="display:none; margin:16px 0 14px; background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:8px; padding:14px 18px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:12.5px;">
@@ -1446,45 +1584,13 @@ HTML_PAGE = r"""<!DOCTYPE html>
           </div>
         </div>
 
-        <!-- Nút Tiếp Tục (Khi chưa quét: TỐI MÀU; Khi quét xong: SÁNG MÀU LÊN) -->
-        <div style="display:flex; justify-content:flex-end; margin-top:14px;">
-          <button type="button" id="btnNextFromStep1" class="CleanBtn" style="padding:12px 28px; font-size:14px; font-weight:700; background:#94a3b8; color:#ffffff; border:none; border-radius:6px; cursor:not-allowed; opacity:0.5; transition:all 0.3s;" onclick="if(this.dataset.enabled==='true') wizardGotoStep(2);" disabled title="Hãy nhấn [ BẮT ĐẦU QUÉT DỰ ÁN ] trước để mở khóa bước tiếp theo">
-            [ TIẾP TỤC: CHỌN MÔ HÌNH AI (BƯỚC 2) &rarr; ]
-          </button>
-        </div>
-      </div>
-
-      <!-- ============================================================== -->
-      <!-- BƯỚC 2: CHỌN MÔ HÌNH AI THÍCH ỨNG CẤU HÌNH PHẦN CỨNG          -->
-      <!-- ============================================================== -->
-      <div id="wizardCard2" class="WizardCard" style="display:none;">
-        <h3 style="font-size:16px; margin-bottom:8px; color:#0f172a;">Bước 2: Chọn Mô Hình AI Thích Ứng Cấu Hình Phần Cứng (Hardware-Aware Model Selection)</h3>
-        <p style="color:#64748b; font-size:13px; margin-bottom:16px;">
-          Hệ thống tự động phát hiện năng lực CPU, GPU, VRAM và <b>chọn sẵn mô hình mạnh nhất</b> mà máy tính của bạn có thể vận hành trơn tru. Bạn có thể giữ nguyên mặc định hoặc nhấp chọn mô hình khác tùy ý:
-        </p>
-
-        <!-- Thẻ thông số phần cứng -->
-        <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:14px 18px; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-          <div style="font-size:12.5px; color:#334155; line-height:1.7;">
-            <div><b>Card Đồ Họa (GPU):</b> <span id="wzGpuText" style="color:#0f172a; font-weight:600;">AMD Radeon RX 6600 (8.0GB VRAM)</span></div>
-            <div><b>Bộ Vi Xử Lý (CPU):</b> <span id="wzCpuText" style="color:#0f172a; font-weight:600;">13th Gen Intel Core i5-13400F</span> &bull; <b>RAM:</b> <span id="wzRamText" style="color:#0f172a; font-weight:600;">15.8 GB</span></div>
-          </div>
-          <div id="wzHardwareSummaryTag" style="font-size:12px; font-weight:700; color:#15803d; background:#dcfce7; border:1px solid #86efac; padding:4px 12px; border-radius:6px;">
-            CẤU HÌNH ĐỒ HỌA TIÊU CHUẨN
-          </div>
-        </div>
-
-        <!-- Dynamic Container for Model Tiers -->
-        <div id="wzModelTiersContainer" style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
-          <!-- Populated dynamically by renderHardwareModelSelector() -->
-        </div>
-
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <!-- Nút Điều Hướng Bước 2 -->
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:14px;">
           <button type="button" class="CleanBtn" style="padding:10px 18px; border:1px solid #cbd5e1; background:#ffffff; color:#334155; border-radius:6px; cursor:pointer;" onclick="wizardGotoStep(1)">
-            &larr; Quay Lại Bước 1
+            &larr; Quay Lại Bước 1 (Chọn Model)
           </button>
-          <button type="button" class="CleanBtn btn-primary" style="padding:12px 28px; font-weight:700; background:#2563eb; color:#ffffff; border:none; border-radius:6px; cursor:pointer; box-shadow:0 4px 14px rgba(37,99,235,0.3);" onclick="wizardConfirmStep2ModelAndProceed()">
-            [ XÁC NHẬN MODEL NÀY &amp; TIẾP TỤC BƯỚC 3 &rarr; ]
+          <button type="button" id="btnNextFromStep2" class="CleanBtn" style="padding:12px 28px; font-size:14px; font-weight:700; background:#94a3b8; color:#ffffff; border:none; border-radius:6px; cursor:not-allowed; opacity:0.5; transition:all 0.3s;" onclick="if(this.dataset.enabled==='true') wizardGotoStep(3);" disabled title="Hãy nhấn [ BẮT ĐẦU QUÉT DỰ ÁN ] trước để mở khóa bước tiếp theo">
+            [ TIẾP TỤC: CHỌN PHÂN HỆ PHÒNG THỦ (BƯỚC 3) &rarr; ]
           </button>
         </div>
       </div>
@@ -1742,6 +1848,25 @@ HTML_PAGE = r"""<!DOCTYPE html>
     <!-- MỤC 1: BÀI BÁO & HIGHLIGHT IOC -->
     <section class="CyberBox" id="sec-feed">
       <div class="BoxLegend">1. NGUỒN BÁO VÀ VĂN BẢN GỐC HIGHLIGHT</div>
+
+      <!-- LIVE AGENT STATUS BANNER (ĐÈN TRẠNG THÁI TÁC TỬ SỐNG) -->
+      <div id="feedAgentStatusBar" style="display:flex; justify-content:space-between; align-items:center; background:#f0fdf4; border:1.5px solid #86efac; border-radius:8px; padding:10px 16px; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span class="AgentLedDot state-ready" id="feedAgentLedDot" style="width:13px; height:13px;"></span>
+          <div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <b id="feedAgentLedTitle" style="color:#15803d; font-size:13.5px; letter-spacing:0.02em;">TÁC TỬ AI ĐANG HOẠT ĐỘNG (ALIVE &amp; READY)</b>
+              <span id="feedAgentLedBadge" style="background:#15803d; color:#ffffff; font-size:11px; font-weight:700; padding:2px 9px; border-radius:12px;">ĐÈN XANH: SỐNG</span>
+            </div>
+            <div id="feedAgentTelemetry" style="font-size:12px; color:#475569; margin-top:3px;">
+              Mô hình: <b id="feedActiveModelText" style="color:#1d4ed8;">khang-qwen3:latest</b> &bull; Phần cứng: <span id="feedActiveHwText">AMD Radeon RX 6600 (8GB VRAM)</span> &bull; Trạng thái: Sẵn sàng suy luận
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <span id="feedAgentTaskState" style="font-size:11.5px; font-family:monospace; color:#15803d; background:#dcfce7; border:1px solid #86efac; padding:4px 10px; border-radius:6px; font-weight:700;">IDLE / CHỜ LỆNH</span>
+        </div>
+      </div>
 
       <!-- LIVE AI AGENT ACTIVITY TICKER -->
       <div class="LiveTickerBar">
@@ -2385,6 +2510,102 @@ HTML_PAGE = r"""<!DOCTYPE html>
 
     let detectedSystemHardware = null;
 
+    function updateAgentLedStatus(state, title, desc) {
+      // state: 'ready' (green pulse), 'processing' (cyan/blue pulse), 'offline' (red)
+      const validState = (state === 'processing' || state === 'offline') ? state : 'ready';
+
+      // 1. Navbar Pill & Dot
+      const navPill = document.getElementById('navAgentLedPill');
+      const navDot = document.getElementById('navAgentLedDot');
+      const navText = document.getElementById('navAgentLedText');
+      if (navPill) navPill.className = 'AgentLedPill state-' + validState;
+      if (navDot) navDot.className = 'AgentLedDot state-' + validState;
+      if (navText) {
+        if (validState === 'processing') navText.textContent = 'AGENT: ĐANG XỬ LÝ';
+        else if (validState === 'offline') navText.textContent = 'AGENT: OFFLINE';
+        else navText.textContent = 'AGENT: SẴN SÀNG';
+      }
+
+      // 2. Status Strip Dot
+      const stripDot = document.getElementById('stripAgentLedDot');
+      if (stripDot) stripDot.className = 'AgentLedDot state-' + validState;
+
+      // 3. Step 2 Dot in Card 2
+      const step2Dot = document.getElementById('step2AgentLedDot');
+      if (step2Dot) step2Dot.className = 'AgentLedDot state-' + validState;
+
+      // 4. Feed Header Live Banner
+      const feedDot = document.getElementById('feedAgentLedDot');
+      const feedTitle = document.getElementById('feedAgentLedTitle');
+      const feedBadge = document.getElementById('feedAgentLedBadge');
+      const feedTask = document.getElementById('feedAgentTaskState');
+      const feedBar = document.getElementById('feedAgentStatusBar');
+      if (feedDot) feedDot.className = 'AgentLedDot state-' + validState;
+      if (feedBar) {
+        if (validState === 'processing') {
+          feedBar.style.background = '#f0f9ff';
+          feedBar.style.borderColor = '#7dd3fc';
+        } else if (validState === 'offline') {
+          feedBar.style.background = '#fef2f2';
+          feedBar.style.borderColor = '#fca5a5';
+        } else {
+          feedBar.style.background = '#f0fdf4';
+          feedBar.style.borderColor = '#86efac';
+        }
+      }
+      if (feedTitle) {
+        if (title) {
+          feedTitle.textContent = title;
+        } else {
+          feedTitle.textContent = (validState === 'processing')
+            ? 'TÁC TỬ AI ĐANG SUY LUẬN (GPU INFERENCE)'
+            : ((validState === 'offline') ? 'TÁC TỬ AI OFFLINE / KHÔNG KẾT NỐI ĐƯỢC' : 'TÁC TỬ AI ĐANG HOẠT ĐỘNG (ALIVE & READY)');
+        }
+        feedTitle.style.color = (validState === 'processing') ? '#0369a1' : ((validState === 'offline') ? '#b91c1c' : '#15803d');
+      }
+      if (feedBadge) {
+        if (validState === 'processing') {
+          feedBadge.style.background = '#0284c7';
+          feedBadge.textContent = 'ĐÈN LAM: ĐANG TÍNH TOÁN';
+        } else if (validState === 'offline') {
+          feedBadge.style.background = '#ef4444';
+          feedBadge.textContent = 'ĐÈN ĐỎ: MẤT KẾT NỐI';
+        } else {
+          feedBadge.style.background = '#15803d';
+          feedBadge.textContent = 'ĐÈN XANH: SỐNG';
+        }
+      }
+      if (feedTask) {
+        if (desc) {
+          feedTask.textContent = desc;
+        } else {
+          feedTask.textContent = (validState === 'processing') ? 'ĐANG SUY LUẬN GPU...' : ((validState === 'offline') ? 'OFFLINE' : 'IDLE / CHỜ LỆNH');
+        }
+        feedTask.style.color = (validState === 'processing') ? '#0369a1' : ((validState === 'offline') ? '#b91c1c' : '#15803d');
+        feedTask.style.background = (validState === 'processing') ? '#e0f2fe' : ((validState === 'offline') ? '#fee2e2' : '#dcfce7');
+        feedTask.style.borderColor = (validState === 'processing') ? '#7dd3fc' : ((validState === 'offline') ? '#fca5a5' : '#86efac');
+      }
+
+      // 5. Update active model & hardware labels in Feed Header and Step 2
+      const chosenModel = localStorage.getItem('selectedAiModel') || (detectedSystemModelData ? detectedSystemModelData.active_model : 'khang-qwen3:latest');
+      const feedModel = document.getElementById('feedActiveModelText');
+      if (feedModel) feedModel.textContent = chosenModel;
+      const step2Model = document.getElementById('step2ActiveModelName');
+      if (step2Model) step2Model.textContent = chosenModel;
+
+      const hwDesc = detectedSystemHardware
+        ? `${detectedSystemHardware.gpu_name} (${detectedSystemHardware.vram_gb || 8}GB VRAM)`
+        : 'AMD Radeon RX 6600 (8GB VRAM)';
+      const feedHw = document.getElementById('feedActiveHwText');
+      if (feedHw) feedHw.textContent = hwDesc;
+      const step2Hw = document.getElementById('step2ActiveHwInfo');
+      if (step2Hw) step2Hw.textContent = hwDesc;
+    }
+
+    function updateStep2ModelDisplay() {
+      updateAgentLedStatus('ready');
+    }
+
     async function loadHardwareAndModels() {
       try {
         const res = await fetch('/api/system/hardware-info');
@@ -2423,7 +2644,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
             if (!wzIsProjectConfigured && !savedModel) {
               const pendingOpt = document.createElement('option');
               pendingOpt.value = 'pending';
-              pendingOpt.textContent = 'Chờ khảo sát phần cứng (Chọn ở Bước 2)...';
+              pendingOpt.textContent = 'Chờ khảo sát phần cứng (Chọn ở Bước 1)...';
               pendingOpt.selected = true;
               sel.appendChild(pendingOpt);
             }
@@ -2446,15 +2667,17 @@ HTML_PAGE = r"""<!DOCTYPE html>
           
           if (badge && data.hardware) {
             if (!wzIsProjectConfigured && !localStorage.getItem('selectedAiModel')) {
-              badge.textContent = `PHẦN CỨNG: ${data.hardware.gpu_name.toUpperCase()} (${data.hardware.vram_gb || 8}GB VRAM) • CHỜ KHẢO SÁT MODEL Ở BƯỚC 2`;
+              badge.textContent = `PHẦN CỨNG: ${data.hardware.gpu_name.toUpperCase()} (${data.hardware.vram_gb || 8}GB VRAM) • CHỜ KHẢO SÁT MODEL Ở BƯỚC 1`;
             } else {
               const activeVal = sel ? sel.value : data.active_model;
               updateModelBadgeText(activeVal);
             }
           }
+          updateAgentLedStatus('ready');
         }
       } catch (e) {
         console.error("Không thể lấy thông tin phần cứng:", e);
+        updateAgentLedStatus('offline');
       }
     }
 
@@ -2476,6 +2699,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
         localStorage.setItem('selectedAiModel', val);
       } catch (e) {}
       updateModelBadgeText(val);
+      updateAgentLedStatus('ready');
       updateLiveTicker(`Đã chuyển sang mô hình: ${val} (${detectedSystemHardware ? detectedSystemHardware.gpu_name : 'GPU Cục Bộ'})`);
     }
 
@@ -4782,6 +5006,7 @@ const elArt = document.getElementById('lblMasterArticlesCount');
 
       const startTime = performance.now();
       updateLiveTicker(`[Hàng đợi tuần tự] Bắt đầu phân tích bài #${idx + 1}: "${(art.title || '').slice(0, 55)}..."`);
+      updateAgentLedStatus('processing', `TÁC TỬ AI ĐANG XỬ LÝ BÀI #${idx + 1}`, `Đang suy luận GPU (${selectedModel}) & đối soát 5 nguồn OSINT...`);
 
       try {
         status.textContent = `Đang trích xuất IOC bài #${idx + 1} (${selectedModel})...`;
@@ -4915,6 +5140,7 @@ const elArt = document.getElementById('lblMasterArticlesCount');
           btn.disabled = false;
           btn.textContent = "Chạy Phân Tích";
         }
+        updateAgentLedStatus('ready', 'TÁC TỬ AI ĐANG HOẠT ĐỘNG (ALIVE & READY)', 'Sẵn sàng xử lý tiếp');
         if (autoQueueEnabled) {
           updateLiveTicker(`Chuyển tiếp bài tiếp theo trong hàng đợi sau 1.5s...`);
           setTimeout(() => {
@@ -4955,6 +5181,7 @@ const elArt = document.getElementById('lblMasterArticlesCount');
 
       const startTime = performance.now();
       updateLiveTicker(`Bắt đầu phân tích gộp: "${(currentTitle || '').slice(0, 65)}..."`);
+      updateAgentLedStatus('processing', 'TÁC TỬ AI ĐANG PHÂN TÍCH GỘP BÀI BÁO', `Đang suy luận GPU (${selectedModel}) đa luồng...`);
 
       selectedIndices.forEach(idx => {
         if (articles[idx]) {
@@ -5069,6 +5296,7 @@ const elArt = document.getElementById('lblMasterArticlesCount');
           btn.disabled = false;
           btn.textContent = "Chạy Phân Tích";
         }
+        updateAgentLedStatus('ready', 'TÁC TỬ AI ĐANG HOẠT ĐỘNG (ALIVE & READY)', 'Hoàn tất phân tích gộp');
       }
     }
 
@@ -5321,7 +5549,6 @@ const elArt = document.getElementById('lblMasterArticlesCount');
 
     function wizardStartFromLanding() {
       wizardGotoStep(1);
-      wizardExecuteStep1();
     }
 
     async function initProjectContext() {
@@ -5430,7 +5657,7 @@ const elArt = document.getElementById('lblMasterArticlesCount');
             if (lPath) lPath.textContent = data.target_path || wzTarget;
             const lHwSum = document.getElementById('landingHardwareSummary');
             if (lHwSum && detectedSystemHardware) {
-              lHwSum.textContent = detectedSystemHardware.gpu_name + ' (' + (detectedSystemHardware.vram_gb || 8) + 'GB VRAM) • Chờ khảo sát & chọn model tại Bước 2';
+              lHwSum.textContent = detectedSystemHardware.gpu_name + ' (' + (detectedSystemHardware.vram_gb || 8) + 'GB VRAM) • Sẵn sàng tại Bước 1 (Chọn Model & Khảo Sát)';
             }
 
             if (savedStep > 0 && savedStep < 5) {
@@ -5656,8 +5883,10 @@ let wzIsProjectConfigured = false;
         }
       }
 
-      if (stepNum === 2) {
+      if (stepNum === 1) {
         renderHardwareModelSelector();
+      } else if (stepNum === 2) {
+        updateStep2ModelDisplay();
       } else if (stepNum === 3) {
         syncScopeSelectorUI();
       } else if (stepNum === 4) {
@@ -5685,8 +5914,8 @@ let wzIsProjectConfigured = false;
 
       const stepDescriptions = [
         "",
-        "Bước 1: Quét cây cú pháp AST & Nhận diện điểm nhạy cảm mã nguồn.",
-        "Bước 2: Chọn Mô hình AI thích ứng phần cứng máy tính.",
+        "Bước 1: Chọn Mô hình AI thích ứng phần cứng máy tính (Hardware-Aware Model Selection).",
+        "Bước 2: Quét cây cú pháp AST & Nhận diện điểm nhạy cảm mã nguồn.",
         "Bước 3: Chọn Phân hệ bảo vệ mối đe dọa (CTI Threat Scope).",
         "Bước 4: Thiết lập thời gian quét CTI & Mốc bài báo quá khứ.",
         "Bước 5: Cào báo CTI, Đối soát AST & Sinh gói kỹ năng tác tử.",
@@ -6276,10 +6505,10 @@ let wzIsProjectConfigured = false;
     }
 
     
-    function wizardConfirmStep2ModelAndProceed() {
+    function wizardConfirmStep1ModelAndProceed() {
       // Tìm model đang được chọn trong radio
       const checkedRadio = document.querySelector('input[name="wzModelRadio"]:checked');
-      let chosenModel = checkedRadio ? checkedRadio.value : 'qwen3:8b';
+      let chosenModel = checkedRadio ? checkedRadio.value : (detectedSystemModelData ? detectedSystemModelData.active_model : 'khang-qwen3:latest');
       
       try {
         localStorage.setItem('selectedAiModel', chosenModel);
@@ -6293,12 +6522,17 @@ let wzIsProjectConfigured = false;
         sel.value = chosenModel;
       }
 
-      // Cập nhật thanh ticker
+      // Cập nhật thanh ticker và LED
       updateModelBadgeText(chosenModel);
+      updateAgentLedStatus('ready');
       updateLiveTicker(`Đã xác nhận mô hình phòng thủ: ${chosenModel} (${detectedSystemHardware ? detectedSystemHardware.gpu_name : 'GPU Cục Bộ'})`);
 
-      // Chuyển tiếp sang Bước 3
-      wizardGotoStep(3);
+      // Chuyển tiếp sang Bước 2 (Quét AST Mã Nguồn)
+      wizardGotoStep(2);
+    }
+
+    function wizardConfirmStep2ModelAndProceed() {
+      wizardConfirmStep1ModelAndProceed();
     }
 
     function onWizardModelRadioChange(modelId) {
@@ -6306,6 +6540,7 @@ let wzIsProjectConfigured = false;
       const sel = document.getElementById('aiModelSelect');
       if (sel) sel.value = modelId;
       updateModelBadgeText(modelId);
+      updateAgentLedStatus('ready');
       updateLiveTicker(`Đã chọn mô hình: ${modelId} (${detectedSystemHardware ? detectedSystemHardware.gpu_name : 'GPU Cục Bộ'})`);
       renderHardwareModelSelector(modelId);
     }
@@ -6326,11 +6561,13 @@ let wzIsProjectConfigured = false;
       } catch (e) {}
     }
 
-    async function wizardExecuteStep1() {
+    let wzScanInProgress = false;
+
+    async function wizardExecuteStep2Scan() {
       const targetVal = document.getElementById("wizardInputTarget").value.trim();
       const cloneVal = document.getElementById("wizardInputClone").value.trim();
-      const btn = document.getElementById("btnRunStep1");
-      const nextBtn = document.getElementById("btnNextFromStep1");
+      const btn = document.getElementById("btnRunStep1") || document.getElementById("btnRunStep2Scan");
+      const nextBtn = document.getElementById("btnNextFromStep2") || document.getElementById("btnNextFromStep1");
       const term = document.getElementById("wzScanAgentTerminal");
       const resSummary = document.getElementById("wzScanResultSummary");
       const progWrap = document.getElementById("wzScanProgressWrap");
@@ -6340,6 +6577,10 @@ let wzIsProjectConfigured = false;
       const progDetail = document.getElementById("wzProgressDetail");
       const progEta = document.getElementById("wzProgressEta");
       const progSpinner = document.getElementById("wzProgressSpinner");
+
+      const chosenModel = localStorage.getItem("selectedAiModel") || (document.getElementById("aiModelSelect") ? document.getElementById("aiModelSelect").value : "khang-qwen3:latest");
+      wzScanInProgress = true;
+      updateAgentLedStatus("processing", "TÁC TỬ AI ĐANG QUÉT AST MÃ NGUỒN", `Duyệt cây AST & gọi mô hình ${chosenModel}...`);
 
       if (nextBtn) {
         nextBtn.disabled = true;
@@ -6352,7 +6593,7 @@ let wzIsProjectConfigured = false;
       
       if (btn) {
         btn.disabled = true;
-        btn.textContent = "[ AGENT ĐANG PHÂN TÍCH MÃ NGUỒN... ]";
+        btn.textContent = `[ AGENT ĐANG PHÂN TÍCH VỚI ${chosenModel.toUpperCase()}... ]`;
         btn.style.background = "#64748b";
       }
 
@@ -6364,13 +6605,13 @@ let wzIsProjectConfigured = false;
       }
       if (progText) progText.textContent = "4%";
       if (progStage) progStage.textContent = "[1/4] Duyệt cây thư mục & lập chỉ mục cú pháp AST...";
-      if (progDetail) progDetail.textContent = "Tác tử AI đang đọc các tệp mã nguồn và tệp cấu hình...";
+      if (progDetail) progDetail.textContent = `Tác tử AI (${chosenModel}) đang đọc các tệp mã nguồn và tệp cấu hình...`;
       if (progEta) progEta.textContent = "Ước tính: ~15s";
       if (progSpinner) progSpinner.style.display = "inline-block";
 
       if (term) {
         term.style.display = "block";
-        term.innerHTML = `<div style="color:#94a3b8;">[KHỞI TẠO] Tác tử AI Codebase Inspector đang đọc cây AST và các tệp cấu hình...</div>`;
+        term.innerHTML = `<div style="color:#94a3b8;">[KHỞI TẠO] Tác tử AI Codebase Inspector đang đọc cây AST bằng mô hình: <b style="color:#38bdf8;">${chosenModel}</b> (GPU AMD RX 6600)...</div>`;
       }
 
       // Vòng lặp tiến độ thời gian thực liên tục trong lúc Local LLM GPU suy luận
@@ -6396,11 +6637,11 @@ let wzIsProjectConfigured = false;
               term.scrollTop = term.scrollHeight;
             }
           } else if (rounded >= 45 && rounded < 75) {
-            if (progStage) progStage.textContent = "[3/4] Nạp ngữ cảnh vào Local LLM Qwen3:8B (GPU RX 6600)...";
-            if (progDetail) progDetail.textContent = "Mô hình qwen3:8b đang đọc hiểu cấu trúc mã nguồn và đánh giá rủi ro...";
+            if (progStage) progStage.textContent = `[3/4] Nạp ngữ cảnh vào Local LLM ${chosenModel} (GPU RX 6600)...`;
+            if (progDetail) progDetail.textContent = `Mô hình ${chosenModel} đang đọc hiểu cấu trúc mã nguồn và đánh giá rủi ro...`;
             if (!logStage3 && term) {
               logStage3 = true;
-              term.innerHTML += `<div style="color:#fbbf24; margin-top:4px;">[GPU INFERENCE] Đang nạp ngữ cảnh vào mô hình qwen3:8b qua Ollama (chờ ~15s)...</div>`;
+              term.innerHTML += `<div style="color:#fbbf24; margin-top:4px;">[GPU INFERENCE] Đang nạp ngữ cảnh vào mô hình ${chosenModel} qua Ollama (chờ ~15s)...</div>`;
               term.scrollTop = term.scrollHeight;
             }
           } else if (rounded >= 75) {
@@ -6422,9 +6663,10 @@ let wzIsProjectConfigured = false;
         const res = await fetch("/api/wizard/scan", {
           method: "POST",
           headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({ target: targetVal, clone_url: cloneVal })
+          body: JSON.stringify({ target: targetVal, clone_url: cloneVal, model_name: chosenModel })
         });
         clearInterval(progressTimer);
+        wzScanInProgress = false;
 
         // Đạt 100% hoàn thành
         if (progBar) {
@@ -6436,7 +6678,7 @@ let wzIsProjectConfigured = false;
           progText.style.color = "#059669";
         }
         if (progStage) progStage.textContent = "[HOÀN THÀNH] Tác tử AI đã thẩm định xong toàn diện dự án!";
-        if (progDetail) progDetail.textContent = "Đã xác định kiến trúc, điểm nóng và gán phân hệ phòng thủ tối ưu.";
+        if (progDetail) progDetail.textContent = `Đã xác định kiến trúc, điểm nóng và gán phân hệ phòng thủ bằng ${chosenModel}.`;
         if (progEta) progEta.textContent = `Xong trong: ${Math.round(elapsedSec)}s`;
         if (progSpinner) progSpinner.style.display = "none";
         const d = await res.json();
@@ -6515,7 +6757,7 @@ let wzIsProjectConfigured = false;
 
           // Stream logs in terminal
           const logs = d.agent_logs || [
-            "[AGENT 1: CODEBASE INSPECTOR] Đã đọc xong cấu trúc mã nguồn.",
+            `[AGENT: CODEBASE INSPECTOR] Đã đọc xong cấu trúc mã nguồn bằng ${chosenModel}.`,
             "[AST SCANNER] Nhận diện ngăn xếp và các tệp cấu hình hoàn tất.",
             "[LUẬN ĐIỂM TÁC TỬ] Đã gán phân hệ bảo vệ phù hợp nhất."
           ];
@@ -6542,7 +6784,7 @@ let wzIsProjectConfigured = false;
               }
               wzScanCompleted = true;
               try {
-                localStorage.setItem('cti_wizard_step', '1');
+                localStorage.setItem('cti_wizard_step', '2');
                 localStorage.setItem('cti_last_target', d.target_path || wzTarget);
                 localStorage.setItem('cti_scope_id', d.scope_id || wzScopeId);
               } catch (e) {}
@@ -6555,7 +6797,9 @@ let wzIsProjectConfigured = false;
                 verdictEl.textContent = `Dự án được định danh là: ${d.detected_techs && d.detected_techs.length > 0 ? d.detected_techs.join(', ') : 'Ứng dụng Đa Tầng'}. Phát hiện ${d.sensitive_sinks ? d.sensitive_sinks.length : 0} điểm nhạy cảm. Phân hệ bảo vệ khuyến nghị tối ưu nhất: ${d.scope_name}.`;
               }
 
-              // SÁNG MÀU NÚT TIẾP TỤC ĐỂ NGƯỜI DÙNG BẤM QUA BƯỚC 2
+              updateAgentLedStatus('ready', 'TÁC TỬ AI ĐANG HOẠT ĐỘNG (ALIVE & READY)', 'Đã hoàn tất thẩm định mã nguồn');
+
+              // SÁNG MÀU NÚT TIẾP TỤC ĐỂ NGƯỜI DÙNG BẤM QUA BƯỚC 3
               if (nextBtn) {
                 nextBtn.disabled = false;
                 nextBtn.dataset.enabled = "true";
@@ -6564,7 +6808,8 @@ let wzIsProjectConfigured = false;
                 nextBtn.style.opacity = "1";
                 nextBtn.style.boxShadow = "0 6px 20px rgba(37,99,235,0.5)";
                 nextBtn.classList.add("progress-pulse");
-                nextBtn.title = "Nhấn để tiếp tục tới bước Chọn Mô Hình AI";
+                nextBtn.title = "Nhấn để tiếp tục tới bước Chọn Phân Hệ Phòng Thủ (Bước 3)";
+                nextBtn.onclick = () => wizardGotoStep(3);
                 setTimeout(() => {
                   nextBtn.scrollIntoView({ behavior: "smooth", block: "center" });
                 }, 300);
@@ -6578,14 +6823,22 @@ let wzIsProjectConfigured = false;
             btn.disabled = false;
             btn.textContent = "[ BẮT ĐẦU QUÉT DỰ ÁN ]";
           }
+          updateAgentLedStatus('ready');
         }
       } catch (e) {
+        clearInterval(progressTimer);
+        wzScanInProgress = false;
         alert("Lỗi kết nối API /api/wizard/scan: " + e);
         if (btn) {
           btn.disabled = false;
           btn.textContent = "[ BẮT ĐẦU QUÉT DỰ ÁN ]";
         }
+        updateAgentLedStatus('offline');
       }
+    }
+
+    function wizardExecuteStep1() {
+      wizardExecuteStep2Scan();
     }
 
     let wzCurrentQueueFilter = 'ALL';
@@ -8364,6 +8617,7 @@ def api_system_validate_folder(req: FolderValidationReq):
 class WizardScanReq(BaseModel):
     target: str = ""
     clone_url: str = ""
+    model_name: Optional[str] = "auto"
 
 class WizardCrawlReq(BaseModel):
     target: str = ""
@@ -8394,7 +8648,7 @@ def api_wizard_scan(req: WizardScanReq):
             }, ensure_ascii=False, indent=2), encoding="utf-8")
         except Exception:
             pass
-    return wizard_scan_project(target=req.target, clone_url=req.clone_url)
+    return wizard_scan_project(target=req.target, clone_url=req.clone_url, model_name=req.model_name)
 
 @app.post("/api/wizard/crawl-scope")
 def api_wizard_crawl_scope(req: WizardCrawlReq):

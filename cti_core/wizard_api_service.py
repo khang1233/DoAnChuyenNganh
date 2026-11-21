@@ -31,7 +31,8 @@ def _call_local_agent_llm_for_codebase_scope(
     frameworks: List[str],
     sensitive_sinks: List[str],
     runtime_versions: Dict[str, str],
-    total_files: int
+    total_files: int,
+    model_name: Optional[str] = None
 ) -> Dict[str, Any]:
     """Tác tử AI thực sự đọc ngữ cảnh mã nguồn và gọi Local LLM trên GPU để suy luận Scope."""
     import requests as req_http
@@ -83,8 +84,12 @@ Trả về duy nhất định dạng JSON thuần túy (không bọc trong markd
   "agent_reasoning": "Chuỗi lập luận giải thích tại sao dự án này thuộc phạm vi phòng thủ trên (dưới 60 từ)"
 }}"""
 
+    # Xác định mô hình AI được chọn từ Bước 1
+    from phuc_core_ai_agent import MultiProviderLLMBrain
+    active_model = MultiProviderLLMBrain._ensure_and_detect_local_ollama_model(model_name) or "khang-qwen3:latest"
+
     payload = {
-        "model": "khang-qwen3:latest",
+        "model": active_model,
         "messages": [
             {"role": "system", "content": "Bạn là Tác tử AI An ninh Mạng chuyên sâu. Luôn trả về JSON phân tích kỹ thuật chuẩn xác."},
             {"role": "user", "content": prompt_content}
@@ -124,7 +129,7 @@ Trả về duy nhất định dạng JSON thuần túy (không bọc trong markd
         "agent_reasoning": f"Tác tử định vị cấu trúc mã nguồn web và đề xuất phạm vi phòng thủ: {fallback_name}."
     }
 
-def deep_agent_codebase_scan(target_path: Path) -> Dict[str, Any]:
+def deep_agent_codebase_scan(target_path: Path, model_name: Optional[str] = None) -> Dict[str, Any]:
     """Tác tử AI quét sâu cây AST, tệp cấu hình và định vị điểm nhạy cảm của mã nguồn."""
     p = target_path.resolve()
     if not p.exists():
@@ -256,14 +261,15 @@ def deep_agent_codebase_scan(target_path: Path) -> Dict[str, Any]:
     if languages.get("JavaScript", 0) > 0 and "Node.js" not in runtime_versions:
         runtime_versions["Node.js Runtime"] = "20+" 
     
-    # Gọi Tác tử AI (Local LLM Qwen3:8B trên GPU AMD Radeon RX 6600) phân tích chuyên sâu
+    # Gọi Tác tử AI (Local LLM trên GPU AMD Radeon RX 6600) phân tích chuyên sâu
     ai_verdict = _call_local_agent_llm_for_codebase_scope(
         target_path=p,
         languages=languages,
         frameworks=list(dict.fromkeys(frameworks)),
         sensitive_sinks=sensitive_sinks,
         runtime_versions=runtime_versions,
-        total_files=total_files
+        total_files=total_files,
+        model_name=model_name
     )
 
     scope_id = ai_verdict.get("scope_id", "SCOPE_WEB")
@@ -271,9 +277,12 @@ def deep_agent_codebase_scan(target_path: Path) -> Dict[str, Any]:
     arch_summary = ai_verdict.get("architecture_summary", "")
     attack_analysis = ai_verdict.get("attack_surface_analysis", "")
     agent_reason = ai_verdict.get("agent_reasoning", "")
+
+    from phuc_core_ai_agent import MultiProviderLLMBrain
+    actual_model = MultiProviderLLMBrain._ensure_and_detect_local_ollama_model(model_name) or "khang-qwen3:latest"
     
     agent_logs = [
-        "[TÁC TỬ 1: CODEBASE INSPECTOR] Khởi tạo phân tích kiến trúc mã nguồn qua Local LLM (GPU RX 6600)...",
+        f"[TÁC TỬ CODEBASE INSPECTOR] Sử dụng mô hình: {actual_model} (GPU AMD RX 6600)...",
         f"[AST CODEBASE SCAN] Quét toàn bộ cây thư mục: Đã định vị {total_files} tệp tin mã nguồn.",
         f"[NGÔN NGỮ NHẬN DIỆN] " + (", ".join(lang_labels) if lang_labels else "Đa ngôn ngữ"),
         f"[FRAMEWORKS & DEPENDENCIES] " + (", ".join(list(dict.fromkeys(frameworks))) if frameworks else "Custom Architecture"),
@@ -299,8 +308,8 @@ def deep_agent_codebase_scan(target_path: Path) -> Dict[str, Any]:
         "agent_logs": agent_logs
     }
 
-def wizard_scan_project(target: str = "", clone_url: str = "") -> Dict[str, Any]:
-    """Bước 1: Tác tử AI phân tích sâu mã nguồn dự án đích hoặc clone từ git về."""
+def wizard_scan_project(target: str = "", clone_url: str = "", model_name: Optional[str] = None) -> Dict[str, Any]:
+    """Tác tử AI phân tích sâu mã nguồn dự án đích bằng mô hình AI đã chọn."""
     if clone_url:
         repo_url = clone_url.strip()
         repo_name = repo_url.rstrip("/").split("/")[-1].replace(".git", "")
@@ -315,8 +324,8 @@ def wizard_scan_project(target: str = "", clone_url: str = "") -> Dict[str, Any]
         if not target_path.exists():
             target_path = ROOT_DIR / "target_projects" / "My_Website"
 
-    # Chạy Tác tử AI phân tích kiến trúc mã nguồn
-    scan_meta = deep_agent_codebase_scan(target_path)
+    # Chạy Tác tử AI phân tích kiến trúc mã nguồn với model_name đã chọn
+    scan_meta = deep_agent_codebase_scan(target_path, model_name=model_name)
     scope_id = scan_meta.get("scope_id", "SCOPE_WEB")
     profile = resolve_scope_profile(scope_id)
     
