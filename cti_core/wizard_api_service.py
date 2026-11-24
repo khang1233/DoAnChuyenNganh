@@ -721,9 +721,11 @@ def wizard_synthesize_skill(target: str, scope_id: str, article_id: str, scan_in
         "accumulated_articles_count": manifest.get("accumulated_articles_count", 0),
         "accumulated_iocs_count": manifest.get("accumulated_iocs_count", 0),
         "installed_locations": [
-            str(target_path / ".cursor" / "rules" / skill_name),
-            str(target_path / ".gemini" / "skills" / skill_name),
-            str(target_path / "defense_skills" / skill_name)
+            str(target_path / ".cursor" / "rules" / f"{skill_name}.mdc"),
+            str(target_path / ".gemini" / "skills" / skill_name / "SKILL.md"),
+            str(target_path / "skills" / skill_name),
+            str(target_path / "defense_skills" / skill_name),
+            str(target_path / "SKILL.md")
         ]
     }
 

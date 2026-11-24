@@ -305,6 +305,18 @@ def synthesize_and_deploy_skill(target_path: Path, scope_id: str, article_id: st
     context = extract_project_context(target_path)
     deploy_to_all_major_agent_platforms(target_path, bundle_path, context)
 
+    # Đảm bảo sao chép trực tiếp vào thư mục skills/ và SKILL.md ở thư mục gốc dự án đích
+    try:
+        target_skills_dir = target_path / "skills" / bundle_path.name
+        if target_skills_dir.exists():
+            shutil.rmtree(target_skills_dir)
+        shutil.copytree(bundle_path, target_skills_dir)
+        print(f"  [+] Đã triển khai trực tiếp vào thư mục gốc dự án: {target_skills_dir}")
+        if (bundle_path / "SKILL.md").exists():
+            shutil.copy(bundle_path / "SKILL.md", target_path / "SKILL.md")
+    except Exception as e:
+        print(f"  [-] Lưu ý khi sao chép thư mục skills: {e}")
+
     # Nếu có bài báo đe dọa cao nhất, sinh thêm Micro-Skill chuyên sâu nếu cần
     if article_id:
         try:
