@@ -3417,6 +3417,53 @@ HTML_PAGE = r"""<!DOCTYPE html>
       renderHistoryManager();
     }
 
+    let wzProjectTechs = [];
+    try {
+      const savedTechs = localStorage.getItem('cti_project_techs');
+      if (savedTechs) wzProjectTechs = JSON.parse(savedTechs) || [];
+    } catch (e) {}
+
+    function getArticleMatchedTechs(art) {
+      if (!art) return [];
+      if (Array.isArray(art.matched_project_techs) && art.matched_project_techs.length > 0) {
+        return art.matched_project_techs;
+      }
+      if (!Array.isArray(wzProjectTechs) || wzProjectTechs.length === 0) return [];
+      const hay = ((art.title || '') + ' ' + (art.content || '')).toLowerCase();
+      const catalog = [
+        ['PHP', ['php', 'composer']],
+        ['Nginx', ['nginx']],
+        ['Apache', ['apache', 'httpd']],
+        ['Laravel', ['laravel']],
+        ['WordPress', ['wordpress']],
+        ['Magento', ['magento']],
+        ['Node.js', ['node.js', 'nodejs', 'npm', 'express']],
+        ['React', ['react', 'vite', 'next.js']],
+        ['Python', ['python', 'pip']],
+        ['FastAPI', ['fastapi']],
+        ['Django', ['django']],
+        ['Flask', ['flask']],
+        ['Docker', ['docker', 'container']],
+        ['MySQL', ['mysql', 'mariadb']],
+        ['PostgreSQL', ['postgres', 'postgresql']],
+        ['Redis', ['redis']],
+        ['Go', ['golang']],
+        ['Java', ['java', 'spring', 'struts']]
+      ];
+      const techHay = wzProjectTechs.join(' ').toLowerCase();
+      const matched = [];
+      for (const [label, aliases] of catalog) {
+        if (aliases.some(a => techHay.includes(a))) {
+          const hit = aliases.some(a => {
+            const esc = a.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            return new RegExp('\\b' + esc + '\\b', 'i').test(hay);
+          });
+          if (hit) matched.push(label);
+        }
+      }
+      return matched;
+    }
+
     function renderHistoryManager() {
       let list = [];
       if (historyViewMode === 'PROJECT') {
@@ -3596,13 +3643,18 @@ HTML_PAGE = r"""<!DOCTYPE html>
 
         const safeTitle = (art.title || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         const charLen = (art.content || '').length.toLocaleString('vi-VN');
+        const matchedTechs = getArticleMatchedTechs(art);
+        const isTechMatch = matchedTechs.length > 0 || Boolean(art.is_direct_target);
+        const matchBadgeHtml = matchedTechs.length > 0
+          ? `<div style="margin-top:4px;"><span style="display:inline-block; background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5; font-weight:800; font-size:10.5px; padding:2px 7px; border-radius:4px;">🔥 KHỚP STACK DỰ ÁN: ${matchedTechs.join(', ').toUpperCase()}</span></div>`
+          : '';
 
         return `
-          <tr>
+          <tr style="${isTechMatch ? 'background:#fff5f5;' : ''}">
             <td class="mono">
               <label style="cursor:pointer; display:flex; align-items:center; gap:6px;">
                 <input type="checkbox" ${checked} onchange="toggleHistoryCheckbox('${art.article_id}', this.checked)" />
-                <b style="color:var(--primary);">#${seqNum}</b>
+                <b style="color:${isTechMatch ? '#dc2626' : 'var(--primary)'};">#${seqNum}</b>
               </label>
             </td>
             <td>
@@ -3619,9 +3671,10 @@ HTML_PAGE = r"""<!DOCTYPE html>
               <a class="BtnMiniProof" href="${art.url}" target="_blank">Báo gốc &nearr;</a>
             </td>
             <td>
-              <div style="font-weight:600; color:var(--text-main); cursor:pointer; line-height:1.4;" onclick="viewArticleById('${art.article_id}', false)" title="Nhấn để đọc văn bản nguyên bản">
+              <div style="font-weight:${isTechMatch ? '800' : '600'}; color:${isTechMatch ? '#991b1b' : 'var(--text-main)'}; cursor:pointer; line-height:1.4;" onclick="viewArticleById('${art.article_id}', false)" title="Nhấn để đọc văn bản nguyên bản">
                 ${safeTitle}
               </div>
+              ${matchBadgeHtml}
               <div style="font-size:11.5px; color:var(--text-muted); margin-top:3px;">
                 Độ dài: ${charLen} ký tự &bull; Mã: <span class="mono">${art.article_id}</span>
               </div>
@@ -3903,14 +3956,20 @@ HTML_PAGE = r"""<!DOCTYPE html>
 
         const pubDateStr = formatToLocalTime(art.sort_ts || art.published_at);
         const fetchedDateStr = formatToLocalTime(art.fetched_at || art.sort_ts);
+        const matchedTechs = getArticleMatchedTechs(art);
+        const isTechMatch = matchedTechs.length > 0 || Boolean(art.is_direct_target);
+        const techMatchBanner = matchedTechs.length > 0
+          ? `<div style="margin:4px 0 6px 0;"><span style="display:inline-block; background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:4px;">🔥 KHỚP DỰ ÁN: ${matchedTechs.join(', ').toUpperCase()}</span></div>`
+          : (art.is_direct_target ? `<div style="margin:4px 0 6px 0;"><span style="display:inline-block; background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:4px;">🔥 MỐI ĐE DỌA TRỰC TIẾP DỰ ÁN</span></div>` : '');
 
         return `
-          <div class="FeedItem ${isSel}" id="ncard-${idx}" onclick="selectCard(${idx}, false)">
+          <div class="FeedItem ${isSel}" id="ncard-${idx}" onclick="selectCard(${idx}, false)" style="${isTechMatch ? 'border-left:4px solid #dc2626; background:#fff5f5;' : ''}">
             <div class="FeedMeta">
-              <span class="FeedSource">#${idx + 1} &bull; ${art.source}</span>
+              <span class="FeedSource" style="${isTechMatch ? 'color:#b91c1c; font-weight:700;' : ''}">#${idx + 1} &bull; ${art.source}</span>
               ${iocBadgeMeta}
             </div>
-            <div class="FeedTitle">${art.title}</div>
+            <div class="FeedTitle" style="${isTechMatch ? 'color:#991b1b; font-weight:800;' : ''}">${art.title}</div>
+            ${techMatchBanner}
             <div class="FeedFootMeta" style="flex-wrap: wrap; gap: 4px;">
               <span title="Thời gian xuất bản gốc (Giờ Việt Nam GMT+7)"><span style="color:var(--text-muted);">Đăng:</span> <span class="mono">${pubDateStr || '--'}</span></span>
               <span title="Thời điểm crawler quét nạp về hệ thống (Giờ Việt Nam GMT+7)"><span style="color:var(--text-muted);">Quét:</span> <span class="mono" style="color:var(--primary);">${fetchedDateStr || '--'}</span></span>
@@ -7560,11 +7619,17 @@ let wzIsProjectConfigured = false;
                 btn.textContent = "[ QUÉT LẠI DỰ ÁN ]";
               }
               wzScanCompleted = true;
+              if (Array.isArray(d.detected_techs) && d.detected_techs.length > 0) {
+                wzProjectTechs = d.detected_techs;
+              } else if (Array.isArray(d.languages) && d.languages.length > 0) {
+                wzProjectTechs = d.languages;
+              }
               try {
                 localStorage.setItem('cti_wizard_step', '2');
                 localStorage.setItem('cti_last_target', d.target_path || wzTarget);
                 localStorage.setItem('cti_scope_id', d.scope_id || wzScopeId);
                 localStorage.setItem('cti_last_scan_data', JSON.stringify(d));
+                localStorage.setItem('cti_project_techs', JSON.stringify(wzProjectTechs));
               } catch (e) {}
 
               // Hiển thị khung kết quả & Điểm mấu chốt
@@ -7714,6 +7779,10 @@ let wzIsProjectConfigured = false;
         const d = await res.json();
         if (d.status === "success") {
           wzBestArticleId = d.best_article_id;
+          if (Array.isArray(d.project_techs) && d.project_techs.length > 0) {
+            wzProjectTechs = d.project_techs;
+            try { localStorage.setItem('cti_project_techs', JSON.stringify(wzProjectTechs)); } catch (e) {}
+          }
 
           if (d.scope_articles && d.scope_articles.length > 0) {
             articles = d.scope_articles.map((art, idx) => ({
@@ -7726,6 +7795,8 @@ let wzIsProjectConfigured = false;
               sort_ts: art.sort_ts || art.published_date || "2026",
               content: art.content || art.excerpt || "",
               status: art.status || "pending",
+              matched_project_techs: art.matched_project_techs || [],
+              is_direct_target: Boolean(art.is_direct_target),
               ioc_counts: {
                 cves: (art.cves || []).length,
                 ips: (art.sample_ips || []).length,

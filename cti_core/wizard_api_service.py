@@ -592,6 +592,34 @@ def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3, live_
     _, techs = detect_project_scope(target_path)
     best_art_id, best_art_title = find_optimal_article_for_scope(scope_id, techs)
 
+    # Trích xuất danh sách công nghệ chủ chốt thực tế của dự án để đối soát & tô đỏ bài báo trùng
+    canonical_tech_catalog = [
+        ("PHP", ["php", "composer"]),
+        ("Nginx", ["nginx"]),
+        ("Apache", ["apache", "httpd"]),
+        ("Laravel", ["laravel"]),
+        ("WordPress", ["wordpress"]),
+        ("Magento", ["magento"]),
+        ("Node.js", ["node.js", "nodejs", "npm", "express"]),
+        ("React", ["react", "vite", "next.js"]),
+        ("Python", ["python", "pip"]),
+        ("FastAPI", ["fastapi"]),
+        ("Django", ["django"]),
+        ("Flask", ["flask"]),
+        ("Docker", ["docker", "container"]),
+        ("MySQL", ["mysql", "mariadb"]),
+        ("PostgreSQL", ["postgres", "postgresql"]),
+        ("Redis", ["redis"]),
+        ("Go", ["golang"]),
+        ("Java", ["java", "spring", "struts"]),
+    ]
+    tech_hay = " ".join(str(t).lower() for t in (techs or []))
+    project_tech_tokens = []
+    for label, aliases in canonical_tech_catalog:
+        if any(a in tech_hay for a in aliases):
+            project_tech_tokens.append((label, aliases))
+    project_tech_labels = [lbl for lbl, _ in project_tech_tokens]
+
     with sqlite3.connect(DB_PATH) as conn:
         conn.row_factory = sqlite3.Row
         art = conn.execute("SELECT * FROM articles_archive WHERE article_id = ?", (best_art_id,)).fetchone() if best_art_id else None
@@ -647,7 +675,13 @@ def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3, live_
                 skills_generated.append(f"Lá chắn Netsh chặn IP C2 {r_ips[0]}")
             if not skills_generated:
                 skills_generated.append("Kỹ năng tác tử: Refactor Whitelist & RCE Shield")
-                
+
+            art_hay = (r["title"] + " " + c_text).lower()
+            matched_techs = []
+            for label, aliases in project_tech_tokens:
+                if any(re.search(r"\b" + re.escape(a) + r"\b", art_hay) for a in aliases):
+                    matched_techs.append(label)
+
             enriched_articles.append({
                 "article_id": r["article_id"],
                 "title": r["title"],
@@ -665,14 +699,15 @@ def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3, live_
                 "risk_level": risk_tag,
                 "skills_summary": ", ".join(skills_generated),
                 "rules_summary": ", ".join(skills_generated),
-                "is_direct_target": (r["article_id"] == best_art_id)
+                "matched_project_techs": matched_techs,
+                "is_direct_target": (r["article_id"] == best_art_id) or (len(matched_techs) > 0)
             })
 
-        # Đưa bài báo đe dọa cao nhất lên vị trí đầu tiên
-        best_idx = next((i for i, a in enumerate(enriched_articles) if a["article_id"] == best_art_id), -1)
-        if best_idx > 0:
-            best_item = enriched_articles.pop(best_idx)
-            enriched_articles.insert(0, best_item)
+        # Đưa bài báo trùng công nghệ dự án và đe dọa cao nhất lên đầu danh sách
+        enriched_articles.sort(
+            key=lambda a: (1 if a["article_id"] == best_art_id else 0, len(a.get("matched_project_techs") or [])),
+            reverse=True,
+        )
 
     if not matched_count:
         matched_count = len(matched_arts) if matched_arts else 1
@@ -736,6 +771,7 @@ def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3, live_
         "best_article_title": best_art_title,
         "cves_found": cves[:5],
         "content_excerpt": art_dict.get("content", "")[:350],
+        "project_techs": project_tech_labels,
         "scope_articles": enriched_articles
     }
 
