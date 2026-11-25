@@ -167,7 +167,7 @@ def _extract_verbatim_article_excerpt(raw_html: str, max_ioc_lines: int = 24) ->
 
     body = raw_html
     # Tìm vùng chứa thân bài báo chính theo từng nguồn phổ biến
-    thn_match = re.search(r'id=[\'"]articlebody[\'"][^>]*>(.*?)<div class=[\'"](?:clear|post-share-wrap|post-navigation)', raw_html, flags=re.I|re.S)
+    thn_match = re.search(r'id=[\'"]articlebody[\'"][^>]*>(.*?)<div class=[\'"](?:post-share-wrap|post-navigation|below-post|author-box|comments)', raw_html, flags=re.I|re.S)
     kasp_match = re.search(r'class=[\'"][^\'"]*(?:js-article-body|c-article__content)[^\'"]*[\'"][^>]*>(.*?)(?:<div class=[\'"]c-article__related|<footer|</article>)', raw_html, flags=re.I|re.S)
     article_match = re.search(r'<article[^>]*>(.*?)</article>', raw_html, flags=re.I|re.S)
     entry_match = re.search(r'class=[\'"][^\'"]*entry-content[^\'"]*[\'"][^>]*>(.*?)</(?:article|main|div)>', raw_html, flags=re.I|re.S)
@@ -189,6 +189,19 @@ def _extract_verbatim_article_excerpt(raw_html: str, max_ioc_lines: int = 24) ->
         flags=re.IGNORECASE | re.DOTALL,
     )
     cleaned = re.sub(r'<div[^>]*class=[\'"][^\'"]*ad[^\'"]*[\'"][^>]*>.*?</div>', ' ', cleaned, flags=re.IGNORECASE | re.DOTALL)
+
+    def _img_to_marker(m_obj):
+        tag = m_obj.group(0)
+        src_m = re.search(r'(?:data-src|src)=[\'"](https?://[^\'"]+)[\'"]', tag, flags=re.I)
+        if not src_m:
+            return " "
+        img_url = html.unescape(src_m.group(1)).strip()
+        low_u = img_url.lower()
+        if any(skip in low_u for skip in ("pixel", "1x1", "doubleclick", "feedburner", "gravatar", "avatar", "/ads/", "adservice", "spacer", ".svg")):
+            return " "
+        return f"\n\n[IMAGE: {img_url}]\n\n"
+
+    cleaned = re.sub(r"<img\b[^>]*>", _img_to_marker, cleaned, flags=re.IGNORECASE)
 
     block_separated = re.sub(
         r"</?(?:p|li|tr|div|h1|h2|h3|h4|h5|h6|pre|blockquote|br|td|th)[^>]*>",
@@ -381,7 +394,7 @@ def crawl_all_sources_and_archive(limit_per_source: int = 10) -> List[Dict[str, 
                     page_resp = requests.get(link, headers=DEFAULT_HEADERS, timeout=8)
                     if page_resp.status_code == 200:
                         m = re.search(
-                            r"id=['\"]articlebody['\"][^>]*>(.*?)<div class=['\"]clear",
+                            r"id=['\"]articlebody['\"][^>]*>(.*?)<div class=['\"](?:post-share-wrap|post-navigation|below-post|author-box|comments)",
                             page_resp.text,
                             flags=re.IGNORECASE | re.DOTALL,
                         )
@@ -632,7 +645,21 @@ def crawl_year_to_date_archive(
                 vulns = cisa_resp.json().get("vulnerabilities", [])
                 vulns_ytd = [v for v in vulns if (v.get("dateAdded") or "") >= since_date]
                 vulns_sorted = sorted(vulns_ytd, key=lambda v: v.get("dateAdded", ""), reverse=True)
-                for v in vulns_sorted[:max_cisa]:
+                # Nếu mốc thời gian nhiều năm (3 năm / 5 năm), lấy cân bằng theo từng năm để timeline phủ đủ toàn bộ giai đoạn
+                if len(vulns_sorted) > max_cisa:
+                    by_year: Dict[str, List[Dict[str, Any]]] = {}
+                    for v in vulns_sorted:
+                        yr = (v.get("dateAdded") or "")[:4] or "2026"
+                        by_year.setdefault(yr, []).append(v)
+                    years_desc = sorted(by_year.keys(), reverse=True)
+                    per_year_cap = max(10, max_cisa // max(1, len(years_desc)))
+                    balanced: List[Dict[str, Any]] = []
+                    for yr in years_desc:
+                        balanced.extend(by_year[yr][:per_year_cap])
+                    selected_vulns = balanced[:max_cisa]
+                else:
+                    selected_vulns = vulns_sorted[:max_cisa]
+                for v in selected_vulns:
                     cve_id = v.get("cveID", "")
                     vendor = v.get("vendorProject", "")
                     product = v.get("product", "")
@@ -657,42 +684,75 @@ def crawl_year_to_date_archive(
 
     def _ytd_thn() -> List[Dict[str, Any]]:
         out: List[Dict[str, Any]] = []
+        seen_links: set = set()
         try:
-            start_idx = 1
-            while len(out) < max_thn:
-                feed_url = (
-                    f"https://thehackernews.com/feeds/posts/default?alt=json"
-                    f"&published-min={since_date}T00:00:00Z&max-results=50&start-index={start_idx}"
-                )
-                r = requests.get(feed_url, headers=DEFAULT_HEADERS, timeout=12)
-                if r.status_code != 200:
-                    break
-                entries = r.json().get("feed", {}).get("entry", [])
-                if not entries:
-                    break
-                for item in entries:
-                    title = item.get("title", {}).get(t_key, "").strip()
-                    pub_date = item.get("published", {}).get(t_key, "").strip()
-                    links = [l.get("href") for l in item.get("link", []) if l.get("rel") == "alternate"]
-                    link = links[0] if links else "https://thehackernews.com"
-                    raw_summary = item.get("summary", {}).get(t_key, "") or item.get("content", {}).get(t_key, "")
-                    verbatim_body = _extract_verbatim_article_excerpt(raw_summary)
-                    sort_ts = _normalize_date_to_iso(pub_date)
-                    out.append({
-                        "article_id": f"thn-{hashlib.md5(link.encode('utf-8')).hexdigest()[:8]}",
-                        "source": "TheHackerNews",
-                        "title": title,
-                        "url": link,
-                        "published_at": pub_date,
-                        "is_historical": sort_ts < "2026-10-01",
-                        "content": verbatim_body,
-                    })
-                    if len(out) >= max_thn:
+            try:
+                start_yr = int(since_date[:4])
+            except Exception:
+                start_yr = datetime.now().year
+            end_yr = datetime.now().year
+            years_list = list(range(end_yr, max(2020, start_yr) - 1, -1))
+            per_yr_limit = max(20, max_thn // max(1, len(years_list)))
+
+            for yr in years_list:
+                yr_min = since_date if yr == start_yr else f"{yr}-01-01"
+                yr_max = f"{yr}-12-31T23:59:59Z"
+                yr_items: List[Dict[str, Any]] = []
+                start_idx = 1
+                while len(yr_items) < per_yr_limit and len(out) + len(yr_items) < max_thn:
+                    feed_url = (
+                        f"https://thehackernews.com/feeds/posts/default?alt=json"
+                        f"&published-min={yr_min}T00:00:00Z&published-max={yr_max}"
+                        f"&max-results=50&start-index={start_idx}"
+                    )
+                    r = requests.get(feed_url, headers=DEFAULT_HEADERS, timeout=12)
+                    if r.status_code != 200:
                         break
-                earliest_in_batch = entries[-1].get("published", {}).get(t_key, "")
-                if earliest_in_batch < since_date:
-                    break
-                start_idx += len(entries)
+                    entries = r.json().get("feed", {}).get("entry", [])
+                    if not entries:
+                        break
+                    for item in entries:
+                        title = item.get("title", {}).get(t_key, "").strip()
+                        pub_date = item.get("published", {}).get(t_key, "").strip()
+                        links = [l.get("href") for l in item.get("link", []) if l.get("rel") == "alternate"]
+                        link = links[0] if links else "https://thehackernews.com"
+                        if link in seen_links:
+                            continue
+                        seen_links.add(link)
+                        raw_summary = item.get("summary", {}).get(t_key, "") or item.get("content", {}).get(t_key, "")
+                        verbatim_body = _extract_verbatim_article_excerpt(raw_summary)
+                        sort_ts = _normalize_date_to_iso(pub_date)
+                        yr_items.append({
+                            "article_id": f"thn-{hashlib.md5(link.encode('utf-8')).hexdigest()[:8]}",
+                            "source": "TheHackerNews",
+                            "title": title,
+                            "url": link,
+                            "published_at": pub_date,
+                            "is_historical": sort_ts < "2026-10-01",
+                            "content": verbatim_body,
+                        })
+                        if len(yr_items) >= per_yr_limit or len(out) + len(yr_items) >= max_thn:
+                            break
+                    start_idx += len(entries)
+                    if len(entries) < 50:
+                        break
+                out.extend(yr_items)
+
+            # Cào toàn văn HTML + hình ảnh song song cho các bài THN mới chỉ có đoạn tóm tắt RSS ngắn
+            short_items = [it for it in out[:36] if len(it.get("content") or "") < 900 and it.get("url", "").startswith("http")]
+            if short_items:
+                def _hydrate_thn_full(it: Dict[str, Any]) -> None:
+                    try:
+                        pr = requests.get(it["url"], headers=DEFAULT_HEADERS, timeout=7)
+                        if pr.status_code == 200:
+                            full_txt = _extract_verbatim_article_excerpt(pr.text)
+                            if len(full_txt) > len(it.get("content") or ""):
+                                it["content"] = full_txt
+                    except Exception:
+                        pass
+
+                with ThreadPoolExecutor(max_workers=8) as h_pool:
+                    list(h_pool.map(_hydrate_thn_full, short_items))
         except Exception as e:
             print(f"[YTD CRAWLER] THN error: {e}")
         return out
@@ -1136,7 +1196,7 @@ def scrape_article_text(url: str) -> Dict[str, Any]:
 
         # Nếu là thehackernews.com thì ưu tiên vùng #articlebody
         m_thn = re.search(
-            r"id=['\"]articlebody['\"][^>]*>(.*?)<div class=['\"]clear",
+            r"id=['\"]articlebody['\"][^>]*>(.*?)<div class=['\"](?:post-share-wrap|post-navigation|below-post|author-box|comments)",
             raw_html,
             flags=re.IGNORECASE | re.DOTALL,
         )

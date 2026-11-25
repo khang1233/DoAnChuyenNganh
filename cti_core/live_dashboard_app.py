@@ -1158,8 +1158,8 @@ HTML_PAGE = r"""<!DOCTYPE html>
       <button class="NavLink" onclick="switchView('sec-defense', this)">3. Kho Kỹ Năng Tác Tử (Agentic Skills)</button>
       <button class="NavLink" onclick="switchView('sec-chat', this)">Chat AI Agent</button>
       <button class="NavLink" onclick="switchView('sec-add', this)">+ Thêm Báo Mới</button>
-      <button class="NavLink" onclick="switchView('sec-accuracy-verifier', this)" style="color:#7c3aed; font-weight:700;">🎯 Thẩm Định Độ Chính Xác AI</button>
-      <a href="http://127.0.0.1:8780" target="_blank" class="NavLink" style="color:#059669; font-weight:700; text-decoration:none;" title="Mở phân hệ So Sánh Đối Chiếu 50 Bài CTI Ground Truth (Cổng 8780)">📊 So Sánh 50 Bài ↗</a>
+      <button class="NavLink" onclick="switchView('sec-accuracy-verifier', this)" style="color:#7c3aed; font-weight:700;">Thẩm Định Độ Chính Xác AI</button>
+      <a href="http://127.0.0.1:8780" target="_blank" class="NavLink" style="color:#059669; font-weight:700; text-decoration:none;" title="Mở phân hệ So Sánh Đối Chiếu 50 Bài CTI Ground Truth (Cổng 8780)">So Sánh 50 Bài &nearr;</a>
     </div>
 
     <div class="NavRight" style="display:flex; align-items:center; gap:8px;">
@@ -1171,7 +1171,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
         <option value="auto" selected>Đang dò tìm Model &amp; GPU cục bộ...</option>
       </select>
       <a href="http://127.0.0.1:8780" target="_blank" class="CleanBtn" style="border-color:#10b981; color:#065f46; background:#ecfdf5; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:4px;" title="Mở phân hệ So Sánh Đối Chiếu 50 Bài CTI Ground Truth (Cổng 8780)">
-        📊 So Sánh 50 Bài (8780)
+        So Sánh 50 Bài (8780)
       </a>
       <button class="CleanBtn btn-primary" id="btnRunAll" onclick="runPipeline()">
         Chạy Phân Tích
@@ -3964,8 +3964,8 @@ HTML_PAGE = r"""<!DOCTYPE html>
         const matchedTechs = (st === 'completed') ? getArticleMatchedTechs(art) : [];
         const isTechMatch = (st === 'completed') && (matchedTechs.length > 0 || Boolean(art.is_direct_target));
         const techMatchBanner = matchedTechs.length > 0
-          ? `<div style="margin:4px 0 6px 0;"><span style="display:inline-block; background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:4px;">🔥 KHỚP DỰ ÁN: ${matchedTechs.join(', ').toUpperCase()}</span></div>`
-          : (art.is_direct_target ? `<div style="margin:4px 0 6px 0;"><span style="display:inline-block; background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:4px;">🔥 MỐI ĐE DỌA TRỰC TIẾP DỰ ÁN</span></div>` : '');
+          ? `<div style="margin:4px 0 6px 0;"><span style="display:inline-block; background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:4px;">KHỚP DỰ ÁN: ${matchedTechs.join(', ').toUpperCase()}</span></div>`
+          : (isTechMatch ? `<div style="margin:4px 0 6px 0;"><span style="display:inline-block; background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:4px;">MỐI ĐE DỌA TRỰC TIẾP DỰ ÁN</span></div>` : '');
 
         return `
           <div class="FeedItem ${isSel}" id="ncard-${idx}" onclick="selectCard(${idx}, false)" style="${isTechMatch ? 'border-left:4px solid #dc2626; background:#fff5f5;' : ''}">
@@ -4087,6 +4087,11 @@ HTML_PAGE = r"""<!DOCTYPE html>
         const isDoneArt = (st === 'completed');
         const paragraphs = art.content.split(/\n+/).filter(p => p.trim().length > 0);
         const renderedParas = paragraphs.map(p => {
+          const imgMatch = p.trim().match(/^\[IMAGE:\s*(https?:\/\/[^\]]+)\]$/i);
+          if (imgMatch) {
+            const safeImgUrl = imgMatch[1].replace(/"/g, '&quot;');
+            return `<div style="margin:10px 0; text-align:center;"><img src="${safeImgUrl}" alt="Hình ảnh minh họa bài báo" loading="lazy" referrerpolicy="no-referrer" style="max-width:100%; max-height:420px; border-radius:6px; border:1px solid #e2e8f0; object-fit:contain;" onerror="this.parentElement.style.display='none';" /></div>`;
+          }
           let safeP = p.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
           if (!isDoneArt) {
             return `<div style="margin:6px 0; color:var(--text-main); line-height:1.6;">${safeP}</div>`;
