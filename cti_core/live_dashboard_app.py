@@ -2177,6 +2177,20 @@ HTML_PAGE = r"""<!DOCTYPE html>
           </tbody>
         </table>
       </div>
+
+      <div id="historyArticleViewerBox" style="margin-top:14px; border:1px solid var(--border-main); border-radius:8px; background:#ffffff; overflow:hidden;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:#f8fafc; border-bottom:1px solid var(--border-main); flex-wrap:wrap; gap:8px;">
+          <b style="font-size:12.5px; color:var(--text-main);">VĂN BẢN BÀI BÁO ĐÃ XỬ LÝ &amp; HIGHLIGHT CHỈ SỐ (IP / DOMAIN / CVE / HASH)</b>
+          <div style="display:flex; gap:10px; font-size:11.5px; font-weight:700;">
+            <span style="color:#b91c1c;">[Độc hại IP1/C2]</span>
+            <span style="color:#15803d;">[An toàn IP2]</span>
+            <span style="color:#b45309;">[Lỗ hổng CVE]</span>
+          </div>
+        </div>
+        <div id="historyHighlightedArticleView" style="padding:14px 16px; max-height:480px; overflow-y:auto; font-size:13px; line-height:1.65;">
+          <div style="color:var(--text-muted); font-style:italic;">Chưa có bài báo hoàn thành nào để hiển thị. Khi AI phân tích xong bài báo, nội dung đầy đủ kèm in đậm/highlight IP, Domain, CVE sẽ tự động hiện tại đây.</div>
+        </div>
+      </div>
     </section>
 
     <!-- MỤC 2: BẢNG CHẤM ĐIỂM ĐA NGUỒN 5 LỚP -->
@@ -2243,6 +2257,20 @@ HTML_PAGE = r"""<!DOCTYPE html>
             <tr><td colspan="9" style="color:var(--text-muted);">Đang chờ phân tích...</td></tr>
           </tbody>
         </table>
+      </div>
+
+      <div id="historyArticleViewerBox" style="margin-top:14px; border:1px solid var(--border-main); border-radius:8px; background:#ffffff; overflow:hidden;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:#f8fafc; border-bottom:1px solid var(--border-main); flex-wrap:wrap; gap:8px;">
+          <b style="font-size:12.5px; color:var(--text-main);">VĂN BẢN BÀI BÁO ĐÃ XỬ LÝ &amp; HIGHLIGHT CHỈ SỐ (IP / DOMAIN / CVE / HASH)</b>
+          <div style="display:flex; gap:10px; font-size:11.5px; font-weight:700;">
+            <span style="color:#b91c1c;">[Độc hại IP1/C2]</span>
+            <span style="color:#15803d;">[An toàn IP2]</span>
+            <span style="color:#b45309;">[Lỗ hổng CVE]</span>
+          </div>
+        </div>
+        <div id="historyHighlightedArticleView" style="padding:14px 16px; max-height:480px; overflow-y:auto; font-size:13px; line-height:1.65;">
+          <div style="color:var(--text-muted); font-style:italic;">Chưa có bài báo hoàn thành nào để hiển thị. Khi AI phân tích xong bài báo, nội dung đầy đủ kèm in đậm/highlight IP, Domain, CVE sẽ tự động hiện tại đây.</div>
+        </div>
       </div>
     </section>
 
@@ -3697,6 +3725,15 @@ HTML_PAGE = r"""<!DOCTYPE html>
           </tr>
         `;
       }).join('') + moreNotice;
+
+      // Tự động hiển thị bài báo đã hoàn thành trong khung đọc Highlight của mục Lịch sử
+      const completedInView = filtered.filter(a => (a.status || '').toLowerCase() === 'completed');
+      const targetHistArt = (window.selectedHistoryViewId && filtered.find(a => a.article_id === window.selectedHistoryViewId))
+        || completedInView[0]
+        || null;
+      if (typeof renderHistoryHighlightedArticle === 'function') {
+        renderHistoryHighlightedArticle(targetHistArt);
+      }
     }
 
     function toggleHistoryCheckbox(articleId, isChecked) {
@@ -3719,8 +3756,78 @@ HTML_PAGE = r"""<!DOCTYPE html>
       renderHistoryManager();
     }
 
+    function renderHistoryHighlightedArticle(art) {
+      const box = document.getElementById('historyHighlightedArticleView');
+      if (!box) return;
+      if (!art) {
+        box.innerHTML = `<div style="color:var(--text-muted); font-style:italic;">Chưa có bài báo hoàn thành nào để hiển thị. Khi AI phân tích xong bài báo, nội dung đầy đủ kèm in đậm/highlight IP, Domain, CVE sẽ tự động hiện tại đây.</div>`;
+        return;
+      }
+      const ipRegex = /\b(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\[\.\]|\(\.\)|\.)){3}(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\b/g;
+      const domRegex = /\b(?:[a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+(?:\[\.\]|\(\.\))(?:com|net|org|io|ru|cn|xyz|top|info|biz|cc|pw|club|online|site|tech|gov|edu|tw|ua|pl|ro|ca|uk|ae|la|bet|wiki)\b/gi;
+      const cveRegex = /\bCVE-\d{4}-\d{4,7}\b/gi;
+      const shaRegex = /\b[a-fA-F0-9]{64}\b/g;
+      const md5Regex = /\b[a-fA-F0-9]{32}\b/g;
+
+      const paragraphs = (art.content || '').split(/\n+/).filter(p => p.trim().length > 0);
+      const renderedParas = paragraphs.map(p => {
+        const imgMatch = p.trim().match(/^\[IMAGE:\s*(https?:\/\/[^\]]+)\]$/i);
+        if (imgMatch) {
+          const safeImgUrl = imgMatch[1].replace(/"/g, '&quot;');
+          return `<div style="margin:10px 0; text-align:center;"><img src="${safeImgUrl}" alt="Hình ảnh minh họa bài báo" loading="lazy" referrerpolicy="no-referrer" style="max-width:100%; max-height:420px; border-radius:6px; border:1px solid #e2e8f0; object-fit:contain;" onerror="this.parentElement.style.display='none';" /></div>`;
+        }
+        let safeP = p.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        let hasValidIp = false;
+        let pIpMatch;
+        ipRegex.lastIndex = 0;
+        while ((pIpMatch = ipRegex.exec(p)) !== null) {
+          if (isValidIpv4Token(pIpMatch[0], p, pIpMatch.index)) { hasValidIp = true; break; }
+        }
+        const hasIoc = hasValidIp || domRegex.test(p) || cveRegex.test(p) || shaRegex.test(p) || md5Regex.test(p);
+        domRegex.lastIndex = 0; cveRegex.lastIndex = 0; shaRegex.lastIndex = 0; md5Regex.lastIndex = 0;
+
+        safeP = safeP.replace(cveRegex, (m) => `<span class="HlCve" style="font-weight:800;">${m}</span>`);
+        safeP = safeP.replace(shaRegex, (m) => `<span class="HlHash" style="font-weight:800;">${m}</span>`);
+        safeP = safeP.replace(md5Regex, (m) => `<span class="HlHash" style="font-weight:800;">${m}</span>`);
+        safeP = safeP.replace(domRegex, (m) => {
+          const clean = cleanRefang(m).toLowerCase();
+          if (ipRegex.test(clean)) { ipRegex.lastIndex = 0; return m; }
+          ipRegex.lastIndex = 0;
+          return `<span class="${isBenignOrProtectedIoc(m) ? 'HlIp2' : 'HlIp1'}" style="font-weight:800;">${m}</span>`;
+        });
+        safeP = safeP.replace(ipRegex, (m, offset, fullStr) => {
+          if (!isValidIpv4Token(m, fullStr, offset)) return m;
+          return `<span class="${isBenignOrProtectedIoc(m) ? 'HlIp2' : 'HlIp1'}" style="font-weight:800;">${m}</span>`;
+        });
+        return hasIoc ? `<div class="HlSentence">${safeP}</div>` : `<div style="margin:6px 0; color:var(--text-main);">${safeP}</div>`;
+      }).join('');
+
+      const pubTime = formatToLocalTime(art.sort_ts || art.published_at);
+      const displayTime = formatToLocalTime(art.fetched_at || art.sort_ts);
+      const dur = art.processing_time_sec ? `${art.processing_time_sec.toFixed(1)}s` : 'Xong';
+      box.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; gap:8px;">
+          <b style="color:var(--text-main); font-size:13.5px;">[${art.source || 'CTI'}] ${art.title || ''}</b>
+          <a class="BtnMiniProof" href="${art.url || '#'}" target="_blank">Báo gốc &nearr;</a>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px; font-size:11.5px; color:var(--text-muted); flex-wrap:wrap;">
+          <span>Xuất bản: <b style="color:var(--text-main); font-family:var(--font-mono);">${pubTime}</b></span>
+          <span>Quét về: <b style="color:var(--primary); font-family:var(--font-mono);">${displayTime}</b></span>
+          <span>Trạng thái: <span class="BadgeCompleted">Đã xử lý (${dur})</span></span>
+        </div>
+        <div>${renderedParas}</div>
+      `;
+    }
+
     function viewArticleById(articleId, autoRunAi = false) {
       const list = (allHistoryArticles && allHistoryArticles.length > 0) ? allHistoryArticles : articles;
+      const targetArt = list.find(a => a.article_id === articleId);
+      if (!autoRunAi && targetArt && (targetArt.status || '').toLowerCase() === 'completed') {
+        window.selectedHistoryViewId = articleId;
+        renderHistoryHighlightedArticle(targetArt);
+        document.getElementById('historyArticleViewerBox')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        return;
+      }
       const foundIdx = articles.findIndex(a => a.article_id === articleId);
       if (foundIdx >= 0) {
         selectCard(foundIdx, autoRunAi);
@@ -5953,6 +6060,22 @@ const elArt = document.getElementById('lblMasterArticlesCount');
             // Kích hoạt tab "Tất Cả" để người dùng xem trực tiếp Live AI
             const allNavBtn = document.querySelectorAll('.NavLinks .NavLink')[1];
             switchView('all', allNavBtn);
+
+            // Tự động tiếp tục xử lý hàng đợi nếu vẫn còn bài đang chờ xử lý
+            setTimeout(() => {
+              const hasPending = articles.some(a => (a.status || 'pending') === 'pending');
+              if (hasPending && !isQueueWorkerRunning) {
+                autoQueueEnabled = true;
+                const toggleEl = document.getElementById('autoQueueToggle');
+                if (toggleEl) toggleEl.checked = true;
+                const qStatus = document.getElementById('queueWorkerStatus');
+                if (qStatus) {
+                  qStatus.textContent = 'Bật (Đang xử lý)';
+                  qStatus.style.color = '#16a34a';
+                }
+                triggerNextInQueue();
+              }
+            }, 900);
           } else {
             wzIsProjectConfigured = false;
             const container = document.getElementById('projectContextContainer');
