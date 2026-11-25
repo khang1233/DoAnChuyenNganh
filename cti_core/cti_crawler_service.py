@@ -601,6 +601,29 @@ def crawl_all_sources_and_archive(limit_per_source: int = 10) -> List[Dict[str, 
     return get_archived_articles()
 
 
+def _hydrate_thn_articles_full(items: List[Dict[str, Any]], max_items: int = 36) -> None:
+    """Cào toàn văn HTML + hình ảnh song song cho các bài THN mới chỉ có tóm tắt RSS ngắn."""
+    short_items = [
+        it for it in items[:max_items]
+        if it.get("source") == "TheHackerNews" and len(it.get("content") or "") < 900 and (it.get("url") or "").startswith("http")
+    ]
+    if not short_items:
+        return
+
+    def _hydrate_one(it: Dict[str, Any]) -> None:
+        try:
+            pr = requests.get(it["url"], headers=DEFAULT_HEADERS, timeout=7)
+            if pr.status_code == 200:
+                full_txt = _extract_verbatim_article_excerpt(pr.text)
+                if len(full_txt) > len(it.get("content") or ""):
+                    it["content"] = full_txt
+        except Exception:
+            pass
+
+    with ThreadPoolExecutor(max_workers=8) as h_pool:
+        list(h_pool.map(_hydrate_one, short_items))
+
+
 def crawl_year_to_date_archive(
     since_date: str = "2026-01-01",
     max_thn: int = 600,
@@ -739,20 +762,7 @@ def crawl_year_to_date_archive(
                 out.extend(yr_items)
 
             # Cào toàn văn HTML + hình ảnh song song cho các bài THN mới chỉ có đoạn tóm tắt RSS ngắn
-            short_items = [it for it in out[:36] if len(it.get("content") or "") < 900 and it.get("url", "").startswith("http")]
-            if short_items:
-                def _hydrate_thn_full(it: Dict[str, Any]) -> None:
-                    try:
-                        pr = requests.get(it["url"], headers=DEFAULT_HEADERS, timeout=7)
-                        if pr.status_code == 200:
-                            full_txt = _extract_verbatim_article_excerpt(pr.text)
-                            if len(full_txt) > len(it.get("content") or ""):
-                                it["content"] = full_txt
-                    except Exception:
-                        pass
-
-                with ThreadPoolExecutor(max_workers=8) as h_pool:
-                    list(h_pool.map(_hydrate_thn_full, short_items))
+            _hydrate_thn_articles_full(out, max_items=36)
         except Exception as e:
             print(f"[YTD CRAWLER] THN error: {e}")
         return out
@@ -945,6 +955,7 @@ def crawl_gap_catchup_archive(since_date: Optional[str] = None, max_per_source: 
             if earliest_in_batch < target_since:
                 break
             start_idx += len(entries)
+        _hydrate_thn_articles_full(collected, max_items=36)
     except Exception as e:
         print(f"[CATCH-UP CRAWLER] THN error: {e}")
 
