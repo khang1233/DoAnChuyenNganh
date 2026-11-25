@@ -2099,11 +2099,11 @@ HTML_PAGE = r"""<!DOCTYPE html>
           <button class="CleanBtn" id="btnSortIoc" onclick="setHistorySort('IOC_DESC', this)">Nhiều IOC Nhất</button>
 
           <select class="CleanSelect" id="historyStatusFilter" onchange="renderHistoryManager()">
-            <option value="COMPLETED">Chỉ bài đã Hoàn thành</option>
+            <option value="COMPLETED" selected>Chỉ bài đã Hoàn thành</option>
             <option value="HAS_HASH">Chỉ bài có Mã Băm Malware (SHA256/MD5)</option>
             <option value="HAS_IP">Chỉ bài có IP C2</option>
             <option value="HAS_CVE">Chỉ bài có Lỗ Hổng CVE</option>
-            <option value="ALL" selected>Trạng thái: Tất cả bài báo</option>
+            <option value="ALL">Trạng thái: Tất cả bài báo</option>
             <option value="PENDING">Chỉ bài Chờ xử lý</option>
             <option value="HAS_IOC">Chỉ bài có bất kỳ IOC nào</option>
           </select>
@@ -3946,12 +3946,8 @@ HTML_PAGE = r"""<!DOCTYPE html>
           statusBadgeHtml = `<span class="BadgeCompleted">Đã thẩm định (${dur})</span>`;
           iocBadgeMeta = `<span style="font-size:11px; color:#15803d; background:#dcfce7; border:1px solid #86efac; padding:1px 6px; border-radius:4px; font-weight:700;">Đã xác thực: ${iocBadge}</span>`;
         } else {
-          statusBadgeHtml = `<span class="BadgePending">Chờ AI phân tích sâu</span>`;
-          if (counts.total > 0) {
-            iocBadgeMeta = `<span style="font-size:11px; color:#92400e; background:#fef3c7; border:1px solid #fcd34d; padding:1px 6px; border-radius:4px; font-weight:600;" title="Dữ liệu Regex bóc thô — chưa qua AI xác thực">⚡ Quick Scan: ${iocBadge}</span>`;
-          } else {
-            iocBadgeMeta = `<span style="font-size:11px; color:#94a3b8; font-style:italic;">Chờ AI bóc tách IOC</span>`;
-          }
+          statusBadgeHtml = `<span class="BadgePending">Chờ AI phân tích</span>`;
+          iocBadgeMeta = `<span style="font-size:11px; color:#94a3b8; font-style:italic;">Chưa phân tích</span>`;
         }
 
         const pubDateStr = formatToLocalTime(art.sort_ts || art.published_at);
@@ -4078,8 +4074,14 @@ HTML_PAGE = r"""<!DOCTYPE html>
           }
         });
 
+        const st = art.status || 'pending';
+        const isDoneArt = (st === 'completed');
         const paragraphs = art.content.split(/\n+/).filter(p => p.trim().length > 0);
         const renderedParas = paragraphs.map(p => {
+          let safeP = p.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          if (!isDoneArt) {
+            return `<div style="margin:6px 0; color:var(--text-main); line-height:1.6;">${safeP}</div>`;
+          }
           let hasValidIp = false;
           let pIpMatch;
           ipRegex.lastIndex = 0;
@@ -4100,8 +4102,6 @@ HTML_PAGE = r"""<!DOCTYPE html>
           shaRegex.lastIndex = 0;
           md5Regex.lastIndex = 0;
 
-          let safeP = p.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
           safeP = safeP.replace(cveRegex, (m) => `<span class="HlCve" id="${domSafeId(m.toUpperCase())}">${m}</span>`);
           safeP = safeP.replace(shaRegex, (m) => `<span class="HlHash" id="${domSafeId(m.toLowerCase())}">${m}</span>`);
           safeP = safeP.replace(md5Regex, (m) => `<span class="HlHash" id="${domSafeId(m.toLowerCase())}">${m}</span>`);
@@ -4119,7 +4119,6 @@ HTML_PAGE = r"""<!DOCTYPE html>
           return hasIoc ? `<div class="HlSentence">${safeP}</div>` : `<div style="margin:6px 0; color:var(--text-muted);">${safeP}</div>`;
         }).join('');
 
-        const st = art.status || 'pending';
         let statusBadgeHtml = '';
         if (st === 'processing') {
           statusBadgeHtml = `<span class="BadgeProcessing">Đang xử lý...</span>`;
@@ -6072,7 +6071,11 @@ const elArt = document.getElementById('lblMasterArticlesCount');
           localStorage.removeItem('cti_scope_id');
           localStorage.removeItem('cti_selected_cadence');
           localStorage.removeItem('cti_selected_history_years');
+          localStorage.removeItem('cti_project_techs');
+          localStorage.removeItem('cti_skill_name');
         } catch (eLs) {}
+        wzProjectTechs = [];
+        wzSkillName = "";
         wzScanCompleted = false;
         document.documentElement.classList.remove('project-is-configured');
         document.body.classList.remove('project-is-configured');
@@ -10793,7 +10796,13 @@ def api_reset_project(req: TargetRequest):
         except Exception:
             pass
             
-    for root_extra in [p / ".cursor" / "rules", p / ".gemini" / "skills", p / "skills"]:
+    for root_extra in [
+        p / ".cursor" / "rules",
+        p / ".gemini" / "skills",
+        p / ".gemini" / "rules",
+        p / ".claude" / "skills",
+        p / "skills",
+    ]:
         if root_extra.exists():
             for item in root_extra.glob("agentic-defense-*"):
                 try:
@@ -10804,14 +10813,55 @@ def api_reset_project(req: TargetRequest):
                 except Exception:
                     pass
 
-    root_skill_md = p / "SKILL.md"
-    if root_skill_md.exists():
+    # Xóa sạch toàn bộ file/thư mục tích hợp Agent do CTI tạo ra trong dự án đích
+    cti_generated_files = [
+        p / "SKILL.md",
+        p / "CLAUDE.md",
+        p / "CODEX.md",
+        p / "OPENAI.md",
+        p / "CONVENTIONS.md",
+        p / "DEVIN.md",
+        p / ".cursorrules",
+        p / ".clinerules",
+        p / ".roomodes",
+        p / ".windsurfrules",
+        p / ".aider.conf.yml",
+        p / ".aider.prompt.md",
+        p / ".github" / "copilot-instructions.md",
+    ]
+    for gf in cti_generated_files:
+        if gf.exists() and gf.is_file():
+            try:
+                gf.unlink()
+            except Exception:
+                pass
+
+    cti_generated_dirs = [
+        p / ".codex",
+        p / ".openai",
+        p / ".continue",
+        p / ".devin",
+        p / ".zed",
+        p / ".jetbrains",
+        p / ".amazonq",
+        p / ".cody",
+    ]
+    for gd in cti_generated_dirs:
+        if gd.exists() and gd.is_dir():
+            try:
+                shutil.rmtree(gd, ignore_errors=True)
+            except Exception:
+                pass
+
+    # Dọn các thư mục cha (.cursor, .gemini, .claude, skills, .github) nếu đã rỗng sau khi xóa
+    for parent_dir in [p / ".cursor", p / ".gemini", p / ".claude", p / "skills", p / ".github"]:
         try:
-            root_skill_md.unlink()
+            if parent_dir.exists() and parent_dir.is_dir() and not any(parent_dir.iterdir()):
+                parent_dir.rmdir()
         except Exception:
             pass
 
-    return {"status": "success", "message": f"Đã đặt lại cấu hình phòng thủ cho {p.name}. Sẵn sàng quét lại từ đầu."}
+    return {"status": "success", "message": f"Đã xóa sạch toàn bộ tạo phẩm CTI khỏi {p.name}. Sẵn sàng quét lại từ đầu."}
 
 @app.get("/api/system/hardware-info")
 def api_get_hardware_info():
