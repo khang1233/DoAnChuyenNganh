@@ -73,7 +73,7 @@ except ImportError:
 
 
 # ==============================================================================
-# PHẦN 1: CÔNG VIỆC CỦA LÂM (src/automation/ - TOOL 1 & TOOL 2 KÉO LIVE TỪ MẠNG)
+# STAGE 1: MULTI-SOURCE CTI INGESTION (src/automation/ - LIVE OSINT CRAWLER)
 # ==============================================================================
 def tool1_fetch_rss_feeds_live() -> RawThreatData:
     """
@@ -122,7 +122,7 @@ def tool2_fetch_cisa_kev_live() -> List[Dict[str, Any]]:
 
 
 # ==============================================================================
-# PHẦN 2: CÔNG VIỆC CỦA PHÚC (src/core/ - TOOL 6, TOOL 7, TOOL 8)
+# STAGE 2: AI IOC EXTRACTION & DEFENSE SYNTHESIS (src/core/)
 # ==============================================================================
 NON_DOMAIN_EXT = {
     "exe", "dll", "sys", "bat", "ps1", "vbs", "js", "py", "sh", "zip", "rar",
@@ -199,7 +199,7 @@ def tool8_generate_defensive_rules(
     raw_text: str = "",
 ) -> DefensiveRules:
     """[TOOL 8 - PHÚC] Tự động sinh 3 lớp phòng thủ từ các IOC ĐỘC HẠI (`Score > 80`)."""
-    from phuc_core_ai_agent import tool8_generate_defensive_rules as phuc_tool8
+    from cti_ai_agent import tool8_generate_defensive_rules as phuc_tool8
     return phuc_tool8(campaign_title, enriched_iocs, mitre_list, raw_text=raw_text)
 
 

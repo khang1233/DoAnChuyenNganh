@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-PHẦN CỦA PHÚC (AI Core, ReAct Orchestrator, LLM Tool-Calling & AI Agent Security Guard)
+CTI AI AGENT CORE (ReAct Orchestrator, LLM Tool-Calling & AI Agent Security Guard)
 Bản đầy đủ chạy thật trên máy Khang để Khang nắm trọn vẹn kiến trúc AI Agent của đồ án!
 
 Tính năng cốt lõi đúng chuẩn đề tài giảng viên yêu cầu ("AI Agent và An toàn thông tin"):
@@ -57,7 +57,7 @@ except ImportError:
         refang_ioc,
     )
     from cti_core.src.security.stix_converter import export_stix_package
-from lam_automation_crawler import fetch_rss_feeds, scrape_article_text
+from cti_crawler_service import fetch_rss_feeds, scrape_article_text
 
 
 # =====================================================================
@@ -171,7 +171,7 @@ class MultiProviderLLMBrain:
                             if m == preferred or m.startswith(preferred):
                                 return m
                     # Uu tien cac model pho bien nhat co san tren may
-                    for candidate in ("qwen3:8b", "khang-qwen3", "qwen2.5:7b", "gemma3:4b", "khang-ai", "deepseek-r1:7b", "qwen2.5:3b", "qwen2.5:1.5b", "llama3.2", "llama3", "mistral"):
+                    for candidate in ("qwen3:8b", "qwen2.5:7b", "qwen2.5:7b", "gemma3:4b", "qwen2.5:3b", "deepseek-r1:7b", "qwen2.5:3b", "qwen2.5:1.5b", "llama3.2", "llama3", "mistral"):
                         for m in models:
                             if m.startswith(candidate):
                                 cls._cached_ollama_model = m
@@ -250,7 +250,7 @@ class MultiProviderLLMBrain:
     def _local_deterministic_cti_brain(system_prompt: str, user_prompt: str) -> str:
         """Bộ suy luận chuyên gia Local (Offline Rule-Engine) dự phòng khi daemon Ollama đang khởi động."""
         up_low = user_prompt.lower()
-        if "số liệu từ api của khang" in up_low:
+        if "số liệu hợp nhất từ 5 nguồn" in up_low:
             return (
                 "• [Phân tách Ngữ cảnh IP1 vs IP2]: Local AI Agent kết hợp dữ liệu thực nghiệm từ VirusTotal, AbuseIPDB và Shodan để tách biệt "
                 "nhóm IP1 (Hạ tầng C2/Scanner của kẻ tấn công có nhiều engine cảnh báo và mở cổng nguy hiểm -> Điểm hợp nhất > 80 -> Đưa vào danh sách Chặn & Sinh quy tắc đa tầng) "
@@ -338,7 +338,7 @@ class MultiProviderLLMBrain:
 
 
 # =====================================================================
-# 3. CÁC CÔNG CỤ CỦA PHÚC (TOOL 6, TOOL 7, TOOL 8) KẾT HỢP LLM
+# 3. CTI ANALYSIS TOOLS (EXTRACTION, MITRE ATT&CK MAPPING, RULE SYNTHESIS) + LLM
 # =====================================================================
 
 REGEX_IP_DEFANGED = re.compile(
@@ -938,7 +938,7 @@ class AutonomousCTIReActAgent:
         react_steps: List[Dict[str, Any]] = []
 
         # ------------------------------------------------------------------
-        # BƯỚC 1: THU THẬP DỮ LIỆU THÔ (TOOL 1 & TOOL 2 CỦA LÂM)
+        # BƯỚC 1: THU THẬP DỮ LIỆU THÔ (MULTI-SOURCE CRAWLER & SCRAPER)
         # ------------------------------------------------------------------
         if mode == "scrape_url" and target_url.strip():
             scraped = scrape_article_text(target_url.strip())
@@ -999,7 +999,7 @@ class AutonomousCTIReActAgent:
         )
 
         # ------------------------------------------------------------------
-        # BƯỚC 3: TRÍCH XUẤT IOC LAI (TOOL 6 CỦA PHÚC)
+        # BƯỚC 3: TRÍCH XUẤT IOC LAI (HYBRID IOC EXTRACTOR)
         # ------------------------------------------------------------------
         extracted_iocs = tool6_extract_iocs_hybrid(sanitized_text)
         ioc_preview = ", ".join([f"{i.ioc_type}:{i.value}" for i in extracted_iocs[:8]]) or "Không tìm thấy IOC"
@@ -1027,7 +1027,7 @@ class AutonomousCTIReActAgent:
         react_steps.append(
             {
                 "step": 4,
-                "phase": "Thẩm định Đa nguồn & Chốt chặn Score > 80 (Phần của Khang)",
+                "phase": "Thẩm định Đa nguồn & Chốt chặn Score > 80 (Multi-Source OSINT Fusion)",
                 "thought": "Trong danh sách IOC vừa nhặt có thể lẫn cả IP/Domain sạch (như 8.8.8.8) hoặc IP tấn công mới xuất hiện. Tôi phải gọi Tool 3 (VirusTotal API v3), Tool 4 (AbuseIPDB API v2) và Shodan InternetDB của Khang để tính Điểm Hợp Nhất Đa Nguồn và chỉ giữ lại các IOC có Score > 80.",
                 "action": "Tool 3 (check_virustotal) + Tool 4 (check_abuseipdb) + Shodan InternetDB (Khang)",
                 "observation": f"Đã thẩm định {len(all_enriched)} IOC: Giữ lại {len(high_risk_iocs)} IOC độc hại (Score > 80), lọc bỏ {filtered_out_count} IOC sạch. Chi tiết: "
@@ -1052,7 +1052,7 @@ class AutonomousCTIReActAgent:
         llm_system_prompt = (
             "Bạn là Autonomous Cyber Threat Intelligence (CTI) AI Agent chuyên nghiệp trong trung tâm SOC. "
             "Nhiệm vụ của bạn là đọc nội dung cảnh báo an ninh mạng và kết quả thẩm định IOC từ VirusTotal, AbuseIPDB, Shodan "
-            "(do module của Khang cung cấp), sau đó đưa ra: "
+            "(tổng hợp từ 5 nguồn tình báo OSINT), sau đó đưa ra: "
             "(1) Tóm tắt cơ chế tấn công & mức độ nguy hiểm, "
             "(2) Giải thích vì sao các IOC có Score > 80 bị chặn (dựa trên số liệu VirusTotal, AbuseIPDB, Shodan), "
             "(3) Khuyến nghị phản ứng sự cố (Incident Response) ngắn gọn, súc tích bằng tiếng Việt."

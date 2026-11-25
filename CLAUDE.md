@@ -2,7 +2,7 @@
 
 > **WORKSPACE**: `d:\mkhang\DoAnChuyenNganh` (Windows). Nếu `pwd` trả về `/opt/...` hoặc sandbox Linux — đó là môi trường sai, hãy báo ngay và dừng lại.
 >
-> **PENDING TASK (P2.8)**: Thêm endpoint `POST /api/articles/verify-url` vào `cti_core/live_dashboard_app.py` gần dòng 8217 (gần `/api/articles/add`). Dùng hàm `add_custom_article_from_url_or_text()` từ `lam_automation_crawler.py:1188`. Trả về IOC tìm thấy, Trust Score, đường dẫn skill vừa tạo.
+> **PENDING TASK (P2.8)**: Thêm endpoint `POST /api/articles/verify-url` vào `cti_core/live_dashboard_app.py` gần dòng 8217 (gần `/api/articles/add`). Dùng hàm `add_custom_article_from_url_or_text()` từ `cti_crawler_service.py:1188`. Trả về IOC tìm thấy, Trust Score, đường dẫn skill vừa tạo.
 
 This document provides system instructions, architectural context, and workflow conventions for **Claude Code** and other AI agents interacting with this repository.
 
@@ -60,8 +60,8 @@ DoAnChuyenNganh/
 │   ├── live_defense_orchestrator.py  # Defense engine orchestrator & WAF Proxy (Port 8766)
 │   ├── agentic_defense_skill_engine.py # Trust Score calculation & xAI attribution engine
 │   ├── skill_bundle_packager.py      # GitHub-style skill bundle packager
-│   ├── lam_automation_crawler.py     # Multi-source 100% full-text verbatim crawler
-│   ├── phuc_core_ai_agent.py         # Hybrid IOC extraction & NER engine
+│   ├── cti_crawler_service.py     # Multi-source 100% full-text verbatim crawler
+│   ├── cti_ai_agent.py         # Hybrid IOC extraction & NER engine
 │   ├── openclaw_firewall_bridge.py   # Windows Defender Firewall (netsh) controller
 │   └── cti_multi_source_archive.sqlite # SQLite database (7,450 articles, 9,444 IOCs)
 │

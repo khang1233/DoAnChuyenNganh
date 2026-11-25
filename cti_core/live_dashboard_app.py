@@ -89,7 +89,7 @@ except ImportError:
 def init_project_registry_db():
     db_path = SANDBOX_DIR / "cti_multi_source_archive.sqlite"
     try:
-        from lam_automation_crawler import _init_archive_db
+        from cti_crawler_service import _init_archive_db
         _init_archive_db()
     except Exception:
         pass
@@ -162,7 +162,7 @@ def record_project_configuration(target_path: Path, scope_id: str, scope_name: s
 
 init_project_registry_db()
 
-from lam_automation_crawler import (
+from cti_crawler_service import (
     add_custom_article_from_url_or_text,
     crawl_all_sources_and_archive,
     crawl_gap_catchup_archive,
@@ -183,7 +183,7 @@ from openclaw_firewall_bridge import (
     build_d3fend_recommendations,
     build_master_defense_matrix_from_db,
 )
-from phuc_core_ai_agent import (
+from cti_ai_agent import (
     AIAgentSecurityGuard,
     MultiProviderLLMBrain,
     OpenClawAgentGateway,
@@ -5229,7 +5229,7 @@ const elArt = document.getElementById('lblMasterArticlesCount');
         updateLiveTicker(`Tool-Calling: Đã bóc tách ${d2.iocs.length} IOCs. Đang tra cứu API 5 nguồn (VT, AbuseIPDB, Shodan, OTX)...`);
         setStageState(3, 'active', '', '', 75);
 
-        const r3 = await fetch('/api/step3/khang-enrich-and-reason', {
+        const r3 = await fetch('/api/step3/enrich-and-reason', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text: text, iocs: d2.iocs, model_name: selectedModel })
@@ -5414,7 +5414,7 @@ const elArt = document.getElementById('lblMasterArticlesCount');
         status.textContent = `Đang hợp nhất điểm ${d2.iocs.length} IOC qua 5 nguồn...`;
         setStageState(3, 'active', '', '', 75);
 
-        const r3 = await fetch('/api/step3/khang-enrich-and-reason', {
+        const r3 = await fetch('/api/step3/enrich-and-reason', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text: text, iocs: d2.iocs, model_name: selectedModel })
@@ -8380,7 +8380,7 @@ def api_verify_url_article(req: AddArticleRequest):
         generate_xai_defense_attribution,
         build_agentic_defense_skill_package,
     )
-    from lam_automation_crawler import scrape_article_text
+    from cti_crawler_service import scrape_article_text
 
     t0 = time.time()
     title = (req.title or "").strip()
@@ -8663,7 +8663,7 @@ def api_reset_all_articles_status():
 @app.post("/api/articles/clear-db")
 def api_clear_database_zero_db():
     try:
-        from lam_automation_crawler import _init_archive_db
+        from cti_crawler_service import _init_archive_db
         _init_archive_db()
         db_path = SANDBOX_DIR / "cti_multi_source_archive.sqlite"
         with sqlite3.connect(db_path) as conn:
@@ -8740,7 +8740,7 @@ def api_step2_extract_and_plan(req: Step2Request):
     }
 
 
-@app.post("/api/step3/khang-enrich-and-reason")
+@app.post("/api/step3/enrich-and-reason")
 def api_step3_khang_enrich_and_reason(req: Step3Request):
     parsed = [ExtractedIOC(**x) for x in req.iocs]
     with ThreadPoolExecutor(max_workers=8) as pool:
@@ -9945,7 +9945,7 @@ def api_pull_status(model: str = Query(...)):
 
 @app.post("/api/benchmark/fetch-url")
 def api_benchmark_fetch_url(req: FetchUrlReq):
-    from lam_automation_crawler import scrape_article_text
+    from cti_crawler_service import scrape_article_text
     data = scrape_article_text(req.url.strip())
     return data
 

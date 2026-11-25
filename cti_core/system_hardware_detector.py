@@ -191,7 +191,7 @@ def get_disk_installed_models() -> List[str]:
                         if tag_file.is_file():
                             models.append(f"{model_dir.name}:{tag_file.name}")
 
-    priority_order = ["qwen2.5:7b", "khang-qwen3:latest", "qwen3:8b", "khang-ai:latest", "gemma3:4b", "qwen2.5:1.5b"]
+    priority_order = ["qwen2.5:7b", "llama3.1:8b", "qwen3:8b", "qwen2.5:3b", "gemma3:4b", "qwen2.5:1.5b"]
     seen = set()
     deduped = []
     for p in priority_order:
@@ -424,7 +424,7 @@ def get_adaptive_system_profile() -> Dict[str, Any]:
                 "vram_gb": 6.4
             },
             {
-                "id": "khang-qwen3:latest",
+                "id": "llama3.1:8b",
                 "name": "Qwen 2.5 (CyberSec Special Edition)",
                 "badge": "TỐI ƯU CTI",
                 "desc": "Phiên bản tinh chỉnh cục bộ chuyên phân loại báo cáo an ninh mạng và trích xuất IoC với độ trễ thấp.",
@@ -461,7 +461,7 @@ def get_adaptive_system_profile() -> Dict[str, Any]:
                 "vram_gb": 2.8
             },
             {
-                "id": "khang-ai:latest",
+                "id": "qwen2.5:3b",
                 "name": "SecOps Fast Classifier (4B Light)",
                 "badge": "TỐC ĐỘ CAO",
                 "desc": "Mô hình chuyên trách phân loại nhanh mức độ nghiêm trọng và trích xuất IoC với độ trễ thấp.",
@@ -515,7 +515,7 @@ def get_adaptive_system_profile() -> Dict[str, Any]:
             "vram_gb": 3.6
         },
         {
-            "id": "khang-ai:latest",
+            "id": "qwen2.5:3b",
             "name": "SecOps Fast Classifier (4B Light)",
             "badge": "TỐC ĐỘ CAO",
             "desc": "Mô hình 4B chuyên trách phân loại nhanh mức độ nghiêm trọng và trích xuất thực thể IoC với tốc độ vượt bậc.",

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 r"""
-Unit Tests cho toàn bộ module `src/security/` của Khang (Autonomous CTI).
+Unit Tests cho toàn bộ module `src/security/` của hệ thống (Autonomous CTI).
 
 Nguyên tắc: KHÔNG phụ thuộc mạng. Mọi feed OSINT sống (AbuseIPDB / OpenPhish /
 MalwareBazaar / Feodo / IPsum) đều được thay bằng fixture seed từ

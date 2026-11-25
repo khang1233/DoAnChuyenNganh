@@ -84,7 +84,7 @@ Trả về duy nhất định dạng JSON thuần túy (không bọc trong markd
     # Xác định mô hình AI được chọn từ Bước 1
     use_heuristic_only = (model_name == "cti-heuristic-engine")
     if not use_heuristic_only:
-        from phuc_core_ai_agent import MultiProviderLLMBrain
+        from cti_ai_agent import MultiProviderLLMBrain
         active_model = MultiProviderLLMBrain._ensure_and_detect_local_ollama_model(model_name)
         if active_model:
             payload = {
@@ -276,7 +276,7 @@ def deep_agent_codebase_scan(target_path: Path, model_name: Optional[str] = None
     attack_analysis = ai_verdict.get("attack_surface_analysis", "")
     agent_reason = ai_verdict.get("agent_reasoning", "")
 
-    from phuc_core_ai_agent import MultiProviderLLMBrain
+    from cti_ai_agent import MultiProviderLLMBrain
     if model_name == "cti-heuristic-engine":
         actual_model = "cti-heuristic-engine (Static AST)"
     else:
@@ -507,7 +507,7 @@ def compute_scope_relevance(scope_id: str, title: str, content: str) -> int:
 def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3, live_crawl: bool = True) -> Dict[str, Any]:
     """Bước 2: Cào bài báo trực tiếp từ các nguồn OSINT và lọc tri thức CTI theo Scope & Mốc lịch sử đã chọn."""
     from datetime import timedelta
-    from lam_automation_crawler import _init_archive_db, crawl_all_sources_and_archive, crawl_year_to_date_archive
+    from cti_crawler_service import _init_archive_db, crawl_all_sources_and_archive, crawl_year_to_date_archive
     _init_archive_db()
     profile = resolve_scope_profile(scope_id)
     now_dt = datetime.now()
@@ -677,7 +677,7 @@ def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3, live_
     if not matched_count:
         matched_count = len(matched_arts) if matched_arts else 1
 
-    from lam_automation_crawler import _count_real_iocs
+    from cti_crawler_service import _count_real_iocs
     raw_iocs = _count_real_iocs(art_dict.get("content", ""))
     
     cves = re.findall(r"\bCVE-\d{4}-\d{4,7}\b", art_dict.get("title", "") + " " + art_dict.get("content", ""))

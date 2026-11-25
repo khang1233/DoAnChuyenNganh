@@ -26,7 +26,7 @@ try:
     from src.security.enrichment_service import enrich_ioc_list
 except ImportError:
     from cti_core.src.security.enrichment_service import enrich_ioc_list
-from phuc_core_ai_agent import MultiProviderLLMBrain, tool6_extract_iocs_hybrid
+from cti_ai_agent import MultiProviderLLMBrain, tool6_extract_iocs_hybrid
 
 
 def main() -> None:
@@ -47,7 +47,7 @@ def main() -> None:
 
     while True:
         try:
-            user_input = input("\nroot@khang-cti:~$ ").strip()
+            user_input = input("\ncti-agent:~$ ").strip()
         except (EOFError, KeyboardInterrupt):
             print("\n[OK] Đã thoát CLI AI Agent.")
             break
@@ -73,7 +73,7 @@ def main() -> None:
                 line = f"  - {item.ioc.ioc_type} `{item.ioc.value}`: Điểm={item.reputation_score}/100 ({verdict}) | VT={vt} | AbuseIPDB={ab}% | Shodan Ports={sh}"
                 print(line)
                 lines.append(line)
-            tool_context = "\n\n[DỮ LIỆU THỰC TẾ TỪ CÔNG CỤ VIRUSTOTAL + ABUSEIPDB + SHODAN CỦA KHANG]:\n" + "\n".join(lines)
+            tool_context = "\n\n[DỮ LIỆU THỰC TẾ TỪ CÔNG CỤ VIRUSTOTAL + ABUSEIPDB + SHODAN]:\n" + "\n".join(lines)
 
         history.append({"role": "user", "content": user_input + tool_context})
         try:

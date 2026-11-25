@@ -12,7 +12,7 @@ from agentic_defense_skill_engine import (
     calculate_cti_trust_framework,
     TARGET_SCOPES
 )
-from phuc_core_ai_agent import tool6_extract_iocs_hybrid
+from cti_ai_agent import tool6_extract_iocs_hybrid
 from multi_lang_remediation_suite import write_all_language_fixtures, generate_multi_lang_markdown_sop
 
 SANDBOX_DIR = Path("cti_core")

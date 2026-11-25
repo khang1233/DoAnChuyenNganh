@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-PHẦN CỦA LÂM (Multi-Source Crawler & Historical Archive Database — 100% VERBATIM REAL CONTENT)
+MULTI-SOURCE CTI CRAWLER & ARCHIVE ENGINE (100% VERBATIM REAL CONTENT)
 Thu thập toàn văn bài báo & cảnh báo bảo mật THẬT 100% NGUYÊN BẢN (VERBATIM) từ 6 nguồn quốc tế lớn:
 1. TheHackerNews (thehackernews.com — Cào toàn văn thân bài gốc chứa IP, Domain [.], CVE thật).
 2. Kaspersky Securelist (securelist.com/feed/ — Toàn văn báo cáo APT/Ransomware chứa IP, Domain [.], CVE, SHA256 thật).
@@ -346,7 +346,7 @@ def _save_articles_to_db(items: List[Dict[str, Any]], purge_synthetic: bool = Tr
 
 def crawl_all_sources_and_archive(limit_per_source: int = 10) -> List[Dict[str, Any]]:
     """
-    Tool 1 Mở Rộng (Lâm): Cào trực tiếp nội dung NGUYÊN BẢN (100% Verbatim) từ 6 nguồn CTI quốc tế:
+    Multi-Source OSINT Crawler: Cào trực tiếp nội dung NGUYÊN BẢN (100% Verbatim) từ 6 nguồn CTI quốc tế:
     1. TheHackerNews (thehackernews.com — cào toàn văn thân bài #articlebody)
     2. Kaspersky Securelist (securelist.com/feed/ — toàn văn <content:encoded>)
     3. Check Point Research (research.checkpoint.com/feed/ — toàn văn <content:encoded>)
@@ -1124,7 +1124,7 @@ def fetch_rss_feeds(limit: int = 5) -> List[Dict[str, Any]]:
 
 
 def scrape_article_text(url: str) -> Dict[str, Any]:
-    """Tool 2 (Lâm): Tải trực tiếp toàn văn nguyên bản (Verbatim) 1 bài báo bất kỳ từ URL."""
+    """Verbatim Article Scraper: Tải trực tiếp toàn văn nguyên bản (Verbatim) 1 bài báo bất kỳ từ URL."""
     try:
         resp = requests.get(url, headers=DEFAULT_HEADERS, timeout=12)
         resp.raise_for_status()

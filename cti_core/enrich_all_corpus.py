@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List, Tuple, Dict, Any
 
 sys.path.append('cti_core')
-from phuc_core_ai_agent import tool6_extract_iocs_hybrid
+from cti_ai_agent import tool6_extract_iocs_hybrid
 
 DB_PATH = 'cti_core/cti_multi_source_archive.sqlite'
 

@@ -363,7 +363,7 @@ def run_benchmark(model: str = "qwen3:8b", limit: int = 50, force_rerun: bool = 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Benchmark CTI Local AI Agent (Agentic Skill Pipeline) against Hand-Labeled Ground Truth.")
-    parser.add_argument("--model", type=str, default="qwen3:8b", help="Ollama model name (e.g. qwen3:8b, khang-qwen3:latest, qwen2.5:7b)")
+    parser.add_argument("--model", type=str, default="qwen3:8b", help="Ollama model name (e.g. qwen3:8b, llama3.1:8b, qwen2.5:7b)")
     parser.add_argument("--limit", type=int, default=50, help="Max annotated articles to evaluate")
     parser.add_argument("--rerun", action="store_true", help="Force re-run LLM inference ignoring cache")
     args = parser.parse_args()

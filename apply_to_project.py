@@ -187,7 +187,7 @@ def ensure_cti_knowledge_base(scope_id: str, history_years: int = 3):
     if not DB_PATH.exists():
         print(f"[*] CSDL CTI chưa tồn tại. Đang khởi tạo CSDL mới tại: {DB_PATH}")
         sys.path.append(str(SANDBOX_DIR))
-        from lam_automation_crawler import _init_archive_db
+        from cti_crawler_service import _init_archive_db
         _init_archive_db()
 
     with sqlite3.connect(DB_PATH) as conn:
@@ -227,7 +227,7 @@ def ensure_cti_knowledge_base(scope_id: str, history_years: int = 3):
         else:
             print(f"[!] PHÁT HIỆN MÁY MỚI (COLD-START): Đang cào trực tiếp từ các nguồn của {profile['name']}...")
             sys.path.append(str(SANDBOX_DIR))
-            from lam_automation_crawler import crawl_all_sources_and_archive
+            from cti_crawler_service import crawl_all_sources_and_archive
             crawl_all_sources_and_archive(limit_per_source=8)
     else:
         print(f"[+] Cơ sở tri thức ĐÃ SẴN SÀNG với {count:,} bài báo và hơn 9,440+ IOCs đã học.")
@@ -475,7 +475,7 @@ def main():
                 print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Đang quét bài báo mới về cho {profile['name']}...")
                 # Gọi crawler delta
                 sys.path.append(str(SANDBOX_DIR))
-                from lam_automation_crawler import crawl_all_sources_and_archive
+                from cti_crawler_service import crawl_all_sources_and_archive
                 new_arts = crawl_all_sources_and_archive(limit_per_source=5)
                 print(f"[+] Đã hoàn thành quét định kỳ. Số bài kiểm tra: {len(new_arts)}.")
         except KeyboardInterrupt:
