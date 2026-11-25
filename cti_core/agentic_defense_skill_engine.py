@@ -34,8 +34,8 @@ TARGET_SCOPES = {
         "name": "Scope A: Web & API Layer (Người A)",
         "persona": "Đội ngũ Web / API DevSecOps / E-Commerce Admin",
         "focus": "Chuyên biệt OWASP Top 10, SQLi, RCE, Path Traversal, Deserialization, SSRF, API abuse",
-        "scan_interval_sec": 21600,
-        "cadence_label": "Quét định kỳ: 6 giờ / lần (Chuẩn Web & API Layer)",
+        "scan_interval_sec": 900,
+        "cadence_label": "Quét nhanh: 15 phút / lần (Bắt PoC Exploit tức thì)",
         "feed_sources": ["TheHackerNews", "CISA US Gov (Web KEV)"],
         "primary_outputs": ["WAF ModSecurity v3 Virtual Patching", "Nginx Route Lockdown", "Input Validation Regex", "Prepared Statement SOP"],
     },
@@ -392,7 +392,22 @@ def build_agentic_defense_skill_package(
     Đóng gói tri thức phòng thủ thành một bộ Agentic Defense Skill hoàn chỉnh (chuẩn SKILL.md),
     cho phép các AI Agent phòng thủ hoặc hệ thống SOAR nạp và thực thi tự động.
     """
-    scope_meta = TARGET_SCOPES.get(scope_id, TARGET_SCOPES["SCOPE_ALL"])
+    if "," in (scope_id or "") and scope_id not in TARGET_SCOPES:
+        parts = [s.strip() for s in scope_id.split(",") if s.strip() in TARGET_SCOPES]
+        if len(parts) >= 4:
+            scope_meta = TARGET_SCOPES["SCOPE_ALL"]
+        elif parts:
+            scope_meta = {
+                "id": scope_id,
+                "name": " + ".join(TARGET_SCOPES[p]["name"].split(" (")[0] for p in parts),
+                "persona": ", ".join(dict.fromkeys(TARGET_SCOPES[p]["persona"] for p in parts)),
+                "focus": " | ".join(TARGET_SCOPES[p]["focus"] for p in parts),
+                "cadence_label": TARGET_SCOPES[parts[0]]["cadence_label"],
+            }
+        else:
+            scope_meta = TARGET_SCOPES["SCOPE_ALL"]
+    else:
+        scope_meta = TARGET_SCOPES.get(scope_id, TARGET_SCOPES["SCOPE_ALL"])
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     # Trích xuất CVE và IOC

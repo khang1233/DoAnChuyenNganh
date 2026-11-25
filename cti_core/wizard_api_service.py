@@ -1,9 +1,11 @@
+from datetime import datetime
+import json
 import os
-import sys
+import re
 import shutil
 import sqlite3
-import re
 import subprocess
+import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 
@@ -19,11 +21,6 @@ if str(SANDBOX_DIR) not in sys.path:
     sys.path.insert(0, str(SANDBOX_DIR))
 
 from apply_to_project import detect_project_scope, SCOPE_PROFILES, find_optimal_article_for_scope, synthesize_and_deploy_skill, resolve_scope_profile
-
-
-import json
-import os
-import sys
 
 def _call_local_agent_llm_for_codebase_scope(
     target_path: Path,
@@ -85,48 +82,49 @@ Trả về duy nhất định dạng JSON thuần túy (không bọc trong markd
 }}"""
 
     # Xác định mô hình AI được chọn từ Bước 1
-    from phuc_core_ai_agent import MultiProviderLLMBrain
-    active_model = MultiProviderLLMBrain._ensure_and_detect_local_ollama_model(model_name) or "khang-qwen3:latest"
+    use_heuristic_only = (model_name == "cti-heuristic-engine")
+    if not use_heuristic_only:
+        from phuc_core_ai_agent import MultiProviderLLMBrain
+        active_model = MultiProviderLLMBrain._ensure_and_detect_local_ollama_model(model_name)
+        if active_model:
+            payload = {
+                "model": active_model,
+                "messages": [
+                    {"role": "system", "content": "Bạn là Tác tử AI An ninh Mạng chuyên sâu. Luôn trả về JSON phân tích kỹ thuật chuẩn xác."},
+                    {"role": "user", "content": prompt_content}
+                ],
+                "stream": False,
+                "options": {
+                    "temperature": 0.1,
+                    "top_p": 0.9
+                }
+            }
 
-    payload = {
-        "model": active_model,
-        "messages": [
-            {"role": "system", "content": "Bạn là Tác tử AI An ninh Mạng chuyên sâu. Luôn trả về JSON phân tích kỹ thuật chuẩn xác."},
-            {"role": "user", "content": prompt_content}
-        ],
-        "stream": False,
-        "options": {
-            "temperature": 0.1,
-            "top_p": 0.9
-        }
-    }
+            try:
+                r = req_http.post("http://127.0.0.1:11434/api/chat", json=payload, timeout=45)
+                if r.status_code == 200:
+                    raw_content = r.json().get("message", {}).get("content", "").strip()
+                    clean_json = raw_content
+                    if "```json" in clean_json:
+                        clean_json = clean_json.split("```json")[1].split("```")[0].strip()
+                    elif "```" in clean_json:
+                        clean_json = clean_json.split("```")[1].split("```")[0].strip()
+                    parsed = json.loads(clean_json)
+                    if "scope_id" in parsed:
+                        return parsed
+            except Exception as e:
+                print(f"[AI_AGENT_SCAN_FALLBACK] Lỗi gọi Local LLM: {e}")
 
-    try:
-        r = req_http.post("http://127.0.0.1:11434/api/chat", json=payload, timeout=45)
-        if r.status_code == 200:
-            raw_content = r.json().get("message", {}).get("content", "").strip()
-            # Bóc tách JSON nếu bị bọc trong markdown
-            clean_json = raw_content
-            if "```json" in clean_json:
-                clean_json = clean_json.split("```json")[1].split("```")[0].strip()
-            elif "```" in clean_json:
-                clean_json = clean_json.split("```")[1].split("```")[0].strip()
-            parsed = json.loads(clean_json)
-            if "scope_id" in parsed:
-                return parsed
-    except Exception as e:
-        print(f"[AI_AGENT_SCAN_FALLBACK] Lỗi gọi Local LLM: {e}")
-
-    # Fallback an toàn nếu LLM tạm thời chưa sẵn sàng
-    is_web = any(l in languages for l in ["PHP", "JavaScript", "TypeScript", "HTML"]) or len(frameworks) > 0
+    # Fallback an toàn nếu chọn Heuristic Core hoặc LLM chưa sẵn sàng
+    is_web = any(l in languages for l in ["PHP", "JavaScript", "TypeScript", "HTML", "Python"]) or len(frameworks) > 0
     fallback_scope = "SCOPE_WEB" if is_web else "SCOPE_NETWORK"
     fallback_name = "Scope A: Web & API Layer" if is_web else "Scope B: Network & Perimeter"
     return {
         "scope_id": fallback_scope,
         "scope_name": fallback_name,
-        "architecture_summary": "Hệ thống Web Full-Stack đa tầng mã nguồn mở",
-        "attack_surface_analysis": "Bề mặt rủi ro tập trung vào các điểm nhạy cảm xử lý tệp tin và lệnh hệ điều hành",
-        "agent_reasoning": f"Tác tử định vị cấu trúc mã nguồn web và đề xuất phạm vi phòng thủ: {fallback_name}."
+        "architecture_summary": "Hệ thống ứng dụng phân tích tự động qua AST",
+        "attack_surface_analysis": f"Phát hiện {len(sensitive_sinks)} điểm nhạy cảm tiềm ẩn rủi ro thực thi/tiêm nhiễm.",
+        "agent_reasoning": f"Tác tử định vị cấu trúc mã nguồn và đề xuất phạm vi phòng thủ: {fallback_name}."
     }
 
 def deep_agent_codebase_scan(target_path: Path, model_name: Optional[str] = None) -> Dict[str, Any]:
@@ -261,7 +259,7 @@ def deep_agent_codebase_scan(target_path: Path, model_name: Optional[str] = None
     if languages.get("JavaScript", 0) > 0 and "Node.js" not in runtime_versions:
         runtime_versions["Node.js Runtime"] = "20+" 
     
-    # Gọi Tác tử AI (Local LLM trên GPU AMD Radeon RX 6600) phân tích chuyên sâu
+    # Gọi Tác tử AI (Local LLM trên phần cứng cục bộ) phân tích chuyên sâu
     ai_verdict = _call_local_agent_llm_for_codebase_scope(
         target_path=p,
         languages=languages,
@@ -279,10 +277,19 @@ def deep_agent_codebase_scan(target_path: Path, model_name: Optional[str] = None
     agent_reason = ai_verdict.get("agent_reasoning", "")
 
     from phuc_core_ai_agent import MultiProviderLLMBrain
-    actual_model = MultiProviderLLMBrain._ensure_and_detect_local_ollama_model(model_name) or "khang-qwen3:latest"
-    
+    if model_name == "cti-heuristic-engine":
+        actual_model = "cti-heuristic-engine (Static AST)"
+    else:
+        actual_model = MultiProviderLLMBrain._ensure_and_detect_local_ollama_model(model_name) or "cti-heuristic-engine"
+
+    try:
+        from system_hardware_detector import detect_hardware_profile
+        hw_label = detect_hardware_profile().get("gpu_name", "Local Compute")
+    except Exception:
+        hw_label = "Local Compute"
+
     agent_logs = [
-        f"[TÁC TỬ CODEBASE INSPECTOR] Sử dụng mô hình: {actual_model} (GPU AMD RX 6600)...",
+        f"[TÁC TỬ CODEBASE INSPECTOR] Sử dụng mô hình: {actual_model} ({hw_label})...",
         f"[AST CODEBASE SCAN] Quét toàn bộ cây thư mục: Đã định vị {total_files} tệp tin mã nguồn.",
         f"[NGÔN NGỮ NHẬN DIỆN] " + (", ".join(lang_labels) if lang_labels else "Đa ngôn ngữ"),
         f"[FRAMEWORKS & DEPENDENCIES] " + (", ".join(list(dict.fromkeys(frameworks))) if frameworks else "Custom Architecture"),
@@ -483,6 +490,11 @@ def compute_scope_relevance(scope_id: str, title: str, content: str) -> int:
         for tech in hw_techs:
             if tech in c:
                 score += 2
+    elif "," in (scope_id or ""):
+        sub_scopes = [s.strip() for s in scope_id.split(",") if s.strip() and s.strip() != scope_id]
+        if sub_scopes:
+            return max(compute_scope_relevance(sub, title, content) for sub in sub_scopes)
+        score = 50
     else:
         score = 50
         if any(w in t for w in ["rce", "remote code", "zero-day", "cvss 10", "critical"]):
@@ -492,38 +504,56 @@ def compute_scope_relevance(scope_id: str, title: str, content: str) -> int:
 
     return score
 
-def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3) -> Dict[str, Any]:
-    """Bước 2: Cào bài báo và lọc tri thức CTI theo đúng mục đích của Scope đã chọn."""
+def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3, live_crawl: bool = True) -> Dict[str, Any]:
+    """Bước 2: Cào bài báo trực tiếp từ các nguồn OSINT và lọc tri thức CTI theo Scope & Mốc lịch sử đã chọn."""
+    from datetime import timedelta
+    from lam_automation_crawler import _init_archive_db, crawl_all_sources_and_archive, crawl_year_to_date_archive
+    _init_archive_db()
     profile = resolve_scope_profile(scope_id)
-    min_year = 2026 - history_years
+    now_dt = datetime.now()
+    min_year = now_dt.year - history_years
     min_date = f"{min_year}-01-01"
 
-    # Kiểm tra CSDL cục bộ
+    # Kiểm tra số bài hiện có trong DB thuộc mốc thời gian người dùng chọn
     with sqlite3.connect(DB_PATH) as conn:
-        count = conn.execute("SELECT count(*) FROM articles_archive").fetchone()[0]
+        count_all = conn.execute("SELECT count(*) FROM articles_archive").fetchone()[0]
+        count_in_window = conn.execute("SELECT count(*) FROM articles_archive WHERE sort_ts >= ?", (min_date,)).fetchone()[0]
 
-    # Nếu máy mới hoặc CSDL ít bài, tự nạp bài báo theo đúng Scope
-    if count < 50:
-        if BAK_DB_PATH.exists():
-            with sqlite3.connect(DB_PATH) as conn:
-                conn.execute(f"ATTACH DATABASE '{BAK_DB_PATH.as_posix()}' AS bak")
-                kw_cond = " OR ".join([f"bak.articles_archive.content LIKE '%{kw}%'" for kw in profile["keywords"][:5]])
-                conn.execute(f"""
-                    INSERT OR IGNORE INTO articles_archive 
-                    SELECT * FROM bak.articles_archive 
-                    WHERE sort_ts >= '{min_date}' AND ({kw_cond})
-                    LIMIT 200
-                """)
-                conn.execute("""
-                    INSERT OR IGNORE INTO ioc_knowledge_base
-                    SELECT * FROM bak.ioc_knowledge_base
-                    LIMIT 500
-                """)
-                conn.commit()
-                conn.execute("DETACH DATABASE bak")
-        else:
-            from lam_automation_crawler import crawl_all_sources_and_archive
-            crawl_all_sources_and_archive(limit_per_source=6)
+    # Luôn cào bài mới thực tế khi trực tuyến; nếu DB trống hoặc quá ít bài trong mốc lịch sử, cào bổ sung sâu theo mốc năm
+    if live_crawl or count_all < 40:
+        try:
+            crawl_all_sources_and_archive(limit_per_source=8)
+        except Exception as e:
+            print(f"[WIZARD CRAWL] Khong the cao RSS truc tuyen: {e}")
+
+    with sqlite3.connect(DB_PATH) as conn:
+        count_in_window = conn.execute("SELECT count(*) FROM articles_archive WHERE sort_ts >= ?", (min_date,)).fetchone()[0]
+
+    if count_in_window < 35:
+        try:
+            cap_thn = 60 if history_years <= 1 else 140
+            cap_cisa = 60 if history_years <= 1 else 140
+            crawl_year_to_date_archive(since_date=min_date, max_thn=cap_thn, max_cisa=cap_cisa)
+        except Exception as e:
+            print(f"[WIZARD CRAWL YTD] Khong the cao bo sung theo nam: {e}")
+
+    with sqlite3.connect(DB_PATH) as conn:
+        count_all = conn.execute("SELECT count(*) FROM articles_archive").fetchone()[0]
+
+    # Chỉ dùng kho dự phòng offline nếu hoàn toàn mất mạng khiến DB còn 0 bài
+    if count_all == 0 and BAK_DB_PATH.exists():
+        with sqlite3.connect(DB_PATH) as conn:
+            conn.execute(f"ATTACH DATABASE '{BAK_DB_PATH.as_posix()}' AS bak")
+            kw_cond = " OR ".join([f"bak.articles_archive.content LIKE '%{kw}%'" for kw in profile["keywords"][:5]])
+            conn.execute(f"""
+                INSERT OR IGNORE INTO articles_archive 
+                SELECT article_id, source_name, title, url, published_date, sort_ts, is_historical, content, fetched_at_utc, 'pending', 0.0, ''
+                FROM bak.articles_archive 
+                WHERE sort_ts >= '{min_date}' AND ({kw_cond})
+                LIMIT 200
+            """)
+            conn.commit()
+            conn.execute("DETACH DATABASE bak")
 
     # Tìm bài báo đe dọa cao nhất và lọc bài báo theo Scope & mốc thời gian
     target_path = Path(target)
@@ -532,12 +562,12 @@ def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3) -> Di
 
     with sqlite3.connect(DB_PATH) as conn:
         conn.row_factory = sqlite3.Row
-        art = conn.execute("SELECT * FROM articles_archive WHERE article_id = ?", (best_art_id,)).fetchone()
+        art = conn.execute("SELECT * FROM articles_archive WHERE article_id = ?", (best_art_id,)).fetchone() if best_art_id else None
         art_dict = dict(art) if art else {}
 
         # Lấy toàn bộ bài báo trong mốc thời gian lọc (sort_ts >= min_date)
         all_candidate_rows = conn.execute(
-            "SELECT article_id, title, source_name, url, published_date, sort_ts, content "
+            "SELECT article_id, title, source_name, url, published_date, sort_ts, content, status "
             "FROM articles_archive WHERE sort_ts >= ? ORDER BY sort_ts DESC",
             (min_date,)
         ).fetchall()
@@ -549,12 +579,21 @@ def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3) -> Di
             if relevance >= 20 or r["article_id"] == best_art_id:
                 scored_candidates.append((relevance, dict(r)))
 
+        # Nếu quá ít bài khớp ngưỡng 20 (ví dụ DB vừa khởi tạo rỗng chỉ có vài bài mới cào), lấy toàn bộ bài hiện có
+        if not scored_candidates and all_candidate_rows:
+            scored_candidates = [(compute_scope_relevance(scope_id, r["title"], r["content"]), dict(r)) for r in all_candidate_rows]
+
         # Sắp xếp theo điểm tương quan cao nhất và ngày đăng mới nhất
         scored_candidates.sort(key=lambda x: (x[0], x[1].get("sort_ts") or ""), reverse=True)
         
         matched_count = len(scored_candidates)
         # Giới hạn bài báo hiển thị để giao diện mượt mà (tối đa 120 bài)
         matched_arts = [item[1] for item in scored_candidates[:120]]
+
+        if not art_dict and matched_arts:
+            art_dict = matched_arts[0]
+            best_art_id = art_dict.get("article_id", "")
+            best_art_title = art_dict.get("title", "Chiến dịch đe dọa mới nhất")
 
         # Bóc tách chi tiết từng bài báo để AI xử lý tuần tự trực tiếp trên giao diện
         enriched_articles = []
@@ -583,8 +622,10 @@ def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3) -> Di
                 "source_name": r["source_name"] or "OSINT CTI",
                 "url": r["url"] or "",
                 "published_date": r["published_date"] or r["sort_ts"] or "2026",
+                "sort_ts": r["sort_ts"] or "",
+                "status": r.get("status") or "pending",
                 "cves": r_cves[:3],
-                "ioc_count": max(total_iocs_item, 3),
+                "ioc_count": total_iocs_item,
                 "sample_ips": list(dict.fromkeys(r_ips))[:2],
                 "sample_domains": list(dict.fromkeys(r_domains))[:2],
                 "content": c_text,
@@ -730,25 +771,65 @@ def wizard_synthesize_skill(target: str, scope_id: str, article_id: str, scan_in
     }
 
 def wizard_verify_exploit(target: str, skill_name: str) -> Dict[str, Any]:
-    """Bước 4a: Chạy script verify_exploit.py để kiểm thử lỗ hổng trên server."""
-    target_path = Path(target)
+    """Bước 4a: Thực thi thật script verify_exploit.py kiểm thử WAF & rà quét lỗ hổng trong mã nguồn đích."""
+    target_path = Path(target).resolve()
     script_path = target_path / "defense_skills" / skill_name / "scripts" / "verify_exploit.py"
-    
     if not script_path.exists():
-        # Fallback to skills/
+        script_path = target_path / "skills" / skill_name / "scripts" / "verify_exploit.py"
+    if not script_path.exists():
         script_path = SKILLS_DIR / skill_name / "scripts" / "verify_exploit.py"
 
     output_lines = [
-        f"[*] Tác tử AI kích hoạt: {script_path.name}",
-        f"[*] Địa chỉ mục tiêu: {target_path.as_posix()}",
-        "[+] Gửi gói tin probe kiểm tra chuỗi khai thác RCE / Parameter Injection...",
-        "[+] Điểm yếu được xác nhận: TRUE POSITIVE (Hệ thống chưa được vá).",
-        "[!] Cảnh báo: Endpoint cho phép thực thi lệnh tùy ý thông qua tham số."
+        f"[*] Kích hoạt kiểm thử thực tế: {script_path}",
+        f"[*] Thư mục dự án đích: {target_path.as_posix()}",
     ]
-    
+
+    # 1. Rà quét mã nguồn chưa vá trong dự án
+    unpatched_hits = []
+    for ext_pat in ("*.php", "*.py", "*.js"):
+        for fp in target_path.rglob(ext_pat):
+            fp_s = str(fp)
+            if any(ig in fp_s for ig in ("examples", "defense_skills", "skills", "node_modules", ".git", "cti_core")):
+                continue
+            try:
+                txt = fp.read_text(encoding="utf-8", errors="ignore")
+                if any(pat in txt for pat in ["system($_GET", "shell_exec($_GET", "eval($_GET", "system($cmd)"]):
+                    unpatched_hits.append(str(fp.relative_to(target_path)))
+            except Exception:
+                pass
+
+    # 2. Thực thi probe thật lên WAF Reverse Proxy (Port 8766)
+    waf_blocked = False
+    if script_path.exists():
+        try:
+            proc = subprocess.run(
+                [sys.executable, str(script_path), "http://127.0.0.1:8766"],
+                capture_output=True,
+                text=True,
+                timeout=15
+            )
+            if proc.stdout:
+                output_lines.extend(proc.stdout.strip().splitlines())
+            if proc.stderr:
+                output_lines.append(proc.stderr.strip())
+            waf_blocked = (proc.returncode == 0)
+        except Exception as e:
+            output_lines.append(f"[-] Lỗi chạy script probe: {e}")
+
+    is_vulnerable = len(unpatched_hits) > 0
+    if unpatched_hits:
+        output_lines.append(f"[!] PHÁT HIỆN MÃ NGUỒN CHƯA VÁ (TRUE POSITIVE): {', '.join(unpatched_hits)}")
+        output_lines.append("[*] Hãy nhấn 'Kích Hoạt WAF & Netsh' hoặc 'Tự Động Vá Mã Nguồn' để triệt tiêu điểm yếu.")
+    else:
+        output_lines.append("[+] KIỂM TRA MÃ NGUỒN: Không còn mẫu lỗ hổng RCE/Eval trực tiếp chưa xử lý.")
+        if waf_blocked:
+            output_lines.append("[+] LÁ CHẮN WAF L7 (CỔNG 8766): Đã chặn thành công các vector tấn công thử nghiệm (HTTP 403).")
+
     return {
         "status": "success",
-        "is_vulnerable": True,
+        "is_vulnerable": is_vulnerable,
+        "waf_shield_active": waf_blocked,
+        "unpatched_files": unpatched_hits,
         "probe_output": "\n".join(output_lines)
     }
 
@@ -758,14 +839,16 @@ def wizard_remediate_code(target: str, skill_name: str) -> Dict[str, Any]:
     remediated = []
     diff_lines = []
 
-    # Quét các file PHP/JS trong target_path để sửa
-    for p in target_path.glob("**/*.php"):
-        if "examples" in str(p) or "defense_skills" in str(p):
+    # Quét các file PHP/JS trong target_path để sửa (loại trừ thư mục kỹ năng & thư viện bên thứ ba)
+    for p in target_path.rglob("*.php"):
+        fp_s = str(p)
+        if any(ig in fp_s for ig in ("examples", "defense_skills", "skills", "node_modules", ".git", "cti_core")):
             continue
-        code = p.read_text(encoding="utf-8")
-        if "system($_GET" in code or "system($cmd)" in code or "system(" in code:
-            orig = code
-            # Vá mã nguồn: Thay thế system() bằng whitelist an toàn
+        try:
+            code = p.read_text(encoding="utf-8", errors="ignore")
+        except Exception:
+            continue
+        if any(pat in code for pat in ["system($_GET", "shell_exec($_GET", "eval($_GET", "system($cmd)", "system("]):
             patched = re.sub(
                 r'if\s*\(\s*isset\(\$_GET\[[\'"]cmd[\'"]\]\)\s*\)\s*\{[^}]*\}',
                 '''if (isset($_GET['action'])) {
@@ -781,9 +864,16 @@ def wizard_remediate_code(target: str, skill_name: str) -> Dict[str, Any]:
 }''',
                 code
             )
-            p.write_text(patched, encoding="utf-8")
-            remediated.append(str(p.relative_to(target_path)))
-            diff_lines.append(f"--- a/{p.name}\n+++ b/{p.name}\n- system($cmd);\n+ // [CTI AGENTIC PATCH] Whitelist verification & shell_exec sanitization")
+            if patched == code:
+                patched = re.sub(
+                    r'(?:system|shell_exec|eval)\s*\(\s*\$_(?:GET|POST|REQUEST)\[[^\]]+\]\s*\)\s*;?',
+                    'http_response_code(403); /* [CTI AI AGENT HARDENED] Blocked unsafe dynamic execution */',
+                    patched
+                )
+            if patched != code:
+                p.write_text(patched, encoding="utf-8")
+                remediated.append(str(p.relative_to(target_path)))
+                diff_lines.append(f"--- a/{p.name}\n+++ b/{p.name}\n- unsafe system()/eval() call on untrusted input\n+ // [CTI AGENTIC PATCH] Whitelist verification & strict input rejection")
 
     if not remediated:
         diff_lines.append("Mã nguồn dự án đã tuân thủ chuẩn an toàn hoặc không phát hiện hàm nguy hiểm.")

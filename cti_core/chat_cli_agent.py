@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-OPENCLAW LOCAL AI AGENT — INTERACTIVE CLI CHAT (KHANG-AI • GOOGLE GEMMA 3 • 100% GPU RX 6600)
-Cho phép Khang vừa chat hỏi đáp tự do có bộ nhớ ngữ cảnh (Multi-turn Memory) với AI Local (Offline),
+OPENCLAW LOCAL AI AGENT — INTERACTIVE CLI CHAT (LOCAL OLLAMA + TOOL-CALLING OSINT)
+Cho phép hỏi đáp tự do có bộ nhớ ngữ cảnh (Multi-turn Memory) với AI Local (Offline),
 vừa có thể gõ IP/CVE/Domain để AI tự động gọi Tool chấm điểm VirusTotal/AbuseIPDB/Shodan ngay trên CLI!
 """
 
@@ -10,10 +10,11 @@ import sys
 from pathlib import Path
 import requests
 
-os.environ["OLLAMA_MODELS"] = r"D:\mkhang\DoAnChuyenNganh\ollama_models"
-
 SANDBOX_DIR = Path(__file__).resolve().parent
 ROOT_PROJECT_DIR = Path(__file__).resolve().parents[1]
+CUSTOM_MODELS_DIR = ROOT_PROJECT_DIR / "ollama_models"
+if CUSTOM_MODELS_DIR.exists() and not os.environ.get("OLLAMA_MODELS"):
+    os.environ["OLLAMA_MODELS"] = str(CUSTOM_MODELS_DIR)
 REPO_ROOT = ROOT_PROJECT_DIR / "ai-devsecops-agent"
 
 for candidate_path in [str(SANDBOX_DIR), str(ROOT_PROJECT_DIR), str(REPO_ROOT)]:
@@ -29,11 +30,12 @@ from phuc_core_ai_agent import MultiProviderLLMBrain, tool6_extract_iocs_hybrid
 
 
 def main() -> None:
-    model_name = sys.argv[1] if len(sys.argv) > 1 else "khang-qwen3"
-    MultiProviderLLMBrain._ensure_and_detect_local_ollama_model(model_name)
+    req_model = sys.argv[1] if len(sys.argv) > 1 else "auto"
+    model_name = MultiProviderLLMBrain._ensure_and_detect_local_ollama_model(req_model) or "qwen2.5:7b"
+    hw_label = MultiProviderLLMBrain._get_hw_label()
 
     print("=" * 86)
-    print(f"🧠 OPENCLAW LOCAL AI AGENT CLI — MODEL: {model_name.upper()} (QWEN 3 - 8B • 100% GPU RX 6600 8GB)")
+    print(f"OPENCLAW LOCAL AI AGENT CLI — MODEL: {model_name.upper()} ({hw_label})")
     print("   • Đã tích hợp Bộ nhớ Hội thoại (Multi-turn Memory) + Hiểu tiếng Việt không dấu & Zero Tiếng Trung.")
     print("   • MẸO: Để gõ tiếng Việt CÓ DẤU mượt nhất, hãy mở tab '💬 Chat AI Có Dấu' trên http://127.0.0.1:8765")
     print("   • Gõ câu có kèm IP / Domain / CVE (VD: 'kiểm tra IP 202.182.109.151 và CVE-2026-72898')")

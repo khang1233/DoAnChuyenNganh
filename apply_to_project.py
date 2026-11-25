@@ -21,7 +21,7 @@ import sqlite3
 import argparse
 import time
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 
 ROOT_DIR = Path(__file__).resolve().parent
 SANDBOX_DIR = ROOT_DIR / "cti_core"
@@ -183,7 +183,7 @@ def ensure_cti_knowledge_base(scope_id: str, history_years: int = 3):
     Pha 2: Xử lý Máy mới / Khởi động nguội (Cold-Start).
     Nếu CSDL chưa có dữ liệu, tự động kích hoạt nạp kho bài báo theo mốc thời gian lịch sử.
     """
-    profile = SCOPE_PROFILES[scope_id]
+    profile = resolve_scope_profile(scope_id)
     if not DB_PATH.exists():
         print(f"[*] CSDL CTI chưa tồn tại. Đang khởi tạo CSDL mới tại: {DB_PATH}")
         sys.path.append(str(SANDBOX_DIR))
@@ -199,7 +199,7 @@ def ensure_cti_knowledge_base(scope_id: str, history_years: int = 3):
 
     if count < 50:
         bak_db = SANDBOX_DIR / "cti_multi_source_archive_full_corpus.sqlite"
-        min_date = f"{2026 - history_years}-01-01"
+        min_date = (datetime.now() - timedelta(days=365 * history_years)).strftime("%Y-%m-%d")
         if bak_db.exists():
             print(f"[!] PHÁT HIỆN MÁY MỚI (COLD-START): Đang tự động nạp kho tri thức lịch sử ({history_years} năm) cho {profile['name']}...")
             with sqlite3.connect(DB_PATH) as conn:
@@ -242,7 +242,7 @@ def find_optimal_article_for_scope(scope_id: str, detected_techs: list):
             "SELECT article_id, source_name, title, content, sort_ts FROM articles_archive WHERE length(content) >= 800"
         ).fetchall()
 
-        is_php = any('php' in str(t).lower() for t in detected_techs) or scope_id == "SCOPE_WEB"
+        is_php = any('php' in str(t).lower() for t in detected_techs) or "SCOPE_WEB" in str(scope_id)
         is_node = any('node' in str(t).lower() or 'javascript' in str(t).lower() for t in detected_techs)
         is_docker = any('docker' in str(t).lower() for t in detected_techs)
         
@@ -283,8 +283,10 @@ def find_optimal_article_for_scope(scope_id: str, detected_techs: list):
         candidates.sort(key=lambda x: (x[0], x[1]), reverse=True)
         if candidates and candidates[0][0] > 0:
             return candidates[0][2], candidates[0][3]
+        if candidates:
+            return candidates[0][2], candidates[0][3]
 
-    return "thn-1838c8a4", "Hackers Infect 953 Online Stores With Scanner-Evading JavaScript, Mostly on Magento"
+    return "", "Chiến dịch đe dọa mới nhất"
 
 
 def synthesize_and_deploy_skill(target_path: Path, scope_id: str, article_id: str = None, detected_techs: list = None):
@@ -331,7 +333,7 @@ def synthesize_and_deploy_skill(target_path: Path, scope_id: str, article_id: st
 
     # Pha 5: Tạo kịch bản hành động hậu kỹ năng (Post-Skill Action SOP)
     guide_file = target_path / "AGENT_REMEDIATION_GUIDE.md"
-    profile = SCOPE_PROFILES[scope_id]
+    profile = resolve_scope_profile(scope_id)
     guide_file.write_text(f"""# QUY TRÌNH HÀNH ĐỘNG HẬU KỸ NĂNG (POST-SKILL ACTION PROTOCOL)
 
 > **Dự án mục tiêu:** `{target_path.name}`
@@ -389,7 +391,7 @@ def synthesize_and_deploy_skill(target_path: Path, scope_id: str, article_id: st
             "scope_id": scope_id,
             "scope_name": profile["name"],
             "skill_name": bundle_path.name,
-            "article_id": best_article_id if "best_article_id" in locals() else "",
+            "article_id": article_id or "",
             "configured_at": datetime.now().isoformat(),
             "status": "PROTECTED"
         }
@@ -439,7 +441,7 @@ def main():
         scope_id = args.scope
         _, techs = detect_project_scope(target_path)
         
-    profile = SCOPE_PROFILES.get(scope_id, SCOPE_PROFILES["SCOPE_WEB"])
+    profile = resolve_scope_profile(scope_id)
     print(f"[+] Công nghệ nhận diện: {', '.join(techs)}")
     print(f"[+] Gán Phân hệ bảo vệ: {profile['name']}")
     print(f"[+] Chu kỳ quét tự động: {profile['cadence_label']}")

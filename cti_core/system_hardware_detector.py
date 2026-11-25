@@ -295,8 +295,15 @@ def query_ollama_runtime() -> Dict[str, Any]:
             all_models.append(m)
             seen.add(m)
 
+    ollama_bin = shutil.which("ollama")
+    if not ollama_bin and sys.platform == "win32":
+        default_path = Path(os.environ.get("LOCALAPPDATA", "")) / "Programs" / "Ollama" / "ollama.exe"
+        if default_path.exists():
+            ollama_bin = str(default_path)
+
     return {
         "is_running": is_alive or (len(all_models) > 0),
+        "binary_installed": bool(ollama_bin),
         "models": all_models,
         "port": 11434
     }

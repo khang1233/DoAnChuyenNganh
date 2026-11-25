@@ -20,6 +20,7 @@ Tính năng cốt lõi đúng chuẩn đề tài giảng viên yêu cầu ("AI A
 import json
 import os
 import re
+import shutil
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -129,6 +130,21 @@ class MultiProviderLLMBrain:
     """
 
     _cached_ollama_model: Optional[str] = None
+    _cached_hw_label: Optional[str] = None
+
+    @classmethod
+    def _get_hw_label(cls) -> str:
+        if cls._cached_hw_label is not None:
+            return cls._cached_hw_label
+        try:
+            from system_hardware_detector import detect_hardware_profile
+            hw = detect_hardware_profile()
+            gpu = hw.get("gpu_name") or "CPU Local"
+            vram = hw.get("vram_gb") or 0
+            cls._cached_hw_label = f"{gpu} ({vram}GB VRAM)" if vram else str(gpu)
+        except Exception:
+            cls._cached_hw_label = "Local Compute"
+        return cls._cached_hw_label
 
     def __init__(
         self,
@@ -150,12 +166,12 @@ class MultiProviderLLMBrain:
                 r = requests.get("http://127.0.0.1:11434/api/tags", timeout=2)
                 if r.status_code == 200:
                     models = [m.get("name", "") for m in r.json().get("models", []) if m.get("name")]
-                    if preferred and preferred != "auto":
+                    if preferred and preferred not in ("auto", "pending", "cti-heuristic-engine"):
                         for m in models:
-                            if m.startswith(preferred):
+                            if m == preferred or m.startswith(preferred):
                                 return m
-                    # Ưu tiên các model phổ biến nhất
-                    for candidate in ("qwen3:8b", "khang-qwen3", "qwen2.5:7b", "gemma3:4b", "khang-ai", "deepseek-r1:7b", "qwen2.5:1.5b", "llama3.2", "llama3", "mistral"):
+                    # Uu tien cac model pho bien nhat co san tren may
+                    for candidate in ("qwen3:8b", "khang-qwen3", "qwen2.5:7b", "gemma3:4b", "khang-ai", "deepseek-r1:7b", "qwen2.5:3b", "qwen2.5:1.5b", "llama3.2", "llama3", "mistral"):
                         for m in models:
                             if m.startswith(candidate):
                                 cls._cached_ollama_model = m
@@ -168,14 +184,18 @@ class MultiProviderLLMBrain:
                     try:
                         import subprocess
                         import time
-                        ollama_exe = Path(os.environ.get("LOCALAPPDATA", "")) / "Programs" / "Ollama" / "ollama.exe"
-                        if ollama_exe.exists():
+                        ollama_bin = shutil.which("ollama")
+                        if not ollama_bin:
+                            cand_win = Path(os.environ.get("LOCALAPPDATA", "")) / "Programs" / "Ollama" / "ollama.exe"
+                            if cand_win.exists():
+                                ollama_bin = str(cand_win)
+                        if ollama_bin:
                             env_copy = os.environ.copy()
                             if custom_models_dir.exists():
                                 env_copy["OLLAMA_MODELS"] = str(custom_models_dir)
-                            flags = getattr(subprocess, "DETACHED_PROCESS", 0) | getattr(subprocess, "CREATE_NO_WINDOW", 0)
+                            flags = (getattr(subprocess, "DETACHED_PROCESS", 0) | getattr(subprocess, "CREATE_NO_WINDOW", 0)) if sys.platform == "win32" else 0
                             subprocess.Popen(
-                                [str(ollama_exe), "serve"],
+                                [ollama_bin, "serve"],
                                 stdout=subprocess.DEVNULL,
                                 stderr=subprocess.DEVNULL,
                                 env=env_copy,
@@ -184,7 +204,19 @@ class MultiProviderLLMBrain:
                             time.sleep(2.0)
                     except Exception:
                         pass
-        return preferred if (preferred and preferred != "auto") else (cls._cached_ollama_model or "khang-qwen3")
+        try:
+            from system_hardware_detector import get_disk_installed_models
+            disk_models = get_disk_installed_models()
+            if disk_models:
+                if preferred and preferred not in ("auto", "pending", "cti-heuristic-engine"):
+                    for dm in disk_models:
+                        if dm == preferred or dm.startswith(preferred):
+                            return dm
+                cls._cached_ollama_model = disk_models[0]
+                return disk_models[0]
+        except Exception:
+            pass
+        return preferred if (preferred and preferred not in ("auto", "pending")) else (cls._cached_ollama_model or "")
 
     def _resolve_endpoint_and_key(self) -> Tuple[str, str, str]:
         if self.provider in {"ollama", "local", "openclaw_local"}:
@@ -266,10 +298,11 @@ class MultiProviderLLMBrain:
                 content = re.sub(r"<think>.*?</think>\s*", "", raw_content, flags=re.DOTALL)
                 content = AIAgentSecurityGuard.prevent_data_leakage(content)
                 if content.strip():
+                    hw_label = self._get_hw_label()
                     return {
-                        "provider_used": f"LOCAL OLLAMA ({model} • GPU RX 6600 8GB)",
+                        "provider_used": f"LOCAL OLLAMA ({model} • {hw_label})",
                         "content": content.strip(),
-                        "reasoning": f"Mô hình Local LLM ({model}) đã suy luận trực tiếp trên GPU AMD Radeon RX 6600 (Offline).",
+                        "reasoning": f"Mô hình Local LLM ({model}) đã suy luận trực tiếp trên {hw_label} (Offline).",
                         "status": "live_local_ollama_success",
                     }
         except Exception as exc:

@@ -246,7 +246,7 @@ def package_master_scope_skill(
     top_cve_str = ", ".join(cve_list[:4])
     
     # 2. Định danh thư mục Skill Tổng
-    scope_suffix = scope_id.lower().replace("scope_", "")
+    scope_suffix = re.sub(r"[^a-z0-9]+", "-", (scope_id or "web").lower().replace("scope_", "")).strip("-") or "web"
     skill_slug = f"agentic-defense-master-{scope_suffix}-suite"
     bundle_dir = output_root / skill_slug
     
@@ -276,7 +276,9 @@ import json
 TEST_VECTORS = [
     {{"name": "Health & Info Disclosure", "path": "/health", "payload": "", "expected_safe": True}},
     {{"name": "Command Injection Probe", "path": "/api/query?cmd=test%3Bwhoami", "payload": "; whoami", "expected_blocked": True}},
+    {{"name": "Remote Code Execution Probe (cmd)", "path": "/?cmd=id", "payload": "cmd=id", "expected_blocked": True}},
     {{"name": "SQL Injection Probe", "path": "/api/search?q=admin'%20OR%201=1--", "payload": "' OR 1=1--", "expected_blocked": True}},
+    {{"name": "SQL Injection Probe (UNION SELECT)", "path": "/?id=1%20UNION%20SELECT%201,2,3", "payload": "UNION SELECT", "expected_blocked": True}},
     {{"name": "Path Traversal Probe", "path": "/api/file?name=../../../../etc/passwd", "payload": "../../../../etc/passwd", "expected_blocked": True}},
     {{"name": "Malicious JS Evasion ({cve_list[0] if cve_list else 'CVE-2026-48356'})", "path": "/api/log?data=%3Cscript%3Ealert(1)%3C/script%3E", "payload": "<script>alert(1)</script>", "expected_blocked": True}}
 ]

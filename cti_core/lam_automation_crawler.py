@@ -60,6 +60,7 @@ REGEX_SHA256 = re.compile(r"\b[a-fA-F0-9]{64}\b")
 
 def is_real_ipv4_token(raw_ip: str, full_text: str = "", match_span: tuple = None) -> bool:
     """Loại bỏ các chuỗi số hiệu phiên bản phần mềm (VD: Apache Struts 2.3.20.2, V8 13.6.233.10-node.28) để chỉ giữ lại IPv4 thật."""
+    import ipaddress
     s = (raw_ip or "").strip()
     clean = s.replace("[.]", ".").replace("(.)", ".")
 
@@ -67,8 +68,17 @@ def is_real_ipv4_token(raw_ip: str, full_text: str = "", match_span: tuple = Non
     if clean.startswith("127.") or clean.startswith("0.") or clean.startswith("169.254.") or clean == "255.255.255.255":
         return False
 
+    # Whitelist cơ sở hạ tầng DNS công cộng — không bao giờ được block (theo AGENTS.md)
     if clean in {"8.8.8.8", "8.8.4.4", "1.1.1.1", "1.0.0.1"}:
         return True
+
+    # Loại trừ toàn bộ dải Private IP theo RFC 1918 (10/8, 172.16-31/12, 192.168/16)
+    # Các IP này không phải C2 public — chỉ xuất hiện trong bài báo mô tả lateral movement nội bộ
+    try:
+        if ipaddress.ip_address(clean).is_private:
+            return False
+    except ValueError:
+        return False
 
     if full_text and match_span:
         start, end = match_span
@@ -1150,6 +1160,8 @@ def scrape_article_text(url: str) -> Dict[str, Any]:
     try:
         resp = requests.get(url, headers=DEFAULT_HEADERS, timeout=12)
         resp.raise_for_status()
+        if not resp.encoding or resp.encoding.lower() in ("iso-8859-1", "latin-1"):
+            resp.encoding = resp.apparent_encoding or "utf-8"
         raw_html = resp.text
         title_match = re.search(r"<title[^>]*>(.*?)</title>", raw_html, flags=re.IGNORECASE | re.DOTALL)
         title = _clean_html_inline(title_match.group(1)) if title_match else url

@@ -14,9 +14,11 @@ const fs = require('fs');
 const ROOT_DIR = path.resolve(__dirname, '..');
 const SANDBOX_DIR = path.join(ROOT_DIR, 'cti_core');
 const APP_FILE = path.join(SANDBOX_DIR, 'live_dashboard_app.py');
+const BENCHMARK_FILE = path.join(SANDBOX_DIR, 'benchmark', 'labeler_server.py');
 const SYSTEM_CTL_FILE = path.join(SANDBOX_DIR, 'system_ctl.py');
 const PORT = 8765;
 const WAF_PORT = 8766;
+const BENCHMARK_PORT = 8780;
 
 function openBrowser(url) {
   const platform = process.platform;
@@ -103,7 +105,7 @@ function stopSystem() {
   if (process.platform === 'win32') {
     try {
       execSync(
-        `powershell -NoProfile -Command "Get-NetTCPConnection -LocalPort 8765,8766,11434 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }"`,
+        `powershell -NoProfile -Command "Get-NetTCPConnection -LocalPort 8765,8766,8780,11434 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }"`,
         { stdio: 'ignore' }
       );
       execSync(`taskkill /F /IM ollama.exe /T 2>nul`, { stdio: 'ignore' });
@@ -111,7 +113,7 @@ function stopSystem() {
     } catch (e) {}
   } else {
     try {
-      execSync(`lsof -ti:8765,8766,11434 | xargs kill -9`, { stdio: 'ignore' });
+      execSync(`lsof -ti:8765,8766,8780,11434 | xargs kill -9`, { stdio: 'ignore' });
     } catch (e) {}
   }
   console.log('[OK] Da tat toan bo tien trinh he thong CTI Defense.');
@@ -124,6 +126,7 @@ function printStatus() {
       console.log('  STATUS: DANG HOAT DONG (ONLINE)');
       console.log('  - Web Dashboard : http://127.0.0.1:8765');
       console.log('  - WAF Proxy L7  : http://127.0.0.1:8766');
+      console.log('  - So Sanh 50 Bai: http://127.0.0.1:8780');
       console.log('==============================================================================');
     } else {
       console.log('==============================================================================');
@@ -349,12 +352,33 @@ function startSystem() {
 
     // Khoi dong live_dashboard_app.py voi tham so --target
     console.log('[*] Dang khoi chay Live Dashboard & WAF Proxy (Cong 8765 & 8766)...');
+    const childEnv = { ...process.env, CTI_TARGET_PROJECT: targetDir, PYTHONIOENCODING: 'utf-8' };
+    const customOllamaModels = path.join(ROOT_DIR, 'ollama_models');
+    if (fs.existsSync(customOllamaModels)) {
+      childEnv.OLLAMA_MODELS = customOllamaModels;
+    }
     const child = spawn(pyCmd, [APP_FILE, '--target', targetDir], {
       cwd: SANDBOX_DIR,
-      env: { ...process.env, CTI_TARGET_PROJECT: targetDir, PYTHONIOENCODING: 'utf-8' },
+      env: childEnv,
       stdio: ['ignore', 'pipe', 'pipe'],
       detached: false
     });
+
+    if (fs.existsSync(BENCHMARK_FILE)) {
+      console.log('[*] Dang khoi chay Phan he So Sanh 50 Bai Ground Truth (Cong 8780)...');
+      try {
+        const benchChild = spawn(pyCmd, [BENCHMARK_FILE], {
+          cwd: path.dirname(BENCHMARK_FILE),
+          env: childEnv,
+          stdio: 'ignore',
+          detached: false
+        });
+        benchChild.on('error', () => {});
+        child.on('exit', () => {
+          try { benchChild.kill('SIGINT'); } catch (e) {}
+        });
+      } catch (e) {}
+    }
 
     let stdoutData = '';
     child.stdout.on('data', (d) => {

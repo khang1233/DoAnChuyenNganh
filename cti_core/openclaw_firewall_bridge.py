@@ -1055,7 +1055,25 @@ def build_master_defense_matrix_from_db(db_path: Path, scope: str = "SCOPE_ALL")
     """
     import sqlite3
     if not db_path.exists():
-        return {}
+        return {
+            "all_enriched": [],
+            "mitre_d3fend": "# Chưa có dữ liệu bài báo đã phân tích trong kho SQLite.",
+            "firewall_tab_text": "# Chưa có quy tắc Firewall nào được tạo (Zero-DB Mode).",
+            "suricata_rules": "# Chưa có quy tắc Suricata DPI.",
+            "waf_rules": "# Chưa có quy tắc WAF ModSecurity.",
+            "sigma_and_siem": "# Chưa có quy tắc Sigma & SIEM.",
+            "yara_remediation_stix": "# Chưa có quy tắc YARA & EDR.",
+            "agentic_skill_md": "# Chưa biên dịch Gói Kỹ Năng Tác Tử.",
+            "trust_audit": None,
+            "xai_audit": None,
+            "target_scopes": {},
+            "total_articles": 0,
+            "total_iocs": 0,
+            "malicious_ips": 0,
+            "malicious_domains": 0,
+            "cves_count": 0,
+            "malware_hashes": 0,
+        }
     with sqlite3.connect(db_path) as conn:
         conn.row_factory = sqlite3.Row
         rows = [dict(r) for r in conn.execute(
@@ -1415,7 +1433,19 @@ Write-Host "[HOAN TAT] He thong da quet sach cac socket ket noi toi cum C2." -Fo
             "types": ["CVE"]
         }
     }
-    cur_meta = scope_meta.get(scope, scope_meta["SCOPE_ALL"])
+    if "," in (scope or ""):
+        sub_metas = [scope_meta[s.strip()] for s in scope.split(",") if s.strip() in scope_meta]
+        if sub_metas:
+            merged_types = list(dict.fromkeys(t for sm in sub_metas for t in sm["types"]))
+            cur_meta = {
+                "title": "MA TRẬN PHÒNG THỦ KHO CTI - ĐA PHÂN HỆ TÍCH HỢP (" + " + ".join(s.strip() for s in scope.split(",") if s.strip()) + ")",
+                "source": " + ".join(dict.fromkeys(sm["source"] for sm in sub_metas)),
+                "types": merged_types,
+            }
+        else:
+            cur_meta = scope_meta["SCOPE_ALL"]
+    else:
+        cur_meta = scope_meta.get(scope, scope_meta["SCOPE_ALL"])
     filtered_iocs = [x for x in top_enriched if x["ioc"]["ioc_type"] in cur_meta["types"]] or top_enriched
 
     trust_audit = calculate_cti_trust_framework(

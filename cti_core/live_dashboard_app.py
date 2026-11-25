@@ -17,7 +17,9 @@ from datetime import datetime, timezone
 import json
 from pathlib import Path
 import re
+import shutil
 import sqlite3
+import subprocess
 import sys
 import threading
 import time
@@ -66,15 +68,11 @@ if not ACTIVE_TARGET_PROJECT:
             pass
 
 if not ACTIVE_TARGET_PROJECT:
-    cand_cti = Path("D:/mkhang/testCTI")
-    if cand_cti.exists():
-        ACTIVE_TARGET_PROJECT = str(cand_cti.resolve())
+    sample_p = ROOT_PROJECT_DIR / "target_projects" / "My_Website"
+    if sample_p.exists():
+        ACTIVE_TARGET_PROJECT = str(sample_p)
     else:
-        sample_p = ROOT_PROJECT_DIR / "target_projects" / "My_Website"
-        if sample_p.exists():
-            ACTIVE_TARGET_PROJECT = str(sample_p)
-        else:
-            ACTIVE_TARGET_PROJECT = str(Path.cwd())
+        ACTIVE_TARGET_PROJECT = str(Path.cwd())
 
 try:
     from shared.schemas import EnrichedIOC, ExtractedIOC
@@ -90,26 +88,30 @@ except ImportError:
 
 def init_project_registry_db():
     db_path = SANDBOX_DIR / "cti_multi_source_archive.sqlite"
-    if db_path.exists():
-        try:
-            with sqlite3.connect(db_path) as conn:
-                conn.execute("""
-                    CREATE TABLE IF NOT EXISTS project_defense_registry (
-                        target_path TEXT PRIMARY KEY,
-                        target_name TEXT,
-                        scope_id TEXT,
-                        scope_name TEXT,
-                        skill_name TEXT,
-                        article_id TEXT,
-                        scan_interval_sec INTEGER DEFAULT 21600,
-                        is_configured INTEGER DEFAULT 1,
-                        configured_at TEXT,
-                        updated_at TEXT
-                    )
-                """)
-                conn.commit()
-        except Exception:
-            pass
+    try:
+        from lam_automation_crawler import _init_archive_db
+        _init_archive_db()
+    except Exception:
+        pass
+    try:
+        with sqlite3.connect(db_path) as conn:
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS project_defense_registry (
+                    target_path TEXT PRIMARY KEY,
+                    target_name TEXT,
+                    scope_id TEXT,
+                    scope_name TEXT,
+                    skill_name TEXT,
+                    article_id TEXT,
+                    scan_interval_sec INTEGER DEFAULT 21600,
+                    is_configured INTEGER DEFAULT 1,
+                    configured_at TEXT,
+                    updated_at TEXT
+                )
+            """)
+            conn.commit()
+    except Exception:
+        pass
 
 def record_project_configuration(target_path: Path, scope_id: str, scope_name: str, skill_name: str, scan_interval_sec: int, article_id: str = ""):
     global ACTIVE_TARGET_PROJECT
@@ -250,6 +252,7 @@ class DaemonConfigRequest(BaseModel):
     auto_scan_enabled: Optional[bool] = None
     scan_interval_sec: Optional[int] = None
     auto_queue_enabled: Optional[bool] = None
+    active_model: Optional[str] = None
 
 
 class SuricataTestRequest(BaseModel):
@@ -1847,9 +1850,9 @@ HTML_PAGE = r"""<!DOCTYPE html>
             2. MỐC THỜI GIAN KHO TÌNH BÁO QUÁ KHỨ (HISTORY DEPTH)
           </div>
           <div style="display:flex; gap:20px; align-items:center; flex-wrap:wrap;">
-            <label style="font-size:13px; cursor:pointer;"><input type="radio" name="wzHistory" value="1"> 1 Năm gần nhất (2025 - 2026)</label>
-            <label style="font-size:13px; cursor:pointer;"><input type="radio" name="wzHistory" value="3" checked> 3 Năm (2024 - 2026, Khuyến nghị chuẩn)</label>
-            <label style="font-size:13px; cursor:pointer;"><input type="radio" name="wzHistory" value="5"> 5 Năm (2022 - 2026, Deep Audit toàn diện)</label>
+            <label style="font-size:13px; cursor:pointer;"><input type="radio" name="wzHistory" value="1" onchange="onWizardHistoryChange(this.value)"> 1 Năm gần nhất (2025 - 2026)</label>
+            <label style="font-size:13px; cursor:pointer;"><input type="radio" name="wzHistory" value="3" checked onchange="onWizardHistoryChange(this.value)"> 3 Năm (2024 - 2026, Khuyến nghị chuẩn)</label>
+            <label style="font-size:13px; cursor:pointer;"><input type="radio" name="wzHistory" value="5" onchange="onWizardHistoryChange(this.value)"> 5 Năm (2022 - 2026, Deep Audit toàn diện)</label>
           </div>
         </div>
 
@@ -2144,6 +2147,9 @@ HTML_PAGE = r"""<!DOCTYPE html>
           </button>
           <button type="button" class="CleanBtn" style="border-color:#fca5a5; color:#b91c1c; background:#fef2f2; font-weight:600; padding:4px 10px; font-size:12px; cursor:pointer;" onclick="resetAllArticlesToPending(this)" title="Đặt lại toàn bộ bài báo về trạng thái Chờ xử lý để AI Agent chạy lại từ đầu">
             [ Đặt Lại Toàn Bộ Về Chờ Xử Lý ]
+          </button>
+          <button type="button" class="CleanBtn" style="border-color:#f87171; color:#ffffff; background:#dc2626; font-weight:600; padding:4px 10px; font-size:12px; cursor:pointer;" onclick="clearDatabaseForFreshCrawl(this)" title="Xóa sạch kho bài báo SQLite về 0 (Zero-DB) để kiểm chứng cào mới 100% từ đầu">
+            [ Xóa DB Trống (Zero-DB) ]
           </button>
         </div>
       </div>
@@ -2648,8 +2654,10 @@ HTML_PAGE = r"""<!DOCTYPE html>
     let detectedSystemHardware = null;
 
     function updateAgentLedStatus(state, title, desc) {
-      // state: 'ready' (green pulse), 'processing' (cyan/blue pulse), 'offline' (red)
-      const validState = (state === 'processing' || state === 'offline') ? state : 'ready';
+      // state: 'ready' (green pulse), 'processing'/'inferencing' (cyan/blue pulse), 'offline'/'error' (red)
+      const validState = (state === 'processing' || state === 'inferencing')
+        ? 'processing'
+        : ((state === 'offline' || state === 'error') ? 'offline' : 'ready');
 
       // 1. Navbar Pill & Dot
       const navPill = document.getElementById('navAgentLedPill');
@@ -2811,6 +2819,24 @@ HTML_PAGE = r"""<!DOCTYPE html>
             }
           }
           updateAgentLedStatus('ready');
+          // Kiểm tra Ollama riêng để cập nhật LED chi tiết hơn
+          try {
+            const ollamaRes = await fetch('/api/system/check-ollama');
+            if (ollamaRes.ok) {
+              const ollamaData = await ollamaRes.json();
+              const navText = document.getElementById('navAgentLedText');
+              const navPill = document.getElementById('navAgentLedPill');
+              if (ollamaData.indicator === 'green') {
+                if (navText) navText.textContent = 'AGENT: ONLINE • ' + ollamaData.installed_models.length + ' MODEL';
+              } else if (ollamaData.indicator === 'yellow') {
+                if (navPill) navPill.className = 'AgentLedPill state-ready';
+                if (navText) { navText.textContent = 'HEURISTIC MODE'; navText.style.color = '#b45309'; }
+              } else {
+                updateAgentLedStatus('offline');
+                if (navText) navText.textContent = 'OLLAMA CHƯA CÀI';
+              }
+            }
+          } catch (_) {}
         }
       } catch (e) {
         console.error("Không thể lấy thông tin phần cứng:", e);
@@ -2838,6 +2864,11 @@ HTML_PAGE = r"""<!DOCTYPE html>
       updateModelBadgeText(val);
       updateAgentLedStatus('ready');
       updateLiveTicker(`Đã chuyển sang mô hình: ${val} (${detectedSystemHardware ? detectedSystemHardware.gpu_name : 'GPU Cục Bộ'})`);
+      fetch('/api/system/daemon-config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ active_model: val })
+      }).catch(() => {});
     }
 
     function quickFillChat(text) {
@@ -3460,10 +3491,14 @@ HTML_PAGE = r"""<!DOCTYPE html>
         if (statusFilter === 'HAS_IP' && ((a.ioc_counts?.ips || 0) === 0)) return false;
         if (statusFilter === 'HAS_CVE' && ((a.ioc_counts?.cves || 0) === 0)) return false;
         if (srcFilter !== 'ALL' && !a.source.toLowerCase().includes(srcFilter.toLowerCase())) return false;
-        if (scopeFilter !== 'ALL' && scopeKeywordsMap[scopeFilter]) {
+        if (scopeFilter !== 'ALL' && scopeFilter !== 'SCOPE_ALL') {
           const contentHay = `${a.title} ${a.content || ''}`.toLowerCase();
-          const matchesScope = scopeKeywordsMap[scopeFilter].some(sk => contentHay.includes(sk));
-          if (!matchesScope) return false;
+          const scopeParts = scopeFilter.split(',').map(s => s.trim()).filter(Boolean);
+          const matchesAnyScope = scopeParts.some(sp => {
+            const kws = scopeKeywordsMap[sp];
+            return !kws || kws.some(sk => contentHay.includes(sk));
+          });
+          if (!matchesAnyScope) return false;
         }
         if (kw) {
           const hay = `${a.title} ${a.source} ${a.published_at} ${a.content}`.toLowerCase();
@@ -3739,6 +3774,29 @@ HTML_PAGE = r"""<!DOCTYPE html>
       }
     }
 
+    async function clearDatabaseForFreshCrawl(btnEl) {
+      if (!confirm("CẢNH BÁO: Thao tác này sẽ xóa toàn bộ bài báo và IOC hiện có trong SQLite về 0 (chế độ Zero-DB) để kiểm chứng cào mới 100% từ nguồn thực tế. Tiếp tục?")) return;
+      if (btnEl) { btnEl.disabled = true; btnEl.textContent = "Đang dọn DB..."; }
+      try {
+        const res = await fetch('/api/articles/clear-db', { method: 'POST' });
+        const data = await res.json();
+        if (data.status === 'success') {
+          selectedHistoryIds.clear();
+          allHistoryArticles = [];
+          articles = [];
+          renderNewsGrid();
+          renderHistoryManager();
+          updateLiveTicker("Đã dọn sạch kho SQLite về Zero-DB (0 bài báo). Hãy bấm Quét hoặc Bước 5 để cào mới thực tế!");
+        } else {
+          alert("Lỗi: " + (data.message || "Không thể xóa DB"));
+        }
+      } catch (e) {
+        alert("Lỗi kết nối: " + e);
+      } finally {
+        if (btnEl) { btnEl.disabled = false; btnEl.textContent = "[ Xóa DB Trống (Zero-DB) ]"; }
+      }
+    }
+
     async function triggerManualRefreshHistory(btnEl) {
       if (btnEl) {
         btnEl.disabled = true;
@@ -3835,8 +3893,12 @@ HTML_PAGE = r"""<!DOCTYPE html>
           statusBadgeHtml = `<span class="BadgeCompleted">Đã thẩm định (${dur})</span>`;
           iocBadgeMeta = `<span style="font-size:11px; color:#15803d; background:#dcfce7; border:1px solid #86efac; padding:1px 6px; border-radius:4px; font-weight:700;">Đã xác thực: ${iocBadge}</span>`;
         } else {
-          statusBadgeHtml = `<span class="BadgePending">Chờ xử lý</span>`;
-          iocBadgeMeta = `<span style="font-size:11px; color:#94a3b8; font-style:italic;">Chờ AI bóc tách</span>`;
+          statusBadgeHtml = `<span class="BadgePending">Chờ AI phân tích sâu</span>`;
+          if (counts.total > 0) {
+            iocBadgeMeta = `<span style="font-size:11px; color:#92400e; background:#fef3c7; border:1px solid #fcd34d; padding:1px 6px; border-radius:4px; font-weight:600;" title="Dữ liệu Regex bóc thô — chưa qua AI xác thực">⚡ Quick Scan: ${iocBadge}</span>`;
+          } else {
+            iocBadgeMeta = `<span style="font-size:11px; color:#94a3b8; font-style:italic;">Chờ AI bóc tách IOC</span>`;
+          }
         }
 
         const pubDateStr = formatToLocalTime(art.sort_ts || art.published_at);
@@ -5795,6 +5857,28 @@ const elArt = document.getElementById('lblMasterArticlesCount');
             }
 
             if (savedStep > 0 && savedStep < 5) {
+              try {
+                const savedScanRaw = localStorage.getItem('cti_last_scan_data');
+                if (savedScanRaw) {
+                  const parsedScan = JSON.parse(savedScanRaw);
+                  renderAstScanData(parsedScan);
+                }
+                const savedScopesRaw = localStorage.getItem('cti_selected_scopes');
+                if (savedScopesRaw) {
+                  const arr = JSON.parse(savedScopesRaw);
+                  if (Array.isArray(arr) && arr.length > 0) {
+                    wzSelectedScopes = arr;
+                    wzScopeId = localStorage.getItem('cti_scope_id') || (arr.length >= 4 ? 'SCOPE_ALL' : arr.join(','));
+                    syncScopeSelectorUI();
+                  }
+                }
+                const savedHist = localStorage.getItem('cti_selected_history_years');
+                if (savedHist) {
+                  document.getElementsByName('wzHistory').forEach(r => {
+                    if (r.value === savedHist) r.checked = true;
+                  });
+                }
+              } catch (eRestore) {}
               document.body.classList.remove('landing-mode');
               wizardGotoStep(savedStep);
             } else {
@@ -5886,8 +5970,18 @@ const elArt = document.getElementById('lblMasterArticlesCount');
     async function resetProjectDefense() {
       if (!confirm("Bạn có chắc chắn muốn đặt lại cấu hình phòng thủ để quét lại dự án từ đầu không?")) return;
       try {
-        localStorage.removeItem('cti_configured_' + wzTarget);
-        localStorage.removeItem('cti_last_target');
+        try {
+          localStorage.removeItem('cti_configured_' + wzTarget);
+          localStorage.removeItem('cti_last_target');
+          localStorage.removeItem('cti_dashboard_ready');
+          localStorage.removeItem('cti_wizard_step');
+          localStorage.removeItem('cti_last_scan_data');
+          localStorage.removeItem('cti_selected_scopes');
+          localStorage.removeItem('cti_scope_id');
+          localStorage.removeItem('cti_selected_cadence');
+          localStorage.removeItem('cti_selected_history_years');
+        } catch (eLs) {}
+        wzScanCompleted = false;
         document.documentElement.classList.remove('project-is-configured');
         document.body.classList.remove('project-is-configured');
         const res = await fetch('/api/system/project-reset', {
@@ -6155,6 +6249,11 @@ let wzIsProjectConfigured = false;
       } else {
         wzScopeId = selected.join(",");
       }
+
+      try {
+        localStorage.setItem('cti_selected_scopes', JSON.stringify(selected));
+        localStorage.setItem('cti_scope_id', wzScopeId);
+      } catch (e) {}
 
       updateLiveTicker(`Đã chọn ${selected.length} phân hệ phòng thủ: ${selected.join(', ')}`);
     }
@@ -6619,13 +6718,19 @@ let wzIsProjectConfigured = false;
       }
 
       if (sel && rec && rec.options) {
-        const defSec = rec.default_interval_sec || 21600;
+        let defSec = rec.default_interval_sec || 21600;
+        try {
+          const savedCadence = localStorage.getItem('cti_selected_cadence');
+          if (savedCadence && parseInt(savedCadence, 10) >= 10) {
+            defSec = parseInt(savedCadence, 10);
+          }
+        } catch (e) {}
         sel.innerHTML = "";
         rec.options.forEach(opt => {
           const optEl = document.createElement("option");
           optEl.value = String(opt.sec);
           optEl.textContent = opt.label;
-          if (opt.sec === defSec || opt.is_default) {
+          if (opt.sec === defSec || (opt.is_default && defSec === (rec.default_interval_sec || 21600))) {
             optEl.selected = true;
           }
           sel.appendChild(optEl);
@@ -6636,15 +6741,26 @@ let wzIsProjectConfigured = false;
         onWizardCadenceChange(String(defSec));
       }
 
-      // Đặt mặc định số năm cào báo quá khứ theo thể loại
-      if (rec && rec.default_history_years) {
-        const rads = document.getElementsByName("wzHistory");
-        rads.forEach(r => {
-          if (parseInt(r.value, 10) === rec.default_history_years) {
-            r.checked = true;
-          }
-        });
-      }
+      // Dat moc nam cao bao theo lua chon da luu hoac mac dinh
+      let targetYears = (rec && rec.default_history_years) ? rec.default_history_years : 3;
+      try {
+        const savedHist = localStorage.getItem('cti_selected_history_years');
+        if (savedHist && ['1', '3', '5'].includes(savedHist)) {
+          targetYears = parseInt(savedHist, 10);
+        }
+      } catch (e) {}
+      const rads = document.getElementsByName("wzHistory");
+      rads.forEach(r => {
+        if (parseInt(r.value, 10) === targetYears) {
+          r.checked = true;
+        }
+      });
+    }
+
+    function onWizardHistoryChange(val) {
+      try {
+        localStorage.setItem('cti_selected_history_years', String(val));
+      } catch (e) {}
     }
 
     
@@ -6669,6 +6785,11 @@ let wzIsProjectConfigured = false;
       updateModelBadgeText(chosenModel);
       updateAgentLedStatus('ready');
       updateLiveTicker(`Đã xác nhận mô hình phòng thủ: ${chosenModel} (${detectedSystemHardware ? detectedSystemHardware.gpu_name : 'GPU Cục Bộ'})`);
+      fetch('/api/system/daemon-config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ active_model: chosenModel })
+      }).catch(() => {});
 
       // Chuyển tiếp sang Bước 2 (Quét AST Mã Nguồn)
       wizardGotoStep(2);
@@ -6685,12 +6806,20 @@ let wzIsProjectConfigured = false;
       updateModelBadgeText(modelId);
       updateAgentLedStatus('ready');
       updateLiveTicker(`Đã chọn mô hình: ${modelId} (${detectedSystemHardware ? detectedSystemHardware.gpu_name : 'GPU Cục Bộ'})`);
+      fetch('/api/system/daemon-config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ active_model: modelId })
+      }).catch(() => {});
       renderHardwareModelSelector(modelId);
     }
 
     async function onWizardCadenceChange(val) {
       const sec = parseInt(val, 10);
       serverScanInterval = sec;
+      try {
+        localStorage.setItem('cti_selected_cadence', String(sec));
+      } catch (e) {}
       const selMain = document.getElementById('scanDelayInput');
       if (selMain && selMain.value !== String(sec)) selMain.value = String(sec);
       const wzSel = document.getElementById('wzCadenceSelect');
@@ -6992,11 +7121,11 @@ let wzIsProjectConfigured = false;
           const trustEl = document.getElementById('verifMetricTrust');
           const elapsedEl = document.getElementById('verifElapsedBadge');
 
-          if (precEl) precEl.textContent = (m.precision || 0) + '%';
-          if (recEl) recEl.textContent = (m.recall || 0) + '%';
-          if (f1El) f1El.textContent = (m.f1_score || 0) + '%';
-          if (trustEl) trustEl.textContent = (m.trust_score || 0) + '%';
-          if (elapsedEl) elapsedEl.textContent = `Model: ${d.model_used} • ${d.elapsed_sec}s`;
+          if (precEl) precEl.textContent = (m.precision !== null && m.precision !== undefined) ? (m.precision + '%') : 'N/A';
+          if (recEl) recEl.textContent = (m.recall !== null && m.recall !== undefined) ? (m.recall + '%') : 'N/A (Cần GT)';
+          if (f1El) f1El.textContent = (m.f1_score !== null && m.f1_score !== undefined) ? (m.f1_score + '%') : 'N/A (Cần GT)';
+          if (trustEl) trustEl.textContent = (m.trust_score !== null && m.trust_score !== undefined) ? (m.trust_score + '%') : 'N/A';
+          if (elapsedEl) elapsedEl.textContent = `Model: ${d.model_used} (${d.extraction_mode || 'Hybrid'}) • ${d.elapsed_sec}s`;
 
           const badgesContainer = document.getElementById('verifExtractedBadges');
           if (badgesContainer) {
@@ -7008,10 +7137,21 @@ let wzIsProjectConfigured = false;
             (ext.sha256 || []).forEach(sh => chips.push(`<span class="IocChip hash">SHA: ${sh.slice(0,8)}...</span>`));
             (ext.tactics || []).forEach(t => chips.push(`<span style="background:#fef3c7; color:#92400e; border:1px solid #fde68a; font-weight:700; font-size:11px; padding:2px 8px; border-radius:4px;">ATT&CK: ${t}</span>`));
 
+            let gtSummaryHtml = '';
+            if (d.has_ground_truth) {
+              gtSummaryHtml = `<div style="width:100%; margin-top:8px; padding-top:8px; border-top:1px dashed #cbd5e1; font-size:11.5px;">` +
+                `<span style="color:#15803d; font-weight:700;">TP Đúng: ${m.tp || 0}</span> &bull; ` +
+                `<span style="color:#b91c1c; font-weight:700;">FP Thừa: ${m.fp || 0}</span> &bull; ` +
+                `<span style="color:#b45309; font-weight:700;">FN Bỏ Sót: ${m.fn || 0}</span>` +
+                (d.false_positives && d.false_positives.length ? `<div style="color:#b91c1c; margin-top:3px;">[FP]: ${d.false_positives.join(', ')}</div>` : '') +
+                (d.false_negatives && d.false_negatives.length ? `<div style="color:#b45309; margin-top:2px;">[FN]: ${d.false_negatives.join(', ')}</div>` : '') +
+                `</div>`;
+            }
+
             if (chips.length > 0) {
-              badgesContainer.innerHTML = chips.join(' ');
+              badgesContainer.innerHTML = chips.join(' ') + gtSummaryHtml;
             } else {
-              badgesContainer.innerHTML = `<span style="color:#64748b; font-size:12px;">Báo cáo ngữ cảnh chung (Không chứa chỉ số kỹ thuật độc hại).</span>`;
+              badgesContainer.innerHTML = `<span style="color:#64748b; font-size:12px;">Báo cáo ngữ cảnh chung (Không chứa chỉ số kỹ thuật độc hại).</span>` + gtSummaryHtml;
             }
           }
 
@@ -7032,13 +7172,14 @@ let wzIsProjectConfigured = false;
           }
 
           updateAgentLedStatus('ready', 'TÁC TỬ AI ĐANG HOẠT ĐỘNG (ALIVE & READY)', `Đã thẩm định xong bài báo (${d.elapsed_sec}s)`);
-          updateLiveTicker(`Thẩm định thành công: F1-Score: ${m.f1_score}% • Trust Score: ${m.trust_score}%`);
+          const f1Label = (m.f1_score !== null && m.f1_score !== undefined) ? `F1: ${m.f1_score}%` : `Grounding: ${m.precision}%`;
+          updateLiveTicker(`Thẩm định thành công: ${f1Label} • Trust Score: ${m.trust_score}%`);
         } else {
           alert('Lỗi khi thẩm định: ' + (d.message || 'Không xác định'));
         }
       } catch (err) {
         alert('Lỗi kết nối khi thẩm định: ' + err);
-        updateAgentLedStatus('error');
+        updateAgentLedStatus('offline');
       } finally {
         runBtn.disabled = false;
         runBtn.textContent = '🚀 BẮT ĐẦU PHÂN TÍCH & ĐO ĐỘ CHÍNH XÁC AI';
@@ -7053,29 +7194,30 @@ let wzIsProjectConfigured = false;
       const d = currentVerifData;
       const m = d.metrics || {};
       const ext = d.extracted_entities || {};
+      const recStr = (m.recall !== null && m.recall !== undefined) ? `${m.recall}%` : 'N/A (Chưa nhập Ground Truth)';
+      const f1Str = (m.f1_score !== null && m.f1_score !== undefined) ? `${m.f1_score}%` : 'N/A (Chưa nhập Ground Truth)';
       const md = `# BÁO CÁO KHOA HỌC: THẨM ĐỊNH ĐỘ CHÍNH XÁC TÁC TỬ AI (CTI AGENT ACCURACY BENCHMARK)
 
 - **Tiêu đề bài báo**: ${d.title}
-- **Mô hình tác tử AI sử dụng**: ${d.model_used}
+- **Mô hình tác tử AI sử dụng**: ${d.model_used} (${d.extraction_mode || 'Hybrid'})
 - **Thời gian suy luận**: ${d.elapsed_sec} giây
 - **Số ký tự bài báo**: ${d.char_count} ký tự
+- **Chế độ đối chiếu Ground Truth**: ${d.has_ground_truth ? `Có (TP=${m.tp}, FP=${m.fp}, FN=${m.fn})` : 'Không (Đánh giá Grounding nguyên văn)'}
 
 ## 1. BẢNG CHỈ SỐ KHOA HỌC (SCIENTIFIC METRICS)
 
 | Chỉ Số | Giá Trị | Ý Nghĩa Kỹ Thuật |
 | :--- | :--- | :--- |
-| **Precision (Độ Chuẩn Xác)** | **${m.precision}%** | Tỷ lệ thực thể trích xuất chính xác, loại trừ 100% hiện tượng bịa đặt (Hallucination). |
-| **Recall (Độ Bao Phủ)** | **${m.recall}%** | Tỷ lệ phát hiện đầy đủ mọi điểm yếu và chỉ số đe dọa có trong bài gốc. |
-| **F1-Score** | **${m.f1_score}%** | Trung bình điều hòa cân bằng giữa độ chính xác và độ bao phủ. |
-| **Verbatim Trust Score** | **${m.trust_score}%** | Độ tin cậy đối soát nguồn gốc đối kháng với AlienVault OTX & AbuseIPDB. |
+| **Precision / Grounding** | **${m.precision}%** | Tỷ lệ thực thể trích xuất khớp Ground Truth hoặc hiện diện 100% nguyên văn trong bài gốc. |
+| **Recall (Độ Bao Phủ)** | **${recStr}** | Tỷ lệ phát hiện đầy đủ các chỉ số đe dọa so với bộ nhãn Ground Truth kỳ vọng. |
+| **F1-Score** | **${f1Str}** | Trung bình điều hòa cân bằng giữa Precision và Recall. |
+| **Verbatim Trust Score** | **${m.trust_score}%** | Mức độ tin cậy chống bịa đặt thông qua kiểm chứng sự tồn tại nguyên văn. |
 
 ## 2. CÁC THỰC THỂ AN NINH PHÁT HIỆN
 - **Mã lỗ hổng (CVE)**: ${ext.cves.length > 0 ? ext.cves.join(', ') : 'Không có'}
 - **Địa chỉ IP máy chủ C2**: ${ext.ips.length > 0 ? ext.ips.join(', ') : 'Không có'}
 - **Tên miền độc hại (Domain)**: ${ext.domains.length > 0 ? ext.domains.join(', ') : 'Không có'}
 - **Mã kỹ thuật MITRE ATT&CK**: ${ext.tactics.length > 0 ? ext.tactics.join(', ') : 'Không có'}
-
-*(Báo cáo được trích xuất tự động bởi CTI Autonomous Defense System)*
 `;
       const blob = new Blob([md], { type: 'text/markdown;charset=utf-8;' });
       const link = document.createElement('a');
@@ -7085,19 +7227,21 @@ let wzIsProjectConfigured = false;
     }
 
     async function saveVerifArticleToDatabase() {
-      if (!currentVerifData) {
-        alert('Vui lòng chạy phân tích trước khi lưu vào hệ thống.');
+      const url = document.getElementById('verifUrlInput').value.trim();
+      const content = document.getElementById('verifContentInput').value.trim();
+      const titleInp = document.getElementById('verifTitleInput');
+      let title = titleInp ? titleInp.value.trim() : '';
+      if (!title && currentVerifData && currentVerifData.title) title = currentVerifData.title;
+      if (!url && !content) {
+        alert('Vui lòng nhập URL hoặc dán nội dung bài báo trước khi thẩm định.');
         return;
       }
-      const title = currentVerifData.title;
-      const content = document.getElementById('verifContentInput').value.trim();
-      const url = document.getElementById('verifUrlInput').value.trim();
       const btn = document.getElementById('btnAddVerifToSkills');
       btn.disabled = true;
-      btn.textContent = 'Đang lưu vào SQLite...';
+      btn.textContent = 'Đang thẩm định & sinh Skill...';
 
       try {
-        const res = await fetch('/api/articles/add', {
+        const res = await fetch('/api/articles/verify-url', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
@@ -7107,14 +7251,20 @@ let wzIsProjectConfigured = false;
           })
         });
         const d = await res.json();
-        if (d && d.added) {
-          alert('Đã lưu thành công bài báo vào Kho Lưu Trữ CTI! Tác tử đã tự động cập nhật hệ thống đối sách.');
+        if (d && d.status === 'success') {
+          const c = d.ioc_counts || {};
+          alert(
+            `Đã thẩm định và lưu bài báo vào Kho CTI!\n\n` +
+            `- IOC: ${c.ips || 0} IP, ${c.domains || 0} Domain, ${c.cves || 0} CVE, ${c.hashes || 0} Hash\n` +
+            `- Trust Score: ${d.trust_audit ? d.trust_audit.trust_score : 'N/A'}/100\n` +
+            `- Skill đã tạo: ${d.skill_path || '(không có)'}`
+          );
           await loadArticles('ALL', false);
         } else {
-          alert('Không thể lưu bài báo: ' + JSON.stringify(d));
+          alert('Không thể lưu bài báo: ' + ((d && d.message) || JSON.stringify(d)));
         }
       } catch (e) {
-        alert('Lỗi lưu bài báo: ' + e);
+        alert('Lỗi thẩm định bài báo: ' + e);
       } finally {
         btn.disabled = false;
         btn.textContent = '💾 Lưu Vào Kho Bài Báo & Sinh Skill';
@@ -7170,8 +7320,9 @@ let wzIsProjectConfigured = false;
       if (progSpinner) progSpinner.style.display = "inline-block";
 
       if (term) {
+        const hwLabel = detectedSystemHardware ? detectedSystemHardware.gpu_name : 'GPU/CPU Cục Bộ';
         term.style.display = "block";
-        term.innerHTML = `<div style="color:#94a3b8;">[KHỞI TẠO] Tác tử AI Codebase Inspector đang đọc cây AST bằng mô hình: <b style="color:#38bdf8;">${chosenModel}</b> (GPU AMD RX 6600)...</div>`;
+        term.innerHTML = `<div style="color:#94a3b8;">[KHỞI TẠO] Tác tử AI Codebase Inspector đang đọc cây AST bằng mô hình: <b style="color:#38bdf8;">${chosenModel}</b> (${hwLabel})...</div>`;
       }
 
       // Vòng lặp tiến độ thời gian thực liên tục trong lúc Local LLM GPU suy luận
@@ -7507,13 +7658,13 @@ let wzIsProjectConfigured = false;
               published_at: art.published_date || "2026",
               sort_ts: art.sort_ts || art.published_date || "2026",
               content: art.content || art.excerpt || "",
-              status: "pending",
+              status: art.status || "pending",
               ioc_counts: {
                 cves: (art.cves || []).length,
                 ips: (art.sample_ips || []).length,
                 domains: (art.sample_domains || []).length,
                 sha256: 0,
-                total: art.ioc_count || 3,
+                total: art.ioc_count || 0,
                 sample_cves: art.cves || [],
                 sample_ips: art.sample_ips || [],
                 sample_domains: art.sample_domains || []
@@ -7910,7 +8061,8 @@ let wzIsProjectConfigured = false;
       try {
         const res = await fetch("/api/defense/tools/firewall-apply", { method: "POST" });
         const d = await res.json();
-        box.textContent = "[+] VIRTUAL PATCHING ACTIVATED!\n[+] Cổng WAF Gateway: 8766 (Đang chặn các cuộc tấn công HTTP RCE với mã 403 Forbidden).\n[+] Tường lửa Windows: Đã nạp danh sách IP C2 vào Kernel Netsh.";
+        const logsText = (d.logs && d.logs.length > 0) ? d.logs.join("\n") : JSON.stringify(d, null, 2);
+        box.textContent = `[+] VIRTUAL PATCHING & FIREWALL SYNC (${(d.status || 'ACTIVE').toUpperCase()})!\n[+] Cổng WAF Gateway: 8766 (Sẵn sàng chặn HTTP RCE/SQLi/Traversal với 403 Forbidden).\n` + logsText;
       } catch (e) { box.textContent = "[-] Lỗi WAF: " + e; }
     }
 
@@ -8091,6 +8243,279 @@ def api_add_article(req: AddArticleRequest):
 
 
 
+MAX_ARTICLE_CHARS = 1_000_000
+
+
+@app.post("/api/articles/verify-url")
+def api_verify_url_article(req: AddArticleRequest):
+    """
+    Thẩm định bài báo đơn lẻ (Single URL/Text Verification):
+    Cào nội dung từ URL (hoặc dùng text dán vào) -> bóc IOC -> tính Trust Score ->
+    lưu bài vào kho SQLite -> đóng gói Agentic Defense Skill vào thư mục skills/.
+    """
+    import time
+    import hashlib
+    import socket
+    import re as _re
+    import ipaddress as _ipaddress
+    from urllib.parse import urlparse as _urlparse
+    from agentic_defense_skill_engine import (
+        calculate_cti_trust_framework,
+        generate_xai_defense_attribution,
+        build_agentic_defense_skill_package,
+    )
+    from lam_automation_crawler import scrape_article_text
+
+    t0 = time.time()
+    title = (req.title or "").strip()
+    content = (req.content or "").strip()
+    url = (req.url or "").strip()
+
+    if not url and not content:
+        return {"status": "error", "message": "Cần cung cấp URL hoặc nội dung bài báo."}
+
+    if len(content) > MAX_ARTICLE_CHARS:
+        return {
+            "status": "error",
+            "message": f"Nội dung bài báo quá lớn ({len(content)} ký tự). Giới hạn {MAX_ARTICLE_CHARS} ký tự.",
+        }
+
+    def _host_resolves_to_public_ip(host: str) -> bool:
+        """Chỉ cho phép host phân giải ra IP công cộng (chặn SSRF qua DNS)."""
+        try:
+            infos = socket.getaddrinfo(host, None)
+        except OSError:
+            return False
+        if not infos:
+            return False
+        for info in infos:
+            try:
+                addr = _ipaddress.ip_address(info[4][0])
+            except ValueError:
+                return False
+            if not addr.is_global:
+                return False
+        return True
+
+    # 1. Lấy nội dung thật: ưu tiên text dán sẵn, không có thì cào URL (verbatim)
+    if not content:
+        # SSRF guard: chỉ cho phép http/https, IP/host phải là công cộng
+        try:
+            _p = _urlparse(url)
+            if _p.scheme not in ("http", "https"):
+                return {"status": "error", "message": f"Scheme không được phép: {_p.scheme}. Chỉ hỗ trợ http/https."}
+            _host = (_p.hostname or "").lower()
+            if not _host:
+                return {"status": "error", "message": "URL không có hostname hợp lệ."}
+            if not _host_resolves_to_public_ip(_host):
+                return {
+                    "status": "error",
+                    "message": "Không được phép truy cập địa chỉ IP nội bộ, loopback hoặc host không phân giải được.",
+                }
+        except Exception:
+            return {"status": "error", "message": "URL không hợp lệ."}
+
+        scraped = scrape_article_text(url)
+        if scraped.get("status") != "success" or not (scraped.get("content") or "").strip():
+            return {
+                "status": "error",
+                "message": "Không tải được nội dung từ URL đã cung cấp.",
+            }
+        content = scraped["content"].strip()
+        title = title or (scraped.get("title") or "").strip()
+
+    # 2. Bóc IOC (deterministic, zero-hallucination)
+    guard = AIAgentSecurityGuard.inspect_and_sanitize_input(content)
+    safe_content = guard["sanitized_text"]
+    hybrid_iocs = tool6_extract_iocs_hybrid(safe_content)
+
+    found_ips, found_doms, found_cves, found_hashes = [], [], [], []
+    benign_doms = (
+        "google.com", "microsoft.com", "github.com", "cisa.gov",
+        "thehackernews.com", "securelist.com", "checkpoint.com",
+        "sentinelone.com", "thedfirreport.com",
+    )
+    for ioc in hybrid_iocs:
+        itype = (ioc.ioc_type or "").upper()
+        val = _clean_refang_py(ioc.value)
+        if itype == "IP":
+            if val.startswith(("127.", "0.", "169.254.", "10.", "192.168.")) or val in ("8.8.8.8", "8.8.4.4", "1.1.1.1", "1.0.0.1"):
+                continue
+            found_ips.append(val)
+        elif itype == "DOMAIN":
+            val_l = val.lower()
+            if not any(val_l == b or val_l.endswith("." + b) for b in benign_doms):
+                found_doms.append(val_l)
+        elif itype == "CVE":
+            found_cves.append(val.upper())
+        elif itype in ("SHA256", "MD5"):
+            found_hashes.append(val.lower())
+
+    for m in _re.finditer(r"\bCVE-\d{4}-\d{4,7}\b", title + " " + safe_content, _re.IGNORECASE):
+        found_cves.append(m.group(0).upper())
+
+    found_ips = sorted(set(found_ips))
+    found_doms = sorted(set(found_doms))
+    found_cves = sorted(set(found_cves))
+    found_hashes = sorted(set(found_hashes))
+
+    # 3. Lưu bài vào kho SQLite (ground truth thực, không bịa)
+    storage_url = url or "https://manual-paste.local/nhap-tay"
+    saved = add_custom_article_from_url_or_text(url=storage_url, custom_title=title, custom_content=content)
+
+    # 4. Trust Score + xAI
+    raw_iocs_dicts = (
+        [{"ioc_value": v, "ioc_type": "IP", "is_malicious": True} for v in found_ips]
+        + [{"ioc_value": v, "ioc_type": "DOMAIN", "is_malicious": True} for v in found_doms]
+        + [{"ioc_value": v, "ioc_type": "CVE", "is_malicious": True} for v in found_cves]
+    )
+    source_name = saved.get("source", "Custom URL Source")
+    trust_audit = calculate_cti_trust_framework(
+        report_title=title,
+        raw_text=safe_content,
+        iocs_list=raw_iocs_dicts,
+        source_name=source_name,
+    )
+
+    # 5. Sinh 5 lớp phòng thủ + đóng gói skill vào ./skills/
+    # Lọc IOC độc hại theo cùng guardrail False Positive với step 2.
+    def is_safe_ioc(value: str) -> bool:
+        v = _clean_refang_py(value)
+        if re.fullmatch(r"\d{1,3}(?:\.\d{1,3}){3}", v):
+            try:
+                ip_obj = _ipaddress.ip_address(v)
+                if (
+                    ip_obj.is_private or ip_obj.is_loopback or ip_obj.is_link_local
+                    or ip_obj.is_unspecified or ip_obj.is_multicast or ip_obj.is_reserved
+                ):
+                    return False
+            except ValueError:
+                return False
+        if v.lower() in ("8.8.8.8", "8.8.4.4", "1.1.1.1", "1.0.0.1"):
+            return False
+        vl = v.lower()
+        if any(vl == b or vl.endswith("." + b) for b in benign_doms):
+            return False
+        return True
+
+    high_risk = [
+        EnrichedIOC(
+            ioc=ExtractedIOC(
+                ioc_type=ioc.ioc_type,
+                value=ioc.value,
+                context_sentence=(ioc.context_sentence or "")[:500],
+                confidence=float(getattr(ioc, "confidence", 0.9)),
+            ),
+            reputation_score=95,
+            is_malicious=True,
+            enrichment_source="Verbatim Article Grounding",
+        )
+        for ioc in hybrid_iocs
+        if (ioc.ioc_type or "").upper() in ("IP", "DOMAIN") and is_safe_ioc(ioc.value)
+    ]
+    mitre_tactics = tool7_map_mitre_attack(safe_content, high_risk)
+
+    xai_audit = generate_xai_defense_attribution(
+        report_title=title,
+        raw_text=safe_content,
+        high_risk_iocs=high_risk,
+        mitre_tactics=mitre_tactics,
+        trust_audit=trust_audit,
+        scope_id="SCOPE_ALL",
+    )
+
+    content_fingerprint = hashlib.md5(
+        ((url or "") + (title or "") + content[:500]).encode("utf-8")
+    ).hexdigest()[:8]
+    skill_slug = _re.sub(
+        r"[^a-z0-9-]+",
+        "-",
+        f"agentic-defense-{found_cves[0].lower() if found_cves else 'zero-day-threat'}-{title.lower()[:30]}-{content_fingerprint}",
+    ).strip("-") or "agentic-defense-custom-article"
+
+    skill_path = None
+    skill_error = None
+    try:
+        waf_rules = MultiLayerDefenseSynthesizer.generate_waf_virtual_patch_rules(title, safe_content, high_risk)
+        suricata_rules = MultiLayerDefenseSynthesizer.generate_suricata_ips_rules(title, safe_content, high_risk)
+        remediation_script = MultiLayerDefenseSynthesizer.generate_remediation_hardening_script(title, safe_content, high_risk)
+
+        skill_md = build_agentic_defense_skill_package(
+            report_title=title,
+            raw_text=safe_content,
+            high_risk_iocs=high_risk,
+            mitre_tactics=mitre_tactics,
+            waf_rules=waf_rules,
+            suricata_rules=suricata_rules,
+            remediation_script=remediation_script,
+            scope_id="SCOPE_ALL",
+            trust_audit=trust_audit,
+            xai_audit=xai_audit,
+        )
+
+        skills_root = (ROOT_PROJECT_DIR / "skills").resolve()
+        skill_dir = (skills_root / skill_slug).resolve()
+        if not skill_dir.is_relative_to(skills_root):
+            raise ValueError("Đường dẫn skill không hợp lệ (path traversal)")
+        refs_dir = skill_dir / "references"
+        refs_dir.mkdir(parents=True, exist_ok=True)
+        (skill_dir / "SKILL.md").write_text(skill_md, encoding="utf-8")
+        (refs_dir / "ioc_indicators.txt").write_text(
+            "\n".join(found_ips + found_doms + found_hashes) or "NO-IOC-FOUND",
+            encoding="utf-8",
+        )
+        (skill_dir / "manifest.json").write_text(
+            json.dumps(
+                {
+                    "name": skill_slug,
+                    "description": f"Agentic Defense Skill sinh từ bài báo: {title[:120]}",
+                    "version": "1.0.0",
+                    "source_url": url or None,
+                    "article_id": saved.get("article_id"),
+                    "scope_id": "SCOPE_ALL",
+                    "trust_score": trust_audit.get("trust_score"),
+                    "ioc_counts": {
+                        "ips": len(found_ips),
+                        "domains": len(found_doms),
+                        "cves": len(found_cves),
+                        "hashes": len(found_hashes),
+                    },
+                    "generated_at": datetime.now().isoformat(),
+                },
+                indent=2,
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+        skill_path = str(skill_dir.relative_to(ROOT_PROJECT_DIR))
+    except Exception as exc:
+        print(f"[VERIFY-URL] Lỗi tạo skill '{skill_slug}': {type(exc).__name__}: {exc}")
+        skill_error = type(exc).__name__
+
+    elapsed = round(time.time() - t0, 2)
+    return {
+        "status": "success",
+        "article": saved,
+        "ioc_counts": {
+            "ips": len(found_ips),
+            "domains": len(found_doms),
+            "cves": len(found_cves),
+            "hashes": len(found_hashes),
+        },
+        "extracted": {
+            "ips": found_ips,
+            "domains": found_doms,
+            "cves": found_cves,
+            "hashes": found_hashes,
+        },
+        "trust_audit": trust_audit,
+        "skill_path": skill_path,
+        "skill_slug": skill_slug,
+        "skill_error": skill_error,
+        "elapsed_sec": elapsed,
+    }
+
+
 @app.post("/api/articles/reset-all-status")
 def api_reset_all_articles_status():
     try:
@@ -8104,6 +8529,26 @@ def api_reset_all_articles_status():
             "status": "success",
             "message": "Đã đặt lại toàn bộ bài báo về trạng thái Chờ xử lý (pending).",
             "articles": get_archived_articles(source_filter="ALL"),
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
+@app.post("/api/articles/clear-db")
+def api_clear_database_zero_db():
+    try:
+        from lam_automation_crawler import _init_archive_db
+        _init_archive_db()
+        db_path = SANDBOX_DIR / "cti_multi_source_archive.sqlite"
+        with sqlite3.connect(db_path) as conn:
+            conn.execute("DELETE FROM articles_archive")
+            conn.execute("DELETE FROM ioc_knowledge_base")
+            conn.execute("DELETE FROM ai_analysis_runs")
+            conn.commit()
+        return {
+            "status": "success",
+            "message": "Đã đưa kho SQLite về trạng thái trống 0 bài báo (Zero-DB Mode).",
+            "articles": [],
         }
     except Exception as e:
         return {"status": "error", "message": str(e)}
@@ -9273,31 +9718,73 @@ class VerifySingleArticleReq(BaseModel):
     model_name: Optional[str] = None
     ground_truth: Optional[Dict[str, Any]] = None
 
+def _resolve_ollama_bin() -> Optional[str]:
+    found = shutil.which("ollama")
+    if found:
+        return found
+    cand = Path(os.environ.get("LOCALAPPDATA", "")) / "Programs" / "Ollama" / "ollama.exe"
+    if cand.exists():
+        return str(cand)
+    return None
+
 def _run_ollama_pull(model_name: str):
+    from system_hardware_detector import ensure_ollama_daemon
     ACTIVE_PULL_TASKS[model_name] = {
         "status": "pulling",
-        "progress_text": f"Đang khởi tạo tải mô hình {model_name}...",
-        "percent": 5,
+        "progress_text": f"Đang kiểm tra dịch vụ Ollama & khởi tạo tải {model_name}...",
+        "percent": 2,
         "logs": []
     }
     try:
+        ensure_ollama_daemon()
+        ollama_bin = _resolve_ollama_bin()
+        if not ollama_bin:
+            ACTIVE_PULL_TASKS[model_name]["status"] = "error"
+            ACTIVE_PULL_TASKS[model_name]["progress_text"] = (
+                "Không tìm thấy phần mềm Ollama trên máy tính. Vui lòng cài Ollama tại https://ollama.com/download "
+                "hoặc chọn chế độ CTI Heuristic Core để chạy ngay không cần tải model."
+            )
+            return
+
+        env_copy = os.environ.copy()
+        custom_models_dir = ROOT_PROJECT_DIR / "ollama_models"
+        if custom_models_dir.exists():
+            env_copy["OLLAMA_MODELS"] = str(custom_models_dir)
+
+        ansi_re = re.compile(r'\x1b\[[0-9;?]*[a-zA-Z]|\x1b\][^\x07]*\x07')
+        creationflags = getattr(subprocess, "CREATE_NO_WINDOW", 0) if sys.platform == "win32" else 0
         proc = subprocess.Popen(
-            ["ollama", "pull", model_name],
+            [ollama_bin, "pull", model_name],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
-            bufsize=1
+            encoding="utf-8",
+            errors="replace",
+            env=env_copy,
+            creationflags=creationflags,
+            bufsize=0
         )
-        for line in iter(proc.stdout.readline, ''):
-            if not line:
+        buf = ""
+        while True:
+            ch = proc.stdout.read(1)
+            if not ch:
                 break
-            clean_l = line.strip()
+            if ch in ("\r", "\n"):
+                clean_l = ansi_re.sub("", buf).strip()
+                buf = ""
+                if clean_l:
+                    ACTIVE_PULL_TASKS[model_name]["logs"].append(clean_l)
+                    ACTIVE_PULL_TASKS[model_name]["logs"] = ACTIVE_PULL_TASKS[model_name]["logs"][-20:]
+                    ACTIVE_PULL_TASKS[model_name]["progress_text"] = clean_l
+                    m_pct = re.search(r'(\d+)%', clean_l)
+                    if m_pct:
+                        ACTIVE_PULL_TASKS[model_name]["percent"] = max(int(m_pct.group(1)), ACTIVE_PULL_TASKS[model_name]["percent"])
+            else:
+                buf += ch
+        if buf.strip():
+            clean_l = ansi_re.sub("", buf).strip()
             if clean_l:
-                ACTIVE_PULL_TASKS[model_name]["logs"].append(clean_l)
                 ACTIVE_PULL_TASKS[model_name]["progress_text"] = clean_l
-                m_pct = re.search(r'(\d+)%', clean_l)
-                if m_pct:
-                    ACTIVE_PULL_TASKS[model_name]["percent"] = int(m_pct.group(1))
         proc.wait()
         if proc.returncode == 0:
             ACTIVE_PULL_TASKS[model_name]["status"] = "success"
@@ -9305,7 +9792,7 @@ def _run_ollama_pull(model_name: str):
             ACTIVE_PULL_TASKS[model_name]["progress_text"] = f"Đã tải và nạp mô hình {model_name} thành công!"
         else:
             ACTIVE_PULL_TASKS[model_name]["status"] = "error"
-            ACTIVE_PULL_TASKS[model_name]["progress_text"] = f"Lỗi nạp mô hình (Mã lỗi {proc.returncode})"
+            ACTIVE_PULL_TASKS[model_name]["progress_text"] = f"Lỗi nạp mô hình (Mã lỗi {proc.returncode}): {ACTIVE_PULL_TASKS[model_name]['progress_text']}"
     except Exception as exc:
         ACTIVE_PULL_TASKS[model_name]["status"] = "error"
         ACTIVE_PULL_TASKS[model_name]["progress_text"] = f"Lỗi khởi chạy ollama: {str(exc)}"
@@ -9338,44 +9825,60 @@ def api_benchmark_fetch_url(req: FetchUrlReq):
 
 @app.post("/api/benchmark/verify-single-article")
 def api_benchmark_verify_single(req: VerifySingleArticleReq):
+    import requests as req_http
     import time
     t0 = time.time()
     title = (req.title or "").strip()
     content = (req.content or "").strip()
-    url = (req.url or "").strip()
     gt = req.ground_truth or {}
-    model_name = req.model_name or "cti-heuristic-engine"
+    model_name = (req.model_name or "cti-heuristic-engine").strip()
 
     if not content:
         return {"status": "error", "message": "Nội dung bài báo không được để trống."}
 
-    # Bóc tách IOCs thực tế từ văn bản bài báo
-    ip_regex = re.compile(r'\b(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\[\.\]|\(\.\)|\.)){3}(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\b')
-    dom_regex = re.compile(r'\b(?:[a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+(?:\[\.\]|\(\.\)|\.)(?:com|net|org|io|ru|cn|xyz|top|info|biz|cc|pw|club|online|site|tech|gov|edu|tw|ua|pl|ro|ca|uk|ae|la|bet|wiki)\b', re.IGNORECASE)
-    cve_regex = re.compile(r'\bCVE-\d{4}-\d{4,7}\b', re.IGNORECASE)
-    sha_regex = re.compile(r'\b[a-fA-F0-9]{64}\b')
-    md5_regex = re.compile(r'\b[a-fA-F0-9]{32}\b')
+    # 1. Bóc tách xác định nguyên bản (Deterministic Grounder)
+    guard = AIAgentSecurityGuard.inspect_and_sanitize_input(content)
+    safe_content = guard["sanitized_text"]
+    hybrid_iocs = tool6_extract_iocs_hybrid(safe_content)
 
     found_ips = set()
-    for m in ip_regex.finditer(content):
-        val = m.group(0).replace("[.]", ".").replace("(.)", ".")
-        if not val.startswith(("127.", "0.", "169.254.", "10.", "192.168.")) and val not in ("8.8.8.8", "8.8.4.4", "1.1.1.1", "1.0.0.1"):
-            found_ips.add(val)
-
     found_doms = set()
-    for m in dom_regex.finditer(content):
-        val = m.group(0).replace("[.]", ".").replace("(.)", ".").lower()
-        if not any(val.endswith(d) for d in ("google.com", "microsoft.com", "github.com", "cisa.gov", "thehackernews.com", "bleepingcomputer.com")):
-            found_doms.add(val)
+    found_cves = set()
+    found_shas = set()
+    found_md5s = set()
 
-    found_cves = set(m.group(0).upper() for m in cve_regex.finditer(content + " " + title))
-    found_shas = set(m.group(0).lower() for m in sha_regex.finditer(content))
-    found_md5s = set(m.group(0).lower() for m in md5_regex.finditer(content))
+    for ioc in hybrid_iocs:
+        itype = (ioc.ioc_type or "").upper()
+        val = _clean_refang_py(ioc.value)
+        if itype == "IP":
+            if not val.startswith(("127.", "0.", "169.254.", "10.", "192.168.")) and val not in ("8.8.8.8", "8.8.4.4", "1.1.1.1", "1.0.0.1"):
+                found_ips.add(val)
+        elif itype == "DOMAIN":
+            val_l = val.lower()
+            if not any(val_l.endswith(d) for d in ("google.com", "microsoft.com", "github.com", "cisa.gov", "thehackernews.com", "bleepingcomputer.com", "securelist.com", "checkpoint.com")):
+                found_doms.add(val_l)
+        elif itype == "CVE":
+            found_cves.add(val.upper())
+        elif itype == "SHA256":
+            found_shas.add(val.lower())
+        elif itype == "MD5":
+            found_md5s.add(val.lower())
+
+    dom_regex = re.compile(r'(?<![/@\w])(?:[a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+(?:\[\.\]|\(\.\)|\.)(?:com|net|org|io|ru|cn|xyz|top|info|biz|cc|pw|club|online|site|tech|gov|edu|tw|ua|pl|ro|ca|uk|ae|la|bet|wiki)\b', re.IGNORECASE)
+    benign_doms = ("google.com", "microsoft.com", "github.com", "cisa.gov", "thehackernews.com", "bleepingcomputer.com", "securelist.com", "checkpoint.com", "sentinelone.com", "thedfirreport.com", "virustotal.com", "abuseipdb.com")
+    for m in dom_regex.finditer(safe_content):
+        val_l = m.group(0).replace("[.]", ".").replace("(.)", ".").lower()
+        if not any(val_l == b or val_l.endswith("." + b) for b in benign_doms):
+            found_doms.add(val_l)
+
+    cve_regex = re.compile(r'\bCVE-\d{4}-\d{4,7}\b', re.IGNORECASE)
+    for m in cve_regex.finditer(title + " " + safe_content):
+        found_cves.add(m.group(0).upper())
 
     tcode_regex = re.compile(r'\bT\d{4}(?:\.\d{3})?\b')
-    found_tactics = set(m.group(0).upper() for m in tcode_regex.finditer(content))
+    found_tactics = set(m.group(0).upper() for m in tcode_regex.finditer(safe_content))
     if not found_tactics:
-        lower_c = (content + " " + title).lower()
+        lower_c = (safe_content + " " + title).lower()
         if "sql injection" in lower_c or "sqli" in lower_c:
             found_tactics.add("T1190")
         if "remote code execution" in lower_c or "rce" in lower_c or "code execution" in lower_c:
@@ -9388,6 +9891,40 @@ def api_benchmark_verify_single(req: VerifySingleArticleReq):
         if "deserialization" in lower_c:
             found_tactics.add("T1190")
 
+    # 2. Nếu người dùng chọn Local LLM Ollama, cho LLM phân tích bổ trợ (có fallback an toàn nếu offline)
+    extraction_mode = "Deterministic Grounder + ATT&CK Mapper"
+    if model_name and model_name not in ("cti-heuristic-engine", "auto", "pending"):
+        try:
+            active_llm = MultiProviderLLMBrain._ensure_and_detect_local_ollama_model(model_name)
+            if active_llm:
+                llm_payload = {
+                    "model": active_llm,
+                    "messages": [
+                        {"role": "system", "content": "Trích xuất chỉ số an ninh mạng (CVEs, C2 IPs, Domains, MITRE T-codes) dưới dạng JSON thuần: {\"cves\":[],\"ips\":[],\"domains\":[],\"tactics\":[]}."},
+                        {"role": "user", "content": f"Title: {title}\n\n{safe_content[:2500]}"}
+                    ],
+                    "stream": False,
+                    "options": {"temperature": 0.0, "num_predict": 220}
+                }
+                if "qwen3" in active_llm.lower():
+                    llm_payload["think"] = False
+                resp = req_http.post("http://127.0.0.1:11434/api/chat", json=llm_payload, timeout=14)
+                if resp.status_code == 200:
+                    raw_out = resp.json().get("message", {}).get("content", "").strip()
+                    clean_j = raw_out.split("```json")[1].split("```")[0].strip() if "```json" in raw_out else (raw_out.split("```")[1].split("```")[0].strip() if "```" in raw_out else raw_out)
+                    llm_parsed = json.loads(clean_j)
+                    extraction_mode = f"Hybrid Local LLM ({active_llm}) + Verbatim Grounding"
+                    for c in (llm_parsed.get("cves") or []):
+                        cs = str(c).strip().upper()
+                        if cs.startswith("CVE-") and cs.lower() in (title + " " + safe_content).lower():
+                            found_cves.add(cs)
+                    for t in (llm_parsed.get("tactics") or []):
+                        ts = str(t).strip().upper()
+                        if re.match(r'^T\d{4}(?:\.\d{3})?$', ts):
+                            found_tactics.add(ts)
+        except Exception:
+            extraction_mode = "Deterministic Hybrid (LLM Offline Fallback)"
+
     extracted = {
         "cves": sorted(list(found_cves)),
         "ips": sorted(list(found_ips)),
@@ -9398,46 +9935,58 @@ def api_benchmark_verify_single(req: VerifySingleArticleReq):
     }
 
     gt_cves = set(x.strip().upper() for x in (gt.get("cves") or []) if x.strip())
-    gt_ips = set(x.strip() for x in (gt.get("ips") or []) if x.strip())
-    gt_doms = set(x.strip().lower() for x in (gt.get("domains") or []) if x.strip())
+    gt_ips = set(_clean_refang_py(x) for x in (gt.get("ips") or []) if x.strip())
+    gt_doms = set(_clean_refang_py(x).lower() for x in (gt.get("domains") or []) if x.strip())
     gt_tactics = set(x.strip().upper() for x in (gt.get("tactics") or []) if x.strip())
 
     has_gt = bool(gt_cves or gt_ips or gt_doms or gt_tactics)
+
+    tp_list: List[str] = []
+    fp_list: List[str] = []
+    fn_list: List[str] = []
 
     if has_gt:
         pred_all = set(extracted["cves"] + extracted["ips"] + extracted["domains"] + extracted["tactics"])
         gt_all = set(list(gt_cves) + list(gt_ips) + list(gt_doms) + list(gt_tactics))
 
-        tp = len(pred_all.intersection(gt_all))
-        fp = len(pred_all.difference(gt_all))
-        fn = len(gt_all.difference(pred_all))
+        tp_list = sorted(pred_all.intersection(gt_all))
+        fp_list = sorted(pred_all.difference(gt_all))
+        fn_list = sorted(gt_all.difference(pred_all))
+        tp, fp, fn = len(tp_list), len(fp_list), len(fn_list)
 
-        prec = round((tp / (tp + fp) * 100.0), 2) if (tp + fp) > 0 else 100.0
-        rec = round((tp / (tp + fn) * 100.0), 2) if (tp + fn) > 0 else 100.0
+        prec = round((tp / (tp + fp) * 100.0), 2) if (tp + fp) > 0 else (100.0 if fn == 0 else 0.0)
+        rec = round((tp / (tp + fn) * 100.0), 2) if (tp + fn) > 0 else (100.0 if fp == 0 else 0.0)
         f1 = round((2 * prec * rec / (prec + rec)), 2) if (prec + rec) > 0 else 0.0
+        trust_score = round(min(99.5, prec * 0.98), 1) if prec > 0 else 0.0
     else:
+        # Không bịa Recall khi chưa nhập Ground Truth: chỉ chấm điểm Precision / Verbatim Grounding thực tế
         all_ext = extracted["cves"] + extracted["ips"] + extracted["domains"]
+        hay_lower = (title + " " + content).lower()
         if all_ext:
-            grounded = sum(1 for item in all_ext if item.lower() in content.lower() or item.lower().replace(".", "[.]") in content.lower())
-            prec = round((grounded / len(all_ext) * 100.0), 2)
-            rec = 98.5
-            f1 = round((2 * prec * rec / (prec + rec)), 2)
+            grounded_items = [
+                item for item in all_ext
+                if item.lower() in hay_lower or item.lower().replace(".", "[.]") in hay_lower or item.lower().replace(".", "(.)") in hay_lower
+            ]
+            prec = round((len(grounded_items) / len(all_ext) * 100.0), 2)
+            tp = len(grounded_items)
+            fp = len(all_ext) - len(grounded_items)
         else:
             prec = 100.0
-            rec = 95.0
-            f1 = 97.4
-        tp = len(all_ext)
-        fp = 0
+            tp = 0
+            fp = 0
+        rec = None
+        f1 = None
         fn = 0
+        trust_score = round(min(99.2, prec * 0.98), 1)
 
     elapsed = round(time.time() - t0, 3)
-    trust_score = round(min(99.4, max(85.0, prec * 0.98)), 1)
 
     return {
         "status": "success",
         "title": title,
         "char_count": len(content),
         "model_used": model_name,
+        "extraction_mode": extraction_mode,
         "elapsed_sec": elapsed,
         "has_ground_truth": has_gt,
         "metrics": {
@@ -9449,12 +9998,15 @@ def api_benchmark_verify_single(req: VerifySingleArticleReq):
             "fp": fp,
             "fn": fn
         },
+        "true_positives": tp_list,
+        "false_positives": fp_list,
+        "false_negatives": fn_list,
         "extracted_entities": extracted,
         "ground_truth_input": {
-            "cves": list(gt_cves),
-            "ips": list(gt_ips),
-            "domains": list(gt_doms),
-            "tactics": list(gt_tactics)
+            "cves": sorted(list(gt_cves)),
+            "ips": sorted(list(gt_ips)),
+            "domains": sorted(list(gt_doms)),
+            "tactics": sorted(list(gt_tactics))
         }
     }
 
@@ -9658,6 +10210,10 @@ class ServerAutonomousDaemon:
 
         self.auto_queue_enabled: bool = False
         self.is_processing_queue: bool = False
+        try:
+            self.active_model: str = MultiProviderLLMBrain._ensure_and_detect_local_ollama_model() or "cti-heuristic-engine"
+        except Exception:
+            self.active_model = "cti-heuristic-engine"
         self.active_article_id: str = ""
         self.active_article_title: str = ""
         self.active_stage_idx: int = 0
@@ -9694,6 +10250,7 @@ class ServerAutonomousDaemon:
                 "last_scan_result": self.last_scan_result,
                 "auto_queue_enabled": self.auto_queue_enabled,
                 "is_processing_queue": self.is_processing_queue,
+                "active_model": self.active_model,
                 "active_article_id": self.active_article_id,
                 "active_article_title": self.active_article_title,
                 "active_stage_idx": self.active_stage_idx,
@@ -9704,7 +10261,7 @@ class ServerAutonomousDaemon:
                 "server_uptime_sec": int(now - self.boot_time),
             }
 
-    def update_config(self, auto_scan: Optional[bool] = None, interval_sec: Optional[int] = None, auto_queue: Optional[bool] = None):
+    def update_config(self, auto_scan: Optional[bool] = None, interval_sec: Optional[int] = None, auto_queue: Optional[bool] = None, active_model: Optional[str] = None):
         with self.lock:
             now = time.time()
             if auto_scan is not None:
@@ -9716,6 +10273,8 @@ class ServerAutonomousDaemon:
                 self.next_scan_time = now + self.scan_interval_sec
             if auto_queue is not None:
                 self.auto_queue_enabled = bool(auto_queue)
+            if active_model is not None and active_model.strip() and active_model.strip() != "pending":
+                self.active_model = active_model.strip()
 
     def trigger_scan_now(self):
         with self.lock:
@@ -9782,9 +10341,11 @@ class ServerAutonomousDaemon:
                                     malicious = filter_high_risk_iocs(enriched)
                                     save_enriched_iocs_to_db(enriched, source_title=art_title)
 
+                                active_m = self.active_model or "cti-heuristic-engine"
+                                hw_gpu = CURRENT_HARDWARE.get("gpu_name", "Local Compute")
                                 self.active_stage_idx = 4
-                                self.active_stage_name = "AI Agent suy luận phân tích (Local LLM Qwen3 trên GPU RX 6600)"
-                                brain = MultiProviderLLMBrain(provider="ollama", model_name="khang-qwen3")
+                                self.active_stage_name = f"AI Agent suy luận phân tích ({active_m} trên {hw_gpu})"
+                                brain = MultiProviderLLMBrain(provider="ollama", model_name=active_m)
                                 sys_prompt = (
                                     "Bạn là Tác tử AI An ninh Mạng tự chủ (Autonomous CTI Defense Agent). "
                                     "Hãy phân tích bài báo sau và tóm tắt phương án phòng thủ bằng tiếng Việt trong 3 gạch đầu dòng: "
@@ -9796,15 +10357,17 @@ class ServerAutonomousDaemon:
                                 try:
                                     llm_out = brain.ask_llm(sys_prompt, user_prompt, temperature=0.1)
                                     ai_summary = llm_out.get("content", "").strip()
+                                    model_used_label = llm_out.get("provider_used", f"{active_m} • {hw_gpu}")
                                 except Exception as err:
                                     ai_summary = f"Tác tử phân tích tự động: {err}"
+                                    model_used_label = f"{active_m} • {hw_gpu}"
 
                                 mitre = tool7_map_mitre_attack(art_content, malicious)
                                 base_rules = tool8_generate_defensive_rules(art_title, malicious, mitre, raw_text=art_content)
                                 save_ai_analysis_run_to_db(
                                     run_mode="SERVER_AUTONOMOUS_DAEMON",
                                     campaign_title=f"[{pending_row['source_name']}] {art_title[:100]}",
-                                    model_used="LOCAL OLLAMA (khang-qwen3 • 100% GPU RX 6600)",
+                                    model_used=model_used_label,
                                     total_iocs=len(enriched),
                                     malicious_iocs=len(malicious),
                                     defense_summary=ai_summary or f"Tác tử AI tự động phân tích và sinh Kỹ Năng Tác Tử cho {len(malicious)} IOC.",
@@ -9817,8 +10380,8 @@ class ServerAutonomousDaemon:
                                 except Exception:
                                     pass
                             except Exception as e:
-                                duration = round(time.time() - t_start, 2)
-                                update_article_analysis_status(art_id, status="completed", processing_time_sec=duration)
+                                print(f"[DAEMON_WORKER_ERROR] {art_id}: {e}")
+                                update_article_analysis_status(art_id, status="pending", processing_time_sec=0.0)
                             finally:
                                 self.is_processing_queue = False
                                 self.active_article_id = ""
@@ -10033,7 +10596,7 @@ def api_reset_project(req: TargetRequest):
         except Exception:
             pass
             
-    for root_extra in [p / ".cursor" / "rules", p / ".gemini" / "skills"]:
+    for root_extra in [p / ".cursor" / "rules", p / ".gemini" / "skills", p / "skills"]:
         if root_extra.exists():
             for item in root_extra.glob("agentic-defense-*"):
                 try:
@@ -10043,6 +10606,13 @@ def api_reset_project(req: TargetRequest):
                         item.unlink()
                 except Exception:
                     pass
+
+    root_skill_md = p / "SKILL.md"
+    if root_skill_md.exists():
+        try:
+            root_skill_md.unlink()
+        except Exception:
+            pass
 
     return {"status": "success", "message": f"Đã đặt lại cấu hình phòng thủ cho {p.name}. Sẵn sàng quét lại từ đầu."}
 
@@ -10080,6 +10650,7 @@ def api_update_daemon_config(req: DaemonConfigRequest):
         auto_scan=req.auto_scan_enabled,
         interval_sec=req.scan_interval_sec,
         auto_queue=req.auto_queue_enabled,
+        active_model=req.active_model,
     )
     global ACTIVE_TARGET_PROJECT
     target_to_update = ACTIVE_TARGET_PROJECT
@@ -10099,6 +10670,36 @@ def api_update_daemon_config(req: DaemonConfigRequest):
             pass
     return server_daemon.get_status()
 
+
+
+@app.get("/api/system/check-ollama")
+def api_check_ollama():
+    """Kiểm tra trạng thái Ollama: chưa cài / đã cài nhưng thiếu model / sẵn sàng."""
+    import urllib.request as _ureq
+    try:
+        with _ureq.urlopen("http://127.0.0.1:11434/api/tags", timeout=3) as resp:
+            raw = json.loads(resp.read().decode())
+            models = [m.get("name", "") for m in raw.get("models", [])]
+            if models:
+                return {
+                    "status": "ready",
+                    "indicator": "green",
+                    "message": f"Ollama đang chạy • {len(models)} model sẵn sàng",
+                    "installed_models": models,
+                }
+            return {
+                "status": "no_models",
+                "indicator": "yellow",
+                "message": "Ollama đã cài nhưng chưa có model. Chọn model và nhấn [Cài Đặt] để tải về.",
+                "installed_models": [],
+            }
+    except Exception:
+        return {
+            "status": "not_installed",
+            "indicator": "red",
+            "message": "Ollama chưa được cài đặt. Tải về tại https://ollama.com/download hoặc chọn chế độ CTI Heuristic Core.",
+            "installed_models": [],
+        }
 
 
 @app.get("/api/system/gap-status")
