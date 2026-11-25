@@ -3720,12 +3720,14 @@ HTML_PAGE = r"""<!DOCTYPE html>
         `;
       }).join('') + moreNotice;
 
-      // Tự động hiển thị bài báo đã hoàn thành trong khung đọc Highlight của mục Lịch sử
+      // Tự động hiển thị bài báo đã hoàn thành trong khung đọc Highlight của mục Lịch sử (chỉ render lại nếu đổi bài)
       const completedInView = filtered.filter(a => (a.status || '').toLowerCase() === 'completed');
       const targetHistArt = (window.selectedHistoryViewId && filtered.find(a => a.article_id === window.selectedHistoryViewId))
         || completedInView[0]
         || null;
-      if (typeof renderHistoryHighlightedArticle === 'function') {
+      const targetHistId = targetHistArt ? targetHistArt.article_id : null;
+      if (typeof renderHistoryHighlightedArticle === 'function' && window.renderedHistoryViewId !== targetHistId) {
+        window.renderedHistoryViewId = targetHistId;
         renderHistoryHighlightedArticle(targetHistArt);
       }
     }
@@ -4032,6 +4034,12 @@ HTML_PAGE = r"""<!DOCTYPE html>
         </div>`;
         return;
       }
+      const prevWinY = window.scrollY;
+      const gridEl = document.getElementById('newsGrid');
+      const prevGridTop = gridEl ? gridEl.scrollTop : 0;
+      const viewerEl = document.getElementById('highlightedArticleView');
+      const prevViewerTop = viewerEl ? viewerEl.scrollTop : 0;
+
       const MAX_FEED = 200;
       const feedToShow = displayedArticles.slice(0, MAX_FEED);
       grid.innerHTML = feedToShow.map((art) => {
@@ -4085,6 +4093,9 @@ HTML_PAGE = r"""<!DOCTYPE html>
           </div>
         `;
       }).join('');
+      if (gridEl) gridEl.scrollTop = prevGridTop;
+      if (viewerEl) viewerEl.scrollTop = prevViewerTop;
+      if (Math.abs(window.scrollY - prevWinY) > 4) window.scrollTo({ top: prevWinY, behavior: 'instant' });
     }
 
     function renderHighlightedArticlesAndBuildProvenance(selectedArts) {
@@ -5361,7 +5372,10 @@ const elArt = document.getElementById('lblMasterArticlesCount');
       const hArtProcessing = allHistoryArticles.find(a => a.article_id === art.article_id);
       if (hArtProcessing) hArtProcessing.status = 'processing';
 
-      selectCard(idx, false);
+      // Chỉ tự động chọn thẻ nếu người dùng chưa chọn bài nào để đọc, tránh giật màn hình khi đang lướt bài khác
+      if (selectedIndices.length === 0) {
+        selectCard(idx, false);
+      }
       renderNewsGrid();
       renderHistoryManager();
 
@@ -5501,13 +5515,16 @@ const elArt = document.getElementById('lblMasterArticlesCount');
           body: JSON.stringify({ article_id: art.article_id, status: 'completed', processing_time_sec: durationSec })
         }).catch(() => {});
 
-        renderHighlightedArticlesAndBuildProvenance([{ art, idx }]);
+        if (selectedIndices.includes(idx)) {
+          renderHighlightedArticlesAndBuildProvenance([{ art, idx }]);
+        }
         renderNewsGrid();
         renderHistoryManager();
 
-        // Tự động chuyển Section 3 sang chế độ Theo Bài Báo để người dùng thấy ngay điểm số mới được tính!
-        await switchDefenseScope('SINGLE');
-        applyArticleDefenseData(articleDefenseCache[art.article_id]);
+        if (selectedIndices.includes(idx)) {
+          await switchDefenseScope('SINGLE');
+          applyArticleDefenseData(articleDefenseCache[art.article_id]);
+        }
       } catch (err) {
         status.textContent = `Lỗi bài #${idx + 1}: ` + err;
         updateLiveTicker(`Lỗi xử lý bài #${idx + 1}: ${err}`);
@@ -5519,13 +5536,16 @@ const elArt = document.getElementById('lblMasterArticlesCount');
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ article_id: art.article_id, status: 'pending', processing_time_sec: 0 })
         }).catch(() => {});
-        renderHighlightedArticlesAndBuildProvenance([{ art, idx }]);
+        if (selectedIndices.includes(idx)) {
+          renderHighlightedArticlesAndBuildProvenance([{ art, idx }]);
+        }
         renderNewsGrid();
         renderHistoryManager();
 
-        // Tự động chuyển Section 3 sang chế độ Theo Bài Báo để người dùng thấy ngay điểm số mới được tính!
-        await switchDefenseScope('SINGLE');
-        applyArticleDefenseData(articleDefenseCache[art.article_id]);
+        if (selectedIndices.includes(idx)) {
+          await switchDefenseScope('SINGLE');
+          applyArticleDefenseData(articleDefenseCache[art.article_id]);
+        }
       } finally {
         isQueueWorkerRunning = false;
         if (btn) {
