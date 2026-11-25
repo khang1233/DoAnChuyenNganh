@@ -1180,7 +1180,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
         CLI Controller
       </button>
       <button class="CleanBtn" id="btnShutdownSystem" style="border-color:#fca5a5; color:#b91c1c; background:#fef2f2; font-weight:700;" onclick="shutdownSystem()" title="Tắt toàn bộ hệ thống (Dashboard 8765, WAF 8766, Benchmark 8780, Ollama GPU) và giải phóng 100% RAM/VRAM">
-        ⏻ Tắt Hệ Thống
+        Tắt Hệ Thống
       </button>
     </div>
   </nav>
@@ -5760,7 +5760,6 @@ const elArt = document.getElementById('lblMasterArticlesCount');
       document.body.innerHTML = `
         <div style="min-height:100vh; display:flex; align-items:center; justify-content:center; background:#f8fafc; color:#0f172a; font-family:'Inter',sans-serif; padding:24px;">
           <div style="border:1px solid #cbd5e1; background:#ffffff; border-radius:10px; box-shadow:0 4px 16px rgba(0,0,0,0.07); padding:36px 42px; max-width:580px; text-align:center;">
-            <div style="display:inline-flex; align-items:center; justify-content:center; width:48px; height:48px; border-radius:50%; background:#fee2e2; color:#b91c1c; font-size:22px; font-weight:800; margin-bottom:14px;">⏻</div>
             <h2 style="color:#0f172a; margin:0 0 10px 0; font-weight:800;">HỆ THỐNG ĐÃ TẮT HOÀN TOÀN</h2>
             <p style="color:#475569; line-height:1.65; font-size:14px; margin:0 0 16px 0;">
               Đã dừng toàn bộ tiến trình nền và giải phóng 100% RAM / GPU VRAM:<br/>
