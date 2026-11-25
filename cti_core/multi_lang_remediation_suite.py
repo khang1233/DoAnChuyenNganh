@@ -207,7 +207,7 @@ public class PatchedSecureSample {
     "php": {
         "title": "PHP (Modern PHP & Laravel)",
         "lang_tag": "php",
-        "file_vuln": "vulnerable_sample.php",
+        "file_vuln": "vulnerable_sample.php.txt",
         "file_secure": "patched_secure_sample.php",
         "vuln_code": """<?php
 // [VULNERABLE] PHP — Thực thi hệ thống với system() và ghép chuỗi SQL
