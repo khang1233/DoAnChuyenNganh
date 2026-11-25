@@ -3802,16 +3802,77 @@ HTML_PAGE = r"""<!DOCTYPE html>
       const displayTime = formatToLocalTime(art.fetched_at || art.sort_ts);
       const dur = art.processing_time_sec ? `${art.processing_time_sec.toFixed(1)}s` : 'Xong';
       box.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; gap:8px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; gap:8px; flex-wrap:wrap;">
           <b style="color:var(--text-main); font-size:13.5px;">[${art.source || 'CTI'}] ${art.title || ''}</b>
-          <a class="BtnMiniProof" href="${art.url || '#'}" target="_blank">Báo gốc &nearr;</a>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <button type="button" class="BtnMiniProof" style="border-color:var(--primary); color:var(--primary); font-weight:700;" onclick="toggleHistoryAiAnalysis('${art.article_id}')">Xem Phân Tích &amp; Suy Luận AI</button>
+            <a class="BtnMiniProof" href="${art.url || '#'}" target="_blank">Báo gốc &nearr;</a>
+          </div>
         </div>
         <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px; font-size:11.5px; color:var(--text-muted); flex-wrap:wrap;">
           <span>Xuất bản: <b style="color:var(--text-main); font-family:var(--font-mono);">${pubTime}</b></span>
           <span>Quét về: <b style="color:var(--primary); font-family:var(--font-mono);">${displayTime}</b></span>
           <span>Trạng thái: <span class="BadgeCompleted">Đã xử lý (${dur})</span></span>
         </div>
+        <div id="historyAiAnalysisPanel_${art.article_id}" style="display:none; margin-bottom:12px; padding:12px 14px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px;"></div>
         <div>${renderedParas}</div>
+      `;
+    }
+
+    async function toggleHistoryAiAnalysis(articleId) {
+      const panel = document.getElementById(`historyAiAnalysisPanel_${articleId}`);
+      if (!panel) return;
+      if (panel.style.display === 'block') {
+        panel.style.display = 'none';
+        return;
+      }
+      panel.style.display = 'block';
+      let c = articleDefenseCache[articleId];
+      if (!c) {
+        panel.innerHTML = `<div style="color:var(--text-muted); font-size:12.5px;">Đang nạp chuỗi phân tích ngữ cảnh &amp; suy luận từ AI Agent...</div>`;
+        try {
+          const res = await fetch(`/api/articles/details/${encodeURIComponent(articleId)}`);
+          if (res.ok) {
+            const data = await res.json();
+            c = {
+              history: data.history_and_summary,
+              firewall: data.firewall_tab_text,
+              suricata: data.suricata_rules,
+              waf: data.waf_rules,
+              sigma: data.sigma_and_siem,
+              yara: data.yara_remediation_stix,
+              skill_md: data.agentic_skill_md,
+              trust_audit: data.trust_audit,
+              xai_audit: data.xai_audit,
+              score: data.all_enriched,
+              plan: data.ai_plan,
+              reason: data.ai_reasoning
+            };
+            articleDefenseCache[articleId] = c;
+          }
+        } catch (e) {}
+      }
+      if (!c) {
+        panel.innerHTML = `<div style="color:#b91c1c; font-size:12.5px;">Không tải được dữ liệu suy luận AI cho bài báo này.</div>`;
+        return;
+      }
+      const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      panel.innerHTML = `
+        <div style="font-weight:700; color:#1e40af; font-size:12.5px; margin-bottom:8px;">CHUỖI SUY LUẬN CỦA AI AGENT (NGỮ CẢNH &rarr; TẤN CÔNG &rarr; PHÒNG TRÁNH &rarr; SKILL)</div>
+        <div style="display:grid; gap:8px;">
+          <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; padding:10px;">
+            <div style="font-weight:700; font-size:12px; color:#0f172a; margin-bottom:4px;">1. Phân tích Ngữ cảnh &amp; Kế hoạch Điều tra</div>
+            <pre style="margin:0; white-space:pre-wrap; font-family:inherit; font-size:12px; color:#334155; max-height:180px; overflow-y:auto;">${esc(c.plan || 'Không có dữ liệu')}</pre>
+          </div>
+          <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; padding:10px;">
+            <div style="font-weight:700; font-size:12px; color:#0f172a; margin-bottom:4px;">2. Biện pháp Tấn công &amp; Suy luận Phòng tránh (MITRE ATT&amp;CK &rarr; D3FEND)</div>
+            <pre style="margin:0; white-space:pre-wrap; font-family:inherit; font-size:12px; color:#334155; max-height:240px; overflow-y:auto;">${esc(c.history || c.reason || 'Không có dữ liệu')}</pre>
+          </div>
+          <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; padding:10px;">
+            <div style="font-weight:700; font-size:12px; color:#15803d; margin-bottom:4px;">3. Gói Kỹ Năng Tác Tử Sinh Ra (SKILL.md)</div>
+            <pre style="margin:0; white-space:pre-wrap; font-family:var(--font-mono); font-size:11.5px; color:#0f172a; max-height:220px; overflow-y:auto;">${esc(c.skill_md || 'Chưa có SKILL.md')}</pre>
+          </div>
+        </div>
       `;
     }
 
