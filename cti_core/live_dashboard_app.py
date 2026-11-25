@@ -3835,8 +3835,11 @@ HTML_PAGE = r"""<!DOCTYPE html>
         const data = await res.json();
         if (data.status === 'success') {
           selectedHistoryIds.clear();
+          selectedIndices = [];
           allHistoryArticles = [];
           articles = [];
+          const hlView = document.getElementById('highlightedArticleView');
+          if (hlView) hlView.innerHTML = '<div style="padding:18px; color:var(--text-muted); font-style:italic;">Kho bài báo đang trống (Zero-DB). Hãy bấm Quét hoặc Bước 5 để cào bài mới từ nguồn thực tế.</div>';
           renderNewsGrid();
           renderHistoryManager();
           updateLiveTicker("Đã dọn sạch kho SQLite về Zero-DB (0 bài báo). Hãy bấm Quét hoặc Bước 5 để cào mới thực tế!");
@@ -6086,27 +6089,14 @@ const elArt = document.getElementById('lblMasterArticlesCount');
         });
         const d = await res.json();
         wzIsProjectConfigured = false;
+        articles = [];
+        allHistoryArticles = [];
+        selectedIndices = [];
+        autoQueueEnabled = false;
 
-        // Chuyển thẳng về màn hình Landing / Bắt đầu từ đầu
-        document.body.classList.add('landing-mode');
-        document.body.classList.remove('wizard-setup-mode');
-        const card0 = document.getElementById('wizardCard0');
-        if (card0) card0.style.display = 'block';
-        const stepperNav = document.getElementById('wizardStepperNav');
-        if (stepperNav) stepperNav.style.display = 'none';
-        for (let i = 1; i <= 6; i++) {
-          const c = document.getElementById('wizardCard' + i);
-          if (c) c.style.display = 'none';
-        }
-        const secWizard = document.getElementById('sec-wizard');
-        if (secWizard) {
-          secWizard.style.display = 'block';
-          secWizard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-        const navWiz = document.querySelectorAll('.NavLinks .NavLink')[0];
-        if (navWiz) switchView('sec-wizard', navWiz);
-        wzCurrentStep = 0;
-        await initProjectContext();
+        // Tải lại trang sạch sẽ để văng thẳng về màn hình Bước 0 (Quét dự án từ đầu)
+        const nextUrl = '/?target=' + encodeURIComponent(wzTarget || '');
+        window.location.replace(nextUrl);
       } catch (e) {
         alert("Lỗi đặt lại: " + e);
       }
@@ -10758,7 +10748,9 @@ def api_reset_project(req: TargetRequest):
     try:
         db_path = SANDBOX_DIR / "cti_multi_source_archive.sqlite"
         if db_path.exists():
+            norm_p = str(p).replace("\\", "/").lower()
             with sqlite3.connect(db_path) as conn:
+                conn.execute("DELETE FROM project_defense_registry WHERE lower(replace(target_path, '\\', '/')) = ?", (norm_p,))
                 conn.execute("UPDATE project_defense_registry SET is_configured = 0 WHERE target_path = ?", (str(p),))
                 conn.execute("UPDATE articles_archive SET status = 'pending', processing_time_sec = 0, last_analyzed_at = NULL")
                 conn.execute("DELETE FROM ioc_knowledge_base")
