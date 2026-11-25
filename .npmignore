@@ -8,7 +8,16 @@ target_projects/
 ai-devsecops-agent/
 *.docx
 __pycache__/
+**/__pycache__/
 *.pyc
+**/*.pyc
+**/*.pyo
+.pytest_cache/
+**/.pytest_cache/
+.claude/
+.kilo/
+.mypy_cache/
+.ruff_cache/
 
 # Binaries & large installers
 *.exe
