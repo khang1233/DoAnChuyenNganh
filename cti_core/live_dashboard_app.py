@@ -2735,7 +2735,10 @@ HTML_PAGE = r"""<!DOCTYPE html>
       }
 
       // 5. Update active model & hardware labels in Feed Header and Step 2
-      const chosenModel = localStorage.getItem('selectedAiModel') || (detectedSystemModelData ? detectedSystemModelData.active_model : 'cti-heuristic-engine');
+      const navSelEl = document.getElementById('aiModelSelect');
+      const chosenModel = (navSelEl && navSelEl.value && navSelEl.value !== 'auto')
+        ? navSelEl.value
+        : (localStorage.getItem('selectedAiModel') || (detectedSystemModelData ? detectedSystemModelData.active_model : 'cti-heuristic-engine'));
       const feedModel = document.getElementById('feedActiveModelText');
       if (feedModel) feedModel.textContent = chosenModel;
       const step2Model = document.getElementById('step2ActiveModelName');
@@ -7418,7 +7421,11 @@ let wzIsProjectConfigured = false;
       const progEta = document.getElementById("wzProgressEta");
       const progSpinner = document.getElementById("wzProgressSpinner");
 
-      const chosenModel = localStorage.getItem("selectedAiModel") || (document.getElementById("aiModelSelect") ? document.getElementById("aiModelSelect").value : "auto");
+      const navSelEl = document.getElementById("aiModelSelect");
+      const chosenModel = (navSelEl && navSelEl.value && navSelEl.value !== "auto")
+        ? navSelEl.value
+        : (localStorage.getItem("selectedAiModel") || (detectedSystemModelData ? detectedSystemModelData.active_model : "auto"));
+      try { if (chosenModel && chosenModel !== "auto") localStorage.setItem("selectedAiModel", chosenModel); } catch (e) {}
       wzScanInProgress = true;
       updateAgentLedStatus("processing", "TÁC TỬ AI ĐANG QUÉT AST MÃ NGUỒN", `Duyệt cây AST & gọi mô hình ${chosenModel}...`);
 
