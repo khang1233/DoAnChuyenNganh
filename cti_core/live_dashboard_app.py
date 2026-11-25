@@ -1179,6 +1179,9 @@ HTML_PAGE = r"""<!DOCTYPE html>
       <button class="CleanBtn" style="border-color:#93c5fd; color:#0369a1; background:#f0f9ff; font-weight:600;" onclick="showCliControlModal()" title="Quản lý hệ thống qua CLI Terminal">
         CLI Controller
       </button>
+      <button class="CleanBtn" id="btnShutdownSystem" style="border-color:#fca5a5; color:#b91c1c; background:#fef2f2; font-weight:700;" onclick="shutdownSystem()" title="Tắt toàn bộ hệ thống (Dashboard 8765, WAF 8766, Benchmark 8780, Ollama GPU) và giải phóng 100% RAM/VRAM">
+        ⏻ Tắt Hệ Thống
+      </button>
     </div>
   </nav>
 
@@ -5747,18 +5750,28 @@ const elArt = document.getElementById('lblMasterArticlesCount');
     }
 
     async function shutdownSystem() {
+      if (!confirm("Bạn có chắc chắn muốn TẮT TOÀN BỘ hệ thống CTI Defense?\n\nHành động này sẽ dừng Dashboard (8765), WAF Proxy (8766), Benchmark (8780), Ollama GPU (11434) và giải phóng toàn bộ RAM/VRAM.")) {
+        return;
+      }
+      autoQueueEnabled = false;
       try {
-        fetch('/api/system/shutdown', { method: 'POST' }).catch(() => {});
+        await fetch('/api/system/shutdown', { method: 'POST', keepalive: true }).catch(() => {});
       } catch (e) {}
       document.body.innerHTML = `
         <div style="min-height:100vh; display:flex; align-items:center; justify-content:center; background:#f8fafc; color:#0f172a; font-family:'Inter',sans-serif; padding:24px;">
-          <div style="border:1px solid #cbd5e1; background:#ffffff; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.06); padding:36px 42px; max-width:560px; text-align:center;">
-            <h2 style="color:#0f172a; margin-bottom:12px; font-weight:700;">HỆ THỐNG ĐÃ DỪNG AN TOÀN</h2>
-            <p style="color:#475569; line-height:1.6; font-size:14px;">
-              Tiến trình Web và GPU Server đã được giải phóng bộ nhớ.<br/>
-              Để khởi động lại hệ thống, mở Terminal và chạy lệnh:<br/>
-              <code style="display:inline-block; margin-top:8px; background:#0f172a; color:#4ade80; padding:6px 16px; border-radius:6px; font-family:monospace; font-weight:700; font-size:14px;">cti-defense</code>
+          <div style="border:1px solid #cbd5e1; background:#ffffff; border-radius:10px; box-shadow:0 4px 16px rgba(0,0,0,0.07); padding:36px 42px; max-width:580px; text-align:center;">
+            <div style="display:inline-flex; align-items:center; justify-content:center; width:48px; height:48px; border-radius:50%; background:#fee2e2; color:#b91c1c; font-size:22px; font-weight:800; margin-bottom:14px;">⏻</div>
+            <h2 style="color:#0f172a; margin:0 0 10px 0; font-weight:800;">HỆ THỐNG ĐÃ TẮT HOÀN TOÀN</h2>
+            <p style="color:#475569; line-height:1.65; font-size:14px; margin:0 0 16px 0;">
+              Đã dừng toàn bộ tiến trình nền và giải phóng 100% RAM / GPU VRAM:<br/>
+              <span style="display:inline-block; margin-top:6px; font-size:12.5px; color:#64748b;">
+                Dashboard (:8765) • WAF Proxy (:8766) • Benchmark (:8780) • Ollama GPU (:11434)
+              </span>
             </p>
+            <div style="background:#f1f5f9; border-radius:8px; padding:12px 16px; font-size:13px; color:#334155;">
+              Để khởi động lại hệ thống, mở Terminal tại thư mục dự án và chạy:<br/>
+              <code style="display:inline-block; margin-top:8px; background:#0f172a; color:#4ade80; padding:6px 18px; border-radius:6px; font-family:monospace; font-weight:700; font-size:14px;">cti</code>
+            </div>
           </div>
         </div>
       `;
@@ -9653,20 +9666,47 @@ def api_export_skill_md(scope: str = "SCOPE_WEB"):
 
 @app.post("/api/system/shutdown")
 def api_system_shutdown():
+    import gc
     import os
     import subprocess
     import threading
     import time
 
+    try:
+        server_daemon.update_config(auto_scan=False, auto_queue=False)
+    except Exception:
+        pass
+
     def _kill_all() -> None:
-        time.sleep(0.4)
-        subprocess.run(["taskkill", "/F", "/IM", "ollama app.exe", "/T"], capture_output=True)
-        subprocess.run(["taskkill", "/F", "/IM", "ollama.exe", "/T"], capture_output=True)
-        subprocess.run(["taskkill", "/F", "/IM", "ollama_llama_server.exe", "/T"], capture_output=True)
+        time.sleep(0.35)
+        my_pid = os.getpid()
+        if os.name == "nt":
+            for img in ("ollama app.exe", "ollama.exe", "ollama_llama_server.exe"):
+                try:
+                    subprocess.run(["taskkill", "/F", "/IM", img, "/T"], capture_output=True, timeout=5)
+                except Exception:
+                    pass
+            try:
+                ps_cmd = (
+                    f"$selfPid = {my_pid}; "
+                    "$procs = Get-CimInstance Win32_Process | Where-Object { "
+                    "$_.ProcessId -ne $selfPid -and $_.CommandLine -match 'live_dashboard_app|labeler_server' }; "
+                    "if ($procs) { $procs | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue } }; "
+                    "$pids = (Get-NetTCPConnection -LocalPort 8766,8780,11434 -ErrorAction SilentlyContinue).OwningProcess | "
+                    "Where-Object { $_ -and $_ -ne $selfPid } | Select-Object -Unique; "
+                    "if ($pids) { Stop-Process -Id $pids -Force -ErrorAction SilentlyContinue }"
+                )
+                subprocess.run(["powershell", "-NoProfile", "-Command", ps_cmd], capture_output=True, timeout=8)
+            except Exception:
+                pass
+        try:
+            gc.collect()
+        except Exception:
+            pass
         os._exit(0)
 
     threading.Thread(target=_kill_all, daemon=True).start()
-    return {"status": "shutting_down"}
+    return {"status": "shutting_down", "released_ports": [8765, 8766, 8780, 11434]}
 
 
 
