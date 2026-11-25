@@ -263,9 +263,31 @@ function attachInteractiveConsole(targetDir, webUrl, childProcess = null) {
   }, 4000);
 }
 
+function resolveTargetDir() {
+  const args = process.argv.slice(2);
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i];
+    if (a === '--target' || a === '-t') {
+      if (args[i + 1]) return path.resolve(args[i + 1]);
+    }
+    if (a.startsWith('--target=')) {
+      return path.resolve(a.split('=')[1]);
+    }
+    const lower = a.toLowerCase();
+    if (!a.startsWith('-') && !['scan', 'quet', 'protect', 'stop', 'down', 'tat', 'status', 'check', 'help', '--help', '-h'].includes(lower)) {
+      try {
+        if (fs.existsSync(a) && fs.statSync(a).isDirectory()) {
+          return path.resolve(a);
+        }
+      } catch (e) {}
+    }
+  }
+  return path.resolve(process.cwd());
+}
+
 function startSystem() {
   const pyCmd = findPythonCommand();
-  const targetDir = path.resolve(process.cwd());
+  const targetDir = resolveTargetDir();
   const webUrl = `http://127.0.0.1:8765/?target=${encodeURIComponent(targetDir)}`;
 
   ensureDependencies(pyCmd);
@@ -365,7 +387,7 @@ function startSystem() {
 
 function scanCurrentProject() {
   const pyCmd = findPythonCommand();
-  const targetDir = path.resolve(process.cwd());
+  const targetDir = resolveTargetDir();
   const applyScript = path.join(ROOT_DIR, 'apply_to_project.py');
   console.log('==============================================================================');
   console.log('  CTI AGENTIC DEFENSE: DANG QUET VA BAO VE DU AN TRUC TIEP QUA TERMINAL');

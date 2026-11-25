@@ -10,6 +10,7 @@
   "files": [
     "bin",
     "cti_core",
+    "skills",
     "shared",
     "src",
     "!cti_core/**/*.exe",
