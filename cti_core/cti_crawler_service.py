@@ -197,7 +197,7 @@ def _extract_verbatim_article_excerpt(raw_html: str, max_ioc_lines: int = 24) ->
             return " "
         img_url = html.unescape(src_m.group(1)).strip()
         low_u = img_url.lower()
-        if any(skip in low_u for skip in ("pixel", "1x1", "doubleclick", "feedburner", "gravatar", "avatar", "/ads/", "adservice", "spacer", ".svg")):
+        if any(skip in low_u for skip in ("pixel", "1x1", "doubleclick", "feedburner", "gravatar", "avatar", "/ads/", "adservice", "spacer", ".svg", "w72-h72", "w64-h64", "s72-", "150x150")):
             return " "
         return f"\n\n[IMAGE: {img_url}]\n\n"
 
@@ -217,6 +217,11 @@ def _extract_verbatim_article_excerpt(raw_html: str, max_ioc_lines: int = 24) ->
         'copyright ©', 'all rights reserved', 'cookie policy', 'privacy policy'
     )
 
+    sidebar_stop_markers = (
+        'top stories this week', 'featured resources', 'cybersecurity webinars',
+        'popular this week', 'more from the hacker news', 'recommended for you'
+    )
+
     lines: List[str] = []
     seen = set()
     for raw_ln in plain.splitlines():
@@ -224,6 +229,8 @@ def _extract_verbatim_article_excerpt(raw_html: str, max_ioc_lines: int = 24) ->
         if len(s) < 8:
             continue
         low = s.lower()
+        if any(marker in low for marker in sidebar_stop_markers):
+            break
         if any(sp in low for sp in skip_phrases):
             continue
         if s not in seen:

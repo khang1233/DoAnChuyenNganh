@@ -9015,7 +9015,8 @@ def api_update_article_status(req: UpdateArticleStatusRequest):
 
 @app.post("/api/step2/extract-and-plan")
 def api_step2_extract_and_plan(req: Step2Request):
-    guard = AIAgentSecurityGuard.inspect_and_sanitize_input(req.text)
+    clean_text = re.sub(r"\[IMAGE:\s*https?://[^\]]+\]", " ", req.text or "", flags=re.IGNORECASE)
+    guard = AIAgentSecurityGuard.inspect_and_sanitize_input(clean_text)
     iocs = tool6_extract_iocs_hybrid(guard["sanitized_text"])
 
     brain = MultiProviderLLMBrain(provider="ollama", model_name=req.model_name)
@@ -9111,9 +9112,10 @@ def _format_firewall_bridge_report(fw_res: Dict[str, Any]) -> str:
 
 @app.post("/api/step4/correlate-and-generate-code")
 def api_step4_correlate_and_generate_code(req: Step4GenerateRequest):
+    clean_req_text = re.sub(r"\[IMAGE:\s*https?://[^\]]+\]", " ", req.text or "", flags=re.IGNORECASE)
     high_risk = [EnrichedIOC(**x) for x in req.malicious_iocs]
-    mitre = tool7_map_mitre_attack(req.text, high_risk)
-    base_rules = tool8_generate_defensive_rules(req.title, high_risk, mitre, raw_text=req.text)
+    mitre = tool7_map_mitre_attack(clean_req_text, high_risk)
+    base_rules = tool8_generate_defensive_rules(req.title, high_risk, mitre, raw_text=clean_req_text)
 
     # 1. Đề xuất Phương pháp Phòng thủ Đa tầng ĐỘNG theo đúng IOC của bài báo
     d3fend_list = build_d3fend_recommendations(req.text, high_risk, mitre)
