@@ -3958,8 +3958,8 @@ HTML_PAGE = r"""<!DOCTYPE html>
 
         const pubDateStr = formatToLocalTime(art.sort_ts || art.published_at);
         const fetchedDateStr = formatToLocalTime(art.fetched_at || art.sort_ts);
-        const matchedTechs = getArticleMatchedTechs(art);
-        const isTechMatch = matchedTechs.length > 0 || Boolean(art.is_direct_target);
+        const matchedTechs = (st === 'completed') ? getArticleMatchedTechs(art) : [];
+        const isTechMatch = (st === 'completed') && (matchedTechs.length > 0 || Boolean(art.is_direct_target));
         const techMatchBanner = matchedTechs.length > 0
           ? `<div style="margin:4px 0 6px 0;"><span style="display:inline-block; background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:4px;">🔥 KHỚP DỰ ÁN: ${matchedTechs.join(', ').toUpperCase()}</span></div>`
           : (art.is_direct_target ? `<div style="margin:4px 0 6px 0;"><span style="display:inline-block; background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:4px;">🔥 MỐI ĐE DỌA TRỰC TIẾP DỰ ÁN</span></div>` : '');
@@ -5322,6 +5322,7 @@ const elArt = document.getElementById('lblMasterArticlesCount');
             model_name: selectedModel
           })
         });
+        if (!r4.ok) throw new Error(`HTTP ${r4.status}: ${await r4.text()}`);
         const d4 = await r4.json();
 
         window.latestFirewallText = d4.firewall_tab_text || "";

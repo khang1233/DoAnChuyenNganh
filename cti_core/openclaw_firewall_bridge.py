@@ -32,6 +32,7 @@ import re
 import sqlite3
 import subprocess
 import sys
+import uuid
 from typing import Any, Dict, List, Optional, Set, Tuple
 SANDBOX_DIR = Path(__file__).resolve().parent
 ROOT_PROJECT_DIR = Path(__file__).resolve().parents[1]
