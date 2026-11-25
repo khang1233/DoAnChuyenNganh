@@ -2012,11 +2012,10 @@ HTML_PAGE = r"""<!DOCTYPE html>
         </span>
       </div>
 
-      <div class="ToolbarRow">
-        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-          <span class="FieldLabel" style="margin:0;">LỌC NGUỒN:</span>
+      <div class="ToolbarRow" style="justify-content:space-between;">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
           <select class="CleanSelect" onchange="filterBySource(this.value, this)">
-            <option value="ALL">Tất cả nguồn (Gộp 4 bài đầu)</option>
+            <option value="ALL">Nguồn: Tất cả</option>
             <option value="NEW_ONLY">Bài mới quét live</option>
             <option value="TheHackerNews">TheHackerNews</option>
             <option value="Securelist">Securelist (Kaspersky)</option>
@@ -2024,25 +2023,20 @@ HTML_PAGE = r"""<!DOCTYPE html>
             <option value="SentinelOne">SentinelOne Labs</option>
             <option value="DFIR">The DFIR Report</option>
             <option value="CISA">CISA KEV (Mỹ)</option>
-            <option value="YEAR_2026">Kho tri thức Năm 2026</option>
-            <option value="YEAR_2025">Kho tri thức Năm 2025</option>
-            <option value="YEAR_2024">Kho tri thức Năm 2024</option>
-            <option value="OLD_ONLY">Kho lưu trữ bài cũ</option>
+            <option value="YEAR_2026">Năm 2026</option>
+            <option value="YEAR_2025">Năm 2025</option>
+            <option value="YEAR_2024">Năm 2024</option>
           </select>
 
-          <span class="FieldLabel" style="margin:0; margin-left:6px;">HIỂN THỊ:</span>
           <select class="CleanSelect" id="feedStatusFilter" onchange="renderNewsGrid()">
-            <option value="QUEUE" selected>Hàng đợi Live (Chờ &amp; Đang xử lý)</option>
-            <option value="processing">Chỉ bài Đang xử lý...</option>
-            <option value="pending">Chỉ bài Chờ xử lý</option>
-            <option value="completed">Chỉ bài Đã xử lý (Xem lại)</option>
-            <option value="ALL">Tất cả bài trong kho</option>
+            <option value="QUEUE" selected>Hàng đợi (Chờ &amp; Đang xử lý)</option>
+            <option value="pending">Chờ xử lý</option>
+            <option value="completed">Đã xử lý</option>
+            <option value="ALL">Tất cả bài</option>
           </select>
 
           <button class="CleanBtn" id="btnQueueControl" onclick="toggleAutoQueueManual()">Dừng Hàng Đợi</button>
         </div>
-
-        <div id="sourceWebsitesList" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
       </div>
 
       <div class="SplitWorkspace">
@@ -4038,7 +4032,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
         </div>`;
         return;
       }
-      const MAX_FEED = 50;
+      const MAX_FEED = 200;
       const feedToShow = displayedArticles.slice(0, MAX_FEED);
       grid.innerHTML = feedToShow.map((art) => {
         const idx = articles.indexOf(art);
@@ -4827,7 +4821,16 @@ const elArt = document.getElementById('lblMasterArticlesCount');
     }
 
     function applyArticleDefenseData(c) {
-      if (c.skill_md) document.getElementById('outSkillMd').textContent = c.skill_md;
+      const isPlaceholderSkill = c.skill_md && c.skill_md.includes('KỸ NĂNG TÁC TỬ ĐANG CHỜ PHÂN TÍCH');
+      const curSkillEl = document.getElementById('outSkillMd');
+      if (c.skill_md && !isPlaceholderSkill) {
+        if (curSkillEl) curSkillEl.textContent = c.skill_md;
+        window.lastLiveSkillMd = c.skill_md;
+      } else if (curSkillEl && window.lastLiveSkillMd) {
+        curSkillEl.textContent = window.lastLiveSkillMd;
+      } else if (c.skill_md && curSkillEl && !curSkillEl.textContent.trim()) {
+        curSkillEl.textContent = c.skill_md;
+      }
       if (c.trust_audit) renderTrustAuditView(c.trust_audit);
       if (c.xai_audit) renderXAIExplanationView(c.xai_audit);
       if (c.history) document.getElementById('outHistory').textContent = c.history;
@@ -5394,7 +5397,7 @@ const elArt = document.getElementById('lblMasterArticlesCount');
 
       try {
         status.textContent = `Đang trích xuất IOC bài #${idx + 1} (${selectedModel})...`;
-        updateLiveTicker(`AI Agent (${selectedModel}): Đang trích xuất danh sách thực thể IOC bài #${idx + 1}...`);
+        updateLiveTicker(`Đang phân tích bài #${idx + 1}: "${(art.title || '').slice(0, 50)}..."`);
         setStageState(2, 'active', '', '', 40);
 
         const r2 = await fetch('/api/step2/extract-and-plan', {
@@ -5405,8 +5408,7 @@ const elArt = document.getElementById('lblMasterArticlesCount');
         const d2 = await r2.json();
         document.getElementById('aiPlanBox').textContent = d2.ai_plan;
 
-        status.textContent = `Đang hợp nhất điểm ${d2.iocs.length} IOC qua 5 nguồn OSINT...`;
-        updateLiveTicker(`Tool-Calling: Đã bóc tách ${d2.iocs.length} IOCs. Đang tra cứu API 5 nguồn (VT, AbuseIPDB, Shodan, OTX)...`);
+        status.textContent = `Đang đối soát ${d2.iocs.length} IOC bài #${idx + 1}...`;
         setStageState(3, 'active', '', '', 75);
 
         const r3 = await fetch('/api/step3/enrich-and-reason', {
@@ -5425,8 +5427,7 @@ const elArt = document.getElementById('lblMasterArticlesCount');
           if (badgeEl) badgeEl.textContent = d2.llm_provider_used;
         }
 
-        status.textContent = `Đang sinh 5 lớp quy tắc phòng thủ bài #${idx + 1}...`;
-        updateLiveTicker(`Gatekeeper: Đã thẩm định ${d3.all_enriched.length} IOCs (${d3.malicious_only.length} IOC > 80đ bị chặn). Đang sinh 5 lớp phòng thủ & MITRE D3FEND...`);
+        status.textContent = `Đang sinh phòng thủ & SKILL.md bài #${idx + 1}...`;
 
         const r4 = await fetch('/api/step4/correlate-and-generate-code', {
           method: 'POST',
@@ -5469,8 +5470,14 @@ const elArt = document.getElementById('lblMasterArticlesCount');
 
         const durationSec = parseFloat(((performance.now() - startTime) / 1000).toFixed(1));
         setStageState(4, 'done', '', '', 100);
-        status.textContent = `Hoàn tất bài #${idx + 1}: ${d2.iocs.length} IOC (${d3.malicious_only.length} IOC bị chặn >80) trong ${durationSec}s.`;
-        updateLiveTicker(`Hoàn tất bài #${idx + 1} trong ${durationSec}s! Đã khóa ${d3.malicious_only.length} IOC độc hại và sinh đầy đủ 5 lớp phòng thủ.`);
+        status.textContent = `Hoàn tất bài #${idx + 1} (${durationSec}s)`;
+        updateLiveTicker(`Hoàn tất bài #${idx + 1} (${durationSec}s) — đã cập nhật IOC & SKILL.md.`);
+        if (d4.agentic_skill_md) {
+          window.lastLiveSkillMd = d4.agentic_skill_md;
+        }
+        if (typeof ensureWizardSkillSynthesized === 'function') {
+          ensureWizardSkillSynthesized().catch(() => {});
+        }
 
         const nowIso = new Date().toISOString().replace('T', ' ').slice(0, 19);
 
@@ -6060,6 +6067,11 @@ const elArt = document.getElementById('lblMasterArticlesCount');
             // Kích hoạt tab "Tất Cả" để người dùng xem trực tiếp Live AI
             const allNavBtn = document.querySelectorAll('.NavLinks .NavLink')[1];
             switchView('all', allNavBtn);
+
+            // Nạp sẵn SKILL.md tổng hợp hiện tại của dự án vào Kho Gói Kỹ Năng
+            if (typeof recompileActiveProjectSkill === 'function') {
+              recompileActiveProjectSkill();
+            }
 
             // Tự động tiếp tục xử lý hàng đợi nếu vẫn còn bài đang chờ xử lý
             setTimeout(() => {
