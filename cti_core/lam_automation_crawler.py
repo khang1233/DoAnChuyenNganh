@@ -20,6 +20,7 @@ import html
 import re
 import sqlite3
 import xml.etree.ElementTree as ET
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -356,18 +357,21 @@ def crawl_all_sources_and_archive(limit_per_source: int = 10) -> List[Dict[str, 
     collected: List[Dict[str, Any]] = []
     content_ns = "{http://purl.org/rss/1.0/modules/content/}encoded"
 
-    # ------------------------------------------------------------------
-    # NGUỒN 1: TheHackerNews (Cào trực tiếp toàn văn trang bài báo thehackernews.com)
-    # ------------------------------------------------------------------
-    try:
-        resp = requests.get(
-            "https://feeds.feedburner.com/TheHackersNews",
-            headers={**DEFAULT_HEADERS, "Cache-Control": "no-cache"},
-            timeout=9,
-        )
-        if resp.status_code == 200:
+    def _fetch_thn() -> List[Dict[str, Any]]:
+        out: List[Dict[str, Any]] = []
+        try:
+            resp = requests.get(
+                "https://feeds.feedburner.com/TheHackersNews",
+                headers={**DEFAULT_HEADERS, "Cache-Control": "no-cache"},
+                timeout=9,
+            )
+            if resp.status_code != 200:
+                return out
             root = ET.fromstring(resp.content)
-            for idx, item in enumerate(root.findall(".//item")[:12]):
+            items = root.findall(".//item")[:12]
+
+            def _parse_thn_item(idx_item):
+                idx, item = idx_item
                 title = (item.findtext("title") or "").strip()
                 link = (item.findtext("link") or "").strip()
                 pub_date = (item.findtext("pubDate") or "").strip()
@@ -387,42 +391,42 @@ def crawl_all_sources_and_archive(limit_per_source: int = 10) -> List[Dict[str, 
                     pass
                 if not verbatim_body:
                     verbatim_body = _extract_verbatim_article_excerpt(desc_html)
-
                 ioc_stats = _count_real_iocs(verbatim_body)
-                # Giữ lại các bài báo có chứa IOC thật trên trang thehackernews.com (hoặc 2 bài mới nhất)
                 if ioc_stats["total"] > 0 or idx < 2:
                     sort_ts = _normalize_date_to_iso(pub_date)
-                    collected.append(
-                        {
-                            "article_id": f"thn-{hashlib.md5(link.encode('utf-8')).hexdigest()[:8]}",
-                            "source": "TheHackerNews",
-                            "title": title,
-                            "url": link,
-                            "published_at": pub_date,
-                            "is_historical": sort_ts < "2026-10-08",
-                            "content": verbatim_body,
-                        }
-                    )
-    except Exception:
-        pass
+                    return {
+                        "article_id": f"thn-{hashlib.md5(link.encode('utf-8')).hexdigest()[:8]}",
+                        "source": "TheHackerNews",
+                        "title": title,
+                        "url": link,
+                        "published_at": pub_date,
+                        "is_historical": sort_ts < "2026-10-08",
+                        "content": verbatim_body,
+                    }
+                return None
 
-    # ------------------------------------------------------------------
-    # NGUỒN 2: Kaspersky Securelist (Toàn văn <content:encoded> chứa IP, Domain [.], CVE, SHA256 thật)
-    # ------------------------------------------------------------------
-    try:
-        resp = requests.get("https://securelist.com/feed/", headers=DEFAULT_HEADERS, timeout=9)
-        if resp.status_code == 200:
-            root = ET.fromstring(resp.content)
-            for idx, item in enumerate(root.findall(".//item")[:10]):
-                title = (item.findtext("title") or "").strip()
-                link = (item.findtext("link") or "").strip()
-                pub_date = (item.findtext("pubDate") or "").strip()
-                raw_html = item.findtext(content_ns) or item.findtext("description") or ""
-                verbatim_body = _extract_verbatim_article_excerpt(raw_html)
-                ioc_stats = _count_real_iocs(verbatim_body)
-                if ioc_stats["total"] >= 2:
-                    collected.append(
-                        {
+            with ThreadPoolExecutor(max_workers=6) as p_pool:
+                for res_item in p_pool.map(_parse_thn_item, enumerate(items)):
+                    if res_item:
+                        out.append(res_item)
+        except Exception:
+            pass
+        return out
+
+    def _fetch_securelist() -> List[Dict[str, Any]]:
+        out: List[Dict[str, Any]] = []
+        try:
+            resp = requests.get("https://securelist.com/feed/", headers=DEFAULT_HEADERS, timeout=9)
+            if resp.status_code == 200:
+                root = ET.fromstring(resp.content)
+                for idx, item in enumerate(root.findall(".//item")[:10]):
+                    title = (item.findtext("title") or "").strip()
+                    link = (item.findtext("link") or "").strip()
+                    pub_date = (item.findtext("pubDate") or "").strip()
+                    raw_html = item.findtext(content_ns) or item.findtext("description") or ""
+                    verbatim_body = _extract_verbatim_article_excerpt(raw_html)
+                    if _count_real_iocs(verbatim_body)["total"] >= 2:
+                        out.append({
                             "article_id": f"securelist-{hashlib.md5(link.encode('utf-8')).hexdigest()[:8]}",
                             "source": "Kaspersky Securelist",
                             "title": title,
@@ -430,28 +434,25 @@ def crawl_all_sources_and_archive(limit_per_source: int = 10) -> List[Dict[str, 
                             "published_at": pub_date,
                             "is_historical": idx >= 2,
                             "content": verbatim_body,
-                        }
-                    )
-    except Exception:
-        pass
+                        })
+        except Exception:
+            pass
+        return out
 
-    # ------------------------------------------------------------------
-    # NGUỒN 3: Check Point Research (Toàn văn <content:encoded> chứa IP1, IP2 8.8.8.8/1.1.1.1, CVE, SHA256 thật)
-    # ------------------------------------------------------------------
-    try:
-        resp = requests.get("https://research.checkpoint.com/feed/", headers=DEFAULT_HEADERS, timeout=9)
-        if resp.status_code == 200:
-            root = ET.fromstring(resp.content)
-            for idx, item in enumerate(root.findall(".//item")[:12]):
-                title = (item.findtext("title") or "").strip()
-                link = (item.findtext("link") or "").strip()
-                pub_date = (item.findtext("pubDate") or "").strip()
-                raw_html = item.findtext(content_ns) or item.findtext("description") or ""
-                verbatim_body = _extract_verbatim_article_excerpt(raw_html)
-                ioc_stats = _count_real_iocs(verbatim_body)
-                if ioc_stats["total"] >= 2:
-                    collected.append(
-                        {
+    def _fetch_checkpoint() -> List[Dict[str, Any]]:
+        out: List[Dict[str, Any]] = []
+        try:
+            resp = requests.get("https://research.checkpoint.com/feed/", headers=DEFAULT_HEADERS, timeout=9)
+            if resp.status_code == 200:
+                root = ET.fromstring(resp.content)
+                for idx, item in enumerate(root.findall(".//item")[:12]):
+                    title = (item.findtext("title") or "").strip()
+                    link = (item.findtext("link") or "").strip()
+                    pub_date = (item.findtext("pubDate") or "").strip()
+                    raw_html = item.findtext(content_ns) or item.findtext("description") or ""
+                    verbatim_body = _extract_verbatim_article_excerpt(raw_html)
+                    if _count_real_iocs(verbatim_body)["total"] >= 2:
+                        out.append({
                             "article_id": f"checkpoint-{hashlib.md5(link.encode('utf-8')).hexdigest()[:8]}",
                             "source": "Check Point Research",
                             "title": title,
@@ -459,28 +460,25 @@ def crawl_all_sources_and_archive(limit_per_source: int = 10) -> List[Dict[str, 
                             "published_at": pub_date,
                             "is_historical": idx >= 2,
                             "content": verbatim_body,
-                        }
-                    )
-    except Exception:
-        pass
+                        })
+        except Exception:
+            pass
+        return out
 
-    # ------------------------------------------------------------------
-    # NGUỒN 4: SentinelOne Labs (Toàn văn <content:encoded> chứa IP C2 Lazarus/APT & Domain thật)
-    # ------------------------------------------------------------------
-    try:
-        resp = requests.get("https://www.sentinelone.com/labs/feed/", headers=DEFAULT_HEADERS, timeout=9)
-        if resp.status_code == 200:
-            root = ET.fromstring(resp.content)
-            for idx, item in enumerate(root.findall(".//item")[:8]):
-                title = (item.findtext("title") or "").strip()
-                link = (item.findtext("link") or "").strip()
-                pub_date = (item.findtext("pubDate") or "").strip()
-                raw_html = item.findtext(content_ns) or item.findtext("description") or ""
-                verbatim_body = _extract_verbatim_article_excerpt(raw_html)
-                ioc_stats = _count_real_iocs(verbatim_body)
-                if ioc_stats["total"] >= 1:
-                    collected.append(
-                        {
+    def _fetch_sentinelone() -> List[Dict[str, Any]]:
+        out: List[Dict[str, Any]] = []
+        try:
+            resp = requests.get("https://www.sentinelone.com/labs/feed/", headers=DEFAULT_HEADERS, timeout=9)
+            if resp.status_code == 200:
+                root = ET.fromstring(resp.content)
+                for idx, item in enumerate(root.findall(".//item")[:8]):
+                    title = (item.findtext("title") or "").strip()
+                    link = (item.findtext("link") or "").strip()
+                    pub_date = (item.findtext("pubDate") or "").strip()
+                    raw_html = item.findtext(content_ns) or item.findtext("description") or ""
+                    verbatim_body = _extract_verbatim_article_excerpt(raw_html)
+                    if _count_real_iocs(verbatim_body)["total"] >= 1:
+                        out.append({
                             "article_id": f"sentinelone-{hashlib.md5(link.encode('utf-8')).hexdigest()[:8]}",
                             "source": "SentinelOne Labs",
                             "title": title,
@@ -488,19 +486,22 @@ def crawl_all_sources_and_archive(limit_per_source: int = 10) -> List[Dict[str, 
                             "published_at": pub_date,
                             "is_historical": idx >= 2,
                             "content": verbatim_body,
-                        }
-                    )
-    except Exception:
-        pass
+                        })
+        except Exception:
+            pass
+        return out
 
-    # ------------------------------------------------------------------
-    # NGUỒN 5: The DFIR Report (Cào toàn văn báo cáo điều tra số chứa danh sách IP C2 thật)
-    # ------------------------------------------------------------------
-    try:
-        resp = requests.get("https://thedfirreport.com/feed/", headers=DEFAULT_HEADERS, timeout=9)
-        if resp.status_code == 200:
+    def _fetch_dfir() -> List[Dict[str, Any]]:
+        out: List[Dict[str, Any]] = []
+        try:
+            resp = requests.get("https://thedfirreport.com/feed/", headers=DEFAULT_HEADERS, timeout=9)
+            if resp.status_code != 200:
+                return out
             root = ET.fromstring(resp.content)
-            for idx, item in enumerate(root.findall(".//item")[:4]):
+            items = root.findall(".//item")[:4]
+
+            def _parse_dfir_item(idx_item):
+                idx, item = idx_item
                 title = (item.findtext("title") or "").strip()
                 link = (item.findtext("link") or "").strip()
                 pub_date = (item.findtext("pubDate") or "").strip()
@@ -512,47 +513,48 @@ def crawl_all_sources_and_archive(limit_per_source: int = 10) -> List[Dict[str, 
                 except Exception:
                     pass
                 verbatim_body = _extract_verbatim_article_excerpt(raw_html, max_ioc_lines=28)
-                ioc_stats = _count_real_iocs(verbatim_body)
-                if ioc_stats["total"] >= 2:
-                    collected.append(
-                        {
-                            "article_id": f"dfir-{hashlib.md5(link.encode('utf-8')).hexdigest()[:8]}",
-                            "source": "The DFIR Report",
-                            "title": title,
-                            "url": link,
-                            "published_at": pub_date,
-                            "is_historical": idx >= 1,
-                            "content": verbatim_body,
-                        }
-                    )
-    except Exception:
-        pass
+                if _count_real_iocs(verbatim_body)["total"] >= 2:
+                    return {
+                        "article_id": f"dfir-{hashlib.md5(link.encode('utf-8')).hexdigest()[:8]}",
+                        "source": "The DFIR Report",
+                        "title": title,
+                        "url": link,
+                        "published_at": pub_date,
+                        "is_historical": idx >= 1,
+                        "content": verbatim_body,
+                    }
+                return None
 
-    # ------------------------------------------------------------------
-    # NGUỒN 6: CISA KEV Chính phủ Mỹ (Nguyên bản mô tả tiếng Anh trên CISA / NVD, KHÔNG ghép IP giả)
-    # ------------------------------------------------------------------
-    try:
-        cisa_resp = requests.get(
-            "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json",
-            headers=DEFAULT_HEADERS,
-            timeout=9,
-        )
-        if cisa_resp.status_code == 200:
-            vulns = cisa_resp.json().get("vulnerabilities", [])
-            vulns_sorted = sorted(vulns, key=lambda v: v.get("dateAdded", ""), reverse=True)
-            for idx, v in enumerate(vulns_sorted[:6]):
-                cve_id = v.get("cveID", "")
-                vendor = v.get("vendorProject", "")
-                product = v.get("product", "")
-                vuln_name = v.get("vulnerabilityName", "")
-                date_added = v.get("dateAdded", "")
-                short_desc = v.get("shortDescription", "")
-                action = v.get("requiredAction", "")
-                notes = v.get("notes", "")
-                # Nguyên bản 100% dữ liệu từ CISA KEV Catalog và NVD
-                content = f"{cve_id} — {vendor} {product}: {vuln_name}\n\n{short_desc}\n\n{action}\n\n{notes}".strip()
-                collected.append(
-                    {
+            with ThreadPoolExecutor(max_workers=4) as d_pool:
+                for res_item in d_pool.map(_parse_dfir_item, enumerate(items)):
+                    if res_item:
+                        out.append(res_item)
+        except Exception:
+            pass
+        return out
+
+    def _fetch_cisa() -> List[Dict[str, Any]]:
+        out: List[Dict[str, Any]] = []
+        try:
+            cisa_resp = requests.get(
+                "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json",
+                headers=DEFAULT_HEADERS,
+                timeout=9,
+            )
+            if cisa_resp.status_code == 200:
+                vulns = cisa_resp.json().get("vulnerabilities", [])
+                vulns_sorted = sorted(vulns, key=lambda v: v.get("dateAdded", ""), reverse=True)
+                for idx, v in enumerate(vulns_sorted[:6]):
+                    cve_id = v.get("cveID", "")
+                    vendor = v.get("vendorProject", "")
+                    product = v.get("product", "")
+                    vuln_name = v.get("vulnerabilityName", "")
+                    date_added = v.get("dateAdded", "")
+                    short_desc = v.get("shortDescription", "")
+                    action = v.get("requiredAction", "")
+                    notes = v.get("notes", "")
+                    content = f"{cve_id} — {vendor} {product}: {vuln_name}\n\n{short_desc}\n\n{action}\n\n{notes}".strip()
+                    out.append({
                         "article_id": f"cisa-{cve_id}",
                         "source": "CISA US Gov",
                         "title": f"[{cve_id}] {vendor} {product} — {vuln_name}",
@@ -560,10 +562,25 @@ def crawl_all_sources_and_archive(limit_per_source: int = 10) -> List[Dict[str, 
                         "published_at": date_added,
                         "is_historical": idx >= 3,
                         "content": content,
-                    }
-                )
-    except Exception:
-        pass
+                    })
+        except Exception:
+            pass
+        return out
+
+    with ThreadPoolExecutor(max_workers=6) as src_pool:
+        futures = [
+            src_pool.submit(_fetch_thn),
+            src_pool.submit(_fetch_securelist),
+            src_pool.submit(_fetch_checkpoint),
+            src_pool.submit(_fetch_sentinelone),
+            src_pool.submit(_fetch_dfir),
+            src_pool.submit(_fetch_cisa),
+        ]
+        for fut in futures:
+            try:
+                collected.extend(fut.result())
+            except Exception:
+                pass
 
     if collected:
         _save_articles_to_db(collected, purge_synthetic=True)
@@ -601,187 +618,138 @@ def crawl_year_to_date_archive(
         "The DFIR Report": 0,
     }
 
-    # 1. CISA KEV US Gov (Các lỗ hổng được ghi nhận trong năm 2026)
-    try:
-        cisa_resp = requests.get(
-            "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json",
-            headers=DEFAULT_HEADERS,
-            timeout=12,
-        )
-        if cisa_resp.status_code == 200:
-            vulns = cisa_resp.json().get("vulnerabilities", [])
-            vulns_ytd = [v for v in vulns if (v.get("dateAdded") or "") >= since_date]
-            vulns_sorted = sorted(vulns_ytd, key=lambda v: v.get("dateAdded", ""), reverse=True)
-            for v in vulns_sorted[:max_cisa]:
-                cve_id = v.get("cveID", "")
-                vendor = v.get("vendorProject", "")
-                product = v.get("product", "")
-                vuln_name = v.get("vulnerabilityName", "")
-                date_added = v.get("dateAdded", "")
-                short_desc = v.get("shortDescription", "")
-                action = v.get("requiredAction", "")
-                notes = v.get("notes", "")
-                content = f"{cve_id} — {vendor} {product}: {vuln_name}\n\n{short_desc}\n\n{action}\n\n{notes}".strip()
-                collected.append({
-                    "article_id": f"cisa-{cve_id}",
-                    "source": "CISA US Gov",
-                    "title": f"[{cve_id}] {vendor} {product} — {vuln_name}",
-                    "url": f"https://nvd.nist.gov/vuln/detail/{cve_id}",
-                    "published_at": date_added,
-                    "is_historical": date_added < "2026-10-01",
-                    "content": content,
-                })
-                stats_breakdown["CISA US Gov"] += 1
-    except Exception as e:
-        print(f"[YTD CRAWLER] CISA error: {e}")
-
-    # 2. TheHackerNews (Phân trang qua Blogger JSON API)
     t_key = "$" + "t"
-    try:
-        start_idx = 1
-        while stats_breakdown["TheHackerNews"] < max_thn:
-            feed_url = (
-                f"https://thehackernews.com/feeds/posts/default?alt=json"
-                f"&published-min={since_date}T00:00:00Z&max-results=50&start-index={start_idx}"
+
+    def _ytd_cisa() -> List[Dict[str, Any]]:
+        out: List[Dict[str, Any]] = []
+        try:
+            cisa_resp = requests.get(
+                "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json",
+                headers=DEFAULT_HEADERS,
+                timeout=12,
             )
-            r = requests.get(feed_url, headers=DEFAULT_HEADERS, timeout=12)
-            if r.status_code != 200:
-                break
-            entries = r.json().get("feed", {}).get("entry", [])
-            if not entries:
-                break
+            if cisa_resp.status_code == 200:
+                vulns = cisa_resp.json().get("vulnerabilities", [])
+                vulns_ytd = [v for v in vulns if (v.get("dateAdded") or "") >= since_date]
+                vulns_sorted = sorted(vulns_ytd, key=lambda v: v.get("dateAdded", ""), reverse=True)
+                for v in vulns_sorted[:max_cisa]:
+                    cve_id = v.get("cveID", "")
+                    vendor = v.get("vendorProject", "")
+                    product = v.get("product", "")
+                    vuln_name = v.get("vulnerabilityName", "")
+                    date_added = v.get("dateAdded", "")
+                    short_desc = v.get("shortDescription", "")
+                    action = v.get("requiredAction", "")
+                    notes = v.get("notes", "")
+                    content = f"{cve_id} — {vendor} {product}: {vuln_name}\n\n{short_desc}\n\n{action}\n\n{notes}".strip()
+                    out.append({
+                        "article_id": f"cisa-{cve_id}",
+                        "source": "CISA US Gov",
+                        "title": f"[{cve_id}] {vendor} {product} — {vuln_name}",
+                        "url": f"https://nvd.nist.gov/vuln/detail/{cve_id}",
+                        "published_at": date_added,
+                        "is_historical": date_added < "2026-10-01",
+                        "content": content,
+                    })
+        except Exception as e:
+            print(f"[YTD CRAWLER] CISA error: {e}")
+        return out
 
-            for item in entries:
-                title = item.get("title", {}).get(t_key, "").strip()
-                pub_date = item.get("published", {}).get(t_key, "").strip()
-                links = [l.get("href") for l in item.get("link", []) if l.get("rel") == "alternate"]
-                link = links[0] if links else "https://thehackernews.com"
-                raw_summary = item.get("summary", {}).get(t_key, "") or item.get("content", {}).get(t_key, "")
-                verbatim_body = _extract_verbatim_article_excerpt(raw_summary)
-                sort_ts = _normalize_date_to_iso(pub_date)
-
-                collected.append({
-                    "article_id": f"thn-{hashlib.md5(link.encode('utf-8')).hexdigest()[:8]}",
-                    "source": "TheHackerNews",
-                    "title": title,
-                    "url": link,
-                    "published_at": pub_date,
-                    "is_historical": sort_ts < "2026-10-01",
-                    "content": verbatim_body,
-                })
-                stats_breakdown["TheHackerNews"] += 1
-                if stats_breakdown["TheHackerNews"] >= max_thn:
+    def _ytd_thn() -> List[Dict[str, Any]]:
+        out: List[Dict[str, Any]] = []
+        try:
+            start_idx = 1
+            while len(out) < max_thn:
+                feed_url = (
+                    f"https://thehackernews.com/feeds/posts/default?alt=json"
+                    f"&published-min={since_date}T00:00:00Z&max-results=50&start-index={start_idx}"
+                )
+                r = requests.get(feed_url, headers=DEFAULT_HEADERS, timeout=12)
+                if r.status_code != 200:
                     break
-
-            earliest_in_batch = entries[-1].get("published", {}).get(t_key, "")
-            if earliest_in_batch < since_date:
-                break
-            start_idx += len(entries)
-    except Exception as e:
-        print(f"[YTD CRAWLER] THN error: {e}")
-
-    # 3. Kaspersky Securelist (Phân trang paged=1..9)
-    try:
-        for p in range(1, 10):
-            url = f"https://securelist.com/feed/?paged={p}"
-            r = requests.get(url, headers=DEFAULT_HEADERS, timeout=10)
-            if r.status_code != 200:
-                break
-            root = ET.fromstring(r.content)
-            items = root.findall(".//item")
-            if not items:
-                break
-            stop_early = False
-            for it in items:
-                title = (it.findtext("title") or "").strip()
-                link = (it.findtext("link") or "").strip()
-                pub_date = (it.findtext("pubDate") or "").strip()
-                sort_ts = _normalize_date_to_iso(pub_date)
-                if sort_ts < since_date:
-                    stop_early = True
+                entries = r.json().get("feed", {}).get("entry", [])
+                if not entries:
                     break
-                raw_html = it.findtext(content_ns) or it.findtext("description") or ""
-                verbatim_body = _extract_verbatim_article_excerpt(raw_html)
-                collected.append({
-                    "article_id": f"securelist-{hashlib.md5(link.encode('utf-8')).hexdigest()[:8]}",
-                    "source": "Kaspersky Securelist",
-                    "title": title,
-                    "url": link,
-                    "published_at": pub_date,
-                    "is_historical": sort_ts < "2026-10-01",
-                    "content": verbatim_body,
-                })
-                stats_breakdown["Kaspersky Securelist"] += 1
-            if stop_early:
-                break
-    except Exception as e:
-        print(f"[YTD CRAWLER] Securelist error: {e}")
+                for item in entries:
+                    title = item.get("title", {}).get(t_key, "").strip()
+                    pub_date = item.get("published", {}).get(t_key, "").strip()
+                    links = [l.get("href") for l in item.get("link", []) if l.get("rel") == "alternate"]
+                    link = links[0] if links else "https://thehackernews.com"
+                    raw_summary = item.get("summary", {}).get(t_key, "") or item.get("content", {}).get(t_key, "")
+                    verbatim_body = _extract_verbatim_article_excerpt(raw_summary)
+                    sort_ts = _normalize_date_to_iso(pub_date)
+                    out.append({
+                        "article_id": f"thn-{hashlib.md5(link.encode('utf-8')).hexdigest()[:8]}",
+                        "source": "TheHackerNews",
+                        "title": title,
+                        "url": link,
+                        "published_at": pub_date,
+                        "is_historical": sort_ts < "2026-10-01",
+                        "content": verbatim_body,
+                    })
+                    if len(out) >= max_thn:
+                        break
+                earliest_in_batch = entries[-1].get("published", {}).get(t_key, "")
+                if earliest_in_batch < since_date:
+                    break
+                start_idx += len(entries)
+        except Exception as e:
+            print(f"[YTD CRAWLER] THN error: {e}")
+        return out
 
-    # 4. SentinelOne Labs (Phân trang paged=1..5)
-    try:
-        for p in range(1, 6):
-            url = f"https://www.sentinelone.com/labs/feed/?paged={p}"
-            r = requests.get(url, headers=DEFAULT_HEADERS, timeout=10)
-            if r.status_code != 200:
-                break
-            root = ET.fromstring(r.content)
-            items = root.findall(".//item")
-            if not items:
-                break
-            for it in items:
-                title = (it.findtext("title") or "").strip()
-                link = (it.findtext("link") or "").strip()
-                pub_date = (it.findtext("pubDate") or "").strip()
-                sort_ts = _normalize_date_to_iso(pub_date)
-                if sort_ts < since_date:
-                    continue
-                raw_html = it.findtext(content_ns) or it.findtext("description") or ""
-                verbatim_body = _extract_verbatim_article_excerpt(raw_html)
-                collected.append({
-                    "article_id": f"s1-{hashlib.md5(link.encode('utf-8')).hexdigest()[:8]}",
-                    "source": "SentinelOne Labs",
-                    "title": title,
-                    "url": link,
-                    "published_at": pub_date,
-                    "is_historical": sort_ts < "2026-10-01",
-                    "content": verbatim_body,
-                })
-                stats_breakdown["SentinelOne Labs"] += 1
-    except Exception as e:
-        print(f"[YTD CRAWLER] SentinelOne error: {e}")
+    def _ytd_rss_paged(base_url: str, max_pages: int, src_name: str, id_prefix: str) -> List[Dict[str, Any]]:
+        out: List[Dict[str, Any]] = []
+        try:
+            for p in range(1, max_pages + 1):
+                url = f"{base_url}?paged={p}"
+                r = requests.get(url, headers=DEFAULT_HEADERS, timeout=10)
+                if r.status_code != 200:
+                    break
+                root = ET.fromstring(r.content)
+                items = root.findall(".//item")
+                if not items:
+                    break
+                stop_early = False
+                for it in items:
+                    title = (it.findtext("title") or "").strip()
+                    link = (it.findtext("link") or "").strip()
+                    pub_date = (it.findtext("pubDate") or "").strip()
+                    sort_ts = _normalize_date_to_iso(pub_date)
+                    if sort_ts < since_date:
+                        stop_early = True
+                        break
+                    raw_html = it.findtext(content_ns) or it.findtext("description") or ""
+                    verbatim_body = _extract_verbatim_article_excerpt(raw_html)
+                    out.append({
+                        "article_id": f"{id_prefix}-{hashlib.md5(link.encode('utf-8')).hexdigest()[:8]}",
+                        "source": src_name,
+                        "title": title,
+                        "url": link,
+                        "published_at": pub_date,
+                        "is_historical": sort_ts < "2026-10-01",
+                        "content": verbatim_body,
+                    })
+                if stop_early:
+                    break
+        except Exception as e:
+            print(f"[YTD CRAWLER] {src_name} error: {e}")
+        return out
 
-    # 5. The DFIR Report (Phân trang paged=1..3)
-    try:
-        for p in range(1, 4):
-            url = f"https://thedfirreport.com/feed/?paged={p}"
-            r = requests.get(url, headers=DEFAULT_HEADERS, timeout=10)
-            if r.status_code != 200:
-                break
-            root = ET.fromstring(r.content)
-            items = root.findall(".//item")
-            if not items:
-                break
-            for it in items:
-                title = (it.findtext("title") or "").strip()
-                link = (it.findtext("link") or "").strip()
-                pub_date = (it.findtext("pubDate") or "").strip()
-                sort_ts = _normalize_date_to_iso(pub_date)
-                if sort_ts < since_date:
-                    continue
-                raw_html = it.findtext(content_ns) or it.findtext("description") or ""
-                verbatim_body = _extract_verbatim_article_excerpt(raw_html)
-                collected.append({
-                    "article_id": f"dfir-{hashlib.md5(link.encode('utf-8')).hexdigest()[:8]}",
-                    "source": "The DFIR Report",
-                    "title": title,
-                    "url": link,
-                    "published_at": pub_date,
-                    "is_historical": sort_ts < "2026-10-01",
-                    "content": verbatim_body,
-                })
-                stats_breakdown["The DFIR Report"] += 1
-    except Exception as e:
-        print(f"[YTD CRAWLER] DFIR error: {e}")
+    with ThreadPoolExecutor(max_workers=5) as ytd_pool:
+        tasks = [
+            ("CISA US Gov", ytd_pool.submit(_ytd_cisa)),
+            ("TheHackerNews", ytd_pool.submit(_ytd_thn)),
+            ("Kaspersky Securelist", ytd_pool.submit(_ytd_rss_paged, "https://securelist.com/feed/", 6, "Kaspersky Securelist", "securelist")),
+            ("SentinelOne Labs", ytd_pool.submit(_ytd_rss_paged, "https://www.sentinelone.com/labs/feed/", 4, "SentinelOne Labs", "s1")),
+            ("The DFIR Report", ytd_pool.submit(_ytd_rss_paged, "https://thedfirreport.com/feed/", 3, "The DFIR Report", "dfir")),
+        ]
+        for src_label, fut in tasks:
+            try:
+                items = fut.result()
+                collected.extend(items)
+                stats_breakdown[src_label] = len(items)
+            except Exception:
+                pass
 
     # 6. Lưu vĩnh viễn vào SQLite database
     now_str = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")

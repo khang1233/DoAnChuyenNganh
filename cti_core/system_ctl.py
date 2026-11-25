@@ -48,13 +48,10 @@ def get_default_target_project() -> str:
             pass
 
     # 3. Thư mục dự án kiểm thử mặc định
-    cti_cand = Path("D:/mkhang/testCTI")
-    if cti_cand.exists():
-        return str(cti_cand.resolve())
     sample_p = ROOT_DIR / "target_projects" / "My_Website"
     if sample_p.exists():
         return str(sample_p.resolve())
-    return ""
+    return str(cwd)
 def is_port_listening(port: int, host: str = "127.0.0.1") -> bool:
     """Kiểm tra cực nhanh (0.01s) xem cổng có đang mở không."""
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:

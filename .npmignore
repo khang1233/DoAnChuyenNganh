@@ -30,5 +30,10 @@ cti_core/suricata_setup.msi
 cti_core/suricata_windivert.msi
 cti_core/winpcap.exe
 cti_core/cti_multi_source_archive_full_corpus.sqlite
+cti_core/*.sqlite
+cti_core/*.sqlite-wal
+cti_core/*.sqlite-shm
+skills/agentic-defense-*
+miraiapi_proxy.*
 cti_core/live_defense_system/suricata_bin/
 cti_core/live_defense_system/suricata_windivert_bin/

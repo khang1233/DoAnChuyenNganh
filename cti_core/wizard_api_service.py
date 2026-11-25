@@ -511,15 +511,22 @@ def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3, live_
     _init_archive_db()
     profile = resolve_scope_profile(scope_id)
     now_dt = datetime.now()
-    min_year = now_dt.year - history_years
-    min_date = f"{min_year}-01-01"
+    min_date = (now_dt - timedelta(days=365 * max(1, int(history_years or 3)))).strftime("%Y-%m-%d")
 
     # Kiểm tra số bài hiện có trong DB thuộc mốc thời gian người dùng chọn
     with sqlite3.connect(DB_PATH) as conn:
+        conn.row_factory = sqlite3.Row
         count_all = conn.execute("SELECT count(*) FROM articles_archive").fetchone()[0]
-        count_in_window = conn.execute("SELECT count(*) FROM articles_archive WHERE sort_ts >= ?", (min_date,)).fetchone()[0]
+        window_rows = conn.execute(
+            "SELECT title, content FROM articles_archive WHERE sort_ts >= ?",
+            (min_date,),
+        ).fetchall()
+        count_in_window = len(window_rows)
+        scope_matched_in_window = sum(
+            1 for r in window_rows if compute_scope_relevance(scope_id, r["title"], r["content"]) >= 20
+        )
 
-    # Luôn cào bài mới thực tế khi trực tuyến; nếu DB trống hoặc quá ít bài trong mốc lịch sử, cào bổ sung sâu theo mốc năm
+    # Luôn cào bài mới thực tế khi trực tuyến; nếu DB trống hoặc quá ít bài khớp scope trong mốc lịch sử, cào bổ sung sâu theo mốc năm
     if live_crawl or count_all < 40:
         try:
             crawl_all_sources_and_archive(limit_per_source=8)
@@ -527,12 +534,20 @@ def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3, live_
             print(f"[WIZARD CRAWL] Khong the cao RSS truc tuyen: {e}")
 
     with sqlite3.connect(DB_PATH) as conn:
-        count_in_window = conn.execute("SELECT count(*) FROM articles_archive WHERE sort_ts >= ?", (min_date,)).fetchone()[0]
+        conn.row_factory = sqlite3.Row
+        window_rows = conn.execute(
+            "SELECT title, content FROM articles_archive WHERE sort_ts >= ?",
+            (min_date,),
+        ).fetchall()
+        count_in_window = len(window_rows)
+        scope_matched_in_window = sum(
+            1 for r in window_rows if compute_scope_relevance(scope_id, r["title"], r["content"]) >= 20
+        )
 
-    if count_in_window < 35:
+    if count_in_window < 35 or scope_matched_in_window < 15:
         try:
-            cap_thn = 60 if history_years <= 1 else 140
-            cap_cisa = 60 if history_years <= 1 else 140
+            cap_thn = 80 if history_years <= 1 else 160
+            cap_cisa = 80 if history_years <= 1 else 160
             crawl_year_to_date_archive(since_date=min_date, max_thn=cap_thn, max_cisa=cap_cisa)
         except Exception as e:
             print(f"[WIZARD CRAWL YTD] Khong the cao bo sung theo nam: {e}")
@@ -543,15 +558,32 @@ def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3, live_
     # Chỉ dùng kho dự phòng offline nếu hoàn toàn mất mạng khiến DB còn 0 bài
     if count_all == 0 and BAK_DB_PATH.exists():
         with sqlite3.connect(DB_PATH) as conn:
-            conn.execute(f"ATTACH DATABASE '{BAK_DB_PATH.as_posix()}' AS bak")
-            kw_cond = " OR ".join([f"bak.articles_archive.content LIKE '%{kw}%'" for kw in profile["keywords"][:5]])
-            conn.execute(f"""
-                INSERT OR IGNORE INTO articles_archive 
-                SELECT article_id, source_name, title, url, published_date, sort_ts, is_historical, content, fetched_at_utc, 'pending', 0.0, ''
-                FROM bak.articles_archive 
-                WHERE sort_ts >= '{min_date}' AND ({kw_cond})
-                LIMIT 200
-            """)
+            conn.execute("ATTACH DATABASE ? AS bak", (BAK_DB_PATH.as_posix(),))
+            kws = [kw for kw in profile["keywords"][:5] if kw]
+            if kws:
+                kw_cond = " OR ".join(["bak.articles_archive.content LIKE ?"] * len(kws))
+                params = [min_date] + [f"%{kw}%" for kw in kws]
+                conn.execute(
+                    f"""
+                    INSERT OR IGNORE INTO articles_archive
+                    SELECT article_id, source_name, title, url, published_date, sort_ts, is_historical, content, fetched_at_utc, 'pending', 0.0, ''
+                    FROM bak.articles_archive
+                    WHERE sort_ts >= ? AND ({kw_cond})
+                    LIMIT 200
+                    """,
+                    params,
+                )
+            else:
+                conn.execute(
+                    """
+                    INSERT OR IGNORE INTO articles_archive
+                    SELECT article_id, source_name, title, url, published_date, sort_ts, is_historical, content, fetched_at_utc, 'pending', 0.0, ''
+                    FROM bak.articles_archive
+                    WHERE sort_ts >= ?
+                    LIMIT 200
+                    """,
+                    (min_date,),
+                )
             conn.commit()
             conn.execute("DETACH DATABASE bak")
 

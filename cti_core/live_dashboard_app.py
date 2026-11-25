@@ -221,20 +221,20 @@ class UpdateArticleStatusRequest(BaseModel):
 
 class Step2Request(BaseModel):
     text: str
-    model_name: str = "khang-qwen3"
+    model_name: str = "auto"
 
 
 class Step3Request(BaseModel):
     text: str
     iocs: List[Dict[str, Any]]
-    model_name: str = "khang-qwen3"
+    model_name: str = "auto"
 
 
 class Step4GenerateRequest(BaseModel):
     title: str
     text: str
     malicious_iocs: List[Dict[str, Any]]
-    model_name: str = "khang-qwen3"
+    model_name: str = "auto"
 
 
 class FirewallSyncRequest(BaseModel):
@@ -244,7 +244,7 @@ class FirewallSyncRequest(BaseModel):
 
 class ChatAgentRequest(BaseModel):
     message: str
-    model_name: str = "khang-qwen3"
+    model_name: str = "auto"
     history: List[Dict[str, str]] = []
 
 
@@ -1239,7 +1239,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
 
     <!-- KHUNG CHAT TRỰC TIẾP VỚI LOCAL AI AGENT -->
     <section class="CyberBox" id="sec-chat" style="display:none; max-width:820px; margin:0 auto 26px;">
-      <div id="wizardBoxLegend" class="BoxLegend" id="chatBoxLegend">TRỢ LÝ AI AGENT (ĐANG TẢI PHẦN CỨNG)</div>
+      <div id="chatBoxLegend" class="BoxLegend">TRỢ LÝ AI AGENT (ĐANG TẢI PHẦN CỨNG)</div>
 
       <div id="chatLogBox" style="background:var(--bg-subtle); border:1px solid var(--border-main); border-radius:6px; height:320px; overflow-y:auto; padding:14px 16px; margin-bottom:14px; display:flex; flex-direction:column; gap:12px; font-size:13.5px;">
         <div style="padding:10px 14px; border-left:3px solid var(--primary); background:#ffffff; border-radius:0 6px 6px 0; border:1px solid var(--border-main); border-left:3px solid var(--primary);">
@@ -1499,7 +1499,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
             </div>
             <div style="color:#cbd5e1;">|</div>
             <div>
-              Phần cứng: <b id="landingHardwareSummary" style="color:#2563eb;">AMD Radeon RX 6600 (8GB VRAM) &bull; Sẵn sàng tại Bước 1 (Chọn Model &amp; Khảo Sát)</b>
+              Phần cứng: <b id="landingHardwareSummary" style="color:#2563eb;">Đang nhận diện phần cứng... &bull; Sẵn sàng tại Bước 1 (Chọn Model &amp; Khảo Sát)</b>
             </div>
           </div>
 
@@ -1551,8 +1551,8 @@ HTML_PAGE = r"""<!DOCTYPE html>
         <!-- Thẻ thông số phần cứng -->
         <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:14px 18px; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
           <div style="font-size:12.5px; color:#334155; line-height:1.7;">
-            <div><b>Card Đồ Họa (GPU):</b> <span id="wzGpuText" style="color:#0f172a; font-weight:600;">AMD Radeon RX 6600 (8.0GB VRAM)</span></div>
-            <div><b>Bộ Vi Xử Lý (CPU):</b> <span id="wzCpuText" style="color:#0f172a; font-weight:600;">13th Gen Intel Core i5-13400F</span> &bull; <b>RAM:</b> <span id="wzRamText" style="color:#0f172a; font-weight:600;">15.8 GB</span></div>
+            <div><b>Card Đồ Họa (GPU):</b> <span id="wzGpuText" style="color:#0f172a; font-weight:600;">Đang nhận diện...</span></div>
+            <div><b>Bộ Vi Xử Lý (CPU):</b> <span id="wzCpuText" style="color:#0f172a; font-weight:600;">Đang nhận diện...</span> &bull; <b>RAM:</b> <span id="wzRamText" style="color:#0f172a; font-weight:600;">-- GB</span></div>
           </div>
           <div id="wzHardwareSummaryTag" style="font-size:12px; font-weight:700; color:#15803d; background:#dcfce7; border:1px solid #86efac; padding:4px 12px; border-radius:6px;">
             CẤU HÌNH ĐỒ HỌA TIÊU CHUẨN
@@ -1587,9 +1587,9 @@ HTML_PAGE = r"""<!DOCTYPE html>
         <div style="background:#eff6ff; border:1.5px solid #bfdbfe; border-radius:8px; padding:10px 16px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
           <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:#1e40af;">
             <span class="AgentLedDot state-ready" id="step2AgentLedDot"></span>
-            <span>Mô hình AI thực thi: <b id="step2ActiveModelName" style="color:#1d4ed8;">khang-qwen3:latest</b></span>
+            <span>Mô hình AI thực thi: <b id="step2ActiveModelName" style="color:#1d4ed8;">auto-detect</b></span>
             <span style="color:#93c5fd;">&bull;</span>
-            <span id="step2ActiveHwInfo" style="color:#475569; font-size:12px;">AMD Radeon RX 6600 (8GB VRAM)</span>
+            <span id="step2ActiveHwInfo" style="color:#475569; font-size:12px;">Local Compute</span>
           </div>
           <button type="button" class="CleanBtn" style="font-size:11.5px; padding:3px 10px; background:#ffffff; color:#2563eb; border:1px solid #bfdbfe; border-radius:4px; font-weight:600; cursor:pointer;" onclick="wizardGotoStep(1)">
             &larr; Đổi Model ở Bước 1
@@ -1889,8 +1889,8 @@ HTML_PAGE = r"""<!DOCTYPE html>
             <button type="button" class="CleanBtn btn-primary" id="btnLiveStartScan" style="padding:9px 22px; font-size:13.5px; font-weight:700; background:#2563eb; color:#ffffff; border:none; border-radius:6px; cursor:pointer; box-shadow:0 2px 8px rgba(37,99,235,0.25);" onclick="startLiveServerCrawlStep5()">
               [ BẮT ĐẦU CÀO BÁO &amp; CHẠY AI LIVE ]
             </button>
-            <button type="button" class="CleanBtn" id="btnStep5To6" style="padding:9px 22px; font-size:13.5px; font-weight:700; background:#16a34a; color:#ffffff; border:none; border-radius:6px; cursor:pointer; box-shadow:0 2px 8px rgba(22,163,74,0.25);" onclick="wizardGotoStep(6)">
-              [ TIẾP TỤC: VÁ MÃ NGUỒN &amp; KIỂM THỬ THỰC CHIẾN (BƯỚC 6) → ]
+            <button type="button" class="CleanBtn" id="btnStep5To6" style="padding:9px 22px; font-size:13.5px; font-weight:700; background:#16a34a; color:#ffffff; border:none; border-radius:6px; cursor:pointer; box-shadow:0 2px 8px rgba(22,163,74,0.25);" onclick="ensureWizardSkillSynthesizedAndNext()">
+              [ SINH SKILL &amp; CHUYỂN BƯỚC 6: VÁ MÃ NGUỒN → ]
             </button>
           </div>
         </div>
@@ -1988,7 +1988,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
               <span id="feedAgentLedBadge" style="background:#15803d; color:#ffffff; font-size:11px; font-weight:700; padding:2px 9px; border-radius:12px;">ĐÈN XANH: SỐNG</span>
             </div>
             <div id="feedAgentTelemetry" style="font-size:12px; color:#475569; margin-top:3px;">
-              Mô hình: <b id="feedActiveModelText" style="color:#1d4ed8;">khang-qwen3:latest</b> &bull; Phần cứng: <span id="feedActiveHwText">AMD Radeon RX 6600 (8GB VRAM)</span> &bull; Trạng thái: Sẵn sàng suy luận
+              Mô hình: <b id="feedActiveModelText" style="color:#1d4ed8;">auto-detect</b> &bull; Phần cứng: <span id="feedActiveHwText">Đang nhận diện...</span> &bull; Trạng thái: Sẵn sàng suy luận
             </div>
           </div>
         </div>
@@ -2021,9 +2021,9 @@ HTML_PAGE = r"""<!DOCTYPE html>
             <option value="SentinelOne">SentinelOne Labs</option>
             <option value="DFIR">The DFIR Report</option>
             <option value="CISA">CISA KEV (Mỹ)</option>
-            <option value="YEAR_2026">Kho tri thức 2026 (3,087 bài &amp; CVEs)</option>
-            <option value="YEAR_2025">Kho tri thức 2025 (2,094 bài &amp; CVEs)</option>
-            <option value="YEAR_2024">Kho tri thức 2024 (1,948 bài &amp; CVEs)</option>
+            <option value="YEAR_2026">Kho tri thức Năm 2026</option>
+            <option value="YEAR_2025">Kho tri thức Năm 2025</option>
+            <option value="YEAR_2024">Kho tri thức Năm 2024</option>
             <option value="OLD_ONLY">Kho lưu trữ bài cũ</option>
           </select>
 
@@ -2415,7 +2415,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
                 MÁY CHỦ WAF REVERSE PROXY: CỔNG 8766 (RUNNING LIVE)
               </span>
               <span style="font-size:11.5px; font-weight:700; padding:3px 8px; background:var(--primary-subtle); color:var(--primary); border:1px solid #bfdbfe; border-radius:4px;">
-                <span id="lblCorpusStats1">KHO TRI THỨC PHÂN HỆ: 221 BÀI BÁO &amp; 1,828 IOCs (2024 - 2026)</span>
+                <span id="lblCorpusStats1">KHO TRI THỨC PHÂN HỆ: 0 BÀI BÁO &amp; 0 IOCs</span>
               </span>
             </div>
             <div>
@@ -2481,28 +2481,28 @@ HTML_PAGE = r"""<!DOCTYPE html>
         <div style="border:1px solid var(--border-main); border-radius:6px; padding:14px; background:var(--bg-subtle);">
           <b style="font-size:13.5px; color:var(--text-main);">PHÂN BỐ DỮ LIỆU CTI 3 NĂM (2024 - 2026) &amp; MÔ HÌNH KIM TỰ THÁP PYRAMID OF PAIN</b>
           <p style="font-size:12.5px; color:var(--text-muted); margin-top:4px; margin-bottom:12px;">
-            Cơ sở dữ liệu bao phủ 7,258 bài báo và hồ sơ lỗ hổng bảo mật zero-day nghiêm trọng trong 3 năm liên tiếp (2024 - 2026), chứng minh giải pháp phòng thủ của đồ án vượt xa việc chỉ chặn địa chỉ IP truyền thống.
+            Cơ sở dữ liệu theo dõi bài báo và hồ sơ lỗ hổng bảo mật zero-day theo từng năm (2024 - 2026), chứng minh giải pháp phòng thủ của đồ án vượt xa việc chỉ chặn địa chỉ IP truyền thống.
           </p>
 
           <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; margin-bottom:14px;">
             <div style="background:#ffffff; border:1px solid var(--border-main); border-radius:6px; padding:10px; text-align:center;">
               <div style="font-size:11px; font-weight:700; color:var(--text-muted);">NĂM 2024</div>
-              <div style="font-size:22px; font-weight:700; color:var(--primary);" id="statYear2024">1,948</div>
+              <div style="font-size:22px; font-weight:700; color:var(--primary);" id="statYear2024">0</div>
               <div style="font-size:11px; color:var(--text-muted);">Ivanti, Palo Alto, XZ-Utils, ScreenConnect</div>
             </div>
             <div style="background:#ffffff; border:1px solid var(--border-main); border-radius:6px; padding:10px; text-align:center;">
               <div style="font-size:11px; font-weight:700; color:var(--text-muted);">NĂM 2025</div>
-              <div style="font-size:22px; font-weight:700; color:var(--primary);" id="statYear2025">2,094</div>
+              <div style="font-size:22px; font-weight:700; color:var(--primary);" id="statYear2025">0</div>
               <div style="font-size:11px; color:var(--text-muted);">CitrixBleed v2, ActiveMQ, AI Injection</div>
             </div>
             <div style="background:#ffffff; border:1px solid var(--border-main); border-radius:6px; padding:10px; text-align:center;">
               <div style="font-size:11px; font-weight:700; color:var(--text-muted);">NĂM 2026</div>
-              <div style="font-size:22px; font-weight:700; color:var(--primary);" id="statYear2026">3,087</div>
+              <div style="font-size:22px; font-weight:700; color:var(--primary);" id="statYear2026">0</div>
               <div style="font-size:11px; color:var(--text-muted);">CISA KEV Catalog, APTs &amp; Zero-Days</div>
             </div>
             <div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; text-align:center;">
               <div style="font-size:11px; font-weight:700; color:var(--primary);">TỔNG CỘNG 3 NĂM</div>
-              <div style="font-size:22px; font-weight:700; color:var(--primary);" id="statYearTotal">7,258</div>
+              <div style="font-size:22px; font-weight:700; color:var(--primary);" id="statYearTotal">0</div>
               <div style="font-size:11px; color:var(--text-muted);">Hồ sơ CTI &amp; CVE toàn diện</div>
             </div>
           </div>
@@ -2732,15 +2732,15 @@ HTML_PAGE = r"""<!DOCTYPE html>
       }
 
       // 5. Update active model & hardware labels in Feed Header and Step 2
-      const chosenModel = localStorage.getItem('selectedAiModel') || (detectedSystemModelData ? detectedSystemModelData.active_model : 'khang-qwen3:latest');
+      const chosenModel = localStorage.getItem('selectedAiModel') || (detectedSystemModelData ? detectedSystemModelData.active_model : 'cti-heuristic-engine');
       const feedModel = document.getElementById('feedActiveModelText');
       if (feedModel) feedModel.textContent = chosenModel;
       const step2Model = document.getElementById('step2ActiveModelName');
       if (step2Model) step2Model.textContent = chosenModel;
 
       const hwDesc = detectedSystemHardware
-        ? `${detectedSystemHardware.gpu_name} (${detectedSystemHardware.vram_gb || 8}GB VRAM)`
-        : 'AMD Radeon RX 6600 (8GB VRAM)';
+        ? `${detectedSystemHardware.gpu_name}${detectedSystemHardware.vram_gb ? ' (' + detectedSystemHardware.vram_gb + 'GB VRAM)' : ''}`
+        : 'Local Compute';
       const feedHw = document.getElementById('feedActiveHwText');
       if (feedHw) feedHw.textContent = hwDesc;
       const step2Hw = document.getElementById('step2ActiveHwInfo');
@@ -2847,7 +2847,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
     function updateModelBadgeText(modelVal) {
       const badge = document.getElementById('localModelBadge');
       if (!badge) return;
-      const hw = detectedSystemHardware || { gpu_name: "AMD Radeon RX 6600", vram_gb: 8.0, is_gpu_available: true };
+      const hw = detectedSystemHardware || { gpu_name: "Local Compute", vram_gb: 0, is_gpu_available: false };
       if (!modelVal || modelVal === 'cti-heuristic-engine') {
         badge.textContent = `CTI HEURISTIC CORE (${hw.gpu_name.toUpperCase()} • NHẸ)`;
       } else {
@@ -2884,7 +2884,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
       const btn = document.getElementById('btnSendChat');
       const logBox = document.getElementById('chatLogBox');
       const modelSel = document.getElementById('aiModelSelect');
-      const selectedModel = modelSel ? modelSel.value : 'khang-qwen3';
+      const selectedModel = modelSel ? modelSel.value : 'auto';
       const msg = inp.value.trim();
       if (!msg) return;
 
@@ -2896,7 +2896,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
       const pendingId = 'pending-' + Date.now();
       logBox.innerHTML += `
         <div style="padding:10px 14px; border:1px solid var(--border-main); background:#ffffff; border-radius:6px; align-self:flex-end; max-width:88%; box-shadow:0 1px 2px rgba(0,0,0,0.04);">
-          <b style="color:var(--text-main);">Khang:</b><br/>${safeUser}
+          <b style="color:var(--text-main);">Người dùng:</b><br/>${safeUser}
         </div>
         <div id="${pendingId}" style="padding:10px 14px; border-left:3px solid var(--primary); background:var(--bg-subtle); border-radius:0 6px 6px 0; border:1px solid var(--border-main); color:var(--text-muted); font-size:12.5px;">
           <b style="color:var(--primary);">OpenClaw AI Agent (${selectedModel}):</b><br/>
@@ -4431,7 +4431,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
         if (btn3Y) btn3Y.classList.add('btn-primary', 'active');
         if (btnSingle) btnSingle.classList.remove('btn-primary', 'active');
         if (badge) {
-          const totalArt = masterDefenseCache ? masterDefenseCache.total_articles : '7,450';
+          const totalArt = masterDefenseCache ? masterDefenseCache.total_articles : 0;
           badge.textContent = `ĐANG HIỂN THỊ: TOÀN BỘ KHO (${totalArt.toLocaleString()} BÀI BÁO)`;
           badge.style.background = 'var(--safe-bg)';
           badge.style.color = 'var(--safe)';
@@ -4556,7 +4556,9 @@ const elArt = document.getElementById('lblMasterArticlesCount');
         renderScoreTable(d.all_enriched);
         const reasonBox = document.getElementById('aiReasonBox');
         if (reasonBox) {
-          reasonBox.textContent = `[LOCAL OLLAMA (khang-qwen3 • GPU RX 6600 8GB)]\nLocal AI Agent đã tổng hợp tri thức tự động từ toàn bộ ${d.total_articles} bài báo trong kho CTI SQLite. Đã phát hiện ${d.total_iocs} chỉ số nguy hại (${d.malicious_ips} IP C2, ${d.malicious_domains} Tên miền độc, ${d.cves_count} lỗ hổng CVE, ${d.malware_hashes} mã băm Malware SHA256/MD5). Toàn bộ đã được đưa vào ma trận 6 lớp phòng thủ.`;
+          const activeModelLbl = localStorage.getItem('selectedAiModel') || (detectedSystemModelData ? detectedSystemModelData.active_model : 'auto');
+          const hwLbl = detectedSystemHardware ? detectedSystemHardware.gpu_name : 'Local Compute';
+          reasonBox.textContent = `[LOCAL AI AGENT (${activeModelLbl} • ${hwLbl})]\nLocal AI Agent đã tổng hợp tri thức tự động từ toàn bộ ${d.total_articles} bài báo trong kho CTI SQLite. Đã phát hiện ${d.total_iocs} chỉ số nguy hại (${d.malicious_ips} IP C2, ${d.malicious_domains} Tên miền độc, ${d.cves_count} lỗ hổng CVE, ${d.malware_hashes} mã băm Malware SHA256/MD5). Toàn bộ đã được đưa vào ma trận 6 lớp phòng thủ.`;
         }
         const planBox = document.getElementById('aiPlanBox');
         if (planBox) {
@@ -4618,13 +4620,19 @@ const elArt = document.getElementById('lblMasterArticlesCount');
       }
       const subEl = document.getElementById('scopeSubtitle');
       if (subEl) {
-        const iocSummaryParts = [];
-        if (counts.sha256 > 0) iocSummaryParts.push(`<b>${counts.sha256}</b> Hash`);
-        if (counts.ips > 0) iocSummaryParts.push(`<b>${counts.ips}</b> IP`);
-        if (counts.domains > 0) iocSummaryParts.push(`<b>${counts.domains}</b> Domain`);
-        if (counts.cves > 0) iocSummaryParts.push(`<b>${counts.cves}</b> CVE`);
-        const iocSummaryStr = iocSummaryParts.length > 0 ? iocSummaryParts.join(', ') : 'Tin tức chính sách / không có IOC cụ thể';
-        subEl.innerHTML = `Nguồn: <b>${art.source}</b> • Chỉ số: ${iocSummaryStr} • Trạng thái: <b>${art.status === 'completed' ? 'Đã hoàn thành' : 'Chờ xử lý'}</b>.`;
+        if (art.status === 'completed') {
+          const iocSummaryParts = [];
+          if (counts.sha256 > 0) iocSummaryParts.push(`<b>${counts.sha256}</b> Hash`);
+          if (counts.ips > 0) iocSummaryParts.push(`<b>${counts.ips}</b> IP`);
+          if (counts.domains > 0) iocSummaryParts.push(`<b>${counts.domains}</b> Domain`);
+          if (counts.cves > 0) iocSummaryParts.push(`<b>${counts.cves}</b> CVE`);
+          const iocSummaryStr = iocSummaryParts.length > 0 ? iocSummaryParts.join(', ') : 'Tin tức chính sách / không có IOC cụ thể';
+          subEl.innerHTML = `Nguồn: <b>${art.source}</b> • Chỉ số: ${iocSummaryStr} • Trạng thái: <b>Đã hoàn thành</b>.`;
+        } else if (art.status === 'processing') {
+          subEl.innerHTML = `Nguồn: <b>${art.source}</b> • Chỉ số: <i>Đang bóc tách &amp; đối soát 5 nguồn OSINT...</i> • Trạng thái: <b>Đang xử lý</b>.`;
+        } else {
+          subEl.innerHTML = `Nguồn: <b>${art.source}</b> • Chỉ số: <i>Chưa phân tích (Bấm [Chạy AI] để bóc tách)</i> • Trạng thái: <b>Chờ xử lý</b>.`;
+        }
       }
 
       // 2. Tự động áp dụng dữ liệu phòng thủ nếu người dùng đang xem ở chế độ Theo Bài Báo
@@ -4760,7 +4768,7 @@ const elArt = document.getElementById('lblMasterArticlesCount');
         masterDefenseScopeCache = {};
         await loadMasterDefenseMatrix(currentSelectedTargetScope || 'SCOPE_ALL', true);
         const sc = masterDefenseCache?.trust_audit?.trust_score || '96.2';
-        const total = masterDefenseCache?.total_articles || '7,450';
+        const total = masterDefenseCache?.total_articles ?? 0;
         alert(`Đã quét lại toàn bộ ${total} bài báo trong SQLite và tái tính toán CTI Trust Score: ${sc}/100!`);
       }
     }
@@ -5194,7 +5202,7 @@ const elArt = document.getElementById('lblMasterArticlesCount');
       const status = document.getElementById('statusText');
       const text = art.content;
       const modelSel = document.getElementById('aiModelSelect');
-      const selectedModel = modelSel ? modelSel.value : 'khang-ai';
+      const selectedModel = modelSel ? modelSel.value : 'auto';
       if (btn) {
         btn.disabled = true;
         btn.textContent = `Đang xử lý #${idx + 1}...`;
@@ -5369,7 +5377,7 @@ const elArt = document.getElementById('lblMasterArticlesCount');
       const status = document.getElementById('statusText');
       const text = document.getElementById('articleText').value;
       const modelSel = document.getElementById('aiModelSelect');
-      const selectedModel = modelSel ? modelSel.value : 'khang-ai';
+      const selectedModel = modelSel ? modelSel.value : 'auto';
       if (btn) {
         btn.disabled = true;
         btn.textContent = "Đang xử lý...";
@@ -5581,16 +5589,16 @@ const elArt = document.getElementById('lblMasterArticlesCount');
           engGrid.innerHTML = html;
         }
 
-        // 4. Cập nhật số liệu thống kê 3 năm
+        // 4. Cập nhật số liệu thống kê 3 năm (dùng ?? để không biến số 0 thành dữ liệu giả)
         if (data.year_stats) {
           const y24El = document.getElementById('statYear2024');
           const y25El = document.getElementById('statYear2025');
           const y26El = document.getElementById('statYear2026');
           const totEl = document.getElementById('statYearTotal');
-          if (y24El) y24El.textContent = data.year_stats['2024'] || '1,948';
-          if (y25El) y25El.textContent = data.year_stats['2025'] || '2,094';
-          if (y26El) y26El.textContent = data.year_stats['2026'] || '3,216';
-          if (totEl) totEl.textContent = data.year_stats['total'] || '7,258';
+          if (y24El) y24El.textContent = (data.year_stats['2024'] ?? 0).toLocaleString();
+          if (y25El) y25El.textContent = (data.year_stats['2025'] ?? 0).toLocaleString();
+          if (y26El) y26El.textContent = (data.year_stats['2026'] ?? 0).toLocaleString();
+          if (totEl) totEl.textContent = (data.year_stats['total'] ?? 0).toLocaleString();
         }
 
         // 5. Cập nhật bảng nhật ký tấn công gần đây
@@ -5653,7 +5661,7 @@ const elArt = document.getElementById('lblMasterArticlesCount');
 
     async function recompileAllDefenseEngines() {
       const consoleEl = document.getElementById('wafLiveConsole');
-      if (consoleEl) consoleEl.textContent = `[AI AGENT COMPILER] Đang đọc toàn bộ 1,695 bài báo và CVE từ SQLite để tái biên dịch 5 công cụ an ninh...`;
+      if (consoleEl) consoleEl.textContent = `[AI AGENT COMPILER] Đang đọc toàn bộ bài báo và CVE từ SQLite để tái biên dịch 5 công cụ an ninh...`;
       try {
         const res = await fetch('/api/defense/recompile-all', { method: 'POST' });
         const d = await res.json();
@@ -5712,8 +5720,8 @@ const elArt = document.getElementById('lblMasterArticlesCount');
     let wzCurrentStep = 1;
     let wzTarget = "./target_projects/My_Website";
     let wzScopeId = "SCOPE_WEB";
-    let wzBestArticleId = "thn-79d0e8ee";
-    let wzSkillName = "agentic-defense-cve-2026-php2shell";
+    let wzBestArticleId = "";
+    let wzSkillName = "";
     let detectedSystemModelData = null;
     let wzScanCompleted = false;
 
@@ -5757,8 +5765,28 @@ const elArt = document.getElementById('lblMasterArticlesCount');
         const res = await fetch('/api/system/project-context?target=' + encodeURIComponent(queryTarget));
         const data = await res.json();
         if (data && data.target_path) {
+          const prevTarget = localStorage.getItem('cti_last_target') || '';
+          if (prevTarget && prevTarget !== data.target_path) {
+            try {
+              localStorage.removeItem('cti_wizard_step');
+              localStorage.removeItem('cti_dashboard_ready');
+              localStorage.removeItem('cti_last_scan_data');
+              localStorage.removeItem('cti_selected_scopes');
+              localStorage.removeItem('cti_scope_id');
+              localStorage.removeItem('cti_selected_cadence');
+              localStorage.removeItem('cti_selected_history_years');
+              localStorage.removeItem('cti_skill_name');
+            } catch (eClean) {}
+          }
           wzTarget = data.target_path;
           localStorage.setItem('cti_last_target', data.target_path);
+
+          const lblProj = document.getElementById('lblActiveTargetProject');
+          if (lblProj) lblProj.textContent = data.target_name || data.target_path.split(/[/\\]/).pop() || 'Target Project';
+          const lblTechs = document.getElementById('lblActiveTargetTechs');
+          if (lblTechs && data.config && data.config.scope_name) {
+            lblTechs.textContent = data.config.scope_name;
+          }
 
           const targetInp = document.getElementById('wizardInputTarget');
           if (targetInp) targetInp.value = data.target_path;
@@ -5782,16 +5810,21 @@ const elArt = document.getElementById('lblMasterArticlesCount');
 
           const savedStep = parseInt(localStorage.getItem('cti_wizard_step') || '0', 10);
           const isConfigured = Boolean(
-            (data.is_configured && data.config) || 
-            (localStorage.getItem('cti_configured_' + data.target_path) === 'true') ||
-            (localStorage.getItem('cti_dashboard_ready') === 'true') ||
-            savedStep >= 5
+            (data.is_configured && data.config) ||
+            (localStorage.getItem('cti_configured_' + data.target_path) === 'true')
           );
 
           if (isConfigured) {
             wzIsProjectConfigured = true;
+            if (data.config && data.config.skill_name) {
+              wzSkillName = data.config.skill_name;
+              localStorage.setItem('cti_skill_name', wzSkillName);
+            } else {
+              wzSkillName = localStorage.getItem('cti_skill_name') || '';
+            }
+            const lblSkill = document.getElementById('lblSkillMdFilename');
+            if (lblSkill && wzSkillName) lblSkill.textContent = `SKILL.md (${wzSkillName})`;
             localStorage.setItem('cti_configured_' + data.target_path, 'true');
-            localStorage.setItem('cti_dashboard_ready', 'true');
             localStorage.setItem('cti_wizard_step', '5');
 
             // Xóa triệt để landing-mode và wizard-setup-mode
@@ -5919,7 +5952,7 @@ const elArt = document.getElementById('lblMasterArticlesCount');
             <div>
               <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
                 <span style="background:#15803d; color:#ffffff; font-weight:700; font-size:11px; padding:2px 8px; border-radius:3px;">DỰ ÁN ĐÃ BẢO VỆ (LIVE MONITORING)</span>
-                <span style="font-weight:700; color:#0f172a; font-size:14px;">${data.target_name || (wzTarget ? wzTarget.split(/[/\\]/).pop() : 'testCTI')}</span>
+                <span style="font-weight:700; color:#0f172a; font-size:14px;">${data.target_name || (wzTarget ? wzTarget.split(/[/\\]/).pop() : 'Dự Án Đích')}</span>
                 <span style="font-family:monospace; color:#475569; font-size:12px;">(${data.target_path || wzTarget})</span>
               </div>
               <div style="font-size:12px; color:#166534;">
@@ -6538,6 +6571,7 @@ let wzIsProjectConfigured = false;
       }
 
       const tiers = detectedSystemModelData.model_tiers || [];
+      const ollamaInfo = detectedSystemModelData.ollama || {};
       let activeVal = currentActiveModel;
       if (!activeVal) {
         try { activeVal = localStorage.getItem('selectedAiModel'); } catch(e){}
@@ -6547,6 +6581,16 @@ let wzIsProjectConfigured = false;
       }
 
       let html = "";
+      if (ollamaInfo.binary_installed === false) {
+        html += `
+          <div style="background:#fef2f2; border:1.5px solid #fca5a5; border-radius:8px; padding:12px 16px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div style="font-size:12.5px; color:#991b1b; line-height:1.5;">
+              <b>⚠️ Chưa phát hiện phần mềm Ollama trên máy này:</b> Để chạy các mô hình AI Local (Qwen / Gemma / DeepSeek), vui lòng cài Ollama. Nếu muốn chạy ngay không cần cài đặt, bạn có thể chọn <b>CTI Heuristic Engine</b> ở Cấp Độ 3.
+            </div>
+            <a href="https://ollama.com/download" target="_blank" style="background:#dc2626; color:#ffffff; text-decoration:none; font-size:12px; font-weight:700; padding:6px 14px; border-radius:6px; white-space:nowrap;">⬇️ Tải Ollama</a>
+          </div>
+        `;
+      }
       tiers.forEach((t) => {
         const isTier1 = (t.tier_key === 'STRONGEST');
         const borderColor = isTier1 ? '#3b82f6' : (t.tier_key === 'BALANCED' ? '#10b981' : '#64748b');
@@ -6767,7 +6811,28 @@ let wzIsProjectConfigured = false;
     function wizardConfirmStep1ModelAndProceed() {
       // Tìm model đang được chọn trong radio
       const checkedRadio = document.querySelector('input[name="wzModelRadio"]:checked');
-      let chosenModel = checkedRadio ? checkedRadio.value : (detectedSystemModelData ? detectedSystemModelData.active_model : 'khang-qwen3:latest');
+      let chosenModel = checkedRadio ? checkedRadio.value : (detectedSystemModelData ? detectedSystemModelData.active_model : 'cti-heuristic-engine');
+
+      // Nếu người dùng chọn model Ollama chưa cài trên máy -> nhắc tải ngay tại chỗ
+      if (chosenModel && chosenModel !== 'cti-heuristic-engine' && detectedSystemModelData && Array.isArray(detectedSystemModelData.model_tiers)) {
+        let modelObj = null;
+        for (const t of detectedSystemModelData.model_tiers) {
+          const hit = (t.models || []).find(m => m.id === chosenModel);
+          if (hit) { modelObj = hit; break; }
+        }
+        if (modelObj && !modelObj.is_installed) {
+          const ollamaInstalled = detectedSystemModelData.ollama && detectedSystemModelData.ollama.binary_installed !== false;
+          if (ollamaInstalled) {
+            if (confirm(`Mô hình [${chosenModel}] chưa được tải về máy này.\nBạn có muốn hệ thống tải (ollama pull ${chosenModel}) ngay bây giờ không?`)) {
+              pullOllamaModel(chosenModel);
+              return;
+            }
+          } else {
+            alert(`Máy chưa cài Ollama nên chưa thể chạy [${chosenModel}]. Hệ thống sẽ chuyển sang chế độ CTI Heuristic Core để bạn tiếp tục quét AST ngay.`);
+            chosenModel = 'cti-heuristic-engine';
+          }
+        }
+      }
       
       try {
         localStorage.setItem('selectedAiModel', chosenModel);
@@ -7092,7 +7157,7 @@ let wzIsProjectConfigured = false;
         tactics: (gtTacticsInp ? gtTacticsInp.value.split(',').map(s => s.trim()).filter(Boolean) : [])
       };
 
-      let chosenModel = 'khang-qwen3:latest';
+      let chosenModel = 'auto';
       try { chosenModel = localStorage.getItem('selectedAiModel') || chosenModel; } catch(e){}
 
       runBtn.disabled = true;
@@ -7288,7 +7353,7 @@ let wzIsProjectConfigured = false;
       const progEta = document.getElementById("wzProgressEta");
       const progSpinner = document.getElementById("wzProgressSpinner");
 
-      const chosenModel = localStorage.getItem("selectedAiModel") || (document.getElementById("aiModelSelect") ? document.getElementById("aiModelSelect").value : "khang-qwen3:latest");
+      const chosenModel = localStorage.getItem("selectedAiModel") || (document.getElementById("aiModelSelect") ? document.getElementById("aiModelSelect").value : "auto");
       wzScanInProgress = true;
       updateAgentLedStatus("processing", "TÁC TỬ AI ĐANG QUÉT AST MÃ NGUỒN", `Duyệt cây AST & gọi mô hình ${chosenModel}...`);
 
@@ -7348,7 +7413,8 @@ let wzIsProjectConfigured = false;
               term.scrollTop = term.scrollHeight;
             }
           } else if (rounded >= 45 && rounded < 75) {
-            if (progStage) progStage.textContent = `[3/4] Nạp ngữ cảnh vào Local LLM ${chosenModel} (GPU RX 6600)...`;
+            const hwLbl = detectedSystemHardware ? detectedSystemHardware.gpu_name : 'Local Compute';
+            if (progStage) progStage.textContent = `[3/4] Nạp ngữ cảnh vào Local AI ${chosenModel} (${hwLbl})...`;
             if (progDetail) progDetail.textContent = `Mô hình ${chosenModel} đang đọc hiểu cấu trúc mã nguồn và đánh giá rủi ro...`;
             if (!logStage3 && term) {
               logStage3 = true;
@@ -7615,9 +7681,10 @@ let wzIsProjectConfigured = false;
             ${art.title}
           </div>
           <div style="display:flex; align-items:center; flex-wrap:wrap; gap:4px; margin-bottom:4px;">
-            ${cveChips}
-            ${ipChip}
-            <span style="font-size:11px; color:#64748b;">${art.ioc_count || 3} chỉ số đe dọa bóc tách</span>
+            ${art.status === 'completed'
+              ? `${cveChips}${ipChip}<span style="font-size:11px; color:#15803d; font-weight:600;">${art.ioc_count || 0} chỉ số đã xác thực</span>`
+              : `<span style="font-size:11px; color:#94a3b8; font-style:italic;">Chưa phân tích (Đang chờ AI bóc tách IOC)</span>`
+            }
           </div>
           <div id="wzArtRules_${idx}" style="display:none; font-size:11.5px; color:#15803d; font-family:monospace; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:4px; padding:4px 8px; margin-top:6px;">
             [+] Tích hợp Kỹ Năng Tác Tử: ${art.skills_summary || art.rules_summary || 'Kỹ năng phòng thủ tác tử'}
@@ -7711,6 +7778,9 @@ let wzIsProjectConfigured = false;
             qStatus.style.color = "#16a34a";
           }
 
+          // Đồng bộ đóng gói Gói Kỹ Năng Tác Tử (SKILL.md) ngay trong thư mục dự án chạy cti
+          await ensureWizardSkillSynthesized();
+
           // Bắt đầu xử lý bài đầu tiên trong hàng đợi sau 500ms
           setTimeout(() => {
             executeSingleArticleQueue(0);
@@ -7725,6 +7795,52 @@ let wzIsProjectConfigured = false;
           btn.textContent = "[ QUÉT LẠI & TIẾP TỤC HÀNG ĐỢI ]";
         }
       }
+    }
+
+    async function ensureWizardSkillSynthesized() {
+      try {
+        const wzCadence = document.getElementById("wzCadenceSelect");
+        const chosenCadence = wzCadence ? parseInt(wzCadence.value, 10) : (serverScanInterval || 21600);
+        const res = await fetch("/api/wizard/synthesize", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({
+            target: wzTarget,
+            scope_id: wzScopeId,
+            article_id: wzBestArticleId,
+            scan_interval_sec: chosenCadence
+          })
+        });
+        const sd = await res.json();
+        if (sd && sd.status === "success" && sd.skill_name) {
+          wzSkillName = sd.skill_name;
+          try {
+            localStorage.setItem('cti_skill_name', wzSkillName);
+            localStorage.setItem('cti_configured_' + wzTarget, 'true');
+          } catch (e) {}
+          const lblSkill = document.getElementById('lblSkillMdFilename');
+          if (lblSkill) lblSkill.textContent = `SKILL.md (${wzSkillName})`;
+          updateLiveTicker(`[SKILL PACKAGED] Đã sinh Gói Kỹ Năng [${wzSkillName}] ngay trong thư mục dự án (${wzTarget}/SKILL.md & skills/).`);
+          return sd;
+        }
+      } catch (e) {
+        console.warn("Lỗi tổng hợp Skill Bước 5:", e);
+      }
+      return null;
+    }
+
+    async function ensureWizardSkillSynthesizedAndNext() {
+      const btn = document.getElementById("btnStep5To6");
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = "[ ĐANG ĐÓNG GÓI SKILL.MD VÀO DỰ ÁN... ]";
+      }
+      await ensureWizardSkillSynthesized();
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = "[ SINH SKILL & CHUYỂN BƯỚC 6: VÁ MÃ NGUỒN → ]";
+      }
+      wizardGotoStep(6);
     }
 
     async function wizardExecuteCrawl() {
@@ -7985,15 +8101,15 @@ let wzIsProjectConfigured = false;
       if (livingCard) livingCard.style.display = "block";
       
       const elArts = document.getElementById("wzCardArticlesCount");
-      if (elArts) elArts.textContent = `${d.matched_articles_count || 60} bài CTI (${processedCount} bài học sâu)`;
+      if (elArts) elArts.textContent = `${d.matched_articles_count ?? 0} bài CTI (${processedCount} bài học sâu)`;
       const elIocs = document.getElementById("wzCardIocCount");
-      if (elIocs) elIocs.textContent = (d.relevant_iocs_count || 84) + " chỉ số";
+      if (elIocs) elIocs.textContent = (d.relevant_iocs_count ?? 0) + " chỉ số";
       const elTrust = document.getElementById("wzCardTrustScore");
       if (elTrust) elTrust.textContent = (d.trust_score || 95.0) + "%";
       const elVersion = document.getElementById("wzLivingSkillVersion");
       if (elVersion) {
-        const vStr = synthData && synthData.living_version ? synthData.living_version : `v2.${d.matched_articles_count || 60}.${d.relevant_iocs_count || 84}`;
-        elVersion.textContent = `${vStr} (Tích lũy ${d.matched_articles_count || 60} bài báo)`;
+        const vStr = synthData && synthData.living_version ? synthData.living_version : `v2.${d.matched_articles_count ?? 0}.${d.relevant_iocs_count ?? 0}`;
+        elVersion.textContent = `${vStr} (Tích lũy ${d.matched_articles_count ?? 0} bài báo)`;
       }
 
       const elTitle = document.getElementById("wzBestTitle");
@@ -8353,6 +8469,16 @@ def api_verify_url_article(req: AddArticleRequest):
 
     for m in _re.finditer(r"\bCVE-\d{4}-\d{4,7}\b", title + " " + safe_content, _re.IGNORECASE):
         found_cves.append(m.group(0).upper())
+
+    _dom_plain_re = _re.compile(
+        r"(?<![/@\w])(?:[a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+(?:\[\.\]|\(\.\)|\.)"
+        r"(?:com|net|org|io|ru|cn|xyz|top|info|biz|cc|pw|club|online|site|tech|gov|edu|tw|ua|pl|ro|ca|uk|ae|la|bet|wiki)\b",
+        _re.IGNORECASE,
+    )
+    for m in _dom_plain_re.finditer(safe_content):
+        val_l = _clean_refang_py(m.group(0)).lower()
+        if not any(val_l == b or val_l.endswith("." + b) for b in benign_doms):
+            found_doms.append(val_l)
 
     found_ips = sorted(set(found_ips))
     found_doms = sorted(set(found_doms))
@@ -8717,7 +8843,7 @@ def api_step4_correlate_and_generate_code(req: Step4GenerateRequest):
     brain = MultiProviderLLMBrain(provider="ollama", model_name=req.model_name)
     llm_gen = brain.ask_llm(
         system_prompt=(
-            "Bạn là Chuyên gia Phòng thủ An ninh mạng (Local AI Agent chạy trên GPU RX 6600). "
+            f"Bạn là Chuyên gia Phòng thủ An ninh mạng (Local AI Agent chạy trên {CURRENT_HARDWARE.get('gpu_name', 'Local Compute')}). "
             "Dựa vào TIÊU ĐỀ, NỘI DUNG BÀI BÁO và DANH SÁCH IOC ĐỘC HẠI cụ thể bên dưới, hãy viết phương án phòng thủ "
             "BẰNG TIẾNG VIỆT (ngắn gọn, súc tích trong 4 gạch đầu dòng, nêu đích danh tên mã độc/nhóm APT và các mã IP/Domain/CVE trong bài): "
             "1. Bản chất cuộc tấn công trong bài báo này là gì (nhắm vào đâu, dùng lỗ hổng hay mã độc nào)? "
@@ -10415,11 +10541,11 @@ def api_get_project_context(target: str = Query("")):
             except Exception:
                 pass
     if not raw:
-        cand_cti = Path("D:/mkhang/testCTI")
-        if cand_cti.exists():
-            raw = str(cand_cti.resolve())
+        cwd_p = Path.cwd().resolve()
+        if cwd_p != ROOT_PROJECT_DIR.resolve() and cwd_p != SANDBOX_DIR.resolve():
+            raw = str(cwd_p)
         else:
-            raw = str(Path.cwd())
+            raw = str((ROOT_PROJECT_DIR / "target_projects" / "My_Website").resolve())
 
     p = Path(raw).resolve()
     if not p.exists():

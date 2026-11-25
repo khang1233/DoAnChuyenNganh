@@ -270,8 +270,25 @@ class MultiProviderLLMBrain:
         )
 
     def ask_llm(self, system_prompt: str, user_prompt: str, temperature: float = 0.2) -> Dict[str, str]:
-        """Gọi trực tiếp Local AI Agent (Ollama Local LLM tại 127.0.0.1:11434/api/chat) — Tối ưu chống lag GPU RX 6600."""
+        """Gọi trực tiếp Local AI Agent (Ollama Local LLM tại 127.0.0.1:11434/api/chat) hoặc trả về tức thì với Heuristic Engine."""
+        if (self.model_name or "").strip().lower() == "cti-heuristic-engine":
+            fallback_text = self._local_deterministic_cti_brain(system_prompt, user_prompt)
+            return {
+                "provider_used": "CTI HEURISTIC CORE (Deterministic AST • <1ms)",
+                "content": fallback_text,
+                "reasoning": "Sử dụng bộ suy luận CTI Heuristic Core (không gọi LLM mạng nơ-ron).",
+                "status": "local_deterministic",
+            }
+
         _, _, model = self._resolve_endpoint_and_key()
+        if not model or model == "cti-heuristic-engine":
+            fallback_text = self._local_deterministic_cti_brain(system_prompt, user_prompt)
+            return {
+                "provider_used": "LOCAL DETERMINISTIC ENGINE (No Ollama Model Installed)",
+                "content": fallback_text,
+                "reasoning": "Máy trạm chưa cài mô hình Ollama, sử dụng bộ suy luận Local Deterministic Engine.",
+                "status": "local_deterministic",
+            }
 
         payload: Dict[str, Any] = {
             "model": model,
