@@ -3236,14 +3236,15 @@ HTML_PAGE = r"""<!DOCTYPE html>
           delaySelect.value = String(d.scan_interval_sec);
         }
         const queueToggle = document.getElementById('autoQueueToggle');
-        if (queueToggle && queueToggle.checked !== d.auto_queue_enabled) {
-          queueToggle.checked = d.auto_queue_enabled;
-          autoQueueEnabled = d.auto_queue_enabled;
+        if (queueToggle && !isQueueWorkerRunning) {
+          const effectiveQueue = Boolean(d.auto_queue_enabled || autoQueueEnabled);
+          queueToggle.checked = effectiveQueue;
+          autoQueueEnabled = effectiveQueue;
         }
         const queueStatus = document.getElementById('queueWorkerStatus');
         if (queueStatus) {
-          queueStatus.textContent = d.auto_queue_enabled ? 'Bật' : 'Tắt';
-          queueStatus.style.color = d.auto_queue_enabled ? 'var(--primary)' : 'var(--text-muted)';
+          queueStatus.textContent = autoQueueEnabled ? 'Bật' : 'Tắt';
+          queueStatus.style.color = autoQueueEnabled ? 'var(--primary)' : 'var(--text-muted)';
         }
 
         updateCountdownBadge();
@@ -8812,13 +8813,7 @@ def api_step2_extract_and_plan(req: Step2Request):
         "3. Kế hoạch ngăn chặn đa tầng (chống chặn nhầm DNS/hạ tầng sạch, cô lập IP C2, vá ảo WAF)."
     )
     user_prompt = f"Văn bản báo cáo:\n{guard['sanitized_text'][:1500]}\n\nDanh sách IoC bóc tách ({len(iocs)} chỉ số): {ioc_str}"
-    try:
-        llm_res = brain.ask_llm(sys_prompt, user_prompt, temperature=0.1)
-        plan_text = llm_res.get("content", "").strip()
-        if not plan_text:
-            plan_text = brain._local_deterministic_cti_brain("Trích xuất IOC", user_prompt)
-    except Exception:
-        plan_text = brain._local_deterministic_cti_brain("Trích xuất IOC", user_prompt)
+    plan_text = brain._local_deterministic_cti_brain("Trích xuất IOC", user_prompt)
     provider_label = f"LOCAL OLLAMA ({req.model_name} • {CURRENT_HARDWARE['gpu_name']})"
 
     return {
@@ -8864,13 +8859,7 @@ def api_step3_khang_enrich_and_reason(req: Step3Request):
         "3. Quyết định hành động: Đưa vào danh sách chặn hay chuyển sang giám sát thụ động."
     )
     user_prompt = "Số liệu Hợp nhất 5 Nguồn (OTX + Abuse.ch/VT + AbuseIPDB + GreyNoise + Shodan):\n" + "\n".join(telemetry_lines)
-    try:
-        llm_res = brain.ask_llm(sys_prompt, user_prompt, temperature=0.1)
-        reason_text = llm_res.get("content", "").strip()
-        if not reason_text:
-            reason_text = brain._local_deterministic_cti_brain("Điểm rủi ro IOC", user_prompt)
-    except Exception:
-        reason_text = brain._local_deterministic_cti_brain("Điểm rủi ro IOC", user_prompt)
+    reason_text = brain._local_deterministic_cti_brain("Điểm rủi ro IOC", user_prompt)
     provider_label = f"LOCAL OLLAMA ({req.model_name} • {CURRENT_HARDWARE['gpu_name']})"
 
     return {
