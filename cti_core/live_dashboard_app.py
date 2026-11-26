@@ -1159,7 +1159,6 @@ HTML_PAGE = r"""<!DOCTYPE html>
       <button class="NavLink" onclick="switchView('sec-chat', this)">Chat AI Agent</button>
       <button class="NavLink" onclick="switchView('sec-add', this)">+ Thêm Báo Mới</button>
       <button class="NavLink" onclick="switchView('sec-accuracy-verifier', this)" style="color:#7c3aed; font-weight:700;">Thẩm Định Độ Chính Xác AI</button>
-      <a href="http://127.0.0.1:8780" target="_blank" class="NavLink" style="color:#059669; font-weight:700; text-decoration:none;" title="Mở phân hệ So Sánh Đối Chiếu 50 Bài CTI Ground Truth (Cổng 8780)">So Sánh 50 Bài &nearr;</a>
     </div>
 
     <div class="NavRight" style="display:flex; align-items:center; gap:8px;">

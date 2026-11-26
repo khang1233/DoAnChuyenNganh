@@ -1236,14 +1236,15 @@ HTML_UI = r"""<!DOCTYPE html>
           <table>
             <thead>
               <tr>
-                <th style="width:24%;">Bài Báo CTI</th>
-                <th style="width:28%;">Khớp Chuẩn (TP) &amp; Sót (FN)</th>
-                <th style="width:24%;">AI Bịa / Dư (FP)</th>
-                <th style="width:24%;">Gói Agentic Skill AI Sinh</th>
+                <th style="width:18%;">Bài Báo CTI</th>
+                <th style="width:22%;">Người Nhập (Ground Truth)</th>
+                <th style="width:22%;">AI Đưa Ra (AI Agent)</th>
+                <th style="width:16%;">Đúng / Thiếu / Bịa</th>
+                <th style="width:22%;">Gói Agentic Skill AI Sinh</th>
               </tr>
             </thead>
             <tbody id="cmpTableBody">
-              <tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:24px;">Đang tải dữ liệu so sánh...</td></tr>
+              <tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:24px;">Đang tải dữ liệu so sánh...</td></tr>
             </tbody>
           </table>
         </div>
@@ -1896,7 +1897,7 @@ async function loadComparison() {
   const tbody = document.getElementById('cmpTableBody');
   const rows = data.rows || [];
   if (!rows.length) {
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:26px;">Chưa có bài nào được gán nhãn hoặc chưa chạy AI Agent. Hãy gán nhãn ở Tab 1 trước!</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:26px;">Chưa có bài nào được gán nhãn hoặc chưa chạy AI Agent. Hãy gán nhãn ở Tab 1 trước!</td></tr>';
     return;
   }
 
@@ -1913,26 +1914,37 @@ async function loadComparison() {
     const isActive = isBatchActive || isSingleActive;
     const d = r.diff;
 
-    let tpHtml;
+    let humanHtml = '-';
+    let aiOutHtml = '-';
+    let diffSummaryHtml = '-';
+
     if (isBatchActive) {
-      tpHtml = `<div class="BadgeRunning"><span class="Spinner"></span> AI đang phân tích... (<span class="active-art-timer mono">0s</span>)</div>
+      aiOutHtml = `<div class="BadgeRunning"><span class="Spinner"></span> AI đang phân tích... (<span class="active-art-timer mono">0s</span>)</div>
         <div style="margin-top:5px; font-size:12px; color:var(--primary); font-weight:500;">${escapeHtml(batchStep)}</div>`;
     } else if (isSingleActive) {
-      tpHtml = `<div class="BadgeRunning"><span class="Spinner"></span> AI đang phân tích bài này... (<span class="single-art-timer mono">0s</span>)</div>
+      aiOutHtml = `<div class="BadgeRunning"><span class="Spinner"></span> AI đang phân tích bài này... (<span class="single-art-timer mono">0s</span>)</div>
         <div style="margin-top:5px; font-size:12px; color:var(--primary);">Đang đọc bài, trích xuất IOC &amp; sinh Agentic Skill...</div>`;
     } else if (d) {
-      tpHtml = `<div><b style="font-size:11.5px; color:var(--safe);">TP (${d.tp}):</b> ${chips(d.tp_items, 'tp')}</div>
-      <div style="margin-top:4px;"><b style="font-size:11.5px; color:var(--amber);">FN (${d.fn}):</b> ${chips(d.fn_items, 'fn')}</div>`;
+      const humanAll = [...(d.tp_items || []), ...(d.fn_items || [])];
+      const aiAll = [...(d.tp_items || []), ...(d.fp_items || [])];
+      humanHtml = `<div style="font-size:11.5px; color:var(--text-muted); margin-bottom:4px;">Tổng nhập: <b>${humanAll.length}</b></div>`
+        + (d.tp_items && d.tp_items.length ? chips(d.tp_items, 'tp') : '')
+        + (d.fn_items && d.fn_items.length ? `<div style="margin-top:4px;"><span style="font-size:11px; color:var(--amber); font-weight:700;">AI bỏ sót:</span>${chips(d.fn_items, 'fn')}</div>` : '');
+      aiOutHtml = `<div style="font-size:11.5px; color:var(--text-muted); margin-bottom:4px;">AI xuất: <b>${aiAll.length}</b></div>`
+        + (d.tp_items && d.tp_items.length ? chips(d.tp_items, 'tp') : '')
+        + (d.fp_items && d.fp_items.length ? `<div style="margin-top:4px;"><span style="font-size:11px; color:var(--danger); font-weight:700;">AI bịa / dư:</span>${chips(d.fp_items, 'fp')}</div>` : '');
+      diffSummaryHtml = `
+        <div style="font-size:12px; line-height:1.7;">
+          <div><b style="color:var(--safe);">Đúng (TP): ${d.tp}</b></div>
+          <div><b style="color:var(--amber);">Thiếu (FN): ${d.fn}</b></div>
+          <div><b style="color:var(--danger);">Bịa/Dư (FP): ${d.fp}</b></div>
+        </div>`;
     } else {
-      tpHtml = `<div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+      diffSummaryHtml = `<div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
            <span class="BadgePending">Chưa chạy AI</span>
            <button class="CleanBtn" style="padding:3px 9px; font-size:11.5px;" onclick="runCompareRow('${escapeHtml(r.article_id)}', this)">Chạy AI bài này</button>
          </div>`;
     }
-
-    const fpHtml = isActive
-      ? '<span style="color:var(--primary); font-size:12px;">Đang xử lý...</span>'
-      : (d ? chips(d.fp_items, 'fp') : '-');
     const sc = r.syntax_checks || {};
     const aiNotesHtml = (r.ai_context_notes && r.ai_context_notes.length)
       ? `<div style="margin-top:6px; font-size:11.5px; color:var(--text-main);"><b>Ghi chú AI:</b> ${r.ai_context_notes.map(n => escapeHtml(n)).join(' &bull; ')}</div>`
@@ -1956,8 +1968,9 @@ async function loadComparison() {
           <div style="font-weight:600; color:var(--text-main);">#${String(r.index).padStart(2, '0')}. ${escapeHtml(r.title)}</div>
           <div style="font-size:11.5px; color:var(--text-muted); margin-top:3px;">${escapeHtml(r.published_date)} &bull; ${escapeHtml(r.source_name)}</div>
         </td>
-        <td>${tpHtml}</td>
-        <td>${fpHtml}</td>
+        <td>${humanHtml}</td>
+        <td>${aiOutHtml}</td>
+        <td>${diffSummaryHtml}</td>
         <td>${skillHtml}</td>
       </tr>
     `;
