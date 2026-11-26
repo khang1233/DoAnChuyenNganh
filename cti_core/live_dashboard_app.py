@@ -5427,6 +5427,13 @@ const elArt = document.getElementById('lblMasterArticlesCount');
         return;
       }
 
+      // Đảm bảo tại một thời điểm chỉ có duy nhất 1 bài ở trạng thái 'processing'
+      articles.forEach((a, i) => {
+        if (i !== idx && a.status === 'processing') a.status = 'pending';
+      });
+      allHistoryArticles.forEach(a => {
+        if (a.article_id !== art.article_id && a.status === 'processing') a.status = 'pending';
+      });
       // Cập nhật trạng thái 'ĐANG XỬ LÝ...' trước khi chọn thẻ và render
       art.status = 'processing';
       const hArtProcessing = allHistoryArticles.find(a => a.article_id === art.article_id);
@@ -9004,6 +9011,18 @@ def api_toggle_article_status(req: ArticleManageRequest):
 
 @app.post("/api/articles/update-status")
 def api_update_article_status(req: UpdateArticleStatusRequest):
+    if req.status == "processing":
+        try:
+            db_path = SANDBOX_DIR / "cti_multi_source_archive.sqlite"
+            if db_path.exists():
+                with sqlite3.connect(db_path) as conn:
+                    conn.execute(
+                        "UPDATE articles_archive SET status = 'pending' WHERE status = 'processing' AND article_id != ?",
+                        (req.article_id,),
+                    )
+                    conn.commit()
+        except Exception:
+            pass
     update_article_analysis_status(
         article_id=req.article_id,
         status=req.status,
@@ -11231,6 +11250,15 @@ def _start_247_daemon_on_boot() -> None:
         live_orchestrator.start_live_waf_proxy()
     except Exception as e:
         print(f"[STARTUP] Lỗi khởi động live orchestrator: {e}")
+
+    try:
+        db_path = SANDBOX_DIR / "cti_multi_source_archive.sqlite"
+        if db_path.exists():
+            with sqlite3.connect(db_path) as conn:
+                conn.execute("UPDATE articles_archive SET status = 'pending' WHERE status = 'processing'")
+                conn.commit()
+    except Exception:
+        pass
 
     server_daemon.start_worker()
 
