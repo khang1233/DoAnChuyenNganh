@@ -158,14 +158,21 @@ def deep_agent_codebase_scan(target_path: Path, model_name: Optional[str] = None
         ".sql": "SQL"
     }
 
-    ignored_dirs = {".git", "node_modules", "vendor", "venv", ".venv", "__pycache__", "dist", "build", "ollama_models"}
+    ignored_dirs = {
+        ".git", ".claude", ".gemini", ".cursor", ".agent", ".kilo", ".vscode", ".idea",
+        "defense_skills", "node_modules", "vendor", "venv", ".venv", "__pycache__",
+        "dist", "build", "ollama_models"
+    }
+    ignored_files = {".cti_defense.json", "agent_remediation_guide.md"}
     total_files = 0
     
     for root, dirs, files in os.walk(p):
-        dirs[:] = [d for d in dirs if d not in ignored_dirs]
+        dirs[:] = [d for d in dirs if d.lower() not in ignored_dirs and not d.startswith(".")]
         for f in files:
-            total_files += 1
             fl = f.lower()
+            if fl in ignored_files:
+                continue
+            total_files += 1
             ext = os.path.splitext(f)[1].lower()
             if ext in ext_map:
                 lang = ext_map[ext]
@@ -259,6 +266,26 @@ def deep_agent_codebase_scan(target_path: Path, model_name: Optional[str] = None
     if languages.get("JavaScript", 0) > 0 and "Node.js" not in runtime_versions:
         runtime_versions["Node.js Runtime"] = "20+" 
     
+    if total_files == 0:
+        return {
+            "total_files": 0,
+            "languages": [],
+            "frameworks": [],
+            "databases": [],
+            "infra": [],
+            "sensitive_sinks": [],
+            "runtime_versions": {},
+            "scope_id": "SCOPE_ALL",
+            "scope_name": "Thư mục trống (0 tệp mã nguồn)",
+            "architecture_summary": "Thư mục mục tiêu đang trống (không chứa tệp mã nguồn nào).",
+            "attack_surface_analysis": "Không phát hiện ngôn ngữ lập trình hay hàm nhạy cảm nào.",
+            "agent_reasoning": "Thư mục dự án đang trống (0 tệp). Hệ thống từ chối gán nhầm Scope Web/API khi chưa có mã nguồn thực tế.",
+            "agent_logs": [
+                "[AST CODEBASE SCAN] Quét cây thư mục (đã loại trừ thư mục ẩn .claude/.gemini/.cursor): 0 tệp mã nguồn.",
+                "[CẢNH BÁO] Thư mục dự án đang trống. Không tự bịa ngôn ngữ hay gán Scope Web/API.",
+            ],
+        }
+
     # Gọi Tác tử AI (Local LLM trên phần cứng cục bộ) phân tích chuyên sâu
     ai_verdict = _call_local_agent_llm_for_codebase_scope(
         target_path=p,
@@ -349,7 +376,7 @@ def wizard_scan_project(target: str = "", clone_url: str = "", model_name: Optio
         
     combined_techs = list(dict.fromkeys(combined_techs))
     if not combined_techs:
-        combined_techs = ["Full-Stack Web Ecosystem", "Custom Backend"]
+        combined_techs = ["Thư mục trống (0 tệp)"] if scan_meta.get("total_files", 0) == 0 else ["Custom Architecture"]
 
     cfg_file = target_path / ".cti_defense.json"
     is_configured = cfg_file.exists()
