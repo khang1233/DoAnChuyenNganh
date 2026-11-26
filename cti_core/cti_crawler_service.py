@@ -304,8 +304,84 @@ def _init_archive_db() -> None:
         conn.commit()
 
 
+_DEDUP_STOPWORDS = {
+    "the", "and", "for", "with", "from", "that", "this", "into", "over", "after", "before",
+    "new", "uses", "used", "using", "based", "via", "how", "what", "when", "why", "amid",
+    "threat", "intelligence", "report", "weekly", "advisory", "alert", "bulletin",
+    "critical", "high", "severity", "vulnerability", "vulnerabilities", "flaw", "flaws",
+    "bug", "bugs", "zero", "day", "zeroday", "attack", "attacks", "campaign", "campaigns",
+    "hackers", "hacker", "threat", "actor", "actors", "group", "exploit", "exploited",
+    "exploitation", "security", "malware", "ransomware", "backdoor", "backdoors", "trojan",
+    "update", "patch", "patches", "multiple", "products", "server", "servers", "network",
+    "networks", "cloud", "service", "services", "system", "systems", "remote", "code",
+    "execution", "bypass", "authentication", "injection", "command", "arbitrary", "data",
+    "theft", "targets", "targeting", "active", "actively", "wild", "research", "labs",
+}
+
+_PRIMARY_SOURCE_BONUS = {
+    "Check Point Research": 1800,
+    "Kaspersky Securelist": 1800,
+    "SentinelOne Labs": 1600,
+    "The DFIR Report": 2000,
+    "TheHackerNews": 400,
+    "CISA US Gov": 300,
+}
+
+
+def _event_signature(title: str) -> Tuple[Set[str], Set[str]]:
+    """Trích xuất tập CVE và tập từ khóa chiến dịch đặc trưng từ tiêu đề."""
+    t = (title or "").strip()
+    cves = {m.upper() for m in REGEX_CVE.findall(t)}
+    tokens = {
+        tok for tok in re.findall(r"[a-zA-Z0-9]{4,}", t.lower())
+        if tok not in _DEDUP_STOPWORDS and not tok.isdigit()
+    }
+    return cves, tokens
+
+
+def _is_same_event(sig_a: Tuple[Set[str], Set[str]], sig_b: Tuple[Set[str], Set[str]]) -> bool:
+    cves_a, tok_a = sig_a
+    cves_b, tok_b = sig_b
+    if cves_a and cves_b and (cves_a & cves_b):
+        return True
+    if not tok_a or not tok_b:
+        return False
+    common = tok_a & tok_b
+    if len(common) >= 2:
+        return True
+    union = tok_a | tok_b
+    return len(common) >= 1 and (len(common) / max(1, len(union))) >= 0.55
+
+
+def _article_richness_score(item: Dict[str, Any]) -> int:
+    src = item.get("source") or item.get("source_name") or ""
+    content = item.get("content") or ""
+    ioc_total = _count_real_iocs(content)["total"]
+    return _PRIMARY_SOURCE_BONUS.get(src, 0) + min(len(content), 15000) + (ioc_total * 300)
+
+
+def deduplicate_articles_by_event(items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Lọc trùng bài báo đa nguồn cùng đưa tin về 1 chiến dịch/CVE, giữ bài phân tích sâu nhất."""
+    kept: List[Tuple[Tuple[Set[str], Set[str]], int, Dict[str, Any]]] = []
+    for it in items:
+        sig = _event_signature(it.get("title", ""))
+        score = _article_richness_score(it)
+        dup_idx = None
+        for idx, (k_sig, _, _) in enumerate(kept):
+            if _is_same_event(sig, k_sig):
+                dup_idx = idx
+                break
+        if dup_idx is None:
+            kept.append((sig, score, it))
+        else:
+            if score > kept[dup_idx][1]:
+                kept[dup_idx] = (sig, score, it)
+    return [entry[2] for entry in kept]
+
+
 def _save_articles_to_db(items: List[Dict[str, Any]], purge_synthetic: bool = True) -> None:
     _init_archive_db()
+    items = deduplicate_articles_by_event(items)
     now_str = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     with sqlite3.connect(ARCHIVE_DB_PATH) as conn:
         if purge_synthetic:
@@ -313,8 +389,29 @@ def _save_articles_to_db(items: List[Dict[str, Any]], purge_synthetic: bool = Tr
             conn.execute(
                 "DELETE FROM articles_archive WHERE content LIKE '%[PHÁT HIỆN NGỮ CẢNH TẤN CÔNG]%' OR content LIKE '%[Nguồn:%'"
             )
+        existing_rows = conn.execute(
+            "SELECT article_id, source_name, title, content, status FROM articles_archive"
+        ).fetchall()
+        existing_sigs = [
+            (r[0], _event_signature(r[2] or ""), _article_richness_score({"source_name": r[1], "content": r[3]}), r[4])
+            for r in existing_rows
+        ]
         for it in items:
             sort_ts = _normalize_date_to_iso(it["published_at"])
+            it_sig = _event_signature(it.get("title", ""))
+            it_score = _article_richness_score(it)
+            skip_dup = False
+            for ex_id, ex_sig, ex_score, ex_status in existing_sigs:
+                if ex_id == it["article_id"]:
+                    continue
+                if _is_same_event(it_sig, ex_sig):
+                    if ex_status == "completed" or ex_score >= it_score:
+                        skip_dup = True
+                        break
+                    else:
+                        conn.execute("DELETE FROM articles_archive WHERE article_id = ?", (ex_id,))
+            if skip_dup:
+                continue
             conn.execute(
                 "DELETE FROM articles_archive WHERE (title = ? OR url = ?) AND article_id != ? AND status != 'completed'",
                 (it["title"], it["url"], it["article_id"]),
