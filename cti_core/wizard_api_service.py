@@ -29,7 +29,9 @@ def _call_local_agent_llm_for_codebase_scope(
     sensitive_sinks: List[str],
     runtime_versions: Dict[str, str],
     total_files: int,
-    model_name: Optional[str] = None
+    model_name: Optional[str] = None,
+    scope_scores: Optional[Dict[str, int]] = None,
+    scope_signals: Optional[Dict[str, List[str]]] = None,
 ) -> Dict[str, Any]:
     """Tác tử AI thực sự đọc ngữ cảnh mã nguồn và gọi Local LLM trên GPU để suy luận Scope."""
     import requests as req_http
@@ -50,26 +52,30 @@ def _call_local_agent_llm_for_codebase_scope(
             pass
 
     snippets_text = "\n\n".join(code_snippets) if code_snippets else "(Không có tệp mã nguồn nhạy cảm đặc biệt)"
+    scores_summary = json.dumps(scope_scores or {}, ensure_ascii=False)
+    signals_summary = json.dumps({k: v[:6] for k, v in (scope_signals or {}).items() if v}, ensure_ascii=False)
 
     # 2. Xây dựng prompt phân tích chuẩn an ninh mạng
     prompt_content = f"""MỤC TIÊU: Bạn là Tác tử AI Thanh tra An ninh Mã nguồn (Codebase Inspector AI Agent).
 Hãy phân tích ngữ cảnh dự án phần mềm mục tiêu sau đây và xác định xem dự án này thuộc Phân hệ Phòng thủ (Scope) nào:
 
-THÔNG TIN QUÉT MÃ NGUỒN THỰC TẾ:
+THÔNG TIN QUÉT MÃ NGUỒN THỰC TẾ (3 LỚP DẤU HIỆU):
 - Tổng số tệp tin: {total_files} tệp
 - Ngôn ngữ nhận diện: {json.dumps(languages, ensure_ascii=False)}
 - Frameworks & Thư viện: {", ".join(frameworks) if frameworks else "Custom Architecture"}
 - Môi trường runtime: {json.dumps(runtime_versions, ensure_ascii=False)}
+- Điểm chấm 4 phân hệ (Thư mục + Phần mở rộng + Từ khóa): {scores_summary}
+- Dấu hiệu đặc trưng theo phân hệ: {signals_summary}
 - Các điểm nóng nhạy cảm (Sinks): {json.dumps(sensitive_sinks[:4], ensure_ascii=False)}
 
 MẪU MÃ NGUỒN TRỌNG YẾU:
 {snippets_text}
 
 QUY TẮC PHÂN LOẠI PHÂN HỆ PHÒNG THỦ:
-1. SCOPE_WEB: Web & API Layer (OWASP Top 10, SQLi, RCE, File Upload, Deserialization, SSRF, XSS).
-2. SCOPE_NETWORK: Network & Perimeter C2 (C2 IP, Botnet, Router/VPN Zero-Day, DPI Suricata).
-3. SCOPE_ENDPOINT: Endpoint & Host Identity (Webshell spawn, Ransomware, LSASS Dumping).
-4. SCOPE_HARDWARE: Hardware & Firmware Base Layer (UEFI, BIOS, Microcode, IoT/OT ICS).
+1. SCOPE_WEB: Web & API Layer (Website tĩnh/SPA, CMS WordPress/Magento/Drupal, Backend MVC Laravel/Django/FastAPI/Spring/ASP.NET/Express, REST/GraphQL, Nginx/Apache/IIS/Caddy/Traefik).
+2. SCOPE_NETWORK: Network & Perimeter C2 (VPN WireGuard/OpenVPN/IPsec, Firewall/IDS Suricata/Snort/iptables, PCAP, Proxy/DNS/Load Balancer HAProxy/Squid/Bind9, GNS3/EVE-NG, Reverse Shell/C2 Beacon).
+3. SCOPE_ENDPOINT: Endpoint & Host Identity (Desktop WinForms/WPF/Electron/Qt/Tkinter, Mobile Android/iOS/Flutter, Game Server/Mods/Macros AHK, Systemd/Cron/Services, DB cục bộ SQLite/MDF/Redis, Auth/Credentials/Webshell/Malware Host).
+4. SCOPE_HARDWARE: Hardware & Firmware Base Layer (Firmware .bin/.rom/.hex/.uf2/squashfs-root/U-Boot/UEFI/BIOS, Kernel Driver .ko/.sys/.inf, IoT ESP32/Arduino/STM32/OpenWrt/MQTT, OT/ICS PLC/SCADA/Modbus/OPC-UA).
 
 YÊU CẦU ĐẦU RA:
 Trả về duy nhất định dạng JSON thuần túy (không bọc trong markdown code block, không thêm văn bản ngoài):
@@ -115,16 +121,25 @@ Trả về duy nhất định dạng JSON thuần túy (không bọc trong markd
             except Exception as e:
                 print(f"[AI_AGENT_SCAN_FALLBACK] Lỗi gọi Local LLM: {e}")
 
-    # Fallback an toàn nếu chọn Heuristic Core hoặc LLM chưa sẵn sàng
-    is_web = any(l in languages for l in ["PHP", "JavaScript", "TypeScript", "HTML", "Python"]) or len(frameworks) > 0
-    fallback_scope = "SCOPE_WEB" if is_web else "SCOPE_NETWORK"
-    fallback_name = "Scope A: Web & API Layer" if is_web else "Scope B: Network & Perimeter"
+    # Fallback an toàn theo điểm 3 lớp nếu chọn Heuristic Core hoặc LLM chưa sẵn sàng
+    scope_name_map = {
+        "SCOPE_WEB": "Scope A: Web & API Layer",
+        "SCOPE_NETWORK": "Scope B: Network & Perimeter C2",
+        "SCOPE_ENDPOINT": "Scope C: Endpoint & Host Identity",
+        "SCOPE_HARDWARE": "Scope D: Hardware & Firmware Base Layer",
+    }
+    if scope_scores and max(scope_scores.values()) > 0:
+        fallback_scope = max(scope_scores.items(), key=lambda kv: kv[1])[0]
+    else:
+        is_web = any(l in languages for l in ["PHP", "JavaScript", "TypeScript", "HTML"]) or len(frameworks) > 0
+        fallback_scope = "SCOPE_WEB" if is_web else "SCOPE_ENDPOINT"
+    fallback_name = scope_name_map.get(fallback_scope, "Scope A: Web & API Layer")
     return {
         "scope_id": fallback_scope,
         "scope_name": fallback_name,
-        "architecture_summary": "Hệ thống ứng dụng phân tích tự động qua AST",
-        "attack_surface_analysis": f"Phát hiện {len(sensitive_sinks)} điểm nhạy cảm tiềm ẩn rủi ro thực thi/tiêm nhiễm.",
-        "agent_reasoning": f"Tác tử định vị cấu trúc mã nguồn và đề xuất phạm vi phòng thủ: {fallback_name}."
+        "architecture_summary": "Hệ thống phân loại đa tầng (Thư mục + Tệp đặc trưng + Từ khóa AST)",
+        "attack_surface_analysis": f"Phát hiện {len(sensitive_sinks)} điểm nhạy cảm; điểm phân hệ {json.dumps(scope_scores or {})}.",
+        "agent_reasoning": f"Tác tử định vị cấu trúc mã nguồn 3 lớp và đề xuất phạm vi phòng thủ: {fallback_name}."
     }
 
 def deep_agent_codebase_scan(target_path: Path, model_name: Optional[str] = None) -> Dict[str, Any]:
@@ -141,21 +156,42 @@ def deep_agent_codebase_scan(target_path: Path, model_name: Optional[str] = None
     runtime_versions = {}
     
     ext_map = {
-        ".php": "PHP",
-        ".js": "JavaScript",
-        ".ts": "TypeScript",
-        ".jsx": "React (JSX)",
-        ".tsx": "React (TSX)",
-        ".vue": "Vue.js",
-        ".py": "Python",
-        ".go": "Go",
-        ".java": "Java",
-        ".cs": "C# (.NET)",
-        ".rb": "Ruby",
-        ".rs": "Rust",
-        ".html": "HTML",
-        ".css": "CSS",
-        ".sql": "SQL"
+        ".php": "PHP", ".phtml": "PHP",
+        ".js": "JavaScript", ".mjs": "JavaScript", ".cjs": "JavaScript",
+        ".ts": "TypeScript", ".jsx": "React (JSX)", ".tsx": "React (TSX)",
+        ".vue": "Vue.js", ".svelte": "Svelte", ".astro": "Astro",
+        ".py": "Python", ".go": "Go", ".java": "Java", ".kt": "Kotlin",
+        ".cs": "C# (.NET)", ".rb": "Ruby", ".rs": "Rust", ".dart": "Dart/Flutter",
+        ".swift": "Swift", ".c": "C", ".cpp": "C++", ".h": "C/C++ Header",
+        ".html": "HTML", ".css": "CSS", ".sql": "SQL",
+        ".ps1": "PowerShell", ".sh": "Shell Script", ".ahk": "AutoHotkey", ".ino": "Arduino/C++"
+    }
+
+    scope_scores = {"SCOPE_WEB": 0, "SCOPE_NETWORK": 0, "SCOPE_ENDPOINT": 0, "SCOPE_HARDWARE": 0}
+    scope_signals: Dict[str, List[str]] = {"SCOPE_WEB": [], "SCOPE_NETWORK": [], "SCOPE_ENDPOINT": [], "SCOPE_HARDWARE": []}
+
+    def _add_sig(sc: str, pts: int, label: str) -> None:
+        scope_scores[sc] += pts
+        if label not in scope_signals[sc] and len(scope_signals[sc]) < 12:
+            scope_signals[sc].append(label)
+
+    dir_rules = {
+        "SCOPE_WEB": {"wwwroot", "public_html", "htdocs", "wp-content", "wp-includes", "routes", "controllers", "endpoints", "sites-enabled", "conf.d"},
+        "SCOPE_NETWORK": {"suricata", "snort", "wireguard", "openvpn", "ipsec", "swanctl", "haproxy", "squid", "coredns", "frp", "gns3", "eve-ng"},
+        "SCOPE_ENDPOINT": {"systemd", "autostart", "startup", "mods", "plugins", "skript", "winforms", "wpf", "electron"},
+        "SCOPE_HARDWARE": {"firmware", "bootloader", "uboot", "u-boot", "uefi", "coreboot", "squashfs-root", "rootfs", "initramfs", "udev", "drivers", "dkms", "plc", "scada", "arduino", "esp32"},
+    }
+    ext_scope_rules = {
+        "SCOPE_WEB": {".php", ".phtml", ".jsp", ".aspx", ".ashx", ".html", ".jsx", ".tsx", ".vue", ".svelte", ".astro"},
+        "SCOPE_NETWORK": {".pcap", ".pcapng", ".cap", ".ovpn", ".pkt"},
+        "SCOPE_ENDPOINT": {".exe", ".dll", ".msi", ".deb", ".rpm", ".appimage", ".apk", ".ipa", ".ahk", ".au3", ".service", ".timer", ".db", ".sqlite", ".sqlite3", ".mdf", ".ldf", ".bak", ".jks", ".pfx", ".p12", ".csproj", ".sln"},
+        "SCOPE_HARDWARE": {".bin", ".rom", ".hex", ".fw", ".uf2", ".ko", ".sys", ".inf", ".ino", ".dts", ".dtsi", ".scd", ".icd"},
+    }
+    file_scope_rules = {
+        "SCOPE_WEB": {"wp-config.php", "openapi.json", "swagger.json", "swagger.yaml", "nginx.conf", ".htaccess", "web.config", "appsettings.json", "caddyfile", "traefik.yml", "mkdocs.yml"},
+        "SCOPE_NETWORK": {"suricata.yaml", "wg0.conf", "ipsec.conf", "haproxy.cfg", "squid.conf", "named.conf", "dnsmasq.conf", "frps.ini", "frpc.ini", "frps.toml", "frpc.toml"},
+        "SCOPE_ENDPOINT": {"androidmanifest.xml", "pubspec.yaml", "server.properties", "spigot.yml"},
+        "SCOPE_HARDWARE": {"platformio.ini", "kconfig", "openocd.cfg"},
     }
 
     ignored_dirs = {
@@ -168,6 +204,11 @@ def deep_agent_codebase_scan(target_path: Path, model_name: Optional[str] = None
     
     for root, dirs, files in os.walk(p):
         dirs[:] = [d for d in dirs if d.lower() not in ignored_dirs and not d.startswith(".")]
+        for d in dirs:
+            dl = d.lower()
+            for sc, dset in dir_rules.items():
+                if dl in dset:
+                    _add_sig(sc, 5, f"dir:{d}")
         for f in files:
             fl = f.lower()
             if fl in ignored_files:
@@ -177,6 +218,12 @@ def deep_agent_codebase_scan(target_path: Path, model_name: Optional[str] = None
             if ext in ext_map:
                 lang = ext_map[ext]
                 languages[lang] = languages.get(lang, 0) + 1
+            for sc, eset in ext_scope_rules.items():
+                if ext in eset:
+                    _add_sig(sc, 3, f"ext:{ext}")
+            for sc, fset in file_scope_rules.items():
+                if fl in fset:
+                    _add_sig(sc, 6, f"file:{f}")
                 
             if fl == "package.json":
                 try:
@@ -244,15 +291,25 @@ def deep_agent_codebase_scan(target_path: Path, model_name: Optional[str] = None
                 except Exception:
                     pass
 
-            if ext in (".php", ".js", ".py") and len(sensitive_sinks) < 6:
+            if ext in (".php", ".js", ".ts", ".py", ".c", ".cpp", ".ino", ".ps1", ".sh", ".conf", ".yaml", ".yml", ".ini", ".toml"):
                 try:
-                    code_lines = (Path(root) / f).read_text(encoding='utf-8', errors='ignore').splitlines()
-                    for line_idx, line in enumerate(code_lines[:400]):
-                        if any(sink in line for sink in ["execAsync(", "shell_exec(", "exec(", "eval(", "system(", "child_process", "mysqli_query", "unserialize("]):
-                            rel_p = str(Path(root) / f).replace(str(p), "").lstrip("/\\").replace("\\", "/")
-                            sensitive_sinks.append(f"{rel_p}:{line_idx+1} -> {line.strip()[:65]}")
-                            if len(sensitive_sinks) >= 6:
-                                break
+                    raw_head = (Path(root) / f).read_text(encoding='utf-8', errors='ignore')[:16000]
+                    low_head = raw_head.lower()
+                    if any(k in low_head for k in ("app.get(", "@app.post(", "express(", "fastapi(", "laravel", "$_get", "$_post", "graphql", "swagger")):
+                        _add_sig("SCOPE_WEB", 4, f"kw:web({f})")
+                    if any(k in low_head for k in ("iptables", "nftables", "suricata", "wireguard", "openvpn", "socks5", "proxy_pass", "scapy", "reverse_shell", "0.0.0.0/0")):
+                        _add_sig("SCOPE_NETWORK", 5, f"kw:net({f})")
+                    if any(k in low_head for k in ("winforms", "wpf", "tkinter", "pyqt", "electron", "sqlite3", "systemd", "schtasks", "autohotkey", "lsass", "minecraft")):
+                        _add_sig("SCOPE_ENDPOINT", 5, f"kw:endp({f})")
+                    if any(k in low_head for k in ("modbus", "opcua", "scada", "uefi", "u-boot", "gpio", "i2c", "spi", "uart", "mqtt", "esp32", "arduino", "module_init", "driverentry")):
+                        _add_sig("SCOPE_HARDWARE", 6, f"kw:hw({f})")
+                    if ext in (".php", ".js", ".py") and len(sensitive_sinks) < 6:
+                        for line_idx, line in enumerate(raw_head.splitlines()[:400]):
+                            if any(sink in line for sink in ["execAsync(", "shell_exec(", "exec(", "eval(", "system(", "child_process", "mysqli_query", "unserialize("]):
+                                rel_p = str(Path(root) / f).replace(str(p), "").lstrip("/\\").replace("\\", "/")
+                                sensitive_sinks.append(f"{rel_p}:{line_idx+1} -> {line.strip()[:65]}")
+                                if len(sensitive_sinks) >= 6:
+                                    break
                 except Exception:
                     pass
 
@@ -294,7 +351,9 @@ def deep_agent_codebase_scan(target_path: Path, model_name: Optional[str] = None
         sensitive_sinks=sensitive_sinks,
         runtime_versions=runtime_versions,
         total_files=total_files,
-        model_name=model_name
+        model_name=model_name,
+        scope_scores=scope_scores,
+        scope_signals=scope_signals,
     )
 
     scope_id = ai_verdict.get("scope_id", "SCOPE_WEB")
