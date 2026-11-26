@@ -622,15 +622,18 @@ def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3, live_
     with sqlite3.connect(DB_PATH) as conn:
         conn.row_factory = sqlite3.Row
         window_rows = conn.execute(
-            "SELECT title, content FROM articles_archive WHERE sort_ts >= ?",
+            "SELECT title, content, sort_ts FROM articles_archive WHERE sort_ts >= ?",
             (min_date,),
         ).fetchall()
         count_in_window = len(window_rows)
         scope_matched_in_window = sum(
             1 for r in window_rows if compute_scope_relevance(scope_id, r["title"], r["content"]) >= 20
         )
+        earliest_ts = min((str(r["sort_ts"] or "")[:10] for r in window_rows if r["sort_ts"]), default="9999-99-99")
+        target_start_year = int(min_date[:4])
+        needs_historical_years = (int(history_years or 1) > 1) and (earliest_ts[:4] > str(target_start_year))
 
-    if count_in_window < 35 or scope_matched_in_window < 15:
+    if count_in_window < 35 or scope_matched_in_window < 15 or needs_historical_years:
         try:
             cap_thn = 80 if history_years <= 1 else 160
             cap_cisa = 80 if history_years <= 1 else 160
