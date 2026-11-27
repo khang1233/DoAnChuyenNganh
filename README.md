@@ -63,7 +63,7 @@ cti
 
 ---
 
-#### CÁCH 2: KẾT NỐI QUA DÒNG LỆNH CLI (CHO LẬP TRÌNH VIÊN)
+#### CÁCH 3: KẾT NỐI QUA DÒNG LỆNH CLI (CHO LẬP TRÌNH VIÊN)
 Nếu không muốn mở Web Dashboard, bạn có thể chạy thẳng script Python:
 ```bash
 pip install -r requirements.txt

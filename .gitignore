@@ -90,3 +90,4 @@ install.ps1
 !cti_core/cti_multi_source_archive.sqlite
 !cti_core/cti_local_firewall_rules.sqlite
 !*.html
+cti_core/last_active_project.json

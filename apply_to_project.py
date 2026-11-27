@@ -119,10 +119,16 @@ def detect_project_scope(target_path: Path):
     detected_techs = []
     scores = {"SCOPE_WEB": 0, "SCOPE_NETWORK": 0, "SCOPE_ENDPOINT": 0, "SCOPE_HARDWARE": 0}
     
-    ignored_dirs = {".git", "node_modules", "vendor", "venv", ".venv", "dist", "build", ".cursor", ".gemini", "defense_skills", "__pycache__"}
+    ignored_dirs = {
+        ".git", "node_modules", "vendor", "venv", ".venv", "dist", "build",
+        ".cursor", ".gemini", ".claude", ".agent", ".kilo", ".vscode", ".idea",
+        "skills", "defense_skills", "__pycache__", "ollama_models"
+    }
+    ignored_files = {".cti_defense.json", "agent_remediation_guide.md", "skill.md"}
     
     found_exts = set()
     found_filenames = set()
+    total_files = 0
     
     # Duyệt nhanh cây thư mục tối đa 4 tầng
     base_depth = len(target_path.parts)
@@ -134,10 +140,16 @@ def detect_project_scope(target_path: Path):
         dirs[:] = [d for d in dirs if d.lower() not in ignored_dirs and not d.startswith('.')]
         for f in files:
             fl = f.lower()
+            if fl in ignored_files:
+                continue
+            total_files += 1
             found_filenames.add(fl)
             ext = os.path.splitext(fl)[1]
             if ext:
                 found_exts.add(ext)
+
+    if total_files == 0:
+        return "SCOPE_ALL", ["Thư mục trống (0 tệp)"]
 
     # 1. Đánh giá Scope theo mẫu tệp tin
     for scope_id, profile in SCOPE_PROFILES.items():
@@ -152,7 +164,7 @@ def detect_project_scope(target_path: Path):
             elif pat_l in found_filenames:
                 scores[scope_id] += 6
 
-    # 2. Định danh công nghệ chi tiết
+    # 2. Định danh công nghệ chi tiết 4 phân hệ
     if "composer.json" in found_filenames or ".php" in found_exts:
         detected_techs.append("PHP Framework (Laravel / WordPress / Custom)")
         scores["SCOPE_WEB"] += 10
@@ -162,10 +174,16 @@ def detect_project_scope(target_path: Path):
     if "requirements.txt" in found_filenames or ".py" in found_exts:
         detected_techs.append("Python Backend (FastAPI / Django / Flask)")
         scores["SCOPE_WEB"] += 6
+    if any(x in found_exts for x in (".pcap", ".pcapng", ".ovpn", ".rules")) or any(fn in found_filenames for fn in ("suricata.yaml", "wg0.conf", "haproxy.cfg")):
+        detected_techs.append("Network Security / VPN / DPI Infrastructure")
+        scores["SCOPE_NETWORK"] += 14
     if "dockerfile" in found_filenames or "docker-compose.yml" in found_filenames:
         detected_techs.append("Containerized Environment (Docker)")
-        scores["SCOPE_NETWORK"] += 10
-    if ".c" in found_exts or ".hex" in found_exts or "platformio.ini" in found_filenames:
+        scores["SCOPE_NETWORK"] += 6
+    if any(x in found_exts for x in (".exe", ".dll", ".apk", ".ahk", ".service", ".sqlite", ".csproj", ".sln")):
+        detected_techs.append("Endpoint Application / Host Service / Local DB")
+        scores["SCOPE_ENDPOINT"] += 14
+    if any(x in found_exts for x in (".c", ".hex", ".bin", ".rom", ".ko", ".sys", ".ino")) or "platformio.ini" in found_filenames:
         detected_techs.append("Embedded C/C++ / IoT / Firmware")
         scores["SCOPE_HARDWARE"] += 15
 
@@ -203,14 +221,20 @@ def ensure_cti_knowledge_base(scope_id: str, history_years: int = 3):
         if bak_db.exists():
             print(f"[!] PHÁT HIỆN MÁY MỚI (COLD-START): Đang tự động nạp kho tri thức lịch sử ({history_years} năm) cho {profile['name']}...")
             with sqlite3.connect(DB_PATH) as conn:
-                conn.execute(f"ATTACH DATABASE '{bak_db.as_posix()}' AS bak")
-                kw_cond = " OR ".join([f"bak.articles_archive.content LIKE '%{kw}%'" for kw in profile["keywords"][:5]])
-                conn.execute(f"""
-                    INSERT OR IGNORE INTO articles_archive 
-                    SELECT * FROM bak.articles_archive 
-                    WHERE sort_ts >= '{min_date}' AND ({kw_cond})
-                    LIMIT 200
-                """)
+                conn.execute("ATTACH DATABASE ? AS bak", (bak_db.as_posix(),))
+                kws = [kw for kw in profile["keywords"][:5] if kw]
+                if kws:
+                    kw_cond = " OR ".join(["bak.articles_archive.content LIKE ?"] * len(kws))
+                    params = [min_date] + [f"%{kw}%" for kw in kws]
+                    conn.execute(
+                        f"INSERT OR IGNORE INTO articles_archive SELECT * FROM bak.articles_archive WHERE sort_ts >= ? AND ({kw_cond}) LIMIT 200",
+                        params,
+                    )
+                else:
+                    conn.execute(
+                        "INSERT OR IGNORE INTO articles_archive SELECT * FROM bak.articles_archive WHERE sort_ts >= ? LIMIT 200",
+                        (min_date,),
+                    )
                 conn.execute("""
                     INSERT OR IGNORE INTO ioc_knowledge_base
                     SELECT * FROM bak.ioc_knowledge_base
@@ -307,13 +331,14 @@ def synthesize_and_deploy_skill(target_path: Path, scope_id: str, article_id: st
     context = extract_project_context(target_path)
     deploy_to_all_major_agent_platforms(target_path, bundle_path, context)
 
-    # Đảm bảo sao chép trực tiếp vào thư mục skills/ và SKILL.md ở thư mục gốc dự án đích
+    # Đảm bảo sao chép trực tiếp vào cả skills/ và defense_skills/ (để khớp 100% với AGENT_REMEDIATION_GUIDE.md)
     try:
-        target_skills_dir = target_path / "skills" / bundle_path.name
-        if target_skills_dir.exists():
-            shutil.rmtree(target_skills_dir)
-        shutil.copytree(bundle_path, target_skills_dir)
-        print(f"  [+] Đã triển khai trực tiếp vào thư mục gốc dự án: {target_skills_dir}")
+        for folder_name in ("skills", "defense_skills"):
+            dest_bundle_dir = target_path / folder_name / bundle_path.name
+            if dest_bundle_dir.exists():
+                shutil.rmtree(dest_bundle_dir)
+            shutil.copytree(bundle_path, dest_bundle_dir)
+        print(f"  [+] Đã triển khai trực tiếp vào thư mục dự án: skills/{bundle_path.name} & defense_skills/{bundle_path.name}")
         if (bundle_path / "SKILL.md").exists():
             shutil.copy(bundle_path / "SKILL.md", target_path / "SKILL.md")
     except Exception as e:

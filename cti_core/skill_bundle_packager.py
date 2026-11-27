@@ -1,10 +1,17 @@
+import ipaddress
 import os
 import json
+import shutil
 import sqlite3
 import re
+import sys
 from pathlib import Path
 from datetime import datetime, timezone
 from typing import Dict, Any
+
+SANDBOX_DIR = Path(__file__).resolve().parent
+if str(SANDBOX_DIR) not in sys.path:
+    sys.path.insert(0, str(SANDBOX_DIR))
 
 from agentic_defense_skill_engine import (
     build_agentic_defense_skill_package,
@@ -15,9 +22,22 @@ from agentic_defense_skill_engine import (
 from cti_ai_agent import tool6_extract_iocs_hybrid
 from multi_lang_remediation_suite import write_all_language_fixtures, generate_multi_lang_markdown_sop
 
-SANDBOX_DIR = Path("cti_core")
 DB_PATH = SANDBOX_DIR / "cti_multi_source_archive.sqlite"
-SKILLS_OUTPUT_DIR = Path("skills")
+SKILLS_OUTPUT_DIR = SANDBOX_DIR.parent / "skills"
+
+_PROTECTED_PUBLIC_DNS = {"8.8.8.8", "8.8.4.4", "1.1.1.1", "1.0.0.1", "9.9.9.9"}
+
+
+def _is_safe_blockable_c2_ip(raw_ip: str) -> bool:
+    """Fail-Closed Guardrail (AGENTS.md): Tuyệt đối không đưa Public DNS / Loopback / RFC1918 vào danh sách chặn."""
+    ip_clean = (raw_ip or "").replace("[.]", ".").replace("(.)", ".").strip()
+    if not ip_clean or ip_clean in _PROTECTED_PUBLIC_DNS:
+        return False
+    try:
+        addr = ipaddress.ip_address(ip_clean)
+        return not (addr.is_private or addr.is_loopback or addr.is_link_local or addr.is_multicast or addr.is_unspecified)
+    except ValueError:
+        return False
 
 def package_github_skill_bundle(article_id: str = "thn-79d0e8ee", output_root: Path = SKILLS_OUTPUT_DIR) -> Path:
     """
@@ -38,11 +58,15 @@ def package_github_skill_bundle(article_id: str = "thn-79d0e8ee", output_root: P
     # 1. Trích xuất IOCs & CVEs
     extracted_iocs = tool6_extract_iocs_hybrid(content)
     cves = [it.value for it in extracted_iocs if it.ioc_type == "CVE"]
-    ips = [it.value.replace("[.]", ".").strip() for it in extracted_iocs if it.ioc_type == "IP"]
+    ips = [
+        it.value.replace("[.]", ".").strip()
+        for it in extracted_iocs
+        if it.ioc_type == "IP" and _is_safe_blockable_c2_ip(it.value)
+    ]
     sha256s = [it.value for it in extracted_iocs if it.ioc_type == "SHA256"]
     domains = [it.value.replace("[.]", ".").strip() for it in extracted_iocs if it.ioc_type == "DOMAIN"]
     
-    cve_id = cves[0] if cves else "CVE-2026-GENERIC"
+    cve_id = cves[0] if cves else "CTI-CAMPAIGN"
     skill_slug = f"agentic-defense-{cve_id.lower()}-{re.sub(r'[^a-zA-Z0-9]', '-', title.lower())[:25]}".strip("-")
     bundle_dir = output_root / skill_slug
     
@@ -50,8 +74,9 @@ def package_github_skill_bundle(article_id: str = "thn-79d0e8ee", output_root: P
     scripts_dir = bundle_dir / "scripts"
     refs_dir = bundle_dir / "references"
     examples_dir = bundle_dir / "examples"
+    rules_dir = bundle_dir / "rules"
     
-    for d in (scripts_dir, refs_dir, examples_dir):
+    for d in (scripts_dir, refs_dir, examples_dir, rules_dir):
         d.mkdir(parents=True, exist_ok=True)
         
     # 2. Tính toán Trust Score & xAI Audit
@@ -72,8 +97,8 @@ def package_github_skill_bundle(article_id: str = "thn-79d0e8ee", output_root: P
         scope_id="SCOPE_WEB"
     )
     
-    # 3. Lưu trữ chỉ số C2 vào references/ (Ground Truth Indicators)
-    (refs_dir / "c2_ip_indicators.txt").write_text("\n".join(ips if ips else ["185.220.101.5"]), encoding="utf-8")
+    # 3. Lưu trữ chỉ số C2 đã qua Fail-Closed Guardrail vào references/ (Không bịa IP giả)
+    (refs_dir / "c2_ip_indicators.txt").write_text("\n".join(ips), encoding="utf-8")
 
     # 4. Sinh scripts/ (Các công cụ thực thi của Agent)
     verify_script = f'''#!/usr/bin/env python3
@@ -124,19 +149,36 @@ if __name__ == '__main__':
     (refs_dir / "xai_audit_trail.json").write_text(json.dumps(xai_audit, ensure_ascii=False, indent=2), encoding="utf-8")
     (refs_dir / "trust_score_breakdown.json").write_text(json.dumps(trust_audit, ensure_ascii=False, indent=2), encoding="utf-8")
     
-    # STIX 2.1
+    # STIX 2.1 (Chỉ tạo indicator khi có bằng chứng thật từ bài báo, không bịa URL giả)
+    stix_objects = []
+    if sha256s:
+        stix_objects.append({
+            "type": "indicator",
+            "id": f"indicator--{cve_id.lower()}",
+            "name": f"Indicator for {cve_id}",
+            "pattern": f"[file:hashes.'SHA-256' = '{sha256s[0]}']",
+            "valid_from": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        })
+    elif ips:
+        stix_objects.append({
+            "type": "indicator",
+            "id": f"indicator--{cve_id.lower()}",
+            "name": f"Indicator for {cve_id}",
+            "pattern": f"[network-traffic:dst_ref.value = '{ips[0]}']",
+            "valid_from": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        })
+    elif domains:
+        stix_objects.append({
+            "type": "indicator",
+            "id": f"indicator--{cve_id.lower()}",
+            "name": f"Indicator for {cve_id}",
+            "pattern": f"[domain-name:value = '{domains[0]}']",
+            "valid_from": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        })
     stix_bundle = {
         "type": "bundle",
         "id": f"bundle--{cve_id.lower()}",
-        "objects": [
-            {
-                "type": "indicator",
-                "id": f"indicator--{cve_id.lower()}",
-                "name": f"Indicator for {cve_id}",
-                "pattern": f"[file:hashes.'SHA-256' = '{sha256s[0]}']" if sha256s else f"[network-traffic:dst_ref.value = '{ips[0]}']" if ips else "[url:value = 'http://malicious.test']",
-                "valid_from": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-            }
-        ]
+        "objects": stix_objects,
     }
     (refs_dir / "stix21_bundle.json").write_text(json.dumps(stix_bundle, indent=2), encoding="utf-8")
 
@@ -215,6 +257,7 @@ def package_master_scope_skill(
         db_iocs = cur.execute("""
             SELECT ioc_value, ioc_type, reputation_score 
             FROM ioc_knowledge_base 
+            WHERE is_malicious = 1
             ORDER BY reputation_score DESC LIMIT 200
         """).fetchall()
 
@@ -229,8 +272,8 @@ def package_master_scope_skill(
         val = row["ioc_value"].replace("[.]", ".").strip()
         itype = row["ioc_type"]
         if itype == "CVE":
-            all_cves.add(val)
-        elif itype == "IP" and val not in all_ips:
+            all_cves.add(val.upper())
+        elif itype == "IP" and _is_safe_blockable_c2_ip(val) and val not in all_ips:
             all_ips.append(val)
         elif itype == "DOMAIN" and val not in all_domains:
             all_domains.append(val)
@@ -242,8 +285,8 @@ def package_master_scope_skill(
         for m in matches:
             all_cves.add(m.upper())
 
-    cve_list = sorted(list(all_cves))[:8] or ["CVE-2026-48356", "CVE-2026-109618"]
-    top_cve_str = ", ".join(cve_list[:4])
+    cve_list = sorted(list(all_cves))[:8]
+    top_cve_str = ", ".join(cve_list[:4]) if cve_list else "OWASP Multi-Vector"
     
     # 2. Định danh thư mục Skill Tổng
     scope_suffix = re.sub(r"[^a-z0-9]+", "-", (scope_id or "web").lower().replace("scope_", "")).strip("-") or "web"
@@ -253,45 +296,76 @@ def package_master_scope_skill(
     scripts_dir = bundle_dir / "scripts"
     refs_dir = bundle_dir / "references"
     examples_dir = bundle_dir / "examples"
+    rules_dir = bundle_dir / "rules"
     
-    for d in (scripts_dir, refs_dir, examples_dir):
+    for d in (scripts_dir, refs_dir, examples_dir, rules_dir):
         d.mkdir(parents=True, exist_ok=True)
         
-    # 3. Lưu trữ chỉ số C2 bóc tách vào references/
-    blocklist_ips = all_ips if all_ips else ["185.220.101.5", "194.26.29.112", "45.142.214.12", "193.142.146.88"]
+    # 3. Lưu trữ chỉ số C2 đã xác thực vào references/ & rules/ (Không bịa IP giả)
+    blocklist_ips = all_ips
     (refs_dir / "c2_ip_indicators.txt").write_text("\n".join(blocklist_ips), encoding="utf-8")
+    (rules_dir / "firewall_c2_blocklist.txt").write_text("\n".join(blocklist_ips), encoding="utf-8")
+
+    live_def_dir = SANDBOX_DIR / "live_defense_system"
+    for src_rel, dst_name, default_hdr in [
+        ("waf_modsecurity/cti_virtual_patching.conf", "waf_modsecurity.conf", "# ModSecurity v3 Virtual Patching Rules\nSecRuleEngine On\n"),
+        ("suricata_ips/cti_autonomous_master.rules", "suricata_dpi.rules", "# Suricata L7 DPI Rules\n"),
+        ("wazuh_siem/local_rules.xml", "wazuh_siem.xml", "<group name=\"cti_agentic_defense,\">\n</group>\n"),
+    ]:
+        src_p = live_def_dir / src_rel
+        if src_p.exists():
+            shutil.copyfile(src_p, rules_dir / dst_name)
+        else:
+            (rules_dir / dst_name).write_text(default_hdr, encoding="utf-8")
 
     # 7. Sinh Script Kiểm Thử Đa Vector (scripts/verify_exploit.py)
+    probe_cve_label = cve_list[0] if cve_list else "XSS/Script Injection"
     verify_script = f'''#!/usr/bin/env python3
 """
 Tool: verify_exploit.py (Master Multi-Vector Security Probe)
 Phạm vi: {scope_id} — Công nghệ: {tech_str}
-Mục đích: Tác tử AI chạy script này để quét và đánh giá toàn diện lỗ hổng bảo mật trên Web Server.
+Mục đích: Tác tử AI chạy script này để quét và đánh giá toàn diện lỗ hổng bảo mật trên Web Server / WAF Gateway.
 """
+import socket
 import sys
-import urllib.request
+import urllib.error
 import urllib.parse
-import json
+import urllib.request
 
 TEST_VECTORS = [
-    {{"name": "Health & Info Disclosure", "path": "/health", "payload": "", "expected_safe": True}},
+    {{"name": "Health & Baseline Reachability", "path": "/health", "payload": "", "expected_safe": True}},
     {{"name": "Command Injection Probe", "path": "/api/query?cmd=test%3Bwhoami", "payload": "; whoami", "expected_blocked": True}},
     {{"name": "Remote Code Execution Probe (cmd)", "path": "/?cmd=id", "payload": "cmd=id", "expected_blocked": True}},
     {{"name": "SQL Injection Probe", "path": "/api/search?q=admin'%20OR%201=1--", "payload": "' OR 1=1--", "expected_blocked": True}},
     {{"name": "SQL Injection Probe (UNION SELECT)", "path": "/?id=1%20UNION%20SELECT%201,2,3", "payload": "UNION SELECT", "expected_blocked": True}},
     {{"name": "Path Traversal Probe", "path": "/api/file?name=../../../../etc/passwd", "payload": "../../../../etc/passwd", "expected_blocked": True}},
-    {{"name": "Malicious JS Evasion ({cve_list[0] if cve_list else 'CVE-2026-48356'})", "path": "/api/log?data=%3Cscript%3Ealert(1)%3C/script%3E", "payload": "<script>alert(1)</script>", "expected_blocked": True}}
+    {{"name": "Malicious JS Evasion ({probe_cve_label})", "path": "/api/log?data=%3Cscript%3Ealert(1)%3C/script%3E", "payload": "<script>alert(1)</script>", "expected_blocked": True}}
 ]
+
+def _check_host_reachable(base_url: str) -> bool:
+    parsed = urllib.parse.urlparse(base_url)
+    host = parsed.hostname or "127.0.0.1"
+    port = parsed.port or (443 if parsed.scheme == "https" else 80)
+    try:
+        with socket.create_connection((host, port), timeout=2.5):
+            return True
+    except OSError:
+        return False
 
 def run_probe(base_url: str):
     base_url = base_url.rstrip("/")
     print(f"[*] BẮT ĐẦU KIỂM THỬ ĐA VECTOR TRÊN MỤC TIÊU: {{base_url}}")
     print(f"[*] Phân hệ: {scope_id} | Công nghệ: {tech_str}")
     print("=" * 65)
-    
+
+    if not _check_host_reachable(base_url):
+        print(f"[!] KHÔNG KẾT NỐI ĐƯỢC TỚI {{base_url}} (Cổng mục tiêu đang đóng / chưa khởi chạy).")
+        print("[!] Hãy bật hệ thống CTI WAF Proxy (`cti`) hoặc truyền URL ứng dụng đang chạy để kiểm thử thật.")
+        return 2
+
     passed_count = 0
     total_count = len(TEST_VECTORS)
-    
+
     for idx, vec in enumerate(TEST_VECTORS, start=1):
         target = f"{{base_url}}{{vec['path']}}"
         print(f"  [{{idx}}/{{total_count}}] Kiểm tra vector: {{vec['name']}}...")
@@ -300,45 +374,44 @@ def run_probe(base_url: str):
             with urllib.request.urlopen(req, timeout=4) as res:
                 code = res.status
                 body = res.read().decode("utf-8", errors="ignore")
-                if vec.get("expected_blocked") and code == 200 and ("root:" in body or "admin" in body):
+                if vec.get("expected_blocked") and code == 200 and ("root:" in body or "uid=" in body or "syntax" in body.lower()):
                     print(f"      [!] PHÁT HIỆN ĐIỂM YẾU (VULNERABLE): Server trả về HTTP 200 với dữ liệu nhạy cảm.")
                 else:
                     print(f"      [+] AN TOÀN: Server phản hồi HTTP {{code}} (Dữ liệu được kiểm soát).")
                     passed_count += 1
         except urllib.error.HTTPError as e:
             if e.code in (400, 403, 404, 422):
-                print(f"      [+] AN TOÀN / ĐÃ BỊ CHẶN: Server phản hồi mã HTTP {{e.code}} (WAF hoặc Validator đã chặn đứng).")
+                print(f"      [+] ĐÃ BỊ CHẶN (BLOCKED): WAF/Validator phản hồi HTTP {{e.code}}.")
                 passed_count += 1
             else:
                 print(f"      [?] Phản hồi HTTP {{e.code}}")
         except Exception as err:
-            print(f"      [+] Không thể kết nối tới endpoint thử nghiệm (Đã đóng hoặc an toàn): {{err}}")
-            passed_count += 1
+            print(f"      [!] Lỗi kết nối khi gửi vector: {{err}}")
 
     print("=" * 65)
     score_pct = (passed_count / total_count) * 100
-    print(f"[*] KẾT QUẢ ĐÁNH GIÁ AN TOÀN: {{passed_count}}/{{total_count}} vector kiểm thử an toàn ({{score_pct:.1f}}%).")
+    print(f"[*] KẾT QUẢ ĐÁNH GIÁ AN TOÀN: {{passed_count}}/{{total_count}} vector an toàn/đã chặn ({{score_pct:.1f}}%).")
     if passed_count == total_count:
-        print("[+] CHÚC MỪNG: Dự án đã đạt chuẩn phòng thủ vững chắc (Zero Critical Vulnerabilities).")
+        print("[+] ĐẠT CHUẨN: Toàn bộ vector tấn công đã bị WAF / bộ lọc ứng dụng vô hiệu hóa.")
         return 0
-    else:
-        print("[!] CẢNH BÁO: Cần thực hiện quy trình tự động sửa code hoặc kích hoạt WAF ngay lập tức.")
-        return 1
+    print("[!] CẢNH BÁO: Phát hiện vector chưa được chặn. Hãy chạy apply_virtual_patch.py hoặc vá mã nguồn.")
+    return 1
 
 if __name__ == '__main__':
-    url = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:8766"
+    url = sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:8766"
     sys.exit(run_probe(url))
 '''
     (scripts_dir / "verify_exploit.py").write_text(verify_script, encoding="utf-8")
     
-    # 8. Sinh Script Kích Hoạt Lá Chắn (scripts/apply_virtual_patch.py)
+    # 8. Sinh Script Kích Hoạt Lá Chắn Thực Tế (scripts/apply_virtual_patch.py)
     apply_patch_script = f'''#!/usr/bin/env python3
 """
 Tool: apply_virtual_patch.py
-Mục đích: Kích hoạt toàn bộ lá chắn ảo WAF ModSecurity và nạp danh sách IP C2 vào tường lửa.
+Mục đích: Đồng bộ trực tiếp với CTI Defense Orchestrator (8765) để biên dịch & kích hoạt WAF Proxy (8766) + Firewall blocklist.
 """
-import subprocess
+import json
 import sys
+import urllib.request
 from pathlib import Path
 
 REFS_DIR = Path(__file__).resolve().parent.parent / "references"
@@ -346,10 +419,22 @@ IP_BLOCKLIST = REFS_DIR / "c2_ip_indicators.txt"
 
 def activate_virtual_patch():
     print("[*] Đang kích hoạt Gói Lá Chắn Phòng Thủ Tác Tử ({scope_id})...")
+    ips = []
     if IP_BLOCKLIST.exists():
-        ips = [l.strip() for l in IP_BLOCKLIST.read_text(encoding="utf-8").splitlines() if l.strip()]
-        print(f"[+] Đã đồng bộ {{len(ips)}} địa chỉ IP C2 bóc tách từ CTI vào Tường lửa hệ thống.")
-    print("[+] KÍCH HOẠT THÀNH CÔNG: Tác tử AI đã thiết lập lá chắn bảo vệ tự động cho ứng dụng.")
+        ips = [l.strip() for l in IP_BLOCKLIST.read_text(encoding="utf-8").splitlines() if l.strip() and not l.startswith("#")]
+        print(f"[+] Đã nạp {{len(ips)}} địa chỉ IP C2 đã xác thực từ references/c2_ip_indicators.txt.")
+    try:
+        req = urllib.request.Request(
+            "http://127.0.0.1:8765/api/defense/recompile-all",
+            data=b"{{}}",
+            headers={{"Content-Type": "application/json"}},
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=6) as res:
+            payload = json.loads(res.read().decode("utf-8", errors="ignore") or "{{}}")
+            print(f"[+] ĐỒNG BỘ LIVE THÀNH CÔNG QUA CTI ORCHESTRATOR (:8765) -> WAF (:8766): status={{payload.get('status', 'ok')}}")
+    except Exception:
+        print("[*] Máy chủ CTI (:8765) hiện đang offline — đã sẵn sàng bộ tệp cấu hình cục bộ tại ./rules/.")
     return 0
 
 if __name__ == '__main__':
@@ -372,7 +457,6 @@ if __name__ == '__main__':
         "defense_layers": ["Perimeter Firewall (C2 Drop)", "ModSecurity WAF v3 (Zero-Day Virtual Patching)", "Suricata L7 DPI", "Agentic Code Remediation (Whitelist & Parameterization)"]
     }
     (refs_dir / "threat_matrix.json").write_text(json.dumps(threat_matrix, indent=2, ensure_ascii=False), encoding="utf-8")
-    (refs_dir / "c2_ip_indicators.txt").write_text("\n".join(all_ips), encoding="utf-8")
 
     manifest = {
         "schema_version": "2.0.0",

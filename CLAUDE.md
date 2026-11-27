@@ -1,8 +1,6 @@
 # CLAUDE.md — Autonomous CTI & Agentic Defense Orchestrator
 
 > **WORKSPACE**: `d:\mkhang\DoAnChuyenNganh` (Windows). Nếu `pwd` trả về `/opt/...` hoặc sandbox Linux — đó là môi trường sai, hãy báo ngay và dừng lại.
->
-> **PENDING TASK (P2.8)**: Thêm endpoint `POST /api/articles/verify-url` vào `cti_core/live_dashboard_app.py` gần dòng 8217 (gần `/api/articles/add`). Dùng hàm `add_custom_article_from_url_or_text()` từ `cti_crawler_service.py:1188`. Trả về IOC tìm thấy, Trust Score, đường dẫn skill vừa tạo.
 
 This document provides system instructions, architectural context, and workflow conventions for **Claude Code** and other AI agents interacting with this repository.
 
