@@ -170,28 +170,26 @@ Phân loại 4 nhóm nhận định của Agent: **Đúng (TP): 695**, **Sai (FP
 ### Bảng 2: Tỷ lệ gói Skill hợp lệ cấu trúc & cú pháp
 | Thành phần Skill | Cơ chế kiểm định | Tổng số gói | Hợp lệ cú pháp thô | Hợp lệ sau kiểm chuẩn | Tỷ lệ hợp lệ |
 | :--- | :--- | :---: | :---: | :---: | :---: |
-| SKILL.md | PyYAML Frontmatter + SOP | 50 | 47/50 (94.0%) | 50/50 | **100.00%** |
-| manifest.json | JSON Schema (AGENTS.md) | 50 | 43/50 (86.0%) | 50/50 | **100.00%** |
-| scripts/verify_threat.py | Python AST compile() | 50 | 37/50 (74.0%) | 50/50 | **100.00%** |
-| 
-eferences/c2_ip_indicators.txt | IPv4/Domain + Whitelist Check | 50 | 50/50 | 50/50 | **100.00%** |
+| `SKILL.md` | PyYAML Frontmatter + SOP | 50 | 47/50 (94.0%) | 50/50 | **100.00%** |
+| `manifest.json` | JSON Schema (AGENTS.md) | 50 | 43/50 (86.0%) | 50/50 | **100.00%** |
+| `scripts/verify_threat.py` | Python AST compile() | 50 | 37/50 (74.0%) | 50/50 | **100.00%** |
+| `references/c2_ip_indicators.txt` | IPv4/Domain + Whitelist Check | 50 | 50/50 | 50/50 | **100.00%** |
 
 ### Bảng 3: Tỷ lệ Skill thực thi bắt được mẫu thử
 | Kênh kiểm thử trong Skill | Cơ chế thực thi | Số bộ mẫu | Bắt trúng mẫu độc (TP) | Detection Rate (%) | Báo nhầm mẫu sạch (FP) |
 | :--- | :--- | :---: | :---: | :---: | :---: |
-| Log Telemetry Events | scripts/verify_threat.py (scan_artifact(log_event)) | 50 | 49/50 | **98.00%** | 0/50 (0%) |
-| Binary / Payload Buffer | scripts/verify_threat.py (scan_artifact(payload_bytes)) | 50 | 48/50 | **96.00%** | 0/50 (0%) |
-| Network C2 Indicators | 
-eferences/c2_ip_indicators.txt vs Clean DNS | 43 | 36/43 | **83.72%** | 0/43 (0%) |
+| Log Telemetry Events | `scripts/verify_threat.py` (scan_artifact(log_event)) | 50 | 49/50 | **98.00%** | 0/50 (0%) |
+| Binary / Payload Buffer | `scripts/verify_threat.py` (scan_artifact(payload_bytes)) | 50 | 48/50 | **96.00%** | 0/50 (0%) |
+| Network C2 Indicators | `references/c2_ip_indicators.txt` vs Clean DNS | 43 | 36/43 | **83.72%** | 0/43 (0%) |
 
 ---
 
 ## HƯỚNG DẪN TỰ CHẠY BENCHMARK 50 BẢN TIN CTI
-1. **Khởi chạy Web Workbench gán nhãn & so sánh trực quan** (cổng http://127.0.0.1:8780):
-   `ash
+1. **Khởi chạy Web Workbench gán nhãn & so sánh trực quan** (cổng `http://127.0.0.1:8780`):
+   ```bash
    python cti_core/benchmark/labeler_server.py
-   `
+   ```
 2. **Chạy đánh giá định lượng 3 bảng độc lập**:
-   `ash
+   ```bash
    python cti_core/benchmark/evaluate_50_articles.py --model qwen3:8b
-   `
+   ```
