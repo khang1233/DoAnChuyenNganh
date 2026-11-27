@@ -45,9 +45,16 @@ def extract_project_context(target_dir: Path) -> Dict[str, Any]:
         "total_source_files": 0
     }
 
+    ignored_patterns = {
+        ".git", "node_modules", "venv", ".venv", "dist", "build",
+        ".cursor", ".gemini", ".claude", ".continue", ".zed", ".idea",
+        ".codex", ".devin", ".amazonq", ".cody", ".jetbrains", ".kilo", ".agent",
+        "skills", "defense_skills", "__pycache__"
+    }
+
     # 1. Quét Frameworks & Dependencies
     for pkg_file in target_dir.glob("**/package.json"):
-        if any(ign in str(pkg_file) for ign in [".git", "node_modules", "defense_skills"]):
+        if any(ign in pkg_file.parts for ign in ignored_patterns):
             continue
         try:
             d = json.loads(pkg_file.read_text(encoding="utf-8", errors="ignore"))
@@ -59,7 +66,7 @@ def extract_project_context(target_dir: Path) -> Dict[str, Any]:
             pass
 
     for req_file in target_dir.glob("**/requirements*.txt"):
-        if any(ign in str(req_file) for ign in [".git", "node_modules", "defense_skills"]):
+        if any(ign in req_file.parts for ign in ignored_patterns):
             continue
         try:
             text = req_file.read_text(encoding="utf-8", errors="ignore").lower()
@@ -70,13 +77,12 @@ def extract_project_context(target_dir: Path) -> Dict[str, Any]:
             pass
 
     # 2. Quét các file mã nguồn và điểm nhạy cảm thực tế
-    ignored_patterns = [".git", "node_modules", "venv", ".venv", "dist", "build", ".cursor", ".gemini", ".claude", ".continue", ".zed", ".idea", "defense_skills"]
     exts = [".js", ".ts", ".jsx", ".tsx", ".py", ".php", ".go", ".java", ".cs"]
 
     for file_path in target_dir.glob("**/*"):
         if not file_path.is_file() or file_path.suffix not in exts:
             continue
-        if any(ign in str(file_path) for ign in ignored_patterns):
+        if any(ign in file_path.parts for ign in ignored_patterns):
             continue
 
         context["total_source_files"] += 1
@@ -143,8 +149,17 @@ def generate_context_blueprint_markdown(context: Dict[str, Any]) -> str:
         "",
         "### 1. Các File Khởi Chạy Trọng Tâm (Key Entrypoints):"
     ]
-    for ep in entrypoints[:8]:
-        lines.append(f"- `{ep}`")
+    if entrypoints:
+        for ep in entrypoints[:8]:
+            lines.append(f"- `{ep}`")
+    else:
+        lines.append("- *(Chưa ghi nhận entrypoint tiêu chuẩn)*")
+
+    if sinks:
+        lines.extend(["", "### 1b. Các Điểm Nóng Nhạy Cảm Phát Hiện Trong Mã Nguồn (Sensitive Sinks):"])
+        for s_file in sinks[:6]:
+            for fd in s_file.get("findings", [])[:2]:
+                lines.append(f"- `{s_file['file']}:{fd['line']}` ({fd['type']}): `{fd['snippet']}`")
 
     lines.extend([
         "",

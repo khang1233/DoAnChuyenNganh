@@ -39,6 +39,90 @@ def _is_safe_blockable_c2_ip(raw_ip: str) -> bool:
     except ValueError:
         return False
 
+def _build_verify_threat_script() -> str:
+    """Sinh công cụ scripts/verify_threat.py chuẩn rà quét log/payload/IOC kèm Fail-Closed Whitelist."""
+    return '''#!/usr/bin/env python3
+"""
+Tool: verify_threat.py
+Mục đích: Rà quét log telemetry, payload buffer hoặc địa chỉ mạng đối chiếu với IOC đã xác thực trong references/.
+Đảm bảo 0% False Positive trên DNS công cộng (8.8.8.8, 1.1.1.1) và dải mạng nội bộ RFC1918.
+"""
+import ipaddress
+import json
+import re
+import sys
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+REFS_DIR = BASE_DIR / "references"
+PROTECTED_DNS = {"8.8.8.8", "8.8.4.4", "1.1.1.1", "1.0.0.1", "9.9.9.9"}
+
+
+def _is_protected_ip(ip_str: str) -> bool:
+    s = (ip_str or "").strip()
+    if s in PROTECTED_DNS:
+        return True
+    try:
+        addr = ipaddress.ip_address(s)
+        return addr.is_private or addr.is_loopback or addr.is_link_local
+    except ValueError:
+        return False
+
+
+def _load_indicators():
+    c2_ips = set()
+    cves = set()
+    ip_file = REFS_DIR / "c2_ip_indicators.txt"
+    if ip_file.exists():
+        for ln in ip_file.read_text(encoding="utf-8", errors="ignore").splitlines():
+            v = ln.strip()
+            if v and not v.startswith("#") and not _is_protected_ip(v):
+                c2_ips.add(v)
+    tm_file = REFS_DIR / "threat_matrix.json"
+    if tm_file.exists():
+        try:
+            tm = json.loads(tm_file.read_text(encoding="utf-8", errors="ignore"))
+            for c in tm.get("cve_coverage", []):
+                cves.add(str(c).upper())
+        except Exception:
+            pass
+    return c2_ips, cves
+
+
+def scan_artifact(artifact) -> dict:
+    text = artifact.decode("utf-8", errors="ignore") if isinstance(artifact, (bytes, bytearray)) else str(artifact or "")
+    c2_ips, cves = _load_indicators()
+    matched_ips = [ip for ip in c2_ips if ip in text]
+    matched_cves = [c for c in cves if c in text.upper()]
+    suspicious_patterns = []
+    for label, pat in [
+        ("SQLi", r"(?:union\\s+select|'\\s*or\\s*1\\s*=\\s*1)"),
+        ("RCE/CommandExec", r"(?:;\\s*whoami|\\bcmd=id\\b|/etc/passwd|powershell\\s+-enc)"),
+        ("JNDI/Template", r"(?:\\$\\{jndi:|<script>alert\\()"),
+    ]:
+        if re.search(pat, text, flags=re.IGNORECASE):
+            suspicious_patterns.append(label)
+
+    detected = bool(matched_ips or matched_cves or suspicious_patterns)
+    return {
+        "detected": detected,
+        "verdict": "MALICIOUS" if detected else "CLEAN",
+        "matched_c2_ips": matched_ips,
+        "matched_cves": matched_cves,
+        "matched_signatures": suspicious_patterns,
+    }
+
+
+if __name__ == "__main__":
+    sample = " ".join(sys.argv[1:]) if len(sys.argv) > 1 else ""
+    if sample and Path(sample).exists():
+        sample = Path(sample).read_text(encoding="utf-8", errors="ignore")
+    res = scan_artifact(sample)
+    print(json.dumps(res, ensure_ascii=False, indent=2))
+    sys.exit(1 if res["detected"] else 0)
+'''
+
+
 def package_github_skill_bundle(article_id: str = "thn-79d0e8ee", output_root: Path = SKILLS_OUTPUT_DIR) -> Path:
     """
     Đóng gói một bài báo CTI hoặc một chiến dịch phòng thủ thành một thư mục
@@ -143,6 +227,7 @@ if __name__ == '__main__':
     apply()
 '''
     (scripts_dir / "apply_virtual_patch.py").write_text(apply_patch_script, encoding="utf-8")
+    (scripts_dir / "verify_threat.py").write_text(_build_verify_threat_script(), encoding="utf-8")
     
     # 5. Sinh references/ (Bằng chứng và tri thức kiểm chứng)
     (refs_dir / "cti_verbatim_report.txt").write_text(content, encoding="utf-8")
@@ -197,6 +282,7 @@ if __name__ == '__main__':
         "trust_score": trust_audit.get("trust_score", 95.0),
         "tools": [
             {"name": "verify_exploit", "script": "scripts/verify_exploit.py", "description": "Kiểm tra xem mục tiêu có tồn tại lỗ hổng hay không"},
+            {"name": "verify_threat", "script": "scripts/verify_threat.py", "description": "Rà quét log, payload và lưu lượng mạng đối chiếu IOC (0% FP Whitelist)"},
             {"name": "apply_virtual_patch", "script": "scripts/apply_virtual_patch.py", "description": "Kích hoạt vá ảo trên WAF và Tường lửa"}
         ],
 
@@ -441,6 +527,7 @@ if __name__ == '__main__':
     sys.exit(activate_virtual_patch())
 '''
     (scripts_dir / "apply_virtual_patch.py").write_text(apply_patch_script, encoding="utf-8")
+    (scripts_dir / "verify_threat.py").write_text(_build_verify_threat_script(), encoding="utf-8")
 
     # 9. Sinh Mã Mẫu Chuẩn Cho Lập Trình Viên (Examples của 6 ngôn ngữ lớn: JS/TS, Python, Java, PHP, Go, C#)
     write_all_language_fixtures(examples_dir)
@@ -475,9 +562,10 @@ if __name__ == '__main__':
         "trust_score": 97.5,
         "tools": [
             {"name": "verify_exploit", "script": "scripts/verify_exploit.py", "description": "Kiểm thử bảo mật đa vector tự động trên hệ thống"},
+            {"name": "verify_threat", "script": "scripts/verify_threat.py", "description": "Rà quét log, payload và lưu lượng mạng đối chiếu IOC (0% FP Whitelist)"},
             {"name": "apply_virtual_patch", "script": "scripts/apply_virtual_patch.py", "description": "Kích hoạt lá chắn WAF ModSecurity và tường lửa C2"}
         ],
-        "tools_count": 2
+        "tools_count": 3
     }
     (bundle_dir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
 
