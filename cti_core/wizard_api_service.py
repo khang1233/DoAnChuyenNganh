@@ -761,7 +761,7 @@ def wizard_crawl_scope(target: str, scope_id: str, history_years: int = 3, live_
             if len(r_cves) > 0:
                 skills_generated.append(f"Kỹ năng phòng thủ {r_cves[0]} & Script Probe")
             if len(r_ips) > 0:
-                skills_generated.append(f"Lá chắn Netsh chặn IP C2 {r_ips[0]}")
+                skills_generated.append(f"Tích hợp IOC {r_ips[0]} vào Skill verify_threat")
             if not skills_generated:
                 skills_generated.append("Kỹ năng tác tử: Refactor Whitelist & RCE Shield")
 
@@ -976,7 +976,7 @@ def wizard_verify_exploit(target: str, skill_name: str) -> Dict[str, Any]:
     is_vulnerable = len(unpatched_hits) > 0
     if unpatched_hits:
         output_lines.append(f"[!] PHÁT HIỆN MÃ NGUỒN CHƯA VÁ (TRUE POSITIVE): {', '.join(unpatched_hits)}")
-        output_lines.append("[*] Hãy nhấn 'Kích Hoạt WAF & Netsh' hoặc 'Tự Động Vá Mã Nguồn' để triệt tiêu điểm yếu.")
+        output_lines.append("[*] Hãy chạy 'scripts/verify_threat.py' hoặc nhấn 'Tự Động Vá Mã Nguồn' để triệt tiêu điểm yếu.")
     else:
         output_lines.append("[+] KIỂM TRA MÃ NGUỒN: Không còn mẫu lỗ hổng RCE/Eval trực tiếp chưa xử lý.")
         if waf_blocked:

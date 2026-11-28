@@ -2305,7 +2305,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
           [OK] THẨM ĐỊNH TIN CẬY &amp; xAI (TRUST AUDIT)
         </button>
         <button id="mainTabBtn_engines" class="CleanBtn MasterTabBtn" onclick="switchMasterTab('tabEnginesMaster', this)" style="padding:10px 14px; font-size:12.5px; font-weight:700; color:var(--text-main); border-color:var(--border-main); background:#ffffff; text-align:center;">
-          CÔNG CỤ THỰC THI &amp; KIỂM CHỨNG TÁC TỬ (AGENT PLAYBOOK &amp; PROBES)
+          SUY LUẬN NGỮ CẢNH &amp; KIỂM CHỨNG SKILL (PROBES)
         </button>
       </div>
 
@@ -2349,122 +2349,58 @@ HTML_PAGE = r"""<!DOCTYPE html>
         </div>
       </div>
 
-      <!-- MASTER TAB 3: 5 LỚP PHÒNG THỦ KỸ THUẬT & LIVE TEST -->
+      <!-- MASTER TAB 3: SUY LUẬN NGỮ CẢNH MITRE D3FEND & KIỂM CHỨNG SKILL (THAY THẾ TAB RULE TĨNH) -->
       <div id="tabEnginesMaster" class="MasterTabPanel" style="display:none;">
-        <!-- THANH CHUYỂN SUB-TAB PHÒNG THỦ 1 DÒNG DUY NHẤT -->
+        <!-- THANH CHUYỂN SUB-TAB THUẦN SKILL -->
         <div style="display:flex; flex-wrap:wrap; gap:6px; padding:8px 10px; margin-bottom:12px; background:var(--bg-subtle); border:1px solid var(--border-main); border-radius:6px;">
-          <button id="subBtn_subTabWaf" class="CleanBtn EngineSubBtn active btn-primary" onclick="switchEngineSubTab('subTabWaf', this)" style="font-size:12px;">
-            1. Vá Ảo Hóa L7 (Virtual Patching)
-          </button>
-          <button id="subBtn_subTabSuricata" class="CleanBtn EngineSubBtn" onclick="switchEngineSubTab('subTabSuricata', this)" style="font-size:12px;">
-            2. Chữ Ký Kiểm Định Tầng Mạng (DPI Probe)
-          </button>
-          <button id="subBtn_subTabFirewall" class="CleanBtn EngineSubBtn" onclick="switchEngineSubTab('subTabFirewall', this)" style="font-size:12px;">
-            3. Lệnh Tác Tử Chặn C2 (OpenC2 Action)
-          </button>
-          <button id="subBtn_subTabSigma" class="CleanBtn EngineSubBtn" onclick="switchEngineSubTab('subTabSigma', this)" style="font-size:12px;">
-            4. Tương Quan Hành Vi TTPs (Sysmon & SIEM)
-          </button>
-          <button id="subBtn_subTabYara" class="CleanBtn EngineSubBtn" onclick="switchEngineSubTab('subTabYara', this)" style="font-size:12px;">
-            5. Nhận Diện Mã Độc (YARA & EDR)
-          </button>
-          <button id="subBtn_subTabHistory" class="CleanBtn EngineSubBtn" onclick="switchEngineSubTab('subTabHistory', this)" style="font-size:12px;">
-            6. Ma Trận Phòng Thủ MITRE D3FEND
+          <button id="subBtn_subTabHistory" class="CleanBtn EngineSubBtn active btn-primary" onclick="switchEngineSubTab('subTabHistory', this)" style="font-size:12px;">
+            1. Phân Tích Ngữ Cảnh &amp; Đối Sách MITRE D3FEND
           </button>
           <button id="subBtn_subTabLiveServer" class="CleanBtn EngineSubBtn" onclick="switchEngineSubTab('subTabLiveServer', this)" style="font-size:12px;">
-            7. Môi Trường Thực Nghiệm (Port 8766)
+            2. Kiểm Thử Thực Thi Kỹ Năng (Sandbox Probe :8766)
           </button>
         </div>
 
-        <!-- SUB-PANEL 1: WAF -->
-        <div id="subTabWaf" class="EngineSubPanel" style="display:block;">
-          <pre id="outWaf">Đang chờ...</pre>
+        <!-- GIỮ ẨN CÁC CONTAINER ĐỂ ĐỒNG BỘ CACHE MÀ KHÔNG HIỂN THỊ RULE TĨNH -->
+        <div style="display:none;">
+          <div id="subTabWaf"><pre id="outWaf"></pre></div>
+          <div id="subTabSuricata"><span id="suriFileInfoBadge"></span><pre id="outSuricata"></pre></div>
+          <div id="subTabFirewall"><pre id="outFirewall"></pre></div>
+          <div id="subTabSigma"><pre id="outSigma"></pre></div>
+          <div id="subTabYara"><pre id="outYara"></pre></div>
         </div>
 
-        <!-- SUB-PANEL 2: SURICATA -->
-        <div id="subTabSuricata" class="EngineSubPanel" style="display:none;">
-          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; padding:12px 14px; margin-bottom:10px; border:1px solid var(--border-main); border-radius:6px; background:var(--bg-subtle);">
-            <div>
-              <span style="font-size:12px; font-weight:700; color:var(--primary); background:var(--primary-subtle); padding:3px 8px; border-radius:4px; border:1px solid #bfdbfe;">
-                SURICATA IDS/IPS MASTER DEEP PACKET INSPECTION (DPI)
-              </span>
-              <span style="font-size:12px; color:var(--text-muted); margin-left:8px;" id="suriFileInfoBadge">
-                Tệp: cti_autonomous_master.rules (422 Dòng • 87.8 KB • 11 Cụm C2 • 180 Domain Sinkhole • CVE Virtual Patching)
-              </span>
-            </div>
-            <div style="display:flex; gap:8px;">
-              <button class="CleanBtn btn-primary" onclick="validateSuricataRules()">Kiểm Tra Cú Pháp</button>
-              <button class="CleanBtn" onclick="testSuricataDpi('c2_flow')">Test DPI C2 Flow</button>
-              <button class="CleanBtn" onclick="testSuricataDpi('dns_sinkhole')">Test DNS Sinkhole</button>
-              <button class="CleanBtn" onclick="testSuricataDpi('cve_dpi')">Test CVE DPI</button>
-            </div>
-          </div>
-          <pre id="outSuricata" style="max-height:600px; overflow-y:auto; font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.45;">Đang tải toàn bộ quy tắc Suricata Master...</pre>
+        <!-- SUB-PANEL 1: D3FEND & AI REASONING -->
+        <div id="subTabHistory" class="EngineSubPanel" style="display:block;">
+          <pre id="outHistory">Đang chờ tổng hợp phân tích ngữ cảnh &amp; chiến lược phòng thủ từ Agent...</pre>
         </div>
 
-        <!-- SUB-PANEL 3: FIREWALL OPENC2 -->
-        <div id="subTabFirewall" class="EngineSubPanel" style="display:none;">
-          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; padding:12px 14px; margin-bottom:10px; border:1px solid var(--border-main); border-radius:6px; background:var(--bg-subtle);">
-            <span style="font-size:13px; color:var(--text-main);">Đẩy trực tiếp gói lệnh chuẩn <b>OASIS OpenC2</b> xuống <b>Windows Defender Firewall</b>:</span>
-            <div style="display:flex; gap:8px;">
-              <button class="CleanBtn btn-primary" id="btnFwApply" onclick="applyWindowsFirewallTool()">Áp Dụng Firewall</button>
-              <button class="CleanBtn" id="btnFwStatus" onclick="checkWindowsFirewallStatusTool()">Kiểm Tra Trạng Thái</button>
-              <button class="CleanBtn" id="btnFwRollback" style="color:var(--danger); border-color:var(--danger-border);" onclick="rollbackWindowsFirewallTool()">Gỡ Luật Thử Nghiệm</button>
-            </div>
-          </div>
-          <pre id="outFirewall">Đang chờ...</pre>
-        </div>
-
-        <!-- SUB-PANEL 4: SIGMA & SIEM -->
-        <div id="subTabSigma" class="EngineSubPanel" style="display:none;">
-          <pre id="outSigma">Đang chờ...</pre>
-        </div>
-
-        <!-- SUB-PANEL 5: YARA & EDR -->
-        <div id="subTabYara" class="EngineSubPanel" style="display:none;">
-          <pre id="outYara">Đang chờ...</pre>
-        </div>
-
-        <!-- SUB-PANEL 6: D3FEND -->
-        <div id="subTabHistory" class="EngineSubPanel" style="display:none;">
-          <pre id="outHistory">Đang chờ tổng hợp chiến lược phòng thủ...</pre>
-        </div>
-
-        <!-- SUB-PANEL 7: LIVE SERVER -->
+        <!-- SUB-PANEL 2: LIVE PROBE SANDBOX -->
         <div id="subTabLiveServer" class="EngineSubPanel" style="display:none;">
-          <!-- HEADER TRẠNG THÁI MÁY CHỦ -->
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; padding:12px 14px; margin-bottom:12px; border:1px solid var(--border-main); border-radius:6px; background:var(--bg-subtle);">
             <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
               <span style="font-size:11.5px; font-weight:700; padding:3px 8px; background:var(--safe-bg); color:var(--safe); border:1px solid var(--safe-border); border-radius:4px;">
-                MÁY CHỦ WAF REVERSE PROXY: CỔNG 8766 (RUNNING LIVE)
+                SANDBOX KIỂM CHỨNG SKILL LIVE: CỔNG 8766
               </span>
               <span style="font-size:11.5px; font-weight:700; padding:3px 8px; background:var(--primary-subtle); color:var(--primary); border:1px solid #bfdbfe; border-radius:4px;">
                 <span id="lblCorpusStats1">KHO TRI THỨC PHÂN HỆ: 0 BÀI BÁO &amp; 0 IOCs</span>
               </span>
             </div>
             <div>
-              <button class="CleanBtn btn-primary" onclick="recompileAllDefenseEngines()" style="font-size:12px;">Đồng Bộ &amp; Tái Biên Dịch Rule (Hot-Reload)</button>
+              <button class="CleanBtn btn-primary" onclick="recompileAllDefenseEngines()" style="font-size:12px;">Cập Nhật &amp; Đồng Bộ Kho Kỹ Năng Tác Tử</button>
             </div>
           </div>
 
-          <!-- 5 ENGINE PHÒNG THỦ LIVE TRÊN HỆ THỐNG -->
-          <div style="margin-bottom:14px;">
-            <div style="font-size:12px; font-weight:700; color:var(--text-muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.04em;">
-              TÌNH TRẠNG 5 ENGINE PHÒNG THỦ ĐÃ BIÊN DỊCH VÀ SẴN SÀNG THỰC CHIẾN:
-            </div>
-            <div id="liveEnginesGrid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:10px;">
-              <!-- Render động bằng JS -->
-            </div>
-          </div>
+          <div style="display:none;"><div id="liveEnginesGrid"></div></div>
         </div>
 
-        <!-- BẢNG THỬ NGHIỆM TẤN CÔNG THỰC TẾ LÊN WAF PROXY CỔNG 8766 -->
+        <!-- BẢNG KIỂM THỬ PAYLOAD THỰC TẾ TRONG SANDBOX (PORT 8766) -->
         <div style="border:1px solid var(--border-main); border-radius:6px; padding:14px; margin-bottom:14px; background:var(--bg-card);">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
             <div>
-              <b style="font-size:13.5px; color:var(--text-main);">CONSOLE THỬ NGHIỆM TẤN CÔNG WAF THỰC TẾ (PORT 8766)</b>
+              <b style="font-size:13.5px; color:var(--text-main);">CONSOLE KIỂM CHỨNG PAYLOAD KỸ NĂNG TRONG SANDBOX (PORT 8766)</b>
               <div style="font-size:12px; color:var(--text-muted);">
-                Bắn gói tin trực tiếp vào máy chủ WAF để kiểm tra khả năng bắt payload L7 (RCE, SQLi, Path Traversal, JNDI) và trả về HTTP 403 Forbidden.
+                Bắn gói tin thử nghiệm để tác tử kiểm chứng phát hiện payload (RCE, SQLi, Path Traversal, JNDI) và xác nhận 0% báo nhầm gói tin sạch.
               </div>
             </div>
             <div style="display:flex; gap:6px; flex-wrap:wrap;">
@@ -9158,12 +9094,12 @@ def api_step4_correlate_and_generate_code(req: Step4GenerateRequest):
     llm_gen = brain.ask_llm(
         system_prompt=(
             f"Bạn là Chuyên gia Phòng thủ An ninh mạng (Local AI Agent chạy trên {CURRENT_HARDWARE.get('gpu_name', 'Local Compute')}). "
-            "Dựa vào TIÊU ĐỀ, NỘI DUNG BÀI BÁO và DANH SÁCH IOC ĐỘC HẠI cụ thể bên dưới, hãy viết phương án phòng thủ "
+            "Dựa vào TIÊU ĐỀ, NỘI DUNG BÀI BÁO và DANH SÁCH IOC ĐỘC HẠI cụ thể bên dưới, hãy viết phân tích đóng gói Gói Kỹ Năng Tác Tử (`SKILL.md`) "
             "BẰNG TIẾNG VIỆT (ngắn gọn, súc tích trong 4 gạch đầu dòng, nêu đích danh tên mã độc/nhóm APT và các mã IP/Domain/CVE trong bài): "
-            "1. Bản chất cuộc tấn công trong bài báo này là gì (nhắm vào đâu, dùng lỗ hổng hay mã độc nào)? "
-            "2. Cần chặn ngay những IP/Domain nào ở Tường lửa OpenC2 & Suricata IPS? "
-            "3. Cần vá ảo (WAF) lỗ hổng CVE nào hoặc quét YARA/SIEM hành vi gì trên máy trạm? "
-            "4. Khuyến nghị khẩn cấp cho Quản trị viên hệ thống."
+            "1. Bản chất cuộc tấn công & bề mặt ảnh hưởng trong bài báo là gì (dùng lỗ hổng CVE hay mã độc nào)? "
+            "2. Những chỉ số IOC & dấu hiệu hành vi nào cần đưa vào `references/` và công cụ `scripts/verify_threat.py` (giữ Whitelist DNS/nội bộ an toàn)? "
+            "3. AI Coding Agent cần bổ sung chỉ dẫn phòng tránh và mẫu sửa mã nguồn (`examples/` & `SKILL.md`) nào để xử lý tận gốc? "
+            "4. Khuyến nghị hành động ưu tiên cho Quản trị viên."
         ),
         user_prompt=(
             f"Tiêu đề chiến dịch: {req.title}\n"

@@ -105,10 +105,11 @@ def test_master_skill_bundle_and_verify_threat_execution():
             "scripts/verify_exploit.py",
             "scripts/verify_threat.py",
             "scripts/apply_virtual_patch.py",
-            "rules/waf_modsecurity.conf",
             "references/c2_ip_indicators.txt",
+            "examples/patched_secure_sample.py",
         ):
             assert (bundle / rel).exists(), f"Missing {rel}"
+        assert not (bundle / "rules").exists(), "Must not generate static rules/ directory in pure Skill bundle"
 
         spec = importlib.util.spec_from_file_location("verify_threat", bundle / "scripts" / "verify_threat.py")
         mod = importlib.util.module_from_spec(spec)
